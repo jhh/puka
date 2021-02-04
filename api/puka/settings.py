@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -78,11 +79,11 @@ WSGI_APPLICATION = "puka.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "puka",
-        "USER": "jeff",
-        "PASSWORD": "",
-        "HOST": "127.0.0.1",
-        "PORT": "5432",
+        "NAME": os.environ["PUKA_DB"],
+        "USER": os.environ["PUKA_DB_USER"],
+        "PASSWORD": os.environ["PUKA_DB_PASSWORD"],
+        "HOST": os.environ["PUKA_DB_HOST"],
+        "PORT": os.environ["PUKA_DB_PORT"],
     }
 }
 
