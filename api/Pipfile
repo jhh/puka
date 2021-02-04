@@ -6,6 +6,7 @@ verify_ssl = true
 [packages]
 django = "*"
 graphene-django = "*"
+psycopg2 = "*"
 
 [dev-packages]
 black = "*"

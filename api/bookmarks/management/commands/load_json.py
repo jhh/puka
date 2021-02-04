@@ -20,9 +20,9 @@ class Command(BaseCommand):
             json_array = json.load(f)
 
         for bm in json_array:
-            title = bm["title"]
+            title = bm["title"][:120]
             description = bm.get("description", "")
-            url = bm["url"]
+            url = bm["url"][:200]
             # tags = bm["tags"]
             created_at = parse_datetime(bm["timestamp"]["$date"])
             print(f"{title} - {created_at}")
