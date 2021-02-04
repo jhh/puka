@@ -23,10 +23,14 @@ class Command(BaseCommand):
             title = bm["title"][:120]
             description = bm.get("description", "")
             url = bm["url"][:200]
-            # tags = bm["tags"]
+            tags = bm["tags"]
             created_at = parse_datetime(bm["timestamp"]["$date"])
             print(f"{title} - {created_at}")
             bookmark = Bookmark(
-                title=title, description=description, url=url, created_at=created_at
+                title=title,
+                description=description,
+                url=url,
+                tags=tags,
+                created_at=created_at,
             )
             bookmark.save()
