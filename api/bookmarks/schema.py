@@ -1,4 +1,5 @@
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
+from django.db.models import F
 from graphene import Int, List, ObjectType, String
 from graphene_django import DjangoObjectType
 from graphql import GraphQLError
@@ -9,6 +10,7 @@ from .models import Bookmark
 class BookmarkType(DjangoObjectType):
     class Meta:
         model = Bookmark
+        fields = ("id", "title", "description", "url", "tags", "created_at")
 
 
 class Query(ObjectType):
@@ -21,14 +23,13 @@ class Query(ObjectType):
 
     def resolve_bookmarks(self, info, offset, limit, search=None):
         if search:
-            vector = SearchVector("title", weight="A") + SearchVector(
-                "description", weight="B"
-            )
             query = SearchQuery(search, search_type="websearch", config="english")
             return (
-                Bookmark.objects.annotate(rank=SearchRank(vector, query))
+                Bookmark.objects.annotate(
+                    rank=SearchRank(F("title_description_search"), query)
+                )
                 .filter(rank__gte=0.1)
                 .order_by("-rank")[offset : offset + limit]
             )
 
-        return Bookmark.objects.exclude(description__exact="")[offset : offset + limit]
+        return Bookmark.objects.all()[offset : offset + limit]
