@@ -10,7 +10,7 @@ from .models import Bookmark
 class BookmarkType(DjangoObjectType):
     class Meta:
         model = Bookmark
-        fields = ("id", "title", "description", "url", "tags", "created_at")
+        exclude = ("title_description_search",)
 
 
 class Query(ObjectType):
