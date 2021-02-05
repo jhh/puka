@@ -5,9 +5,11 @@ verify_ssl = true
 
 [packages]
 django = "*"
-graphene-django = "*"
+graphene-django = "<3"
 psycopg2 = "*"
 django-extensions = "*"
+pyjwt = "<2"
+django-graphql-jwt = "*"
 
 [dev-packages]
 black = "*"
