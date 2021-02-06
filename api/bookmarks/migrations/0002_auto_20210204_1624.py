@@ -17,7 +17,6 @@ def forwards_func(apps, schema_editor):
     for b in bookmarks:
         fields = b["fields"]
         bookmark = Bookmark(
-            id=b["pk"],
             title=fields["title"],
             description=fields["description"],
             url=fields["url"],
