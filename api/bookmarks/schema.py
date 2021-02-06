@@ -15,11 +15,21 @@ class BookmarkType(DjangoObjectType):
 
 
 class Query(ObjectType):
+    OFFSET = 0
+    LIMIT = 10
+
     bookmarks = List(
         BookmarkType,
         search=String(),
-        offset=Int(default_value=0),
-        limit=Int(default_value=10),
+        offset=Int(default_value=OFFSET),
+        limit=Int(default_value=LIMIT),
+    )
+
+    bookmarks_by_tag = List(
+        BookmarkType,
+        tags=graphene.List(graphene.String, required=True),
+        offset=Int(default_value=OFFSET),
+        limit=Int(default_value=LIMIT),
     )
 
     def resolve_bookmarks(self, info, offset, limit, search=None):
@@ -34,6 +44,11 @@ class Query(ObjectType):
             )
 
         return Bookmark.objects.all().order_by("-created_at")[offset : offset + limit]
+
+    def resolve_bookmarks_by_tag(self, info, tags, offset, limit):
+        return Bookmark.objects.filter(tags__overlap=tags).order_by("-created_at")[
+            offset : offset + limit
+        ]
 
 
 class CreateBookmark(graphene.Mutation):
