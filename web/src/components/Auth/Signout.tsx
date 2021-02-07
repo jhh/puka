@@ -1,5 +1,7 @@
-import React from "react";
+import Button from "@material-ui/core/Button";
 
-const Login = () => <div>Signout</div>;
+const Login = () => {
+  return <Button color="inherit">Sign Out</Button>;
+};
 
 export default Login;
