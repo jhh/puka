@@ -10,6 +10,7 @@ psycopg2 = "*"
 django-extensions = "*"
 pyjwt = "<2"
 django-graphql-jwt = "*"
+django-cors-headers = "*"
 
 [dev-packages]
 black = "*"
