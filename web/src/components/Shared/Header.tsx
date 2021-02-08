@@ -9,7 +9,7 @@ import Signout from "../Auth/Signout";
 const Header = () => {
   const classes = useStyles();
   return (
-    <AppBar className={classes.root}>
+    <AppBar position="sticky" className={classes.root}>
       <Toolbar>
         <BookmarksIcon className={classes.icon} />
         <Typography variant="h6" className={classes.title}>

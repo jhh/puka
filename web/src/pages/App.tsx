@@ -1,19 +1,44 @@
-import { ApolloClient, gql, InMemoryCache } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
+import Container from "@material-ui/core/Container";
+// import { createStyles, makeStyles } from "@material-ui/core/styles";
+import Loading from "../components/Shared/Loading";
+import Error from "../components/Shared/Error";
+import { BookmarkData } from "../components/Shared/types";
+import BookmarkList from "../components/Bookmark/BookmarkList";
 
-const client = new ApolloClient({
-  uri: "http://localhost:8000/graphql/",
-  cache: new InMemoryCache(),
-});
+const App = () => {
+  // const classes = useStyles();
+  const { loading, error, data } = useQuery<BookmarkData>(BOOKMARKS_QUERY);
 
-function App() {
-  return <div>App</div>;
-}
+  let content: JSX.Element;
+
+  if (error) {
+    content = <Error />;
+  } else if (loading) {
+    content = <Loading />;
+  } else if (data) {
+    content = <BookmarkList bookmarks={data.bookmarks} />;
+  } else {
+    content = <></>;
+  }
+
+  return <Container>{content}</Container>;
+};
+
+// const useStyles = makeStyles(() =>
+//   createStyles({
+//     root: {
+//       margin: "0 auto",
+//     },
+//   })
+// );
 
 export default App;
 
 const BOOKMARKS_QUERY = gql`
   {
-    bookmarks {
+    bookmarks(offset: 0, limit: 50) {
+      id
       title
       description
       url
@@ -22,5 +47,3 @@ const BOOKMARKS_QUERY = gql`
     }
   }
 `;
-
-client.query({ query: BOOKMARKS_QUERY }).then((res) => console.log(res));

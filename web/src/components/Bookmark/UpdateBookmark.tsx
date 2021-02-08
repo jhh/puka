@@ -1,3 +1,10 @@
-const Login = () => <div>UpdateBookmark</div>;
+import IconButton from "@material-ui/core/IconButton";
+import EditIcon from "@material-ui/icons/Edit";
 
-export default Login;
+const UpdateBookmark = () => (
+  <IconButton>
+    <EditIcon />
+  </IconButton>
+);
+
+export default UpdateBookmark;
