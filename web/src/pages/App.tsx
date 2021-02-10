@@ -37,7 +37,7 @@ export default App;
 
 const BOOKMARKS_QUERY = gql`
   {
-    bookmarks(offset: 0, limit: 50) {
+    bookmarks(offset: 0, limit: 100) {
       id
       title
       description

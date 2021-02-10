@@ -2,36 +2,34 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import ListItemText from "@material-ui/core/ListItemText";
-// import { FixedSizeList, ListChildComponentProps } from "react-window";
-import { BookmarkData } from "../Shared/types";
-import UpdateBookmark from "./UpdateBookmark";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import { Typography } from "@material-ui/core";
+import { BookmarkData } from "../Shared/types";
+import Link from "@material-ui/core/Link";
+import UpdateBookmark from "./UpdateBookmark";
+import TagList from "../Tag/TagList";
 
 type Props = BookmarkData;
-
-function openInNewTab(url: string) {
-  const newWindow = window.open(url, "_blank", "noopener,noreferrer");
-  if (newWindow) newWindow.opener = null;
-}
 
 const BookmarkList = ({ bookmarks }: Props) => {
   const classes = useStyles();
   return (
     <List dense>
       {bookmarks.map((bm) => (
-        <ListItem button key={bm.id} onClick={() => openInNewTab(bm.url)}>
+        <ListItem key={bm.id}>
           <ListItemText
-            primary={bm.title}
+            primary={
+              <Link href={bm.url} target="_blank" rel="noreferrer">
+                {bm.title}
+              </Link>
+            }
             primaryTypographyProps={{ variant: "subtitle1", color: "primary" }}
             secondary={
               <>
                 {bm.description}
-                <Typography variant="body2" color="textPrimary">
-                  {bm.tags.join(", ")}
-                </Typography>
+                <TagList tags={bm.tags} />
               </>
             }
+            secondaryTypographyProps={{ component: "div" }}
             className={classes.listText}
           />
           <ListItemSecondaryAction>
