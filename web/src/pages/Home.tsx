@@ -6,7 +6,7 @@ import Error from "../components/Shared/Error";
 import { BookmarkData } from "../components/Shared/types";
 import BookmarkList from "../components/Bookmark/BookmarkList";
 
-const App = () => {
+const Home = () => {
   // const classes = useStyles();
   const { loading, error, data } = useQuery<BookmarkData>(BOOKMARKS_QUERY);
 
@@ -33,7 +33,7 @@ const App = () => {
 //   })
 // );
 
-export default App;
+export default Home;
 
 const BOOKMARKS_QUERY = gql`
   {
