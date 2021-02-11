@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "puka"
+version = "0.1.0"
+description = "Puka Bookmarks API"
+authors = ["Jeff Hutchison <jeff@jeffhutchison.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+Django = "^3.1.6"
+django-cors-headers = "^3.7.0"
+django-extensions = "^3.1.0"
+django-graphql-jwt = "^0.3.1"
+graphene-django = "^2.1.5"
+PyJWT = "^1.7.1"
+psycopg2 = "^2.8.6"
+
+[tool.poetry.dev-dependencies]
+black = "^20.8b1"
+ptpython = "^3.0.14"
+python-dotenv = "^0.15.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
