@@ -65,7 +65,7 @@ python-versions = "*"
 
 [[package]]
 name = "django"
-version = "3.1.6"
+version = "3.1.7"
 description = "A high-level Python Web framework that encourages rapid development and clean, pragmatic design."
 category = "main"
 optional = false
@@ -271,7 +271,7 @@ test = ["pytest (>=2.7.3)", "pytest-cov", "coveralls", "futures", "pytest-benchm
 
 [[package]]
 name = "prompt-toolkit"
-version = "3.0.15"
+version = "3.0.16"
 description = "Library for building powerful interactive command lines in Python"
 category = "dev"
 optional = false
@@ -290,7 +290,7 @@ python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*"
 
 [[package]]
 name = "ptpython"
-version = "3.0.14"
+version = "3.0.16"
 description = "Python REPL build on top of prompt_toolkit"
 category = "dev"
 optional = false
@@ -300,7 +300,7 @@ python-versions = ">=3.6"
 appdirs = "*"
 black = "*"
 jedi = ">=0.16.0"
-prompt-toolkit = ">=3.0.12,<3.1.0"
+prompt-toolkit = ">=3.0.16,<3.1.0"
 pygments = "*"
 
 [package.extras]
@@ -308,7 +308,7 @@ ptipython = ["ipython"]
 
 [[package]]
 name = "pygments"
-version = "2.7.4"
+version = "2.8.0"
 description = "Pygments is a syntax highlighting package written in Python."
 category = "dev"
 optional = false
@@ -331,7 +331,7 @@ test = ["pytest (>=4.0.1,<5.0.0)", "pytest-cov (>=2.6.0,<3.0.0)", "pytest-runner
 name = "python-dotenv"
 version = "0.15.0"
 description = "Add .env support to your django/flask apps in development and deployments"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -443,7 +443,7 @@ brotli = ["brotli"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "6e1f73de634bde9691327c85366323f4475317ea395e79d6183aedae604abde9"
+content-hash = "9c9fd2e6af949a57aa0f8a019c5247f99dae2fd0bcb334e10b69e54e139c5b34"
 
 [metadata.files]
 aniso8601 = [
@@ -470,8 +470,8 @@ dj-database-url = [
     {file = "dj_database_url-0.5.0-py2.py3-none-any.whl", hash = "sha256:851785365761ebe4994a921b433062309eb882fedd318e1b0fcecc607ed02da9"},
 ]
 django = [
-    {file = "Django-3.1.6-py3-none-any.whl", hash = "sha256:169e2e7b4839a7910b393eec127fd7cbae62e80fa55f89c6510426abf673fe5f"},
-    {file = "Django-3.1.6.tar.gz", hash = "sha256:c6c0462b8b361f8691171af1fb87eceb4442da28477e12200c40420176206ba7"},
+    {file = "Django-3.1.7-py3-none-any.whl", hash = "sha256:baf099db36ad31f970775d0be5587cc58a6256a6771a44eb795b554d45f211b8"},
+    {file = "Django-3.1.7.tar.gz", hash = "sha256:32ce792ee9b6a0cbbec340123e229ac9f765dff8c2a4ae9247a14b2ba3a365a7"},
 ]
 django-cors-headers = [
     {file = "django-cors-headers-3.7.0.tar.gz", hash = "sha256:96069c4aaacace786a34ee7894ff680780ec2644e4268b31181044410fecd12e"},
@@ -529,8 +529,8 @@ promise = [
     {file = "promise-2.3.tar.gz", hash = "sha256:dfd18337c523ba4b6a58801c164c1904a9d4d1b1747c7d5dbf45b693a49d93d0"},
 ]
 prompt-toolkit = [
-    {file = "prompt_toolkit-3.0.15-py3-none-any.whl", hash = "sha256:4ccd91f540ef57732d38451889b915ab75a78e04f427e9f2811ff9da0332a174"},
-    {file = "prompt_toolkit-3.0.15.tar.gz", hash = "sha256:1411dc3c26dfbfb55b88d8239484b2f2a9df4e69e67965711b187c8917bff872"},
+    {file = "prompt_toolkit-3.0.16-py3-none-any.whl", hash = "sha256:62c811e46bd09130fb11ab759012a4ae385ce4fb2073442d1898867a824183bd"},
+    {file = "prompt_toolkit-3.0.16.tar.gz", hash = "sha256:0fa02fa80363844a4ab4b8d6891f62dd0645ba672723130423ca4037b80c1974"},
 ]
 psycopg2 = [
     {file = "psycopg2-2.8.6-cp27-cp27m-win32.whl", hash = "sha256:068115e13c70dc5982dfc00c5d70437fe37c014c808acce119b5448361c03725"},
@@ -550,12 +550,12 @@ psycopg2 = [
     {file = "psycopg2-2.8.6.tar.gz", hash = "sha256:fb23f6c71107c37fd667cb4ea363ddeb936b348bbd6449278eb92c189699f543"},
 ]
 ptpython = [
-    {file = "ptpython-3.0.14-py2.py3-none-any.whl", hash = "sha256:df579d8cccb0639279efb0b5df2d4775866c428c5a7798ba5d07d36641fa44b7"},
-    {file = "ptpython-3.0.14.tar.gz", hash = "sha256:56d4a0905caddf3e26fb14b16a9cbfca3fbf23b73a6452de237937a69e9386b8"},
+    {file = "ptpython-3.0.16-py2.py3-none-any.whl", hash = "sha256:f153f5c48cad54bd57cbe19ee0b652fd3f9c4437923cfabb27dc33aea727696f"},
+    {file = "ptpython-3.0.16.tar.gz", hash = "sha256:4b0f6e381a8251ec8d6aa94fe12f3400bf6edf789f89c8a6099f8a91d4a5d2e1"},
 ]
 pygments = [
-    {file = "Pygments-2.7.4-py3-none-any.whl", hash = "sha256:bc9591213a8f0e0ca1a5e68a479b4887fdc3e75d0774e5c71c31920c427de435"},
-    {file = "Pygments-2.7.4.tar.gz", hash = "sha256:df49d09b498e83c1a73128295860250b0b7edd4c723a32e9bc0d295c7c2ec337"},
+    {file = "Pygments-2.8.0-py3-none-any.whl", hash = "sha256:b21b072d0ccdf29297a82a2363359d99623597b8a265b8081760e4d0f7153c88"},
+    {file = "Pygments-2.8.0.tar.gz", hash = "sha256:37a13ba168a02ac54cc5891a42b1caec333e59b66addb7fa633ea8a6d73445c0"},
 ]
 pyjwt = [
     {file = "PyJWT-1.7.1-py2.py3-none-any.whl", hash = "sha256:5c6eca3c2940464d106b99ba83b00c6add741c9becaec087fb7ccdefea71350e"},
