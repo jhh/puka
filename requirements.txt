@@ -7,9 +7,6 @@ asgiref==3.3.1; python_version >= "3.6" \
 dj-database-url==0.5.0 \
     --hash=sha256:4aeaeb1f573c74835b0686a2b46b85990571159ffc21aa57ecd4d1e1cb334163 \
     --hash=sha256:851785365761ebe4994a921b433062309eb882fedd318e1b0fcecc607ed02da9
-django-cors-headers==3.7.0; python_version >= "3.6" \
-    --hash=sha256:96069c4aaacace786a34ee7894ff680780ec2644e4268b31181044410fecd12e \
-    --hash=sha256:1ac2b1213de75a251e2ba04448da15f99bcfcbe164288ae6b5ff929dc49b372f
 django-extensions==3.1.1; python_version >= "3.6" \
     --hash=sha256:674ad4c3b1587a884881824f40212d51829e662e52f85b012cd83d83fe1271d9 \
     --hash=sha256:9507f8761ee760748938fd8af766d0608fb2738cf368adfa1b2451f61c15ae35
