@@ -133,6 +133,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
+# Activate Django-Heroku.
+django_heroku.settings(locals())
+
+
 STATIC_URL = "/static/"
 # Place static in the same location as webpack build files
 STATIC_ROOT = os.path.join(BASE_DIR, "build", "static")
@@ -152,6 +156,3 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
-
-# Activate Django-Heroku.
-django_heroku.settings(locals())
