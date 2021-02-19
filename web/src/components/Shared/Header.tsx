@@ -3,6 +3,7 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import BookmarksIcon from "@material-ui/icons/Bookmarks";
+import { Link } from "react-router-dom";
 
 import Signout from "../Auth/Signout";
 
@@ -11,7 +12,9 @@ const Header = () => {
   return (
     <AppBar position="sticky" className={classes.root}>
       <Toolbar>
-        <BookmarksIcon className={classes.icon} />
+        <Link to="/" className={classes.link}>
+          <BookmarksIcon className={classes.icon} />
+        </Link>
         <Typography variant="h6" className={classes.title}>
           Puka
         </Typography>
@@ -32,6 +35,10 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     title: {
       flexGrow: 1,
+    },
+    link: {
+      textDecoration: "none",
+      color: theme.palette.common.white,
     },
   })
 );

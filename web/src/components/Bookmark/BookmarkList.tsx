@@ -1,11 +1,10 @@
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import ListItemText from "@material-ui/core/ListItemText";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import { BookmarkData } from "../Shared/types";
 import Link from "@material-ui/core/Link";
-import UpdateBookmark from "./UpdateBookmark";
+// import UpdateBookmark from "./UpdateBookmark";
 import TagList from "../Tag/TagList";
 
 type Props = BookmarkData;
@@ -32,9 +31,6 @@ const BookmarkList = ({ bookmarks }: Props) => {
             secondaryTypographyProps={{ component: "div" }}
             className={classes.listText}
           />
-          <ListItemSecondaryAction>
-            <UpdateBookmark />
-          </ListItemSecondaryAction>
         </ListItem>
       ))}
     </List>

@@ -1,43 +1,48 @@
 import { gql, useQuery } from "@apollo/client";
 import Container from "@material-ui/core/Container";
-// import { createStyles, makeStyles } from "@material-ui/core/styles";
-import Loading from "../components/Shared/Loading";
-import Error from "../components/Shared/Error";
-import { BookmarkData } from "../components/Shared/types";
+import { useSearchParams } from "react-router-dom";
 import BookmarkList from "../components/Bookmark/BookmarkList";
+import Error from "../components/Shared/Error";
+import Loading from "../components/Shared/Loading";
+import { BookmarkData } from "../components/Shared/types";
 
-const Home = () => {
-  // const classes = useStyles();
-  const { loading, error, data } = useQuery<BookmarkData>(BOOKMARKS_QUERY);
-
-  let content: JSX.Element;
-
-  if (error) {
-    content = <Error />;
-  } else if (loading) {
-    content = <Loading />;
-  } else if (data) {
-    content = <BookmarkList bookmarks={data.bookmarks} />;
-  } else {
-    content = <></>;
-  }
-
-  return <Container>{content}</Container>;
+type BookmarksVars = {
+  offset?: number;
+  limit?: number;
+  search?: string;
+  tags?: string[];
 };
 
-// const useStyles = makeStyles(() =>
-//   createStyles({
-//     root: {
-//       margin: "0 auto",
-//     },
-//   })
-// );
+const Home = () => {
+  const [searchParams] = useSearchParams({});
+  const query = searchParams.get("q");
+  const tags = searchParams.getAll("t");
+
+  let variables: BookmarksVars = { offset: 0, limit: 50 };
+
+  if (query) variables.search = query;
+  if (tags.length > 0) variables.tags = tags;
+
+  const { loading, error, data } = useQuery<BookmarkData, BookmarksVars>(
+    BOOKMARKS_QUERY,
+    { variables }
+  );
+
+  if (error) return <Error error={error} />;
+
+  return (
+    <Container>
+      {loading ? <Loading /> : <></>}
+      {data ? <BookmarkList bookmarks={data.bookmarks} /> : <></>}
+    </Container>
+  );
+};
 
 export default Home;
 
 const BOOKMARKS_QUERY = gql`
-  {
-    bookmarks(offset: 0, limit: 100) {
+  query($search: String, $tags: [String], $offset: Int, $limit: Int) {
+    bookmarks(search: $search, tags: $tags, offset: $offset, limit: $limit) {
       id
       title
       description

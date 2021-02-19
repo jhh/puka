@@ -1,5 +1,5 @@
 import { Typography } from "@material-ui/core";
-import Link from "@material-ui/core/Link";
+import { Link } from "react-router-dom";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
 type Props = {
@@ -9,19 +9,10 @@ type Props = {
 const TagList = ({ tags }: Props) => {
   const classes = useStyles();
 
-  function handleClick(event: React.MouseEvent) {
-    event.preventDefault();
-  }
-
   return (
     <Typography variant="body2" color="textPrimary" component="div">
       {tags.map((tag) => (
-        <Link
-          href="http://example.com"
-          onClick={handleClick}
-          key={tag}
-          className={classes.link}
-        >
+        <Link to={`?t=${tag}`} key={tag} className={classes.link}>
           {tag}
         </Link>
       ))}

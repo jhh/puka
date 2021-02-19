@@ -21,6 +21,7 @@ class Query(ObjectType):
     bookmarks = List(
         BookmarkType,
         search=String(),
+        tags=graphene.List(graphene.String),
         offset=Int(default_value=OFFSET),
         limit=Int(default_value=LIMIT),
     )
@@ -32,7 +33,11 @@ class Query(ObjectType):
         limit=Int(default_value=LIMIT),
     )
 
-    def resolve_bookmarks(self, info, offset, limit, search=None):
+    def resolve_bookmarks(self, info, offset, limit, search=None, tags=None):
+        if tags:
+            return Bookmark.objects.filter(tags__overlap=tags).order_by("-created_at")[
+                offset : offset + limit
+            ]
         if search:
             query = SearchQuery(search, search_type="websearch", config="english")
             return (

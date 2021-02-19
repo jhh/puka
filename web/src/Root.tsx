@@ -15,8 +15,8 @@ const client = new ApolloClient({
 const Root = () => (
   <ApolloProvider client={client}>
     <CssBaseline />
-    <Header />
     <Router>
+      <Header />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="search" element={<Search />} />
