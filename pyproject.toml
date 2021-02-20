@@ -17,6 +17,7 @@ psycopg2 = "^2.8.6"
 python = "^3.9"
 python-dotenv = "^0.15.0"
 whitenoise = "^5.2.0"
+dj-database-url = "^0.5.0"
 
 [tool.poetry.dev-dependencies]
 black = "^20.8b1"
