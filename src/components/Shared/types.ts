@@ -10,3 +10,9 @@ export interface Bookmark {
   export interface BookmarkData {
     bookmarks: Bookmark[];
   }
+
+  export interface LoginData {
+    tokenAuth: {
+      token: string;
+    }
+  }

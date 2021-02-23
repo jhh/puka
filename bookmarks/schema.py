@@ -34,6 +34,10 @@ class Query(ObjectType):
     )
 
     def resolve_bookmarks(self, info, offset, limit, search=None, tags=None):
+        user = info.context.user or None
+        if user.is_anonymous:
+            raise GraphQLError("Log in to view bookmarks.")
+
         if tags:
             return Bookmark.objects.filter(tags__overlap=tags).order_by("-created_at")[
                 offset : offset + limit
