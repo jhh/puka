@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import { ApolloError } from "@apollo/client";
 import Button from "@material-ui/core/Button";
 import Snackbar from "@material-ui/core/Snackbar";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import { ApolloError } from "@apollo/client";
+import { useState } from "react";
 
 type Props = {
   error: ApolloError;

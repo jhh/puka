@@ -19,7 +19,7 @@ class Query(ObjectType):
     LIMIT = 10
 
     bookmarks = List(
-        BookmarkType,
+        graphene.NonNull(BookmarkType),
         search=String(),
         tags=graphene.List(graphene.String),
         offset=Int(default_value=OFFSET),

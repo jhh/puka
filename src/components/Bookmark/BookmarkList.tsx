@@ -1,27 +1,32 @@
+import Link from "@material-ui/core/Link";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import { BookmarkData } from "../Shared/types";
-import Link from "@material-ui/core/Link";
-// import UpdateBookmark from "./UpdateBookmark";
+import { Bookmarks } from "../../generated/Bookmarks";
 import TagList from "../Tag/TagList";
 
-type Props = BookmarkData;
+type Props = Bookmarks;
 
 const BookmarkList = ({ bookmarks }: Props) => {
   const classes = useStyles();
+
+  if (bookmarks === null) return null;
+
   return (
     <List dense>
       {bookmarks.map((bm) => (
         <ListItem key={bm.id}>
           <ListItemText
             primary={
-              <Link href={bm.url} target="_blank" rel="noreferrer">
+              <Link href={bm?.url} target="_blank" rel="noreferrer">
                 {bm.title}
               </Link>
             }
-            primaryTypographyProps={{ variant: "subtitle1", color: "primary" }}
+            primaryTypographyProps={{
+              variant: "subtitle1",
+              color: "primary",
+            }}
             secondary={
               <>
                 {bm.description}

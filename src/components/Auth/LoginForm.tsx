@@ -8,10 +8,10 @@ import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import { useState } from "react";
-import { LoginVars } from "./Login";
+import { TokenAuthVariables } from "../../generated/TokenAuth";
 
 type LoginFormProps = {
-  login: (a: { variables: LoginVars }) => void;
+  login: (a: { variables: TokenAuthVariables }) => void;
 };
 
 function Copyright() {

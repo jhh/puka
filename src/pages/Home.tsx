@@ -2,29 +2,22 @@ import { gql, useQuery } from "@apollo/client";
 import Container from "@material-ui/core/Container";
 import { useSearchParams } from "react-router-dom";
 import BookmarkList from "../components/Bookmark/BookmarkList";
+import CreateBookmark from "../components/Bookmark/CreateBookmark";
 import Error from "../components/Shared/Error";
 import Loading from "../components/Shared/Loading";
-import { BookmarkData } from "../components/Shared/types";
-import CreateBookmark from "../components/Bookmark/CreateBookmark";
-
-type BookmarksVars = {
-  offset?: number;
-  limit?: number;
-  search?: string;
-  tags?: string[];
-};
+import { Bookmarks, BookmarksVariables } from "../generated/Bookmarks";
 
 const Home = () => {
   const [searchParams] = useSearchParams({});
   const query = searchParams.get("q");
   const tags = searchParams.getAll("t");
 
-  let variables: BookmarksVars = { offset: 0, limit: 50 };
+  let variables: BookmarksVariables = { offset: 0, limit: 50 };
 
   if (query) variables.search = query;
   if (tags.length > 0) variables.tags = tags;
 
-  const { loading, error, data } = useQuery<BookmarkData, BookmarksVars>(
+  const { loading, error, data } = useQuery<Bookmarks, BookmarksVariables>(
     BOOKMARKS_QUERY,
     { variables }
   );
