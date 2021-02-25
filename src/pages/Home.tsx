@@ -5,6 +5,7 @@ import BookmarkList from "../components/Bookmark/BookmarkList";
 import Error from "../components/Shared/Error";
 import Loading from "../components/Shared/Loading";
 import { BookmarkData } from "../components/Shared/types";
+import CreateBookmark from "../components/Bookmark/CreateBookmark";
 
 type BookmarksVars = {
   offset?: number;
@@ -34,6 +35,7 @@ const Home = () => {
     <Container>
       {loading ? <Loading /> : <></>}
       {data ? <BookmarkList bookmarks={data.bookmarks} /> : <></>}
+      <CreateBookmark />
     </Container>
   );
 };
@@ -41,7 +43,7 @@ const Home = () => {
 export default Home;
 
 const BOOKMARKS_QUERY = gql`
-  query($search: String, $tags: [String], $offset: Int, $limit: Int) {
+  query Bookmarks($search: String, $tags: [String], $offset: Int, $limit: Int) {
     bookmarks(search: $search, tags: $tags, offset: $offset, limit: $limit) {
       id
       title
