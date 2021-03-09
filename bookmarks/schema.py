@@ -26,11 +26,10 @@ class Query(ObjectType):
         limit=Int(default_value=LIMIT),
     )
 
-    bookmarks_by_tag = List(
-        BookmarkType,
-        tags=graphene.List(graphene.String, required=True),
-        offset=Int(default_value=OFFSET),
-        limit=Int(default_value=LIMIT),
+    bookmarks_count = graphene.Field(
+        graphene.Int,
+        search=String(),
+        tags=graphene.List(graphene.String),
     )
 
     def resolve_bookmarks(self, info, offset, limit, search=None, tags=None):
@@ -54,10 +53,24 @@ class Query(ObjectType):
 
         return Bookmark.objects.all().order_by("-created_at")[offset : offset + limit]
 
-    def resolve_bookmarks_by_tag(self, info, tags, offset, limit):
-        return Bookmark.objects.filter(tags__overlap=tags).order_by("-created_at")[
-            offset : offset + limit
-        ]
+    def resolve_bookmarks_count(self, info, search=None, tags=None):
+        user = info.context.user or None
+        if user.is_anonymous:
+            raise GraphQLError("Log in to view bookmarks.")
+
+        if tags:
+            return Bookmark.objects.filter(tags__overlap=tags).count()
+        if search:
+            query = SearchQuery(search, search_type="websearch", config="english")
+            return (
+                Bookmark.objects.annotate(
+                    rank=SearchRank(F("title_description_search"), query)
+                )
+                .filter(rank__gte=0.1)
+                .count()
+            )
+
+        return Bookmark.objects.count()
 
 
 class CreateBookmark(graphene.Mutation):
