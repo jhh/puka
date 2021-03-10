@@ -8,5 +8,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+MIDDLEWARE.append("puka.middleware.debug.SqlPrintingMiddleware")
+
 os.environ.setdefault("DATABASE_URL", "postgres://127.0.0.1:5432/puka")
 DATABASES = {"default": dj_database_url.config()}
