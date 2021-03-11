@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     "django.contrib.postgres",
     "django_extensions",
     "graphene_django",
+    "django_filters",
     "bookmarks",
 ]
 
@@ -103,6 +104,7 @@ GRAPHENE = {
     "MIDDLEWARE": [
         "graphql_jwt.middleware.JSONWebTokenMiddleware",
     ],
+    "RELAY_CONNECTION_MAX_LIMIT": 100,
 }
 
 AUTHENTICATION_BACKENDS = [
