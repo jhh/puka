@@ -1,11 +1,11 @@
 import { InMemoryCache, makeVar } from "@apollo/client";
-import { offsetLimitPagination } from "@apollo/client/utilities";
+import { relayStylePagination } from "@apollo/client/utilities";
 
 export const cache = new InMemoryCache({
     typePolicies: {
       Query: {
         fields: {
-          bookmarks: offsetLimitPagination(["search", "tags"]),
+          allBookmarks: relayStylePagination(["search", "tags" ,"year"]),
           isLoggedIn: {
             read() {
               return isLoggedInVar();

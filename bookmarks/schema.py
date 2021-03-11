@@ -1,80 +1,55 @@
-from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
-from django.db.models import F
-from graphene import Int, List, ObjectType, String
+import django_filters
 import graphene
+from django.contrib.postgres.search import SearchQuery, SearchRank
+from django.db.models import F
+from django_filters.filters import BaseCSVFilter, CharFilter
+from graphene import Int, List, ObjectType, String, relay
 from graphene_django import DjangoObjectType
+from graphene_django.filter import DjangoFilterConnectionField
 from graphql import GraphQLError
 
 from .models import Bookmark
 
 
-class BookmarkType(DjangoObjectType):
+class CharArrayFilter(BaseCSVFilter, CharFilter):
+    pass
+
+
+class BookmarkFilter(django_filters.FilterSet):
+    tags = CharArrayFilter(lookup_expr="overlap")
+    search = django_filters.CharFilter(method="filter_search")
+    year = django_filters.NumberFilter(field_name="created_at", lookup_expr="year")
+    order_by = django_filters.OrderingFilter(fields=("created_at", "title"))
+
+    def filter_search(self, queryset, name, value):
+        query = SearchQuery(value, search_type="websearch", config="english")
+        return (
+            queryset.annotate(rank=SearchRank(F("title_description_search"), query))
+            .filter(rank__gte=0.1)
+            .order_by("-rank")
+        )
+
+
+class BookmarkNode(DjangoObjectType):
     class Meta:
         model = Bookmark
         exclude = ("title_description_search",)
+        filterset_class = BookmarkFilter
+        interfaces = (relay.Node,)
 
 
 class Query(ObjectType):
-    OFFSET = 0
-    LIMIT = 10
+    bookmark = relay.Node.Field(BookmarkNode)
+    all_bookmarks = DjangoFilterConnectionField(BookmarkNode)
 
-    bookmarks = List(
-        graphene.NonNull(BookmarkType),
-        search=String(),
-        tags=graphene.List(graphene.String),
-        offset=Int(default_value=OFFSET),
-        limit=Int(default_value=LIMIT),
-    )
-
-    bookmarks_count = graphene.Field(
-        graphene.Int,
-        search=String(),
-        tags=graphene.List(graphene.String),
-    )
-
-    def resolve_bookmarks(self, info, offset, limit, search=None, tags=None):
-        user = info.context.user or None
-        if user.is_anonymous:
-            raise GraphQLError("Log in to view bookmarks.")
-
-        if tags:
-            return Bookmark.objects.filter(tags__overlap=tags).order_by("-created_at")[
-                offset : offset + limit
-            ]
-        if search:
-            query = SearchQuery(search, search_type="websearch", config="english")
-            return (
-                Bookmark.objects.annotate(
-                    rank=SearchRank(F("title_description_search"), query)
-                )
-                .filter(rank__gte=0.1)
-                .order_by("-rank")[offset : offset + limit]
-            )
-
-        return Bookmark.objects.all().order_by("-created_at")[offset : offset + limit]
-
-    def resolve_bookmarks_count(self, info, search=None, tags=None):
-        user = info.context.user or None
-        if user.is_anonymous:
-            raise GraphQLError("Log in to view bookmarks.")
-
-        if tags:
-            return Bookmark.objects.filter(tags__overlap=tags).count()
-        if search:
-            query = SearchQuery(search, search_type="websearch", config="english")
-            return (
-                Bookmark.objects.annotate(
-                    rank=SearchRank(F("title_description_search"), query)
-                )
-                .filter(rank__gte=0.1)
-                .count()
-            )
-
-        return Bookmark.objects.count()
+    def resolve_all_bookmarks(self, info, **kwargs):
+        if not info.context.user.is_authenticated:
+            raise GraphQLError("not authenticated")
+        return Bookmark.objects
 
 
 class CreateBookmark(graphene.Mutation):
-    bookmark = graphene.Field(BookmarkType)
+    bookmark = graphene.Field(BookmarkNode)
 
     class Arguments:
         title = graphene.String()
@@ -93,7 +68,7 @@ class CreateBookmark(graphene.Mutation):
 
 
 class UpdateBookmark(graphene.Mutation):
-    bookmark = graphene.Field(BookmarkType)
+    bookmark = graphene.Field(BookmarkNode)
 
     class Arguments:
         bookmark_id = graphene.Int(required=True)
