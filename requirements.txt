@@ -10,6 +10,9 @@ dj-database-url==0.5.0 \
 django-extensions==3.1.1; python_version >= "3.6" \
     --hash=sha256:674ad4c3b1587a884881824f40212d51829e662e52f85b012cd83d83fe1271d9 \
     --hash=sha256:9507f8761ee760748938fd8af766d0608fb2738cf368adfa1b2451f61c15ae35
+django-filter==2.4.0; python_version >= "3.5" \
+    --hash=sha256:84e9d5bb93f237e451db814ed422a3a625751cbc9968b484ecc74964a8696b06 \
+    --hash=sha256:e00d32cebdb3d54273c48f4f878f898dced8d5dfaad009438fe61ebdf535ace1
 django-graphql-jwt==0.3.1 \
     --hash=sha256:468e09b8ce67324fcba21dc33b7c1ea9d234bfc10df7cbfe9c5477be0302f933 \
     --hash=sha256:2189f6d1a13b827d486780fa74a631a15e4f7f0235a3a87a487736b5b0dc4690
