@@ -31,7 +31,7 @@ const AccountMenu = () => {
         <MenuItem onClick={handleClose}>Profile</MenuItem>
         <MenuItem
           onClick={() => {
-            window.location.assign("/admin");
+            window.location.assign("/admin/");
           }}
         >
           Admin
