@@ -52,7 +52,7 @@ export default function SignIn(props: LoginFormProps) {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
     props.login({ variables: { username, password } });
   };
@@ -91,10 +91,6 @@ export default function SignIn(props: LoginFormProps) {
             autoComplete="current-password"
             onChange={(event) => setPassword(event.target.value)}
           />
-          {/* <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
-          /> */}
           <Button
             type="submit"
             fullWidth
@@ -104,18 +100,6 @@ export default function SignIn(props: LoginFormProps) {
           >
             Sign In
           </Button>
-          {/* <Grid container>
-            <Grid item xs>
-              <Link href="#" variant="body2">
-                Forgot password?
-              </Link>
-            </Grid>
-            <Grid item>
-              <Link href="#" variant="body2">
-                {"Don't have an account? Sign Up"}
-              </Link>
-            </Grid>
-          </Grid> */}
         </form>
       </div>
       <Box mt={8}>

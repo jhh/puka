@@ -7,7 +7,7 @@ const Bookmarks = () => {
   return (
     <>
       <Header />
-      <Container>
+      <Container maxWidth="md">
         <BookmarksWithData />
         <CreateBookmark />
       </Container>

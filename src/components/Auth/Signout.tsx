@@ -1,16 +1,17 @@
-import Button from "@material-ui/core/Button";
+import MenuItem from "@material-ui/core/MenuItem";
 import { isLoggedInVar } from "../../cache";
 
 function handleSubmit() {
   localStorage.removeItem("token");
   isLoggedInVar(false);
+  window.location.reload();
 }
 
 const Login = () => {
   return (
-    <Button color="inherit" onClick={() => handleSubmit()}>
+    <MenuItem color="inherit" onClick={() => handleSubmit()}>
       Sign Out
-    </Button>
+    </MenuItem>
   );
 };
 
