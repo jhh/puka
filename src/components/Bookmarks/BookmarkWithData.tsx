@@ -1,8 +1,8 @@
 import { gql, useQuery } from "@apollo/client";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useSearchParams } from "react-router-dom";
-import Error from "../../components/Shared/Error";
-import Loading from "../../components/Shared/Loading";
+import Error from "../Shared/Error";
+import Loading from "../Shared/Loading";
 import {
   AllBookmarks,
   AllBookmarksVariables,
