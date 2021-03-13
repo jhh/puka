@@ -1,15 +1,18 @@
 import Container from "@material-ui/core/Container";
+import { useState } from "react";
+import BookmarksHeader from "../components/Bookmarks/BookmarksHeader";
 import BookmarksWithData from "../components/Bookmarks/BookmarkWithData";
 import CreateBookmark from "../components/Bookmarks/CreateBookmark";
-import Header from "../components/Bookmarks/BookmarksHeader";
 
 const Bookmarks = () => {
+  const [open, setOpen] = useState<boolean>(false);
+
   return (
     <>
-      <Header />
+      <BookmarksHeader onCreateClick={() => setOpen(true)} />
       <Container maxWidth="md">
         <BookmarksWithData />
-        <CreateBookmark />
+        <CreateBookmark open={open} setOpen={setOpen} />
       </Container>
     </>
   );

@@ -1,11 +1,17 @@
 import AppBar from "@material-ui/core/AppBar";
+import IconButton from "@material-ui/core/IconButton";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
+import AddIcon from "@material-ui/icons/Add";
 import AccountMenu from "../Shared/AccountMenu";
 import Logo from "../Shared/Logo";
 
-const Header = () => {
+type Props = {
+  onCreateClick: () => void;
+};
+
+const Header = ({ onCreateClick }: Props) => {
   const classes = useStyles();
 
   return (
@@ -13,8 +19,15 @@ const Header = () => {
       <Toolbar className={classes.toolbar}>
         <Logo />
         <Typography variant="h6" className={classes.title}>
-          Puka Bookmarks
+          Bookmarks
         </Typography>
+        <IconButton>
+          <AddIcon
+            fontSize="large"
+            className={classes.icon}
+            onClick={onCreateClick}
+          />
+        </IconButton>
         <AccountMenu />
       </Toolbar>
     </AppBar>
@@ -33,9 +46,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     icon: {
       color: theme.palette.common.white,
-    },
-    logoButton: {
-      marginRight: theme.spacing(1),
     },
     title: {
       flexGrow: 1,
