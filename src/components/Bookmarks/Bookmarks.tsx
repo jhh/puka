@@ -21,13 +21,18 @@ const Bookmark = ({ bookmark }: BookmarkProp) => {
     <ListItem>
       <ListItemText
         primary={
-          <Link href={bookmark.url} target="_blank" rel="noreferrer">
+          <Link
+            href={bookmark.url}
+            className={classes.title}
+            target="_blank"
+            rel="noreferrer"
+          >
             {bookmark.title}
           </Link>
         }
         primaryTypographyProps={{
           variant: "subtitle1",
-          color: "primary",
+          color: "textPrimary",
         }}
         secondary={
           <>
@@ -57,6 +62,11 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     listText: {
       paddingRight: theme.spacing(4),
+    },
+    title: {
+      "&:hover": {
+        textDecoration: "none",
+      },
     },
   })
 );

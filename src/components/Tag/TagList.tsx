@@ -24,6 +24,11 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     link: {
       paddingRight: theme.spacing(1),
+      color: theme.palette.primary.light,
+      textDecoration: "none",
+      "&:hover": {
+        textDecoration: "underline",
+      },
     },
   })
 );
