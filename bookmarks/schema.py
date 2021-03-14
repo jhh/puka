@@ -3,10 +3,11 @@ import graphene
 from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.db.models import F
 from django_filters.filters import BaseCSVFilter, CharFilter
-from graphene import Int, List, ObjectType, String, relay
+from graphene import ObjectType, relay
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 from graphql import GraphQLError
+from graphql_relay import from_global_id
 
 from .models import Bookmark
 
@@ -43,23 +44,25 @@ class Query(ObjectType):
     all_bookmarks = DjangoFilterConnectionField(BookmarkNode)
 
     def resolve_all_bookmarks(self, info, **kwargs):
-        if not info.context.user.is_authenticated:
-            raise GraphQLError("not authenticated")
+        if info.context.user.is_anonymous:
+            raise GraphQLError("Log in to query bookmarks.")
         return Bookmark.objects
 
 
-class CreateBookmark(graphene.Mutation):
+class CreateBookmark(relay.ClientIDMutation):
     bookmark = graphene.Field(BookmarkNode)
 
-    class Arguments:
-        title = graphene.String()
+    class Input:
+        title = graphene.String(required=True)
         description = graphene.String()
-        url = graphene.String()
+        url = graphene.String(required=True)
         tags = graphene.List(graphene.String)
 
-    def mutate(self, info, title, description, url, tags):
-        user = info.context.user or None
-        if user.is_anonymous:
+    @classmethod
+    def mutate_and_get_payload(
+        cls, root, info, title, url, description="", tags=[], **kwargs
+    ):
+        if info.context.user.is_anonymous:
             raise GraphQLError("Log in to create bookmark.")
 
         bookmark = Bookmark(title=title, description=description, url=url, tags=tags)
@@ -67,22 +70,24 @@ class CreateBookmark(graphene.Mutation):
         return CreateBookmark(bookmark=bookmark)
 
 
-class UpdateBookmark(graphene.Mutation):
+class UpdateBookmark(relay.ClientIDMutation):
     bookmark = graphene.Field(BookmarkNode)
 
-    class Arguments:
-        bookmark_id = graphene.Int(required=True)
+    class Input:
+        id = graphene.ID(required=True)
         title = graphene.String()
         description = graphene.String()
         url = graphene.String()
         tags = graphene.List(graphene.String)
 
-    def mutate(self, info, bookmark_id, title, description, url, tags):
-        user = info.context.user or None
-        if user.is_anonymous:
+    @classmethod
+    def mutate_and_get_payload(
+        cls, root, info, id, title, description, url, tags, **kwargs
+    ):
+        if info.context.user.is_anonymous:
             raise GraphQLError("Log in to update bookmark.")
 
-        bookmark = Bookmark.objects.get(id=bookmark_id)
+        bookmark = Bookmark.objects.get(pk=from_global_id(id)[1])
         bookmark.title = title
         bookmark.description = description
         bookmark.url = url
@@ -91,20 +96,20 @@ class UpdateBookmark(graphene.Mutation):
         return UpdateBookmark(bookmark=bookmark)
 
 
-class DeleteBookmark(graphene.Mutation):
-    bookmark_id = graphene.Int()
+class DeleteBookmark(relay.ClientIDMutation):
+    id = graphene.ID()
 
-    class Arguments:
-        bookmark_id = graphene.Int(required=True)
+    class Input:
+        id = graphene.ID(required=True)
 
-    def mutate(self, info, bookmark_id):
-        user = info.context.user or None
-        if user.is_anonymous:
-            raise GraphQLError("Log in to update bookmark.")
+    @classmethod
+    def mutate_and_get_payload(cls, root, info, id, **kwargs):
+        if info.context.user.is_anonymous:
+            raise GraphQLError("Log in to delete bookmark.")
 
-        bookmark = Bookmark.objects.get(id=bookmark_id)
+        bookmark = Bookmark.objects.get(pk=from_global_id(id)[1])
         bookmark.delete()
-        return DeleteBookmark(bookmark_id=bookmark_id)
+        return DeleteBookmark(id=id)
 
 
 class Mutation(graphene.ObjectType):
