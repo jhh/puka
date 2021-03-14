@@ -10,7 +10,7 @@ const TagList = ({ tags }: Props) => {
   const classes = useStyles();
 
   return (
-    <Typography variant="body2" color="textPrimary" component="div">
+    <Typography variant="subtitle2" color="textPrimary" component="div">
       {tags.map((tag) => (
         <Link to={`?t=${tag}`} key={tag} className={classes.link}>
           {tag}
@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     link: {
       paddingRight: theme.spacing(1),
-      color: theme.palette.primary.light,
+      color: theme.palette.secondary.light,
       textDecoration: "none",
       "&:hover": {
         textDecoration: "underline",

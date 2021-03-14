@@ -1,3 +1,4 @@
+import { Typography } from "@material-ui/core";
 import Link from "@material-ui/core/Link";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -12,6 +13,23 @@ type BookmarksProps = {
 
 type BookmarkProp = {
   bookmark: AllBookmarks_allBookmarks_edges_node;
+};
+
+const EditLine = (props: { date: any }) => {
+  const classes = useStyles();
+
+  const date = new Date(props.date);
+  return (
+    <div>
+      <Typography variant="caption" color="textSecondary">
+        {date
+          .toLocaleDateString("en-us", { year: "numeric", month: "long" })
+          .toLowerCase()}
+        <span className={classes.edit}>edit</span>
+        <span className={classes.edit}>delete</span>
+      </Typography>
+    </div>
+  );
 };
 
 const Bookmark = ({ bookmark }: BookmarkProp) => {
@@ -38,6 +56,7 @@ const Bookmark = ({ bookmark }: BookmarkProp) => {
           <>
             {bookmark.description}
             <TagList tags={bookmark.tags} />
+            <EditLine date={bookmark.createdAt} />
           </>
         }
         secondaryTypographyProps={{ component: "div" }}
@@ -67,6 +86,9 @@ const useStyles = makeStyles((theme: Theme) =>
       "&:hover": {
         textDecoration: "none",
       },
+    },
+    edit: {
+      paddingLeft: theme.spacing(1),
     },
   })
 );
