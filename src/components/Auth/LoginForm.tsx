@@ -77,7 +77,7 @@ export default function SignIn(props: LoginFormProps) {
             name="username"
             autoComplete="username"
             autoFocus
-            onChange={(event) => setUsername(event.target.value)}
+            onChange={(event: any) => setUsername(event.target.value)}
           />
           <TextField
             variant="outlined"
@@ -89,7 +89,7 @@ export default function SignIn(props: LoginFormProps) {
             type="password"
             id="password"
             autoComplete="current-password"
-            onChange={(event) => setPassword(event.target.value)}
+            onChange={(event: any) => setPassword(event.target.value)}
           />
           <Button
             type="submit"

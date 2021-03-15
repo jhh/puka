@@ -85,7 +85,7 @@ const EditBookmark = ({ bookmark }: Props) => {
             label="Title"
             fullWidth
             value={title}
-            onChange={(event) => setTitle(event.target.value)}
+            onChange={(event: any) => setTitle(event.target.value)}
           />
           <TextField
             margin="dense"
@@ -94,7 +94,7 @@ const EditBookmark = ({ bookmark }: Props) => {
             fullWidth
             multiline
             value={description}
-            onChange={(event) => setDescription(event.target.value)}
+            onChange={(event: any) => setDescription(event.target.value)}
           />
           <TextField
             margin="dense"
@@ -102,7 +102,7 @@ const EditBookmark = ({ bookmark }: Props) => {
             label="URL"
             fullWidth
             value={url}
-            onChange={(event) => setUrl(event.target.value)}
+            onChange={(event: any) => setUrl(event.target.value)}
           />
           <TextField
             margin="dense"
@@ -110,7 +110,7 @@ const EditBookmark = ({ bookmark }: Props) => {
             label="Tags"
             fullWidth
             value={tags}
-            onChange={(event) => setTags(event.target.value)}
+            onChange={(event: any) => setTags(event.target.value)}
           />
         </DialogContent>
         <DialogActions>

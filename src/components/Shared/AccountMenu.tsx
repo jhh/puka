@@ -17,7 +17,7 @@ const AccountMenu = () => {
     <div>
       <IconButton
         edge="end"
-        onClick={(event) => setAnchorEl(event.currentTarget)}
+        onClick={(event: any) => setAnchorEl(event.currentTarget)}
       >
         <AccountCircle fontSize="large" className={classes.icon} />
       </IconButton>
