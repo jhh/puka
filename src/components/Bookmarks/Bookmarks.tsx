@@ -6,33 +6,33 @@ import ListItemText from "@material-ui/core/ListItemText";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import { AllBookmarks_allBookmarks_edges_node } from "../../generated/AllBookmarks";
 import TagList from "../Tag/TagList";
+import EditBookmark from "./EditBookmark";
 
 type BookmarksProps = {
   nodes: (AllBookmarks_allBookmarks_edges_node | null)[];
 };
 
-type BookmarkProp = {
+type BookmarkProps = {
   bookmark: AllBookmarks_allBookmarks_edges_node;
 };
 
-const EditLine = (props: { date: any }) => {
+const EditLine = ({ bookmark }: BookmarkProps) => {
   const classes = useStyles();
 
-  const date = new Date(props.date);
+  const date = new Date(bookmark.createdAt);
   return (
     <div>
       <Typography variant="caption" color="textSecondary">
         {date
           .toLocaleDateString("en-us", { year: "numeric", month: "long" })
           .toLowerCase()}
-        <span className={classes.edit}>edit</span>
-        <span className={classes.edit}>delete</span>
+        <EditBookmark bookmark={bookmark} />
       </Typography>
     </div>
   );
 };
 
-const Bookmark = ({ bookmark }: BookmarkProp) => {
+const Bookmark = ({ bookmark }: BookmarkProps) => {
   const classes = useStyles();
 
   return (
@@ -56,7 +56,7 @@ const Bookmark = ({ bookmark }: BookmarkProp) => {
           <>
             {bookmark.description}
             <TagList tags={bookmark.tags} />
-            <EditLine date={bookmark.createdAt} />
+            <EditLine bookmark={bookmark} />
           </>
         }
         secondaryTypographyProps={{ component: "div" }}

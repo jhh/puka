@@ -1,0 +1,238 @@
+"""
+Direct the client to resolve this field locally, either from the cache or local resolvers.
+"""
+directive @client(
+  """
+  When true, the client will never use the cache for this value. See
+  https://www.apollographql.com/docs/react/essentials/local-state/#forcing-resolvers-with-clientalways-true
+  """
+  always: Boolean
+) on FIELD | FRAGMENT_DEFINITION | INLINE_FRAGMENT
+
+"""
+Export this locally resolved field as a variable to be used in the remainder of this query. See
+https://www.apollographql.com/docs/react/essentials/local-state/#using-client-fields-as-variables
+"""
+directive @export(
+  """The variable name to export this field as."""
+  as: String!
+) on FIELD
+
+"""
+Specify a custom store key for this result. See
+https://www.apollographql.com/docs/react/advanced/caching/#the-connection-directive
+"""
+directive @connection(
+  """Specify the store key."""
+  key: String!
+
+  """
+  An array of query argument names to include in the generated custom store key.
+  """
+  filter: [String!]
+) on FIELD
+
+type Query {
+  user(id: Int!): UserType
+  me: UserType
+
+  """The ID of the object"""
+  bookmark(id: ID!): BookmarkNode
+  allBookmarks(
+    offset: Int
+    before: String
+    after: String
+    first: Int
+    last: Int
+    tags: String
+    search: String
+    year: Float
+
+    """Ordering"""
+    orderBy: String
+  ): BookmarkNodeConnection
+  isLoggedIn: Boolean!
+}
+
+type UserType {
+  """"""
+  id: ID!
+
+  """"""
+  password: String!
+
+  """"""
+  lastLogin: DateTime
+
+  """
+  Designates that this user has all permissions without explicitly assigning them.
+  """
+  isSuperuser: Boolean!
+
+  """Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."""
+  username: String!
+
+  """"""
+  firstName: String!
+
+  """"""
+  lastName: String!
+
+  """"""
+  email: String!
+
+  """Designates whether the user can log into this admin site."""
+  isStaff: Boolean!
+
+  """
+  Designates whether this user should be treated as active. Unselect this instead of deleting accounts.
+  """
+  isActive: Boolean!
+
+  """"""
+  dateJoined: DateTime!
+}
+
+"""
+The `DateTime` scalar type represents a DateTime
+value as specified by
+[iso8601](https://en.wikipedia.org/wiki/ISO_8601).
+"""
+scalar DateTime
+
+type BookmarkNode implements Node {
+  """The ID of the object."""
+  id: ID!
+
+  """"""
+  title: String!
+
+  """"""
+  description: String!
+
+  """"""
+  url: String!
+
+  """"""
+  tags: [String!]!
+
+  """"""
+  createdAt: DateTime!
+}
+
+"""An object with an ID"""
+interface Node {
+  """The ID of the object."""
+  id: ID!
+}
+
+type BookmarkNodeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [BookmarkNodeEdge]!
+}
+
+"""
+The Relay compliant `PageInfo` type, containing data necessary to paginate this connection.
+"""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: String
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: String
+}
+
+"""A Relay edge containing a `BookmarkNode` and its cursor."""
+type BookmarkNodeEdge {
+  """The item at the end of the edge"""
+  node: BookmarkNode
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type Mutation {
+  createUser(email: String!, password: String!, username: String!): CreateUser
+  createBookmark(input: CreateBookmarkInput!): CreateBookmarkPayload
+  updateBookmark(input: UpdateBookmarkInput!): UpdateBookmarkPayload
+  deleteBookmark(input: DeleteBookmarkInput!): DeleteBookmarkPayload
+
+  """Obtain JSON Web Token mutation"""
+  tokenAuth(username: String!, password: String!): ObtainJSONWebToken
+  verifyToken(token: String): Verify
+  refreshToken(token: String): Refresh
+}
+
+type CreateUser {
+  user: UserType
+}
+
+type CreateBookmarkPayload {
+  bookmark: BookmarkNode
+  clientMutationId: String
+}
+
+input CreateBookmarkInput {
+  title: String!
+  description: String
+  url: String!
+  tags: [String]
+  clientMutationId: String
+}
+
+type UpdateBookmarkPayload {
+  bookmark: BookmarkNode
+  clientMutationId: String
+}
+
+input UpdateBookmarkInput {
+  id: ID!
+  title: String
+  description: String
+  url: String
+  tags: [String]
+  clientMutationId: String
+}
+
+type DeleteBookmarkPayload {
+  id: ID
+  clientMutationId: String
+}
+
+input DeleteBookmarkInput {
+  id: ID!
+  clientMutationId: String
+}
+
+"""Obtain JSON Web Token mutation"""
+type ObtainJSONWebToken {
+  payload: GenericScalar!
+  refreshExpiresIn: Int!
+  token: String!
+}
+
+"""
+The `GenericScalar` scalar type represents a generic
+GraphQL scalar value that could be:
+String, Boolean, Int, Float, List or Object.
+"""
+scalar GenericScalar
+
+type Verify {
+  payload: GenericScalar!
+}
+
+type Refresh {
+  payload: GenericScalar!
+  refreshExpiresIn: Int!
+  token: String!
+}
