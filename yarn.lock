@@ -5,7 +5,7 @@ __metadata:
   version: 4
   cacheKey: 7
 
-"@apollo/client@npm:^3.3.8":
+"@apollo/client@npm:^3.3.11":
   version: 3.3.11
   resolution: "@apollo/client@npm:3.3.11"
   dependencies:
@@ -13418,7 +13418,7 @@ fsevents@^1.2.7:
   version: 0.0.0-use.local
   resolution: "puka@workspace:."
   dependencies:
-    "@apollo/client": ^3.3.8
+    "@apollo/client": ^3.3.11
     "@material-ui/core": ^4.11.3
     "@material-ui/icons": ^4.11.2
     "@types/node": ^14.14.34
@@ -13433,7 +13433,7 @@ fsevents@^1.2.7:
     react-router-dom: ^6.0.0-beta.0
     react-scripts: ^4.0.3
     typescript: ^4.2.3
-    web-vitals: ^1.1.0
+    web-vitals: ^1.1.1
   languageName: unknown
   linkType: soft
 
@@ -16714,10 +16714,10 @@ typescript@^4.2.3:
   languageName: node
   linkType: hard
 
-"web-vitals@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "web-vitals@npm:1.1.0"
-  checksum: b75f7929f0b0bbd055c67eab95024c16038dcc808873dd7406225318c79491f011d9c2cf7c8cf68109c21fb0e9fa292eee3977b9ac780626d17ad25b36cd2ffe
+"web-vitals@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "web-vitals@npm:1.1.1"
+  checksum: e84e449f46d5bdae9bc3d9d03647e654970bbe7fd448ecc8051ae06bcb869aa29cdcd16486786db416ca7a6e43a2f87e0f66662437ec5679761bcdd753a8c055
   languageName: node
   linkType: hard
 
