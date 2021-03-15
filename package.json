@@ -25,8 +25,7 @@
     "build": "react-scripts build",
     "eject": "react-scripts eject",
     "apollo:generate": "apollo codegen:generate --excludes=node_modules/* --includes=**/*.tsx --endpoint http://localhost:8000/graphql --target typescript --tagName gql --outputFlat src/generated",
-    "apollo:download-schema": "apollo client:download-schema --endpoint http://localhost:8000/graphql schema.graphql",
-    "upgrade": "npm-check --update"
+    "apollo:download-schema": "apollo client:download-schema --endpoint http://localhost:8000/graphql schema.graphql"
   },
   "eslintConfig": {
     "extends": [
@@ -46,7 +45,6 @@
     ]
   },
   "devDependencies": {
-    "apollo": "^2.32.5",
-    "npm-check": "^5.9.2"
+    "apollo": "^2.32.5"
   }
 }
