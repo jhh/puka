@@ -44,7 +44,7 @@ const Header = ({ onCreateClick }: Props) => {
               input: classes.inputInput,
             }}
             onChange={(ev) => setSearch(ev.target.value)}
-            onKeyPress={(ev) => {
+            onKeyPress={(ev: any) => {
               if (ev.key === "Enter") {
                 navigate(`?q=${search}`);
                 ev.preventDefault();
