@@ -17,8 +17,6 @@ type BookmarkProps = {
 };
 
 const EditLine = ({ bookmark }: BookmarkProps) => {
-  const classes = useStyles();
-
   const date = new Date(bookmark.createdAt);
   return (
     <div>
