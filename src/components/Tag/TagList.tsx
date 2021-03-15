@@ -1,6 +1,6 @@
 import { Typography } from "@material-ui/core";
-import { Link } from "react-router-dom";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import { Link } from "react-router-dom";
 
 type Props = {
   tags: string[];
