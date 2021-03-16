@@ -5,9 +5,9 @@ __metadata:
   version: 4
   cacheKey: 7
 
-"@apollo/client@npm:^3.3.11":
-  version: 3.3.11
-  resolution: "@apollo/client@npm:3.3.11"
+"@apollo/client@npm:^3.3.12":
+  version: 3.3.12
+  resolution: "@apollo/client@npm:3.3.12"
   dependencies:
     "@graphql-typed-document-node/core": ^3.0.0
     "@types/zen-observable": ^0.8.0
@@ -19,7 +19,7 @@ __metadata:
     optimism: ^0.14.0
     prop-types: ^15.7.2
     symbol-observable: ^2.0.0
-    ts-invariant: ^0.6.0
+    ts-invariant: ^0.6.2
     tslib: ^1.10.0
     zen-observable: ^0.8.14
   peerDependencies:
@@ -31,7 +31,7 @@ __metadata:
       optional: true
     subscriptions-transport-ws:
       optional: true
-  checksum: 512f62f956c1d51ad1a32d51cca56295e41f685cbcf2b623366b22a85b0bc6487338f8d90dbff6eae311eff9eb342c67a6adf577633851a9cbd85618c229e66b
+  checksum: 18181dc9794b61b6ef314f15a07ffbebac9353bcd4715fc2ab2abd0a287bcc45c6a94aa6f23ddf2a2967b73435cfbcca721411e893a7874903eed07c308046e7
   languageName: node
   linkType: hard
 
@@ -2840,7 +2840,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^14.14.34":
+"@types/node@npm:*":
   version: 14.14.34
   resolution: "@types/node@npm:14.14.34"
   checksum: 74db0d80ad997c3ca2597abe1c63c85e87c32e06b4e8c8392a24a11ad00a4567b293a72bbdf49ace201150b420a943609181771cab034cef10fe65272d452718
@@ -2851,6 +2851,13 @@ __metadata:
   version: 13.13.46
   resolution: "@types/node@npm:13.13.46"
   checksum: 3786ac15b21b489c0c807d769edf64f732788b3e8f7f66ac04d63580c658fbafd5c9352c958199a37b2393c6132b16f4bbc43ced25bf4bcb90cbae9d75e61f17
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^14.14.35":
+  version: 14.14.35
+  resolution: "@types/node@npm:14.14.35"
+  checksum: 0f6320bf5370d1ff82105fb7f26aa0658499c97d3ec78561e65b65724280244f281602541182b63470d2c8a98db22fbb4f91409c5c7c97da8c3bb8f97fbc5dbc
   languageName: node
   linkType: hard
 
@@ -13986,10 +13993,10 @@ fsevents@^1.2.7:
   version: 0.0.0-use.local
   resolution: "puka@workspace:."
   dependencies:
-    "@apollo/client": ^3.3.11
+    "@apollo/client": ^3.3.12
     "@material-ui/core": ^4.11.3
     "@material-ui/icons": ^4.11.2
-    "@types/node": ^14.14.34
+    "@types/node": ^14.14.35
     "@types/react": ^17.0.3
     "@types/react-dom": ^17.0.2
     "@yarnpkg/pnpify": ^2.4.0
@@ -16652,14 +16659,14 @@ resolve@1.18.1:
   languageName: node
   linkType: hard
 
-"ts-invariant@npm:^0.6.0":
-  version: 0.6.1
-  resolution: "ts-invariant@npm:0.6.1"
+"ts-invariant@npm:^0.6.2":
+  version: 0.6.2
+  resolution: "ts-invariant@npm:0.6.2"
   dependencies:
     "@types/ungap__global-this": ^0.3.1
     "@ungap/global-this": ^0.4.2
     tslib: ^1.9.3
-  checksum: 1694c4ce3e8ffa74d0f9879c089b67ec30de29b48821223ba0c57e03cce00158fa55a48f294533a1be99207a06c08bb6da73ebd900f1bd9be599e9a543be719d
+  checksum: 64230c18f04ea17ca9b1222647372202c12be4a45e5c23cff308cace9ad45384f52faaa0cb93aec0b24d82e85e11e2dd77816bf626684ffa3a90d27c420a0727
   languageName: node
   linkType: hard
 
