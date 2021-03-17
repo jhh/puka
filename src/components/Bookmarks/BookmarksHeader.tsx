@@ -71,9 +71,7 @@ const Header = ({ onCreateClick }: Props) => {
             onKeyPress={(ev: any) => {
               if (ev.key === "Enter") {
                 const query = parseSearch(search);
-                if (query.length !== 0) {
-                  navigate(query);
-                }
+                navigate(query);
                 ev.preventDefault();
               }
             }}
