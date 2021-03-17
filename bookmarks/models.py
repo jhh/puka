@@ -11,7 +11,7 @@ from django.utils import timezone
 class Bookmark(models.Model):
     title = models.CharField(max_length=120)
     description = models.TextField(blank=True)
-    url = models.URLField()
+    url = models.URLField(max_length=500)
     tags = ArrayField(models.CharField(max_length=50), blank=True)
     created_at = models.DateTimeField(default=timezone.now)
 
