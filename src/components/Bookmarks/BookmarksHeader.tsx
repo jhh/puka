@@ -16,6 +16,30 @@ import { useNavigate } from "react-router-dom";
 import AccountMenu from "../Shared/AccountMenu";
 import Logo from "../Shared/Logo";
 
+function parseSearch(search: string): string {
+  if (search.length === 0 || /^\s*$/.test(search)) return "";
+
+  let queryTerms: string[] = [];
+  let fullText: string = "";
+
+  const words = search.split(" ");
+  for (const word of words) {
+    console.log({ word });
+    if (word.charAt(0) === "#") {
+      queryTerms.push(`t=${word.slice(1)}`);
+      continue;
+    }
+    if (fullText.length === 0) {
+      fullText = `q=${word}`;
+      continue;
+    }
+    fullText.concat("%20", word);
+  }
+  if (fullText.length !== 0) queryTerms.push(fullText);
+
+  return `?${queryTerms.join("&")}`;
+}
+
 type Props = {
   onCreateClick: () => void;
 };
@@ -46,7 +70,10 @@ const Header = ({ onCreateClick }: Props) => {
             onChange={(ev) => setSearch(ev.target.value)}
             onKeyPress={(ev: any) => {
               if (ev.key === "Enter") {
-                navigate(`?q=${search}`);
+                const query = parseSearch(search);
+                if (query.length !== 0) {
+                  navigate(query);
+                }
                 ev.preventDefault();
               }
             }}
