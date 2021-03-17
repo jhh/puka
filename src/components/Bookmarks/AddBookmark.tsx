@@ -107,10 +107,14 @@ const AddBookmark = ({ open, setOpen }: Props) => {
       .map((t) => t.trim())
       .filter((t) => t.length > 0);
 
-    createBookmark({
+    await createBookmark({
       variables: { title, description, url, tags: tagsArray },
     });
 
+    setTitle("");
+    setDescription("");
+    setUrl("");
+    setTags("");
     setOpen(false);
   };
 
