@@ -16,10 +16,7 @@ module.exports = {
         },
         cssLoaderOptions: {
           modules: {
-            auto: (resourcePath) => {
-              console.log({ resourcePath });
-              return /puka\/src/.test(resourcePath);
-            }, // don't process antd Less files
+            auto: /src/, // don't process antd Less files
             localIdentName:
               process.env.NODE_ENV === "development"
                 ? "[path][name]__[local]"
