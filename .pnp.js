@@ -37,6 +37,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         [null, {
           "packageLocation": "./",
           "packageDependencies": [
+            ["@ant-design/icons", "virtual:a0ed8c4de59b845eecc1ca8cc781c194d9143148f1c37e5c520ee47627324b29394fd3de7e567bc6be580b13973a9e8cc22630c1dc44c900072432704e00e8f4#npm:4.6.2"],
             ["@apollo/client", "virtual:a0ed8c4de59b845eecc1ca8cc781c194d9143148f1c37e5c520ee47627324b29394fd3de7e567bc6be580b13973a9e8cc22630c1dc44c900072432704e00e8f4#npm:3.3.12"],
             ["@craco/craco", "virtual:a0ed8c4de59b845eecc1ca8cc781c194d9143148f1c37e5c520ee47627324b29394fd3de7e567bc6be580b13973a9e8cc22630c1dc44c900072432704e00e8f4#npm:6.1.1"],
             ["@types/node", "npm:14.14.35"],
@@ -83,6 +84,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "SOFT",
         }],
+        ["npm:4.6.2", {
+          "packageLocation": "./.yarn/cache/@ant-design-icons-npm-4.6.2-5f3f45fdf6-97ced46197.zip/node_modules/@ant-design/icons/",
+          "packageDependencies": [
+            ["@ant-design/icons", "npm:4.6.2"]
+          ],
+          "linkType": "SOFT",
+        }],
         ["virtual:6b08804cdd6d282d4baa12a1f9bb763c3e3ac97b8b8a6aac8bef4955f406189d39b386a43783061e9e35e6ef38eed17f98177e31f9e4d5eba9d42604ad86bf88#npm:4.5.0", {
           "packageLocation": "./.yarn/$$virtual/@ant-design-icons-virtual-f83d443678/0/cache/@ant-design-icons-npm-4.5.0-e553ac5f4d-87a2ee2efd.zip/node_modules/@ant-design/icons/",
           "packageDependencies": [
@@ -94,6 +102,24 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["classnames", "npm:2.2.6"],
             ["insert-css", "npm:2.0.0"],
             ["rc-util", "virtual:f83d44367884d6ce902dea53f3edb255a95b6b3c6113624d76e7a3414db0e6485e38b2a35677ac95590476b0924342355ac614b44ccd400fee71d8b6e819dcaf#npm:5.9.2"],
+            ["react", "npm:17.0.1"]
+          ],
+          "packagePeers": [
+            "@types/react",
+            "react"
+          ],
+          "linkType": "HARD",
+        }],
+        ["virtual:a0ed8c4de59b845eecc1ca8cc781c194d9143148f1c37e5c520ee47627324b29394fd3de7e567bc6be580b13973a9e8cc22630c1dc44c900072432704e00e8f4#npm:4.6.2", {
+          "packageLocation": "./.yarn/$$virtual/@ant-design-icons-virtual-b9ba6496ef/0/cache/@ant-design-icons-npm-4.6.2-5f3f45fdf6-97ced46197.zip/node_modules/@ant-design/icons/",
+          "packageDependencies": [
+            ["@ant-design/icons", "virtual:a0ed8c4de59b845eecc1ca8cc781c194d9143148f1c37e5c520ee47627324b29394fd3de7e567bc6be580b13973a9e8cc22630c1dc44c900072432704e00e8f4#npm:4.6.2"],
+            ["@ant-design/colors", "npm:6.0.0"],
+            ["@ant-design/icons-svg", "npm:4.1.0"],
+            ["@babel/runtime", "npm:7.13.10"],
+            ["@types/react", "npm:17.0.3"],
+            ["classnames", "npm:2.2.6"],
+            ["rc-util", "virtual:b9ba6496ef4b4d31370ac06bc4007a5f11ad927eb5ddd859244d869347cfc5c619f40a7b46fca8efae38ae1a10e7969d8656282072a7610bf4dea4a793c58a65#npm:5.9.4"],
             ["react", "npm:17.0.1"]
           ],
           "packagePeers": [
@@ -18814,6 +18840,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./",
           "packageDependencies": [
             ["puka", "workspace:."],
+            ["@ant-design/icons", "virtual:a0ed8c4de59b845eecc1ca8cc781c194d9143148f1c37e5c520ee47627324b29394fd3de7e567bc6be580b13973a9e8cc22630c1dc44c900072432704e00e8f4#npm:4.6.2"],
             ["@apollo/client", "virtual:a0ed8c4de59b845eecc1ca8cc781c194d9143148f1c37e5c520ee47627324b29394fd3de7e567bc6be580b13973a9e8cc22630c1dc44c900072432704e00e8f4#npm:3.3.12"],
             ["@craco/craco", "virtual:a0ed8c4de59b845eecc1ca8cc781c194d9143148f1c37e5c520ee47627324b29394fd3de7e567bc6be580b13973a9e8cc22630c1dc44c900072432704e00e8f4#npm:6.1.1"],
             ["@types/node", "npm:14.14.35"],
@@ -20033,6 +20060,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "SOFT",
         }],
+        ["npm:5.9.4", {
+          "packageLocation": "./.yarn/cache/rc-util-npm-5.9.4-9ec621ffb5-f641672980.zip/node_modules/rc-util/",
+          "packageDependencies": [
+            ["rc-util", "npm:5.9.4"]
+          ],
+          "linkType": "SOFT",
+        }],
         ["virtual:6b08804cdd6d282d4baa12a1f9bb763c3e3ac97b8b8a6aac8bef4955f406189d39b386a43783061e9e35e6ef38eed17f98177e31f9e4d5eba9d42604ad86bf88#npm:5.9.2", {
           "packageLocation": "./.yarn/$$virtual/rc-util-virtual-701e550f49/0/cache/rc-util-npm-5.9.2-56053b528b-6a3031acf3.zip/node_modules/rc-util/",
           "packageDependencies": [
@@ -20042,6 +20076,26 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/react-dom", "npm:17.0.2"],
             ["react", "npm:17.0.1"],
             ["react-dom", "virtual:a0ed8c4de59b845eecc1ca8cc781c194d9143148f1c37e5c520ee47627324b29394fd3de7e567bc6be580b13973a9e8cc22630c1dc44c900072432704e00e8f4#npm:17.0.1"],
+            ["react-is", "npm:16.13.1"],
+            ["shallowequal", "npm:1.1.0"]
+          ],
+          "packagePeers": [
+            "@types/react-dom",
+            "@types/react",
+            "react-dom",
+            "react"
+          ],
+          "linkType": "HARD",
+        }],
+        ["virtual:b9ba6496ef4b4d31370ac06bc4007a5f11ad927eb5ddd859244d869347cfc5c619f40a7b46fca8efae38ae1a10e7969d8656282072a7610bf4dea4a793c58a65#npm:5.9.4", {
+          "packageLocation": "./.yarn/$$virtual/rc-util-virtual-c0feca5072/0/cache/rc-util-npm-5.9.4-9ec621ffb5-f641672980.zip/node_modules/rc-util/",
+          "packageDependencies": [
+            ["rc-util", "virtual:b9ba6496ef4b4d31370ac06bc4007a5f11ad927eb5ddd859244d869347cfc5c619f40a7b46fca8efae38ae1a10e7969d8656282072a7610bf4dea4a793c58a65#npm:5.9.4"],
+            ["@babel/runtime", "npm:7.13.10"],
+            ["@types/react", "npm:17.0.3"],
+            ["@types/react-dom", null],
+            ["react", "npm:17.0.1"],
+            ["react-dom", null],
             ["react-is", "npm:16.13.1"],
             ["shallowequal", "npm:1.1.0"]
           ],
