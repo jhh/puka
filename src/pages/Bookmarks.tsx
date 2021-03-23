@@ -11,7 +11,7 @@ const Bookmarks = () => {
   const [open, setOpen] = useState<boolean>(false);
 
   return (
-    <Layout>
+    <Layout className={styles.layout}>
       <Header className={styles.header}>
         <BookmarksHeader onCreateClick={() => setOpen(true)} />
       </Header>

@@ -59,8 +59,10 @@ const Header = ({ onCreateClick }: Props) => {
     <div className={styles.header}>
       <Logo onClick={() => {}} />
       <h2 className={`${styles.title} ${styles.item}`}>Bookmarks</h2>
+      {/* <div className={`${styles.spacer} ${styles.item}`} /> */}
       <Search
-        placeholder="input search text"
+        placeholder="Search..."
+        allowClear
         onSearch={(search) => {
           const query = parseSearch(search);
           navigate(query);
