@@ -1,12 +1,12 @@
 import { gql, useQuery } from "@apollo/client";
+import { message } from "antd";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useSearchParams } from "react-router-dom";
-import Error from "../Shared/Error";
-import Loading from "../Shared/Loading";
 import {
   AllBookmarks,
   AllBookmarksVariables,
 } from "../../generated/AllBookmarks";
+import Loading from "../Shared/Loading";
 import Bookmarks from "./Bookmarks";
 
 const BOOKMARKS_QUERY = gql`
@@ -50,7 +50,7 @@ const BookmarksWithData = () => {
     AllBookmarksVariables
   >(BOOKMARKS_QUERY, { variables });
 
-  if (error) return <Error error={error} />;
+  if (error) message.error(`Error loading bookmarks: ${error.message}`);
   if (loading) return <Loading />;
 
   const edges = data?.allBookmarks?.edges || [];

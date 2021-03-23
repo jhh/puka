@@ -1,11 +1,7 @@
 import { gql, useMutation } from "@apollo/client";
-import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import TextField from "@material-ui/core/TextField";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
+import { Form, Modal } from "antd";
+import BookmarkForm from "./BookmarkForm";
 import {
   CreateBookmark,
   CreateBookmarkVariables,
@@ -44,10 +40,6 @@ type Props = {
 };
 
 const AddBookmark = ({ open, setOpen }: Props) => {
-  const [title, setTitle] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
-  const [url, setUrl] = useState<string>("");
-  const [tags, setTags] = useState<string>("");
   const [createBookmark] = useMutation<CreateBookmark, CreateBookmarkVariables>(
     CREATE_BOOKMARK_MUTATION,
     {
@@ -101,73 +93,46 @@ const AddBookmark = ({ open, setOpen }: Props) => {
     }
   );
 
-  const handleSubmit = async () => {
-    const tagsArray = tags
+  const onCreate = async (values: any) => {
+    const tagsArray = values.tags
       .split(",")
-      .map((t) => t.trim())
-      .filter((t) => t.length > 0);
+      .map((t: string) => t.trim())
+      .filter((t: string) => t.length > 0);
 
-    await createBookmark({
-      variables: { title, description, url, tags: tagsArray },
-    });
+    const variables: CreateBookmarkVariables = {
+      ...values,
+      tags: tagsArray,
+    };
 
-    setTitle("");
-    setDescription("");
-    setUrl("");
-    setTags("");
+    await createBookmark({ variables });
     setOpen(false);
   };
 
+  const [form] = Form.useForm();
   return (
-    <>
-      <Dialog open={open}>
-        <DialogTitle>Add Bookmark</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="title"
-            label="Title"
-            fullWidth
-            value={title}
-            onChange={(event: any) => setTitle(event.target.value)}
-          />
-          <TextField
-            margin="dense"
-            id="description"
-            label="Description"
-            fullWidth
-            multiline
-            value={description}
-            onChange={(event: any) => setDescription(event.target.value)}
-          />
-          <TextField
-            margin="dense"
-            id="url"
-            label="URL"
-            fullWidth
-            value={url}
-            onChange={(event: any) => setUrl(event.target.value)}
-          />
-          <TextField
-            margin="dense"
-            id="tags"
-            label="Tags"
-            fullWidth
-            value={tags}
-            onChange={(event: any) => setTags(event.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)} color="primary">
-            Cancel
-          </Button>
-          <Button color="primary" onClick={() => handleSubmit()}>
-            Add
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+    <Modal
+      visible={open}
+      title="Create bookmark"
+      okText="Create"
+      cancelText="Cancel"
+      onCancel={() => {
+        form.resetFields();
+        setOpen(false);
+      }}
+      onOk={() => {
+        form
+          .validateFields()
+          .then((values) => {
+            form.resetFields();
+            onCreate(values);
+          })
+          .catch((info) => {
+            console.log("Validate Failed:", info);
+          });
+      }}
+    >
+      <BookmarkForm form={form} />
+    </Modal>
   );
 };
 

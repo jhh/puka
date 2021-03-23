@@ -1,5 +1,3 @@
-import CircularProgress from "@material-ui/core/CircularProgress";
-import { makeStyles } from "@material-ui/core/styles";
 import React, { useEffect, useState } from "react";
 
 const useDelayedRender = (delay: number) => {
@@ -20,31 +18,33 @@ const DelayedRender = ({ delay, children }: DelayedRenderProps) =>
   useDelayedRender(delay)(() => children);
 
 const Loading = () => {
-  const classes = useStyles();
+  const classes = {
+    centered: "centered",
+  };
 
   return (
     <DelayedRender delay={800}>
-      <CircularProgress className={classes.centered} />
+      <div className={classes.centered}>Loading</div>
     </DelayedRender>
   );
 };
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    width: "100vw",
-    textAlign: "center",
-  },
-  progress: {
-    color: theme.palette.secondary.dark,
-  },
-  centered: {
-    color: theme.palette.secondary.dark,
-    position: "fixed",
-    top: "50%",
-    left: "50%",
-    marginTop: "-50px",
-    marginLeft: "-50px",
-  },
-}));
+// const useStyles = makeStyles((theme) => ({
+//   root: {
+//     width: "100vw",
+//     textAlign: "center",
+//   },
+//   progress: {
+//     color: theme.palette.secondary.dark,
+//   },
+//   centered: {
+//     color: theme.palette.secondary.dark,
+//     position: "fixed",
+//     top: "50%",
+//     left: "50%",
+//     marginTop: "-50px",
+//     marginLeft: "-50px",
+//   },
+// }));
 
 export default Loading;
