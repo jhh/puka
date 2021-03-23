@@ -1,36 +1,20 @@
-import { Typography } from "@material-ui/core";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
+import styles from "./tag.less";
 
 type Props = {
   tags: string[];
 };
 
 const TagList = ({ tags }: Props) => {
-  const classes = useStyles();
-
   return (
-    <Typography variant="subtitle2" color="textPrimary" component="div">
+    <span className={styles.tags}>
       {tags.map((tag) => (
-        <Link to={`?t=${tag}`} key={tag} className={classes.link}>
+        <Link to={`?t=${tag}`} key={tag}>
           {tag}
         </Link>
       ))}
-    </Typography>
+    </span>
   );
 };
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    link: {
-      paddingRight: theme.spacing(1),
-      color: theme.palette.secondary.light,
-      textDecoration: "none",
-      "&:hover": {
-        textDecoration: "underline",
-      },
-    },
-  })
-);
 
 export default TagList;

@@ -6,15 +6,13 @@ import {
   useQuery,
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import { ThemeProvider } from "@material-ui/core/styles";
 import React from "react";
 import ReactDOM from "react-dom";
 import { cache } from "./cache";
 import Login from "./components/Auth/Login";
 import Pages from "./pages";
 import reportWebVitals from "./reportWebVitals";
-import theme from "./theme";
+import "./index.less";
 
 const typeDefs = gql`
   extend type Query {
@@ -57,10 +55,7 @@ function IsLoggedIn() {
 ReactDOM.render(
   <React.StrictMode>
     <ApolloProvider client={client}>
-      <CssBaseline />
-      <ThemeProvider theme={theme}>
-        <IsLoggedIn />
-      </ThemeProvider>
+      <IsLoggedIn />
     </ApolloProvider>
   </React.StrictMode>,
   document.getElementById("root")

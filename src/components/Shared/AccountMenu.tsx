@@ -1,53 +1,67 @@
-import AccountCircle from "@material-ui/icons/AccountCircle";
-import MenuItem from "@material-ui/core/MenuItem";
-import Menu from "@material-ui/core/Menu";
-import Signout from "../Auth/Signout";
-import IconButton from "@material-ui/core/IconButton";
+import { UserOutlined } from "@ant-design/icons";
+import { Button, Popover } from "antd";
 import { useState } from "react";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import { isLoggedInVar } from "../../cache";
+import styles from "./shared.less";
+
+function handleSignout() {
+  localStorage.removeItem("token");
+  isLoggedInVar(false);
+  window.location.reload();
+}
 
 const AccountMenu = () => {
-  const classes = useStyles();
-  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
+  const [visible, setVisible] = useState(false);
 
-  const handleClose: React.MouseEventHandler<HTMLLIElement> = () => {
-    setAnchorEl(null);
-  };
   return (
-    <div>
-      <IconButton
-        edge="end"
-        onClick={(event: any) => setAnchorEl(event.currentTarget)}
-      >
-        <AccountCircle fontSize="large" className={classes.icon} />
-      </IconButton>
-      <Menu
-        id="menu-appbar"
-        anchorEl={anchorEl}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
-        <MenuItem onClick={handleClose}>Profile</MenuItem>
-        <MenuItem
-          onClick={() => {
-            window.location.assign("/admin/");
-          }}
-        >
-          Admin
-        </MenuItem>
-        <Signout />
-      </Menu>
-    </div>
+    <Popover
+      overlayClassName="accountMenu"
+      content={
+        <ul className={styles.menu}>
+          <li>
+            <Button
+              type="text"
+              className={styles.button}
+              onClick={() => setVisible(false)}
+            >
+              Profile
+            </Button>
+          </li>
+          <li>
+            <Button
+              type="text"
+              className={styles.button}
+              onClick={() => handleSignout()}
+            >
+              Sign Out
+            </Button>
+          </li>
+        </ul>
+      }
+      trigger="click"
+      visible={visible}
+      onVisibleChange={(v) => setVisible(v)}
+    >
+      <Button
+        type="text"
+        icon={<UserOutlined className={styles.accountIcon} />}
+      />
+    </Popover>
   );
 };
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    icon: {
-      color: theme.palette.common.white,
-    },
-  })
-);
-
+/*
+const AccountMenu = () => {
+  return (
+    <Menu mode="horizontal" triggerSubMenuAction="click">
+      <SubMenu icon={<UserOutlined id="accountIcon" />}>
+        <Menu.Item key="1">Profile</Menu.Item>
+        <Menu.Item key="2" onClick={() => handleSignout()}>
+          Sign Out
+        </Menu.Item>
+      </SubMenu>
+    </Menu>
+  );
+};
+*/
 export default AccountMenu;

@@ -1,12 +1,8 @@
-import { Typography } from "@material-ui/core";
-import Link from "@material-ui/core/Link";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import { List } from "antd";
 import { AllBookmarks_allBookmarks_edges_node } from "../../generated/AllBookmarks";
 import TagList from "../Tag/TagList";
 import EditBookmark from "./EditBookmark";
+import styles from "./bookmarks.less";
 
 type BookmarksProps = {
   nodes: (AllBookmarks_allBookmarks_edges_node | null)[];
@@ -20,75 +16,42 @@ const EditLine = ({ bookmark }: BookmarkProps) => {
   const date = new Date(bookmark.createdAt);
   return (
     <div>
-      <Typography variant="caption" color="textSecondary">
+      <span className={styles.editLine}>
         {date
           .toLocaleDateString("en-us", { year: "numeric", month: "long" })
           .toLowerCase()}
         <EditBookmark bookmark={bookmark} />
-      </Typography>
+      </span>
     </div>
   );
 };
 
 const Bookmark = ({ bookmark }: BookmarkProps) => {
-  const classes = useStyles();
-
   return (
-    <ListItem>
-      <ListItemText
-        primary={
-          <Link
-            href={bookmark.url}
-            className={classes.title}
-            target="_blank"
-            rel="noreferrer"
-          >
+    <List.Item>
+      <List.Item.Meta
+        title={
+          <a href={bookmark.url} target="_blank" rel="noreferrer">
             {bookmark.title}
-          </Link>
+          </a>
         }
-        primaryTypographyProps={{
-          variant: "subtitle1",
-          color: "textPrimary",
-        }}
-        secondary={
-          <>
-            {bookmark.description}
-            <TagList tags={bookmark.tags} />
-            <EditLine bookmark={bookmark} />
-          </>
-        }
-        secondaryTypographyProps={{ component: "div" }}
-        className={classes.listText}
+        description={bookmark.description}
       />
-    </ListItem>
+      <TagList tags={bookmark.tags} />
+      <EditLine bookmark={bookmark} />
+    </List.Item>
   );
 };
 
 const Bookmarks = ({ nodes }: BookmarksProps) => (
-  <List dense>
-    {nodes.map((bookmark) => {
-      if (bookmark === null) {
-        throw new Error("Bookmark bookmark property was null");
-      }
+  <List
+    itemLayout="vertical"
+    dataSource={nodes}
+    renderItem={(bookmark) => {
+      if (bookmark === null) throw new Error("Bookmark was null");
       return <Bookmark key={bookmark.id} bookmark={bookmark} />;
-    })}
-  </List>
-);
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    listText: {
-      paddingRight: theme.spacing(4),
-    },
-    title: {
-      "&:hover": {
-        textDecoration: "none",
-      },
-    },
-    edit: {
-      paddingLeft: theme.spacing(1),
-    },
-  })
+    }}
+  />
 );
 
 export default Bookmarks;

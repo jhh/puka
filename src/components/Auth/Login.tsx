@@ -1,7 +1,7 @@
 import { gql, useMutation } from "@apollo/client";
+import { message } from "antd";
 import { isLoggedInVar } from "../../cache";
 import { TokenAuth, TokenAuthVariables } from "../../generated/TokenAuth";
-import Error from "../Shared/Error";
 import Loading from "../Shared/Loading";
 import LoginForm from "./LoginForm";
 
@@ -20,7 +20,7 @@ const Login = () => {
   });
 
   if (loading) return <Loading />;
-  if (error) return <Error error={error} />;
+  if (error) message.error(`Login error: ${error.message}`);
 
   return <LoginForm login={login} />;
 };
