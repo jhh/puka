@@ -1,0 +1,49 @@
+@import "../../config.less";
+
+.header {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: @puka-header-color;
+  }
+
+  .title {
+    margin-bottom: 0;
+  }
+
+  .icon {
+    font-size: @puka-header-icon-size;
+    color: @puka-header-color;
+  }
+
+  .search {
+    width: @puka-header-search-width;
+  }
+
+  & .spacer {
+    flex-grow: 1;
+  }
+}
+
+.item {
+  & + & {
+    margin-left: 2%;
+  }
+}
+
+.editLine {
+  color: @text-color-secondary;
+  font-size: @puka-edit-font-size;
+  & .edit {
+    padding-left: @control-padding-horizontal;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}

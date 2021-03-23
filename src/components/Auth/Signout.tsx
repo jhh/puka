@@ -1,4 +1,3 @@
-import MenuItem from "@material-ui/core/MenuItem";
 import { isLoggedInVar } from "../../cache";
 
 function handleSubmit() {
@@ -7,12 +6,12 @@ function handleSubmit() {
   window.location.reload();
 }
 
-const Login = () => {
+const Signout = () => {
   return (
-    <MenuItem color="inherit" onClick={() => handleSubmit()}>
+    <li color="inherit" onClick={() => handleSubmit()}>
       Sign Out
-    </MenuItem>
+    </li>
   );
 };
 
-export default Login;
+export default Signout;
