@@ -16,7 +16,7 @@ module.exports = {
         },
         cssLoaderOptions: {
           modules: {
-            auto: /puka\/src/, // don't process antd Less files
+            auto: /puka(-bookmarks)?\/src/, // don't process antd Less files
             localIdentName:
               process.env.NODE_ENV === "development"
                 ? "[path][name]__[local]"
