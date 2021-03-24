@@ -7,16 +7,6 @@ type LoginFormProps = {
   login: (a: { variables: TokenAuthVariables }) => void;
 };
 
-// function Copyright() {
-//   return (
-//     <span>
-//       {"Copyright © "}
-//       <a href="https://www.github.com/jhh">jhh</a> {new Date().getFullYear()}
-//       {"."}
-//     </span>
-//   );
-// }
-
 export default function SignIn(props: LoginFormProps) {
   const onFinish = (values: any) => {
     const variables: TokenAuthVariables = {
