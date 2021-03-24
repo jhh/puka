@@ -44,6 +44,7 @@ const AccountMenu = () => {
     >
       <Button
         type="text"
+        style={{ padding: 0, border: 0, width: "40px" }}
         icon={<UserOutlined className={styles.accountIcon} />}
       />
     </Popover>
