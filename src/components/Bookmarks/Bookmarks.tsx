@@ -6,6 +6,7 @@ import styles from "./bookmarks.less";
 
 type BookmarksProps = {
   nodes: (AllBookmarks_allBookmarks_edges_node | null)[];
+  loading: boolean;
 };
 
 type BookmarkProps = {
@@ -43,10 +44,11 @@ const Bookmark = ({ bookmark }: BookmarkProps) => {
   );
 };
 
-const Bookmarks = ({ nodes }: BookmarksProps) => (
+const Bookmarks = ({ nodes, loading }: BookmarksProps) => (
   <List
     itemLayout="vertical"
     dataSource={nodes}
+    loading={loading}
     renderItem={(bookmark) => {
       if (bookmark === null) throw new Error("Bookmark was null");
       return <Bookmark key={bookmark.id} bookmark={bookmark} />;

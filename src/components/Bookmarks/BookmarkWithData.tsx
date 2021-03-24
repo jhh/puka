@@ -6,7 +6,6 @@ import {
   AllBookmarks,
   AllBookmarksVariables,
 } from "../../generated/AllBookmarks";
-import Loading from "../Shared/Loading";
 import Bookmarks from "./Bookmarks";
 
 const BOOKMARKS_QUERY = gql`
@@ -51,7 +50,6 @@ const BookmarksWithData = () => {
   >(BOOKMARKS_QUERY, { variables });
 
   if (error) message.error(`Error loading bookmarks: ${error.message}`);
-  if (loading) return <Loading />;
 
   const edges = data?.allBookmarks?.edges || [];
   const nodes = edges.map((edge) => (edge ? edge.node : null));
@@ -68,7 +66,7 @@ const BookmarksWithData = () => {
         }
       }}
     >
-      <Bookmarks nodes={nodes} />
+      <Bookmarks nodes={nodes} loading={loading} />
     </InfiniteScroll>
   );
 };
