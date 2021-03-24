@@ -2,24 +2,22 @@ import { gql, useMutation } from "@apollo/client";
 import { message } from "antd";
 import { isLoggedInVar } from "../../cache";
 import { TokenAuth, TokenAuthVariables } from "../../generated/TokenAuth";
-import Loading from "../Shared/Loading";
 import LoginForm from "./LoginForm";
 
 const Login = () => {
-  const [login, { loading, error }] = useMutation<
-    TokenAuth,
-    TokenAuthVariables
-  >(LOGIN_MUTATION, {
-    onCompleted({ tokenAuth }) {
-      const token = tokenAuth?.token;
-      if (token) {
-        localStorage.setItem("token", token);
-        isLoggedInVar(true);
-      }
-    },
-  });
+  const [login, { error }] = useMutation<TokenAuth, TokenAuthVariables>(
+    LOGIN_MUTATION,
+    {
+      onCompleted({ tokenAuth }) {
+        const token = tokenAuth?.token;
+        if (token) {
+          localStorage.setItem("token", token);
+          isLoggedInVar(true);
+        }
+      },
+    }
+  );
 
-  if (loading) return <Loading />;
   if (error) message.error(`Login error: ${error.message}`);
 
   return <LoginForm login={login} />;
