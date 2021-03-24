@@ -5,6 +5,16 @@ import BookmarksWithData from "../components/Bookmarks/BookmarkWithData";
 import { Layout } from "antd";
 import styles from "./pages.less";
 
+function Copyright() {
+  return (
+    <span>
+      {"Copyright © "}
+      <a href="https://www.github.com/jhh">jhh</a> {new Date().getFullYear()}
+      {"."}
+    </span>
+  );
+}
+
 const { Content, Header, Footer } = Layout;
 
 const Bookmarks = () => {
@@ -21,7 +31,9 @@ const Bookmarks = () => {
         </div>
         <AddBookmark open={open} setOpen={setOpen} />
       </Content>
-      <Footer className={styles.footer}>Footer</Footer>
+      <Footer className={styles.footer}>
+        <Copyright />
+      </Footer>
     </Layout>
   );
 };
