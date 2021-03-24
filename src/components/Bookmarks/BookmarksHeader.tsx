@@ -13,8 +13,8 @@ const Logo = (props: LogoProps) => {
   return (
     <Button
       type="text"
+      className={`${styles.button} ${styles.item}`}
       icon={<TagsOutlined className={styles.icon} />}
-      className={styles.item}
       onClick={() => {
         props.onClick();
         navigate("");
