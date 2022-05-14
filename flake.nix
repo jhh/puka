@@ -36,19 +36,6 @@
             '';
           }; in puka.dependencyEnv;
 
-          # packages.default = with pkgs.poetry2nix; mkPoetryApplication {
-          #   projectDir = ./.;
-          #   preferWheels = true;
-
-          #   fixupPhase = ''
-          #     tar -xzf build.tgz
-          #     export SECRET_KEY=dummy
-          #     export DJANGO_SETTINGS_MODULE=puka.settings.production
-          #     python manage.py collectstatic --no-input
-          #     cp -vfr build $out
-          #   '';
-          # };
-
         };
     in
     with utils.lib; eachSystem defaultSystems out // {
@@ -81,8 +68,6 @@
                 wantedBy = [ "multi-user.target" ];
 
                 environment = {
-                  DATABASE_URL = "postgres://puka:PuaExJXjZDNv4PqBcZmb@192.168.1.46:5432/puka";
-                  SECRET_KEY = "gy=mqm_f*98ghz2zq$*uq%v1!!n!!b0u995$)=7-4q!!*3tt-q";
                   DJANGO_SETTINGS_MODULE = "puka.settings.production";
                 };
 
