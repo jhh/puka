@@ -75,9 +75,7 @@
                   let pkg = self.packages.${pkgs.system}.default;
                   in
                   {
-                    # Type = "oneshot";
                     # agenix secret in github:jhh/nixos-configs
-                    # LoadCredential = "AWS_SECRET_ACCESS_KEY:/run/agenix/aws_secret";
                     EnvironmentFile = "/run/agenix/puka_secrets";
                     ExecStart = "${pkg}/bin/gunicorn puka.wsgi --log-file -";
 
@@ -85,6 +83,20 @@
                     NoNewPrivileges = true;
                     ProtectSystem = "strict";
                   };
+              };
+
+              services.nginx = {
+                enable = true;
+                recommendedProxySettings = true;
+                virtualHosts."puka.j3ff.io" = {
+                  default = true;
+
+                  locations = {
+                    "/" = {
+                      proxyPass = "http://127.0.0.1:8000";
+                    };
+                  };
+                };
               };
             };
         };
