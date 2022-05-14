@@ -6,14 +6,14 @@ from puka.settings.common import *
 SECRET_KEY = os.environ["SECRET_KEY"]
 DEBUG = False
 
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SECURE_HSTS_SECONDS = 31536000
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+SECURE_HSTS_SECONDS = 0
 
 ALLOWED_HOSTS = ["*"]
 
-DATABASES = {"default": dj_database_url.config(conn_max_age=600, ssl_require=True)}
+DATABASES = {"default": dj_database_url.config(conn_max_age=600, ssl_require=False)}
 
 STATIC_ROOT = os.path.join(BASE_DIR, "build", "static")
 STATICFILES_DIRS = []
