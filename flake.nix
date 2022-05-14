@@ -84,20 +84,6 @@
                     ProtectSystem = "strict";
                   };
               };
-
-              services.nginx = {
-                enable = true;
-                recommendedProxySettings = true;
-                virtualHosts."puka.j3ff.io" = {
-                  default = true;
-
-                  locations = {
-                    "/" = {
-                      proxyPass = "http://127.0.0.1:8000";
-                    };
-                  };
-                };
-              };
             };
         };
 
