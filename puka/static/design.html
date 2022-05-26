@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Puka Design</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter var", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body>
+    <div class="flex h-screen flex-col">
+      <header class="bg-gray-900 px-6 py-4">
+        <div class="md:flex md:items-center md:justify-between">
+          <div class="min-w-0 flex-1">
+            <h2
+              class="text-2xl font-bold leading-7 text-white sm:truncate sm:text-3xl"
+            >
+              <svg
+                viewBox="64 64 896 896"
+                class="inline"
+                focusable="false"
+                width="1em"
+                height="1em"
+                fill="white"
+                aria-hidden="true"
+              >
+                <path
+                  d="M483.2 790.3L861.4 412c1.7-1.7 2.5-4 2.3-6.3l-25.5-301.4c-.7-7.8-6.8-13.9-14.6-14.6L522.2 64.3c-2.3-.2-4.7.6-6.3 2.3L137.7 444.8a8.03 8.03 0 000 11.3l334.2 334.2c3.1 3.2 8.2 3.2 11.3 0zm62.6-651.7l224.6 19 19 224.6L477.5 694 233.9 450.5l311.9-311.9zm60.16 186.23a48 48 0 1067.88-67.89 48 48 0 10-67.88 67.89zM889.7 539.8l-39.6-39.5a8.03 8.03 0 00-11.3 0l-362 361.3-237.6-237a8.03 8.03 0 00-11.3 0l-39.6 39.5a8.03 8.03 0 000 11.3l243.2 242.8 39.6 39.5c3.1 3.1 8.2 3.1 11.3 0l407.3-406.6c3.1-3.1 3.1-8.2 0-11.3z"
+                ></path>
+              </svg>
+              Puka Bookmarks
+            </h2>
+          </div>
+          <div class="mt-4 flex md:mt-0 md:ml-4">
+            <button
+              type="button"
+              class="inline-flex items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+            >
+              New
+            </button>
+          </div>
+        </div>
+      </header>
+      <main
+        class="flex-grow bg-neutral-100 px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8"
+      >
+        <!-- We've used 3xl here, but feel free to try other max-widths based on your needs -->
+        <div class="mx-auto max-w-4xl bg-white">
+          <ul role="list" class="divide-y divide-gray-200 shadow">
+            <li class="py-4 pl-2">
+              <article>
+                <h2 class="pb-2 text-base font-medium text-slate-800">
+                  Bookmark One
+                </h2>
+                <p class="text-sm text-slate-500">
+                  I'm baby shoreditch typewriter vaporware keffiyeh lyft
+                  bushwick. Slow-carb viral semiotics, meggings shaman vice
+                  seitan. Chillwave chartreuse truffaut fashion axe coloring
+                  book shabby chic. Pug fashion axe lyft, tofu la croix
+                  meditation prism yuccie.
+                </p>
+                <ul role="list" class="mt-4">
+                  <li class="inline text-xs text-red-700">web</li>
+                  <li class="inline text-xs text-red-700">python</li>
+                  <li class="inline text-xs text-red-700">django</li>
+                </ul>
+                <div class="text-xs text-slate-400">
+                  may 2022
+                  <button class="ml-3">edit</button>
+                </div>
+              </article>
+            </li>
+            <li class="py-4 pl-2">
+              <article>
+                <h2 class="pb-2 text-base font-medium text-slate-800">
+                  Bookmark One
+                </h2>
+                <p class="text-sm text-slate-500">
+                  Mustache man braid aesthetic flexitarian, authentic chartreuse
+                  tattooed austin hammock seitan pork belly succulents.
+                </p>
+                <ul role="list" class="mt-4">
+                  <li class="inline text-xs text-red-700">web</li>
+                  <li class="inline text-xs text-red-700">python</li>
+                  <li class="inline text-xs text-red-700">django</li>
+                </ul>
+                <div class="text-xs text-slate-400">
+                  may 2022
+                  <button class="ml-3">edit</button>
+                </div>
+              </article>
+            </li>
+
+            <!-- More items... -->
+          </ul>
+        </div>
+      </main>
+      <footer class="bg-gray-900 p-4 text-white">Footer</footer>
+
+      <!--
+  This example requires Tailwind CSS v2.0+
+
+  This example requires some changes to your config:
+
+  ```
+  // tailwind.config.js
+  module.exports = {
+    // ...
+    plugins: [
+      // ...
+      require('@tailwindcss/forms'),
+    ],
+  }
+  ```
+-->
+      <div
+        class="relative z-10"
+        aria-labelledby="slide-over-title"
+        role="dialog"
+        aria-modal="true"
+      >
+        <!-- Background backdrop, show/hide based on slide-over state. -->
+        <div class="fixed inset-0 bg-gray-600 opacity-50"></div>
+
+        <div class="fixed inset-0 overflow-hidden">
+          <div class="absolute inset-0 overflow-hidden">
+            <div
+              class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16"
+            >
+              <!--
+                          Slide-over panel, show/hide based on slide-over state.
+
+                          Entering: "transform transition ease-in-out duration-500 sm:duration-700"
+                            From: "translate-x-full"
+                            To: "translate-x-0"
+                          Leaving: "transform transition ease-in-out duration-500 sm:duration-700"
+                            From: "translate-x-0"
+                            To: "translate-x-full"
+                        -->
+              <div class="pointer-events-auto w-screen max-w-xl">
+                <form
+                  class="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl"
+                >
+                  <div class="h-0 flex-1 overflow-y-auto">
+                    <div class="bg-black py-6 px-4 sm:px-6">
+                      <div class="flex items-center justify-between">
+                        <h2
+                          class="text-lg font-medium text-white"
+                          id="slide-over-title"
+                        >
+                          New Bookmark
+                        </h2>
+                        <div class="ml-3 flex h-7 items-center">
+                          <button
+                            type="button"
+                            class="rounded-md bg-indigo-700 text-indigo-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                          >
+                            <span class="sr-only">Close panel</span>
+                            <!-- Heroicon name: outline/x -->
+                            <svg
+                              class="h-6 w-6"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke-width="2"
+                              stroke="currentColor"
+                              aria-hidden="true"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M6 18L18 6M6 6l12 12"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                      <!--                      <div class="mt-1">-->
+                      <!--                        <p class="text-sm text-indigo-300">-->
+                      <!--                          Get started by filling in the information below to-->
+                      <!--                          create your new bookmark.-->
+                      <!--                        </p>-->
+                      <!--                      </div>-->
+                    </div>
+                    <div class="flex flex-1 flex-col justify-between">
+                      <div class="divide-y divide-gray-200 px-4 sm:px-6">
+                        <div class="space-y-6 pt-6 pb-5">
+                          <div>
+                            <label
+                              for="bookmark-name"
+                              class="block text-sm font-medium text-gray-900"
+                            >
+                              Bookmark name
+                            </label>
+                            <div class="mt-1">
+                              <input
+                                type="text"
+                                name="bookmark-name"
+                                id="bookmark-name"
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label
+                              for="description"
+                              class="block text-sm font-medium text-gray-900"
+                            >
+                              Description
+                            </label>
+                            <div class="mt-1">
+                              <textarea
+                                id="description"
+                                name="description"
+                                rows="8"
+                                class="block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                              ></textarea>
+                            </div>
+                          </div>
+
+                          <div>
+                            <label
+                              for="tag-list"
+                              class="block text-sm font-medium text-gray-900"
+                            >
+                              Tags
+                            </label>
+                            <div class="mt-1">
+                              <input
+                                type="text"
+                                name="tag-list"
+                                id="tag-list"
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex flex-shrink-0 justify-end px-4 py-4">
+                    <button
+                      type="button"
+                      class="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      class="ml-4 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
