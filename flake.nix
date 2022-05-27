@@ -12,7 +12,7 @@
         poetry2nix.overlay
         (final: prev: {
           # The application
-          myapp = prev.poetry2nix.mkPoetryApplication {
+          puka = prev.poetry2nix.mkPoetryApplication {
             projectDir = ./.;
           };
         })
@@ -21,7 +21,7 @@
       out = system:
         let pkgs = import nixpkgs {
           inherit system;
-          overlays = [ poetry2nix.overlay ];
+          overlays = [ overlay ];
         };
         in
         {
@@ -29,20 +29,18 @@
           devShell = pkgs.mkShell {
 
             nativeBuildInputs = with pkgs; [
-              postgresql
-              python3Packages.poetry
               nodejs-16_x
-              watchman
+              postgresql
               pre-commit
+              python3Packages.ipython
+              python3Packages.poetry
+              watchman
             ];
 
             buildInputs = pkgs.lib.optional pkgs.stdenv.isDarwin pkgs.openssl;
           };
 
-          packages.default = let puka = with pkgs.poetry2nix; mkPoetryApplication {
-            projectDir = ./.;
-            preferWheels = true;
-          }; in puka.dependencyEnv;
+          packages.default = pkgs.puka.dependencyEnv;
 
         };
     in

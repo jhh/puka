@@ -15,10 +15,6 @@ class Bookmark(TimeStampedModel):
     tags = ArrayField(models.CharField(max_length=50), blank=True)
     title_description_search = SearchVectorField(null=True, editable=False)
 
-    @classmethod
-    def foo(cls):
-        ...
-
     class Meta:
         indexes = [
             GinIndex(fields=["tags"]),
