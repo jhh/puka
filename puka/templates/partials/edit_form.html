@@ -2,7 +2,7 @@
     id="id_bookmark_edit"
     class="relative z-10"
     {% if not show_form %}
-    classes="add hidden:700ms"
+    classes="add hidden:600ms"
     {% endif %}
     aria-labelledby="slide-over-title"
     role="dialog"
@@ -13,7 +13,7 @@
   <div
       class="fixed inset-0 bg-gray-600 opacity-50"
             {% if not show_form %}
-            classes="add hidden:700ms"
+            classes="add hidden:600ms"
             {% endif %}
   ></div>
 
@@ -24,10 +24,10 @@
       >
         <div
             {% if show_form %}
-              classes="add translate-x-0, remove translate-x-full"
+              classes="remove translate-x-full"
               class="transform transition ease-in-out duration-500 sm:duration-700 translate-x-full pointer-events-auto w-screen max-w-xl"
             {% else %}
-              classes="remove translate-x-0, add translate-x-full"
+              classes="add translate-x-full"
               class="transform transition ease-in-out duration-500 sm:duration-700 pointer-events-auto w-screen max-w-xl"
             {% endif %}
         >

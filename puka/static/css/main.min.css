@@ -932,10 +932,6 @@ select {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/*.htmx-swapping {*/
-/*  @apply transition-opacity ease-out opacity-0 duration-500;*/
-/*}*/
-
 .dj-input-text, .dj-input-url {
   display: block;
   width: 100%;
