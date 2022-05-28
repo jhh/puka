@@ -27,12 +27,27 @@ def bookmarks(request):
     )
 
 
-def bookmark_form(request):
+@require_GET
+def new(request):
     form = BookmarkForm()
     return render(
         request,
         "partials/edit_form.html",
         {
             "form": form,
+            "show_form": True,
+        },
+    )
+
+
+@require_GET
+def cancel(request):
+    form = BookmarkForm()
+    return render(
+        request,
+        "partials/edit_form.html",
+        {
+            "form": form,
+            "show_form": False,
         },
     )

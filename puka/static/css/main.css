@@ -2,9 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-.htmx-swapping {
-  @apply transition-opacity ease-out opacity-0 duration-500;
-}
+/*.htmx-swapping {*/
+/*  @apply transition-opacity ease-out opacity-0 duration-500;*/
+/*}*/
 
 .dj-input-text, .dj-input-url {
   @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm;

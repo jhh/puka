@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="{% static 'css/main.min.css' %}">
   <link rel="stylesheet" href="https://rsms.me/inter/inter.css"/>
   <script defer src="{% static 'js/htmx.min.js' %}"></script>
+  <script defer src="{% static 'js/class-tools.js' %}"></script>
 </head>
 <body>
 <div class="flex h-screen flex-col">
@@ -36,6 +37,9 @@
       <div class="mt-4 flex md:mt-0 md:ml-4">
         <button
             type="button"
+            hx-get="{% url 'bookmark-new' %}"
+            hx-target="#id_bookmark_edit"
+            hx-swap="outerHTML"
             class="inline-flex items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
         >
           New
@@ -55,7 +59,7 @@
       </div>
     </div>
   </footer>
-  {% include 'partials/edit_form.html' %}
+  <div id="id_bookmark_edit" class="hidden"></div>
 </div>
 </body>
 </html>

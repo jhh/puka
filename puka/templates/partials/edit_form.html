@@ -1,44 +1,36 @@
-<!--
-This example requires Tailwind CSS v2.0+
-
-This example requires some changes to your config:
-
-```
-// tailwind.config.js
-module.exports = {
-// ...
-plugins: [
-// ...
-require('@tailwindcss/forms'),
-],
-}
-```
--->
 <div
-    class=" relative z-10"
+    id="id_bookmark_edit"
+    class="relative z-10"
+    {% if not show_form %}
+    classes="add hidden:700ms"
+    {% endif %}
     aria-labelledby="slide-over-title"
     role="dialog"
     aria-modal="true"
+    hx-ext="class-tools"
 >
-  <!-- Background backdrop, show/hide based on slide-over state. -->
-  <div class="fixed inset-0 bg-gray-600 opacity-50"></div>
+  {# Background backdrop, show/hide based on slide-over state.  #}
+  <div
+      class="fixed inset-0 bg-gray-600 opacity-50"
+            {% if not show_form %}
+            classes="add hidden:700ms"
+            {% endif %}
+  ></div>
 
   <div class="fixed inset-0 overflow-hidden">
     <div class="absolute inset-0 overflow-hidden">
       <div
           class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16"
       >
-        <!--
-                    Slide-over panel, show/hide based on slide-over state.
-
-                    Entering: "transform transition ease-in-out duration-500 sm:duration-700"
-                      From: "translate-x-full"
-                      To: "translate-x-0"
-                    Leaving: "transform transition ease-in-out duration-500 sm:duration-700"
-                      From: "translate-x-0"
-                      To: "translate-x-full"
-                  -->
-        <div class="translate-x-0 pointer-events-auto w-screen max-w-xl">
+        <div
+            {% if show_form %}
+              classes="add translate-x-0, remove translate-x-full"
+              class="transform transition ease-in-out duration-500 sm:duration-700 translate-x-full pointer-events-auto w-screen max-w-xl"
+            {% else %}
+              classes="remove translate-x-0, add translate-x-full"
+              class="transform transition ease-in-out duration-500 sm:duration-700 pointer-events-auto w-screen max-w-xl"
+            {% endif %}
+        >
           <form
               class="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl"
           >
@@ -54,6 +46,9 @@ require('@tailwindcss/forms'),
                   <div class="ml-3 flex h-7 items-center">
                     <button
                         type="button"
+                        hx-get="{% url 'bookmark-cancel' %}"
+                        hx-target="#id_bookmark_edit"
+                        hx-swap="outerHTML"
                         class="rounded-md bg-indigo-700 text-indigo-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
                     >
                       <span class="sr-only">Close panel</span>
@@ -93,12 +88,6 @@ require('@tailwindcss/forms'),
                       </label>
                       <div class="mt-1">
                         {{ form.title }}
-{#                        <input#}
-{#                            type="text"#}
-{#                            name="bookmark-name"#}
-{#                            id="bookmark-name"#}
-{#                            class="dj-input-text"#}
-{#                        />#}
                       </div>
                     </div>
                     <div>
@@ -125,7 +114,7 @@ require('@tailwindcss/forms'),
                       </div>
                     </div>
 
-                     <div>
+                    <div>
                       <label
                           for="{{ form.tags.id_for_label }}"
                           class="block text-sm font-medium text-gray-900"

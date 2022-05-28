@@ -8,9 +8,13 @@ from django.urls import URLPattern
 from django.urls import URLResolver
 
 from puka.bookmarks.views import bookmarks
+from puka.bookmarks.views import cancel
+from puka.bookmarks.views import new
 
 urlpatterns: list[URLPattern | URLResolver] = [
     path("", bookmarks, name="bookmarks"),
+    path("new/", new, name="bookmark-new"),
+    path("cancel/", cancel, name="bookmark-cancel"),
     path("admin/", admin.site.urls),
 ]
 

@@ -672,6 +672,9 @@ select {
 .inline-flex {
   display: inline-flex;
 }
+.hidden {
+  display: none;
+}
 .h-screen {
   height: 100vh;
 }
@@ -716,10 +719,6 @@ select {
 }
 .translate-x-full {
   --tw-translate-x: 100%;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
-.translate-x-0 {
-  --tw-translate-x: 0px;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 .transform {
@@ -933,13 +932,9 @@ select {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.htmx-swapping {
-  opacity: 0;
-  transition-property: opacity;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 500ms;
-  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
-}
+/*.htmx-swapping {*/
+/*  @apply transition-opacity ease-out opacity-0 duration-500;*/
+/*}*/
 
 .dj-input-text, .dj-input-url {
   display: block;

@@ -19,19 +19,21 @@
       ];
 
       out = system:
-        let pkgs = import nixpkgs {
-          inherit system;
-          overlays = [ overlay ];
-        };
-        python = pkgs.python39.withPackages (p: with p; [
-          ipython
-          poetry
-        ]);
+        let
+          pkgs = import nixpkgs {
+            inherit system;
+            overlays = [ overlay ];
+          };
+          python = pkgs.python39.withPackages (p: with p; [
+            ipython
+            poetry
+          ]);
         in
         {
 
           devShell = pkgs.mkShell {
             nativeBuildInputs = with pkgs; [
+              httpie
               nodejs-16_x
               postgresql
               pre-commit
