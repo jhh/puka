@@ -4,6 +4,7 @@ from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.views.decorators.http import require_GET
 
+from .forms import BookmarkForm
 from .models import Bookmark
 
 
@@ -12,6 +13,8 @@ def bookmarks(request):
     bookmark_list = Bookmark.objects.all()
     paginator = Paginator(bookmark_list, 25)
 
+    form = BookmarkForm()
+
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
-    return render(request, "bookmarks.html", {"page_obj": page_obj})
+    return render(request, "bookmarks.html", {"form": form, "page_obj": page_obj})

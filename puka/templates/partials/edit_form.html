@@ -15,7 +15,7 @@ require('@tailwindcss/forms'),
 ```
 -->
 <div
-    class="hidden relative z-10"
+    class=" relative z-10"
     aria-labelledby="slide-over-title"
     role="dialog"
     aria-modal="true"
@@ -86,53 +86,57 @@ require('@tailwindcss/forms'),
                   <div class="space-y-6 pt-6 pb-5">
                     <div>
                       <label
-                          for="bookmark-name"
+                          for="{{ form.title.id_for_label }}"
                           class="block text-sm font-medium text-gray-900"
                       >
                         Bookmark name
                       </label>
                       <div class="mt-1">
-                        <input
-                            type="text"
-                            name="bookmark-name"
-                            id="bookmark-name"
-                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        />
+                        {{ form.title }}
+{#                        <input#}
+{#                            type="text"#}
+{#                            name="bookmark-name"#}
+{#                            id="bookmark-name"#}
+{#                            class="dj-input-text"#}
+{#                        />#}
                       </div>
                     </div>
                     <div>
                       <label
-                          for="description"
+                          for="{{ form.description.id_for_label }}"
                           class="block text-sm font-medium text-gray-900"
                       >
                         Description
                       </label>
                       <div class="mt-1">
-                              <textarea
-                                  id="description"
-                                  name="description"
-                                  rows="8"
-                                  class="block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                              ></textarea>
+                        {{ form.description }}
                       </div>
                     </div>
 
                     <div>
                       <label
-                          for="tag-list"
+                          for="{{ form.url.id_for_label }}"
+                          class="block text-sm font-medium text-gray-900"
+                      >
+                        URL
+                      </label>
+                      <div class="mt-1">
+                        {{ form.url }}
+                      </div>
+                    </div>
+
+                     <div>
+                      <label
+                          for="{{ form.tags.id_for_label }}"
                           class="block text-sm font-medium text-gray-900"
                       >
                         Tags
                       </label>
                       <div class="mt-1">
-                        <input
-                            type="text"
-                            name="tag-list"
-                            id="tag-list"
-                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        />
+                        {{ form.tags }}
                       </div>
                     </div>
+
                   </div>
                 </div>
               </div>

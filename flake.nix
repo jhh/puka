@@ -23,17 +23,19 @@
           inherit system;
           overlays = [ overlay ];
         };
+        python = pkgs.python39.withPackages (p: with p; [
+          ipython
+          poetry
+        ]);
         in
         {
 
           devShell = pkgs.mkShell {
-
             nativeBuildInputs = with pkgs; [
               nodejs-16_x
               postgresql
               pre-commit
-              python3Packages.ipython
-              python3Packages.poetry
+              python
               watchman
             ];
 

@@ -25,7 +25,8 @@ def bookmark_A() -> Bookmark:
     return create_bookmark("A")
 
 
-def test_something(db, bookmark_A: Bookmark):
+@pytest.mark.django_db
+def test_something(bookmark_A: Bookmark):
     bookmark_A.save()
     assert Bookmark.objects.all().count() == 1
 
