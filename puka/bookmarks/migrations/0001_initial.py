@@ -19,7 +19,10 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.BigAutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 ("created", models.DateTimeField(auto_now_add=True)),
@@ -30,7 +33,9 @@ class Migration(migrations.Migration):
                 (
                     "tags",
                     django.contrib.postgres.fields.ArrayField(
-                        base_field=models.CharField(max_length=50), blank=True, size=None
+                        base_field=models.CharField(max_length=50),
+                        blank=True,
+                        size=None,
                     ),
                 ),
                 (
@@ -42,13 +47,15 @@ class Migration(migrations.Migration):
         migrations.AddIndex(
             model_name="bookmark",
             index=django.contrib.postgres.indexes.GinIndex(
-                fields=["tags"], name="bookmarks_b_tags_65d16c_gin"
+                fields=["tags"],
+                name="bookmarks_b_tags_65d16c_gin",
             ),
         ),
         migrations.AddIndex(
             model_name="bookmark",
             index=django.contrib.postgres.indexes.GinIndex(
-                fields=["title_description_search"], name="bookmarks_b_title_d_9107af_gin"
+                fields=["title_description_search"],
+                name="bookmarks_b_title_d_9107af_gin",
             ),
         ),
     ]

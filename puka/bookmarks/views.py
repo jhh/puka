@@ -17,4 +17,22 @@ def bookmarks(request):
 
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
-    return render(request, "bookmarks.html", {"form": form, "page_obj": page_obj})
+    return render(
+        request,
+        "bookmarks.html",
+        {
+            "form": form,
+            "page_obj": page_obj,
+        },
+    )
+
+
+def bookmark_form(request):
+    form = BookmarkForm()
+    return render(
+        request,
+        "partials/edit_form.html",
+        {
+            "form": form,
+        },
+    )

@@ -16,7 +16,12 @@ def create_bookmark(
         tags = ["foo", "bar"]
     ts = timezone.now()
     return Bookmark(
-        title=title, description=description, url=url, tags=tags, created=ts, modified=ts
+        title=title,
+        description=description,
+        url=url,
+        tags=tags,
+        created=ts,
+        modified=ts,
     )
 
 
