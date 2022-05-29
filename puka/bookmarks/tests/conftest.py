@@ -22,11 +22,11 @@ def create_bookmark(
 
 
 @pytest.fixture
-def hipsum_bookmark(db):
+def succulents_bookmark(db):
     bookmark = create_bookmark(
         title="Hexagon bespoke succulents",
-        description="Tumeric tumblr poutine",
-        url="https://hipsum.co/",
+        description="Tumeric tumblr poutine.",
+        url="https://hipsum.co/kombucha",
         tags=["thundercats", "humblebrag"],
     )
     bookmark.save()
@@ -34,5 +34,42 @@ def hipsum_bookmark(db):
 
 
 @pytest.fixture
-def basic_bookmark() -> Bookmark:
-    return create_bookmark("basic bookmark")
+def typewriter_bookmark(db):
+    bookmark = create_bookmark(
+        title="Tote bag typewriter",
+        description="Before they sold out.",
+        url="https://normcore.org/?q=shaman",
+        tags=["banjo", "thundercats"],
+    )
+    bookmark.save()
+    return bookmark
+
+
+@pytest.fixture
+def flannel_bookmark(db):
+    bookmark = create_bookmark(
+        title="Flannel four dollar toast",
+        description=" Kale chips aesthetic.",
+        url="https://organic.com/",
+        tags=["artisan", "banjo"],
+    )
+    bookmark.save()
+    return bookmark
+
+
+@pytest.fixture
+def all_bookmarks(
+    succulents_bookmark,
+    typewriter_bookmark,
+    flannel_bookmark,
+):
+    return [
+        succulents_bookmark,
+        typewriter_bookmark,
+        flannel_bookmark,
+    ]
+
+
+@pytest.fixture
+def unsaved_bookmark() -> Bookmark:
+    return create_bookmark("unsaved bookmark")

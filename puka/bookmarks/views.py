@@ -10,7 +10,11 @@ from .models import Bookmark
 
 @require_GET
 def bookmarks(request):
-    bookmark_list = Bookmark.objects.all()
+    query = request.GET
+    if "tags" in query:
+        bookmark_list = Bookmark.objects.with_tags(query.getlist("tags"))
+    else:
+        bookmark_list = Bookmark.objects.all()
     paginator = Paginator(bookmark_list, 25)
 
     form = BookmarkForm()
