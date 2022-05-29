@@ -5,13 +5,31 @@ from django.urls import reverse
 from pytest_django.asserts import assertContains
 from pytest_django.asserts import assertTemplateUsed
 
+from puka.bookmarks.models import Bookmark
+
+
+@pytest.fixture
+def hipsum_bookmark(db):
+    bookmark = Bookmark(
+        title="Hexagon bespoke succulents",
+        description="Tumeric tumblr poutine",
+        url="https://hipsum.co/",
+        tags=["thundercats", "humblebrag"],
+    )
+    bookmark.save()
+    return bookmark
+
 
 @pytest.mark.django_db
-def test_bookmarks(client):
+def test_bookmarks(client, hipsum_bookmark):
     url = reverse("bookmarks")
     response = client.get(url)
-    assertTemplateUsed(response, "bookmark.html")
-    assert response.status_code == 200
+    assertTemplateUsed(response, "bookmarks.html")
+    assertContains(response, hipsum_bookmark.title)
+    assertContains(response, hipsum_bookmark.description)
+    assertContains(response, hipsum_bookmark.url)
+    for tag in hipsum_bookmark.tags:
+        assertContains(response, tag)
 
 
 def test_edit_form_new(client):
