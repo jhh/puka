@@ -14,6 +14,8 @@ def test_bookmarks(client, hipsum_bookmark):
     assertContains(response, hipsum_bookmark.title)
     assertContains(response, hipsum_bookmark.description)
     assertContains(response, hipsum_bookmark.url)
+    assertContains(response, hipsum_bookmark.created.strftime("%B %Y").lower())
+    print(hipsum_bookmark.created)
     for tag in hipsum_bookmark.tags:
         assertContains(response, tag)
 

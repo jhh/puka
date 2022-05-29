@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import pytest
-from django.utils import timezone
 
 from puka.bookmarks.models import Bookmark
 
@@ -14,14 +13,11 @@ def create_bookmark(
 ) -> Bookmark:
     if tags is None:
         tags = ["foo", "bar"]
-    ts = timezone.now()
     return Bookmark(
         title=title,
         description=description,
         url=url,
         tags=tags,
-        created=ts,
-        modified=ts,
     )
 
 
