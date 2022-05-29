@@ -5,20 +5,6 @@ from django.urls import reverse
 from pytest_django.asserts import assertContains
 from pytest_django.asserts import assertTemplateUsed
 
-from puka.bookmarks.models import Bookmark
-
-
-@pytest.fixture
-def hipsum_bookmark(db):
-    bookmark = Bookmark(
-        title="Hexagon bespoke succulents",
-        description="Tumeric tumblr poutine",
-        url="https://hipsum.co/",
-        tags=["thundercats", "humblebrag"],
-    )
-    bookmark.save()
-    return bookmark
-
 
 @pytest.mark.django_db
 def test_bookmarks(client, hipsum_bookmark):
