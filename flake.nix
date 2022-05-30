@@ -1,17 +1,15 @@
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
+    utils.url = "github:numtide/flake-utils";
     poetry2nix.url = "github:nix-community/poetry2nix";
   };
 
-  outputs = { self, nixpkgs, flake-utils, poetry2nix }:
+  outputs = { self, nixpkgs, utils, poetry2nix }:
     let
-      # Nixpkgs overlay providing the application
-      overlay = nixpkgs.lib.composeManyExtensions [
+      localOverlay = nixpkgs.lib.composeManyExtensions [
         poetry2nix.overlay
         (final: prev: {
-          # The application
           puka = prev.poetry2nix.mkPoetryApplication {
             projectDir = ./.;
           };
@@ -22,22 +20,24 @@
         let
           pkgs = import nixpkgs {
             inherit system;
-            overlays = [ overlay ];
+            overlays = [ localOverlay ];
           };
-          python = pkgs.python39.withPackages (p: with p; [
+
+          localPython = pkgs.python39.withPackages (p: with p; [
             ipython
             poetry
           ]);
+
         in
         {
 
           devShell = pkgs.mkShell {
             nativeBuildInputs = with pkgs; [
               httpie
+              localPython
               nodejs-16_x
               postgresql
               pre-commit
-              python
               watchman
             ];
 
@@ -48,7 +48,7 @@
 
         };
     in
-    with flake-utils.lib; eachSystem defaultSystems out // {
+    with utils.lib; eachSystem defaultSystems out // {
 
       nixosModules.default = { config, lib, pkgs, ... }:
         with lib;
@@ -60,45 +60,42 @@
             enable = mkEnableOption "Enable the Puka service";
           };
 
-          config = mkIf cfg.enable
-            {
-              systemd.services.puka = {
-                description = "Puka bookmarks";
+          config = mkIf cfg.enable {
+            systemd.services.puka = {
+              description = "Puka Bookmarks";
 
-                wantedBy = [ "multi-user.target" ];
+              wantedBy = [ "multi-user.target" ];
 
-                environment = {
-                  DJANGO_SETTINGS_MODULE = "puka.settings.production";
+              environment = {
+                DJANGO_SETTINGS_MODULE = "config.settings.production";
+              };
+
+              serviceConfig =
+                let pkg = self.packages.${pkgs.system}.default;
+                in
+                {
+                  # agenix secret in github:jhh/nixos-configs
+                  EnvironmentFile = "/run/agenix/puka_secrets";
+                  ExecStart = "${pkg}/bin/gunicorn config.wsgi --log-file -";
+
+                  DynamicUser = true;
+                  NoNewPrivileges = true;
+                  ProtectSystem = "strict";
                 };
+            };
 
-                serviceConfig =
-                  let pkg = self.packages.${pkgs.system}.default;
-                  in
-                  {
-                    # agenix secret in github:jhh/nixos-configs
-                    EnvironmentFile = "/run/agenix/puka_secrets";
-                    ExecStart = "${pkg}/bin/gunicorn puka.wsgi --log-file -";
+            services.nginx.virtualHosts."puka.j3ff.io" = {
+              forceSSL = true;
+              # useACMEHost = "puka.j3ff.io";
 
-                    DynamicUser = true;
-                    NoNewPrivileges = true;
-                    ProtectSystem = "strict";
-                  };
+              locations = {
+                "/" = {
+                  proxyPass = "http://127.0.0.1:8000";
+                };
               };
             };
+          };
         };
-      nixosConfigurations.container = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          self.nixosModules.default
-          ({ config, pkgs, ... }: {
-            # Only allow this to boot as a container
-            boot.isContainer = true;
-            networking.hostName = "puka";
-
-            j3ff.puka.enable = true;
-          })
-        ];
-      };
     };
 
 }
