@@ -19,3 +19,37 @@ DATABASES = {
         "PORT": "5432",
     },
 }
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'console': {
+            'format': '%(message)s',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'console',
+        },
+    },
+    'loggers': {
+        'gunicorn': {
+            'level': 'INFO',
+            'handlers': ['console'],
+            'propagate': True,
+        },
+        "django.request": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "django.security.DisallowedHost": {
+            "level": "INFO",
+            "handlers": ["console"],
+            "propagate": True,
+        },
+    },
+
+}
