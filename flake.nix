@@ -15,6 +15,8 @@
 
             fixupPhase = ''
               export SECRET_KEY=dummy
+              export DB_HOST=$SECRET_KEY
+              export DB_PASSWORD=$SECRET_KEY
               export DJANGO_SETTINGS_MODULE=config.settings.production
               python manage.py collectstatic --no-input
               cp -vfr staticfiles $out/lib/python3.9/site-packages/
