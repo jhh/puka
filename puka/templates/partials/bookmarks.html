@@ -1,0 +1,28 @@
+{% for bookmark in page_obj %}
+  <li
+      class="p-4"
+      {% if forloop.last and page_obj.has_next %}
+      hx-get="?page={{ page_obj.next_page_number }}{% if request.GET.t %}&t={{ request.GET.t }}{% endif %}"
+      hx-trigger="revealed"
+      hx-swap="afterend"
+      {% endif %}
+  >
+    <article>
+      <h2 class="pb-2 text-base font-medium text-slate-800">
+        <a href="{{ bookmark.url }}" target="_blank" rel="noreferrer">{{ bookmark.title }}</a>
+      </h2>
+      <p class="text-sm text-slate-600">
+        {{ bookmark.description }}
+      </p>
+      <ul role="list" class="mt-4">
+        {% for tag in bookmark.tags %}
+          <li class="inline text-sm text-red-700"><a href="?t={{ tag }}">{{ tag }}</a></li>
+        {% endfor %}
+      </ul>
+      <div class="text-xs text-slate-400">
+        {{ bookmark.created | date:'F Y' | lower }}
+        <button class="ml-3">edit</button>
+      </div>
+    </article>
+  </li>
+{% endfor %}

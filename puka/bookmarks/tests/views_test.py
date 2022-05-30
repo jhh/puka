@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertContains
+from pytest_django.asserts import assertNotContains
 from pytest_django.asserts import assertTemplateUsed
 
 
@@ -10,7 +11,7 @@ from pytest_django.asserts import assertTemplateUsed
 def test_bookmarks(client, succulents_bookmark):
     url = reverse("bookmarks")
     response = client.get(url)
-    assertTemplateUsed(response, "bookmarks.html")
+    assertTemplateUsed(response, "index.html")
     assertContains(response, succulents_bookmark.title)
     assertContains(response, succulents_bookmark.description)
     assertContains(response, succulents_bookmark.url)
@@ -18,6 +19,14 @@ def test_bookmarks(client, succulents_bookmark):
     print(succulents_bookmark.created)
     for tag in succulents_bookmark.tags:
         assertContains(response, tag)
+
+
+@pytest.mark.django_db
+def test_bookmarks_with_tag(client, succulents_bookmark, typewriter_bookmark):
+    url = reverse("bookmarks")
+    response = client.get(f"{url}?t=humblebrag")
+    assertContains(response, succulents_bookmark.title)
+    assertNotContains(response, typewriter_bookmark.title)
 
 
 def test_edit_form_new(client):

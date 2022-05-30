@@ -11,21 +11,23 @@ from .models import Bookmark
 @require_GET
 def bookmarks(request):
     query = request.GET
-    if "tags" in query:
-        bookmark_list = Bookmark.objects.with_tags(query.getlist("tags"))
+    if "t" in query:
+        bookmark_list = Bookmark.objects.with_tags(query.getlist("t"))
     else:
         bookmark_list = Bookmark.objects.all()
     paginator = Paginator(bookmark_list, 25)
 
-    form = BookmarkForm()
+    if request.htmx:
+        template_name = "partials/bookmarks.html"
+    else:
+        template_name = "index.html"
 
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
     return render(
         request,
-        "bookmarks.html",
+        template_name,
         {
-            "form": form,
             "page_obj": page_obj,
         },
     )

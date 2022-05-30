@@ -1,4 +1,5 @@
 {% load static %}
+{% load django_htmx %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,6 +10,7 @@
   <link rel="stylesheet" href="https://rsms.me/inter/inter.css"/>
   <script defer src="{% static 'js/htmx.min.js' %}"></script>
   <script defer src="{% static 'js/class-tools.js' %}"></script>
+  {% django_htmx_script %}
 </head>
 <body>
 <div class="flex h-screen flex-col">
@@ -17,7 +19,7 @@
       <div class="min-w-0 flex-1">
         <h2
             class="text-2xl font-bold leading-7 text-white sm:truncate sm:text-3xl"
-        >
+        ><a href="{% url 'bookmarks' %}">
           <svg
               viewBox="64 64 896 896"
               class="inline"
@@ -32,6 +34,7 @@
             ></path>
           </svg>
           Puka Bookmarks
+          </a>
         </h2>
       </div>
       <div class="mt-4 flex md:mt-0 md:ml-4">
@@ -50,15 +53,12 @@
   <main
       class="flex-grow bg-neutral-100 px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8"
   >
-    {% block content %}{% endblock %}
-  </main>
-  <footer class="py-4 bg-gray-900">
-    <div class="flex justify-center">
-      <div class="text-sm text-white">Copyright © <a class="text-indigo-300 hover:text-indigo-200"
-                                                     href="https://www.github.com/jhh">jhh</a> 2022.
-      </div>
+    <div class="mx-auto max-w-4xl bg-white">
+      <ul id="id_bookmarks" role="list" class="divide-y divide-gray-200 shadow">
+        {% include "partials/bookmarks.html" %}
+      </ul>
     </div>
-  </footer>
+  </main>
   <div id="id_bookmark_edit" class="hidden"></div>
 </div>
 </body>
