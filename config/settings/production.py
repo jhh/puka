@@ -20,25 +20,28 @@ DATABASES = {
     },
 }
 
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATIC_ROOT = BASE_DIR / "staticfiles"  # noqa
+
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'console': {
-            'format': '%(message)s',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "console": {
+            "format": "%(message)s",
         },
     },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'console',
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "console",
         },
     },
-    'loggers': {
-        'gunicorn': {
-            'level': 'INFO',
-            'handlers': ['console'],
-            'propagate': True,
+    "loggers": {
+        "gunicorn": {
+            "level": "INFO",
+            "handlers": ["console"],
+            "propagate": True,
         },
         "django.request": {
             "handlers": ["console"],
@@ -51,5 +54,4 @@ LOGGING = {
             "propagate": True,
         },
     },
-
 }

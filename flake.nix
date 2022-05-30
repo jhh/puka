@@ -12,6 +12,13 @@
         (final: prev: {
           puka = prev.poetry2nix.mkPoetryApplication {
             projectDir = ./.;
+
+            fixupPhase = ''
+              export SECRET_KEY=dummy
+              export DJANGO_SETTINGS_MODULE=config.settings.production
+              python manage.py collectstatic --no-input
+              cp -vfr staticfiles $out/lib/python3.9/site-packages/
+            '';
           };
         })
       ];
