@@ -12,7 +12,7 @@ ALLOWED_HOSTS = ["puka.j3ff.io"]
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "puka",
+        "NAME": "puka_next",
         "USER": "puka",
         "PASSWORD": os.environ["DB_PASSWORD"],
         "HOST": os.environ["DB_HOST"],
