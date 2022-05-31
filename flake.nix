@@ -88,7 +88,7 @@
                 in
                 ''
                   echo running migrations...
-                  ${pkg}/bin/manage.py --no-input migrate
+                  ${pkg}/bin/manage.py migrate --no-input
                 '';
 
               serviceConfig =
