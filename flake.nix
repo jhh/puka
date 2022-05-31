@@ -13,7 +13,7 @@
           puka = prev.poetry2nix.mkPoetryApplication {
             projectDir = ./.;
 
-            fixupPhase = ''
+            postInstall = ''
               export SECRET_KEY=dummy
               export DB_HOST=$SECRET_KEY
               export DB_PASSWORD=$SECRET_KEY
