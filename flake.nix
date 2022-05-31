@@ -74,10 +74,16 @@
               description = "Puka Bookmarks";
 
               wantedBy = [ "multi-user.target" ];
+              requires = [ "postgresql.service" ];
+              after = [ "postgresql.service" ];
 
               environment = {
                 DJANGO_SETTINGS_MODULE = "config.settings.production";
               };
+
+              preStart = ''
+                echo DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
+              '';
 
               serviceConfig =
                 let pkg = self.packages.${pkgs.system}.default;
