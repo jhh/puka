@@ -95,7 +95,7 @@
 
             services.nginx.virtualHosts."puka.j3ff.io" = {
               forceSSL = true;
-              useACMEHost = "puka.j3ff.io";
+              enableAcme = true;
 
               locations = {
                 "/" = {
