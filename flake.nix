@@ -20,6 +20,8 @@
               export DJANGO_SETTINGS_MODULE=config.settings.production
               python manage.py collectstatic --no-input
               cp -vfr staticfiles $out/lib/python3.9/site-packages/
+              mkdir -p $out/bin/
+              cp -vf manage.py $out/bin/
             '';
           };
         })
