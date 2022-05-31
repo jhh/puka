@@ -84,7 +84,8 @@
               };
 
               preStart = ''
-                echo DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
+                echo running migrations...
+                ${pkg}/bin/manage.py --no-input migrate
               '';
 
               serviceConfig =
