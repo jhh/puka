@@ -87,7 +87,6 @@
                 let pkg = self.packages.${pkgs.system}.default;
                 in
                 ''
-                  echo running migrations...
                   ${pkg}/bin/manage.py migrate --no-input
                 '';
 
