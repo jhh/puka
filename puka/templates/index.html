@@ -19,7 +19,11 @@
       <div class="min-w-0 flex-1">
         <h2
             class="text-2xl font-bold leading-7 text-white sm:truncate sm:text-3xl"
-        ><a href="{% url 'bookmarks' %}">
+        ><a
+            href="{% url 'bookmarks' %}"
+            hx-get="{% url 'bookmarks' %}"
+            hx-target="#id_bookmarks"
+        >
           <svg
               viewBox="64 64 896 896"
               class="inline"
