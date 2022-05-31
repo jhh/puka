@@ -83,10 +83,13 @@
                 DJANGO_SETTINGS_MODULE = "config.settings.production";
               };
 
-              preStart = ''
-                echo running migrations...
-                ${pkg}/bin/manage.py --no-input migrate
-              '';
+              preStart =
+                let pkg = self.packages.${pkgs.system}.default;
+                in
+                ''
+                  echo running migrations...
+                  ${pkg}/bin/manage.py --no-input migrate
+                '';
 
               serviceConfig =
                 let pkg = self.packages.${pkgs.system}.default;
