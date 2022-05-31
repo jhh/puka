@@ -93,6 +93,16 @@
                 };
             };
 
+            services.postgresql = {
+              ensureDatabases = [ "puka" ];
+              ensureUsers = [
+                {
+                  name = "puka";
+                  ensurePermissions."DATABASE puka" = "ALL PRIVILEGES";
+                }
+              ];
+            };
+
             services.nginx.virtualHosts."puka.j3ff.io" = {
               forceSSL = true;
               enableACME = true;
