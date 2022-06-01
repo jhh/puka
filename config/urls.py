@@ -16,6 +16,7 @@ urlpatterns: list[URLPattern | URLResolver] = [
     path("new/", new, name="bookmark-new"),
     path("cancel/", cancel, name="bookmark-cancel"),
     path("admin/", admin.site.urls),
+    path("accounts/", include("django.contrib.auth.urls")),
 ]
 
 

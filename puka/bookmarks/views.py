@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.views.decorators.http import require_GET
@@ -8,6 +9,7 @@ from .forms import BookmarkForm
 from .models import Bookmark
 
 
+@login_required
 @require_GET
 def bookmarks(request):
     query = request.GET
@@ -33,6 +35,7 @@ def bookmarks(request):
     )
 
 
+@login_required
 @require_GET
 def new(request):
     form = BookmarkForm()
@@ -46,6 +49,7 @@ def new(request):
     )
 
 
+@login_required
 @require_GET
 def cancel(request):
     form = BookmarkForm()
