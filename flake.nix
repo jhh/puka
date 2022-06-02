@@ -34,7 +34,7 @@
             overlays = [ localOverlay ];
           };
 
-          localPython = pkgs.python39.withPackages (p: with p; [
+          localPython = pkgs.python3.withPackages (p: with p; [
             ipython
             poetry
           ]);
