@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_http_methods
+from django_htmx.http import trigger_client_event
 
 from .forms import BookmarkForm
 from .models import Bookmark
@@ -36,14 +38,28 @@ def bookmarks(request):
 
 
 @login_required
-@require_GET
+@require_http_methods(["GET", "POST"])
 def new(request):
-    form = BookmarkForm()
+    if request.method == "POST":
+        form = BookmarkForm(request.POST)
+        if form.is_valid():
+            form.save()
+            response = render(
+                request,
+                "partials/edit_form.html",
+                {
+                    "form": form,
+                    "show_form": False,
+                },
+            )
+            return trigger_client_event(response, "bookmark-added", {})
+
+    # GET
     return render(
         request,
         "partials/edit_form.html",
         {
-            "form": form,
+            "form": BookmarkForm(),
             "show_form": True,
         },
     )

@@ -12,7 +12,7 @@
   <script defer src="{% static 'js/class-tools.js' %}"></script>
   {% django_htmx_script %}
 </head>
-<body>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 <div class="flex h-screen flex-col">
   <header class="bg-gray-900 px-6 py-4">
     <div class="md:flex md:items-center md:justify-between">
@@ -38,7 +38,7 @@
             ></path>
           </svg>
           Puka Bookmarks
-          </a>
+        </a>
         </h2>
       </div>
       <div class="mt-4 flex md:mt-0 md:ml-4">
@@ -58,7 +58,13 @@
       class="flex-grow bg-neutral-100 px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8"
   >
     <div class="mx-auto max-w-4xl bg-white">
-      <ul id="id_bookmarks" role="list" class="divide-y divide-gray-200 shadow">
+      <ul
+          id="id_bookmarks"
+          role="list"
+          class="divide-y divide-gray-200 shadow"
+          hx-get="{% url 'bookmarks' %}"
+          hx-trigger="bookmark-added from:body"
+      >
         {% include "partials/bookmarks.html" %}
       </ul>
     </div>
