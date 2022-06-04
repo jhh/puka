@@ -39,7 +39,7 @@ def bookmarks(request):
 
 @login_required
 @require_http_methods(["GET", "POST"])
-def new(request):
+def bookmark_create(request):
     if request.method == "POST":
         form = BookmarkForm(request.POST)
         if form.is_valid():
@@ -60,6 +60,35 @@ def new(request):
         "partials/edit_form.html",
         {
             "form": BookmarkForm(),
+            "show_form": True,
+        },
+    )
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def bookmark_update(request, pk):
+    bookmark = Bookmark.objects.get(pk=pk)
+    if request.method == "POST":
+        form = BookmarkForm(request.POST, instance=bookmark)
+        if form.is_valid():
+            form.save()
+            response = render(
+                request,
+                "partials/edit_form.html",
+                {
+                    "form": form,
+                    "show_form": False,
+                },
+            )
+            return trigger_client_event(response, "bookmark-added", {})
+
+    # GET
+    return render(
+        request,
+        "partials/edit_form.html",
+        {
+            "form": BookmarkForm(instance=bookmark),
             "show_form": True,
         },
     )

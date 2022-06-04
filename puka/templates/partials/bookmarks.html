@@ -27,7 +27,13 @@
       </ul>
       <div class="text-xs text-slate-400">
         {{ bookmark.created | date:'F Y' | lower }}
-        <button class="ml-3">edit</button>
+        <button
+            class="ml-3"
+            hx-get="{% url 'bookmark-update' bookmark.id %}"
+            hx-target="#id_bookmark_edit"
+            hx-swap="outerHTML"
+        >edit
+        </button>
       </div>
     </article>
   </li>

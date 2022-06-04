@@ -33,7 +33,11 @@
         >
           <form
               class="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl"
-              hx-post="{% url 'bookmark-new' %}"
+              {% if form.instance.pk is None %}
+              hx-post="{% url 'bookmark-create' %}"
+              {% else %}
+              hx-post="{% url 'bookmark-update' form.instance.pk %}"
+              {% endif %}
               hx-target="#id_bookmark_edit"
               hx-swap="outerHTML"
           >
