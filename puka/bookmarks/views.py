@@ -17,6 +17,15 @@ def bookmarks(request):
     query = request.GET
     if "t" in query:
         bookmark_list = Bookmark.objects.with_tags(query.getlist("t"))
+    elif "q" in query:
+        search: str = query.get("q")
+        if search.startswith("#"):
+            bookmark_list = Bookmark.objects.with_tags([search.lstrip("#")])
+        elif search.strip():
+            bookmark_list = Bookmark.objects.with_text(search)
+        else:
+            bookmark_list = Bookmark.objects.all()
+
     else:
         bookmark_list = Bookmark.objects.all()
     paginator = Paginator(bookmark_list, 25)

@@ -2,8 +2,11 @@ from __future__ import annotations
 
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchQuery
+from django.contrib.postgres.search import SearchRank
 from django.contrib.postgres.search import SearchVectorField
 from django.db import models
+from django.db.models import F
 
 from puka.core.models import TimeStampedModel
 
@@ -11,6 +14,16 @@ from puka.core.models import TimeStampedModel
 class BookmarkManager(models.Manager):
     def with_tags(self, tags: list[str]) -> models.QuerySet:
         return super().get_queryset().filter(tags__overlap=tags)
+
+    def with_text(self, text: str) -> models.QuerySet:
+        query = SearchQuery(text, search_type="websearch", config="english")
+        return (
+            super()
+            .get_queryset()
+            .annotate(rank=SearchRank(F("title_description_search"), query))
+            .filter(rank__gte=0.1)
+            .order_by("-rank")
+        )
 
 
 class Bookmark(TimeStampedModel):
