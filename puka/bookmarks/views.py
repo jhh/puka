@@ -15,6 +15,7 @@ from .models import Bookmark
 @require_GET
 def bookmarks(request):
     query = request.GET
+    clear_search = True
     if "t" in query:
         bookmark_list = Bookmark.objects.with_tags(query.getlist("t"))
     elif "q" in query:
@@ -25,6 +26,7 @@ def bookmarks(request):
             bookmark_list = Bookmark.objects.with_text(search)
         else:
             bookmark_list = Bookmark.objects.all()
+        clear_search = False
 
     else:
         bookmark_list = Bookmark.objects.all()
@@ -37,13 +39,16 @@ def bookmarks(request):
 
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
-    return render(
+
+    response = render(
         request,
         template_name,
         {
             "page_obj": page_obj,
         },
     )
+
+    return trigger_client_event(response, "clearSearch", {}) if clear_search else response
 
 
 @login_required
@@ -61,7 +66,7 @@ def bookmark_create(request):
                     "show_form": False,
                 },
             )
-            return trigger_client_event(response, "bookmark-added", {})
+            return trigger_client_event(response, "bookmarkAdded", {})
 
     # GET
     return render(
@@ -90,7 +95,7 @@ def bookmark_update(request, pk):
                     "show_form": False,
                 },
             )
-            return trigger_client_event(response, "bookmark-added", {})
+            return trigger_client_event(response, "bookmarkAdded", {})
 
     # GET
     return render(
