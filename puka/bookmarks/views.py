@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.http import QueryDict
 from django.shortcuts import render
 from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_http_methods
@@ -14,15 +15,22 @@ from .models import Bookmark
 @login_required
 @require_GET
 def bookmarks(request):
-    query = request.GET
+    request_query = request.GET
     clear_search = True
-    if "t" in query:
-        bookmark_list = Bookmark.objects.with_tags(query.getlist("t"))
-    elif "q" in query:
-        search: str = query.get("q")
+    query = QueryDict(mutable=True)
+
+    if "t" in request_query:
+        tags = request_query.getlist("t")
+        bookmark_list = Bookmark.objects.with_tags(tags)
+        query.setlist("t", tags)
+    elif "q" in request_query:
+        search: str = request_query.get("q")
         if search.startswith("#"):
-            bookmark_list = Bookmark.objects.with_tags([search.lstrip("#")])
+            tag = search.lstrip("#")
+            query["t"] = tag
+            bookmark_list = Bookmark.objects.with_tags([tag])
         elif search.strip():
+            query["q"] = search
             bookmark_list = Bookmark.objects.with_text(search)
         else:
             bookmark_list = Bookmark.objects.all()
@@ -45,6 +53,7 @@ def bookmarks(request):
         template_name,
         {
             "page_obj": page_obj,
+            "query": query.urlencode(),
         },
     )
 

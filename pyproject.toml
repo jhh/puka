@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "puka"
-version = "2.0.1"
+version = "2.0.2"
 description = "Puka Bookmarks"
 authors = ["Jeff Hutchison <jeff@jeffhutchison.com>"]
 license = "MIT"
