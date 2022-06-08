@@ -133,7 +133,7 @@ sqlparse = ">=0.2.0"
 
 [[package]]
 name = "django-htmx"
-version = "1.11.0"
+version = "1.12.0"
 description = "Extensions for using Django with htmx."
 category = "main"
 optional = false
@@ -343,7 +343,7 @@ python-versions = ">=2"
 
 [[package]]
 name = "whitenoise"
-version = "6.1.0"
+version = "6.2.0"
 description = "Radically simplified static file serving for WSGI applications"
 category = "main"
 optional = false
@@ -526,8 +526,8 @@ django-debug-toolbar = [
     {file = "django_debug_toolbar-3.4.0-py3-none-any.whl", hash = "sha256:42c1c2e9dc05bb57b53d641e3a6d131fc031b92377b34ae32e604a1fe439bb83"},
 ]
 django-htmx = [
-    {file = "django-htmx-1.11.0.tar.gz", hash = "sha256:aab226778ba409d0cf019c549b9fc6881b8a7b10555cd535fba6499c2cef707c"},
-    {file = "django_htmx-1.11.0-py3-none-any.whl", hash = "sha256:9e6403869f41d3a86d356a01aee852e0de03ccfe64c8dab836324d473fb3caf8"},
+    {file = "django-htmx-1.12.0.tar.gz", hash = "sha256:33750914939e8fbd214e36fb0976003e06f4cadc92007cbe5c49f59e32e58de6"},
+    {file = "django_htmx-1.12.0-py3-none-any.whl", hash = "sha256:e8351b9251642a5a550a18c6958727ea9b33574bb412b1900fa5ab0d5dd9db40"},
 ]
 gunicorn = [
     {file = "gunicorn-20.1.0-py3-none-any.whl", hash = "sha256:9dcc4547dbb1cb284accfb15ab5667a0e5d1881cc443e0677b4882a4067a807e"},
@@ -614,6 +614,6 @@ tzdata = [
     {file = "tzdata-2022.1.tar.gz", hash = "sha256:8b536a8ec63dc0751342b3984193a3118f8fca2afe25752bb9b7fffd398552d3"},
 ]
 whitenoise = [
-    {file = "whitenoise-6.1.0-py3-none-any.whl", hash = "sha256:2067fe9008a3cd7d0d75f75c9240b54f5f59996ca285cbeab18fc1e89949e30d"},
-    {file = "whitenoise-6.1.0.tar.gz", hash = "sha256:6ccc6d1ad6fb688a398ea65d97db47f018ea0be7da75e146e8f2e837a04ba590"},
+    {file = "whitenoise-6.2.0-py3-none-any.whl", hash = "sha256:8e9c600a5c18bd17655ef668ad55b5edf6c24ce9bdca5bf607649ca4b1e8e2c2"},
+    {file = "whitenoise-6.2.0.tar.gz", hash = "sha256:8fa943c6d4cd9e27673b70c21a07b0aa120873901e099cd46cab40f7cc96d567"},
 ]
