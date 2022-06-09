@@ -34,23 +34,18 @@
             overlays = [ localOverlay ];
           };
 
-          localPython = pkgs.python3.withPackages (p: with p; [
-            ipython
-            poetry
-          ]);
-
         in
         {
 
           devShell = pkgs.mkShell {
             nativeBuildInputs = with pkgs; [
-              httpie
-              localPython
+              python3
+              poetry
               nodejs-16_x
               postgresql
               pre-commit
               watchman
-            ];
+            ] ++ pkgs.lib.optional pkgs.stdenv.isLinux pkgs.httpie;
 
             buildInputs = pkgs.lib.optional pkgs.stdenv.isDarwin pkgs.openssl;
           };
