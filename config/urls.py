@@ -22,7 +22,7 @@ urlpatterns: list[URLPattern | URLResolver] = [
 ]
 
 
-if "debug_toolbar" in settings.INSTALLED_APPS:
+if "debug_toolbar" in settings.INSTALLED_APPS:  # pragma: no cover
     import debug_toolbar
 
     urlpatterns = [*urlpatterns, path("__debug__/", include(debug_toolbar.urls))]
