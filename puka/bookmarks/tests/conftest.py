@@ -36,7 +36,7 @@ def succulents_bookmark(db):
 @pytest.fixture
 def typewriter_bookmark(db):
     bookmark = create_bookmark(
-        title="Tote bag typewriter",
+        title="Tote bag typewriter aesthetic",
         description="Before they sold out.",
         url="https://normcore.org/?q=shaman",
         tags=["banjo", "thundercats"],

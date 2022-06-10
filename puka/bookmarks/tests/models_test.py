@@ -50,3 +50,14 @@ def test_with_tags(
     assert qs.contains(succulents_bookmark)
     assert qs.contains(typewriter_bookmark)
     assert qs.contains(flannel_bookmark)
+
+
+@pytest.mark.django_db
+def test_with_text(
+    succulents_bookmark,
+    typewriter_bookmark,
+    flannel_bookmark,
+):
+    qs = Bookmark.objects.with_text("tumeric")
+    assert len(qs) == 1
+    assert qs.contains(succulents_bookmark)
