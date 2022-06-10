@@ -1,17 +1,15 @@
 from __future__ import annotations
 
-import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertContains
 from pytest_django.asserts import assertNotContains
 from pytest_django.asserts import assertTemplateUsed
 
 
-@pytest.mark.django_db
-def test_bookmarks(client, succulents_bookmark):
+def test_bookmarks(admin_client, succulents_bookmark):
     url = reverse("bookmarks")
-    response = client.get(url)
-    assertTemplateUsed(response, "index.html")
+    response = admin_client.get(url)
+    assertTemplateUsed(response, "partials/bookmarks.html")
     assertContains(response, succulents_bookmark.title)
     assertContains(response, succulents_bookmark.description)
     assertContains(response, succulents_bookmark.url)
@@ -21,23 +19,22 @@ def test_bookmarks(client, succulents_bookmark):
         assertContains(response, tag)
 
 
-@pytest.mark.django_db
-def test_bookmarks_with_tag(client, succulents_bookmark, typewriter_bookmark):
+def test_bookmarks_with_tag(admin_client, succulents_bookmark, typewriter_bookmark):
     url = reverse("bookmarks")
-    response = client.get(f"{url}?t=humblebrag")
+    response = admin_client.get(f"{url}?t=humblebrag")
     assertContains(response, succulents_bookmark.title)
     assertNotContains(response, typewriter_bookmark.title)
 
 
-def test_edit_form_new(client):
-    url = reverse("bookmark-new")
-    response = client.get(url)
+def test_edit_form_new(admin_client):
+    url = reverse("bookmark-create")
+    response = admin_client.get(url)
     assertTemplateUsed(response, "partials/edit_form.html")
     assertContains(response, "remove translate-x-full")
 
 
-def test_edit_form_cancel(client):
+def test_edit_form_cancel(admin_client):
     url = reverse("bookmark-cancel")
-    response = client.get(url)
+    response = admin_client.get(url)
     assertTemplateUsed(response, "partials/edit_form.html")
     assertContains(response, "add translate-x-full")
