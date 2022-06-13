@@ -77,7 +77,7 @@
                 in
                 ''
                   ${pkg}/bin/manage.py migrate --no-input
-                  ${pkg}/bin/manage.py collectstatic --no-input
+                  ${pkg}/bin/manage.py collectstatic --no-input --clear
 
                 '';
 
