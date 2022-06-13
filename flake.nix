@@ -77,6 +77,7 @@
                 in
                 ''
                   ${pkg}/bin/manage.py migrate --no-input
+                  echo Copying static files to $STATE_DIRECTORY.
                   ${pkg}/bin/manage.py collectstatic --no-input --clear --verbosity=0
 
                 '';
