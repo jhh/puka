@@ -23,8 +23,7 @@ DATABASES = {
 }
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-STATIC_ROOT = BASE_DIR / "staticfiles"  # noqa
-
+STATIC_ROOT = os.environ["STATE_DIRECTORY"]
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
