@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-22.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     utils.url = "github:numtide/flake-utils";
     poetry2nix.url = "github:nix-community/poetry2nix";
   };
@@ -33,7 +33,6 @@
 
           devShell = pkgs.mkShell {
             nativeBuildInputs = with pkgs; [
-              python3
               poetry
               nodejs-16_x
               postgresql
