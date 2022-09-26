@@ -111,6 +111,7 @@
             };
 
             services.nginx.virtualHosts."puka.j3ff.io" = {
+              # security.acme is configured for eris globally in nginx.nix
               forceSSL = true;
               enableACME = true;
               acmeRoot = null;
