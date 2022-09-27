@@ -87,8 +87,11 @@
                 {
                   # agenix secret in github:jhh/nixos-configs
                   EnvironmentFile = "/run/agenix/puka_secrets";
-                  ExecStart = "${pkg}/bin/gunicorn config.wsgi --log-file -";
+                  ExecStart = "${pkgs.uwsgi}/bin/uwsgi --http :8000 --module config.wsgi";
 
+                  Type = "notify";
+                  NotifyAccess = "all";
+                  KillSignal = "SIGQUIT";
                   DynamicUser = true;
                   StateDirectory = "puka";
                   NoNewPrivileges = true;
