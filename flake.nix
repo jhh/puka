@@ -96,7 +96,7 @@
                 {
                   # agenix secret in github:jhh/nixos-configs
                   EnvironmentFile = "/run/agenix/puka_secrets";
-                  ExecStart = "${pkg}/bin/uwsgi  --http-socket 127.0.0.1:8000 --master --processes 4 --threads 2 --module config.wsgi";
+                  ExecStart = "${pkg}/bin/uwsgi  --http-socket 127.0.0.1:8000 --master --processes 2 --disable-logging --module config.wsgi";
 
                   Type = "notify";
                   NotifyAccess = "all";
