@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     utils.url = "github:numtide/flake-utils";
     poetry2nix.url = "github:nix-community/poetry2nix";
   };
@@ -33,12 +33,11 @@
 
           devShell = pkgs.mkShell {
             nativeBuildInputs = with pkgs; [
-              python3
               poetry
               nodejs-16_x
               postgresql
               pre-commit
-              watchman
+              # watchman
             ] ++ pkgs.lib.optional pkgs.stdenv.isLinux pkgs.httpie;
 
             buildInputs = pkgs.lib.optional pkgs.stdenv.isDarwin pkgs.openssl;
