@@ -37,7 +37,7 @@
               nodejs-16_x
               postgresql
               pre-commit
-              watchman
+              # watchman
             ] ++ pkgs.lib.optional pkgs.stdenv.isLinux pkgs.httpie;
 
             buildInputs = pkgs.lib.optional pkgs.stdenv.isDarwin pkgs.openssl;
