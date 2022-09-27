@@ -13,6 +13,15 @@
           puka = prev.poetry2nix.mkPoetryApplication {
             projectDir = ./.;
 
+            overrides = prev.poetry2nix.overrides.withDefaults
+              (self: super: {
+                uwsgi = super.uwsgi.overridePythonAttrs
+                  (old:
+                    {
+                      buildInputs = (old.buildInputs or [ ]) ++ [ prev.expat prev.zlib ];
+                    });
+              });
+
             postInstall = ''
               mkdir -p $out/bin/
               cp -vf manage.py $out/bin/
@@ -40,7 +49,7 @@
               # watchman
             ] ++ pkgs.lib.optional pkgs.stdenv.isLinux pkgs.httpie;
 
-            buildInputs = pkgs.lib.optional pkgs.stdenv.isDarwin pkgs.openssl;
+            buildInputs = [ pkgs.expat pkgs.zlib ] ++ pkgs.lib.optional pkgs.stdenv.isDarwin pkgs.openssl;
           };
 
           packages.default = pkgs.puka.dependencyEnv;

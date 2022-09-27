@@ -305,6 +305,14 @@ optional = false
 python-versions = ">=2"
 
 [[package]]
+name = "uWSGI"
+version = "2.0.20"
+description = "The uWSGI server"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "whitenoise"
 version = "6.2.0"
 description = "Radically simplified static file serving for WSGI applications"
@@ -321,7 +329,7 @@ brotli = ["Brotli"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "3fdfdea929a9676b6f708a488894e9bd9cd78c4fd623ad8f9ccd0f58d6ce3b0f"
+content-hash = "04d6b95fc3c681f946e47cc674f5ea9410408eed3bf5ad7cb9a2b6900b50a59b"
 
 [metadata.files]
 asgiref = [
@@ -569,6 +577,9 @@ tomli = [
 tzdata = [
     {file = "tzdata-2022.4-py2.py3-none-any.whl", hash = "sha256:74da81ecf2b3887c94e53fc1d466d4362aaf8b26fc87cda18f22004544694583"},
     {file = "tzdata-2022.4.tar.gz", hash = "sha256:ada9133fbd561e6ec3d1674d3fba50251636e918aa97bd59d63735bef5a513bb"},
+]
+uWSGI = [
+    {file = "uwsgi-2.0.20.tar.gz", hash = "sha256:88ab9867d8973d8ae84719cf233b7dafc54326fcaec89683c3f9f77c002cdff9"},
 ]
 whitenoise = [
     {file = "whitenoise-6.2.0-py3-none-any.whl", hash = "sha256:8e9c600a5c18bd17655ef668ad55b5edf6c24ce9bdca5bf607649ca4b1e8e2c2"},
