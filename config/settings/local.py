@@ -51,3 +51,5 @@ LOGGING = {
         "level": "INFO",
     },
 }
+
+TAILWIND_CSS = "css/main.css"

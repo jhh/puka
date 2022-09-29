@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# script/bootstrap: Resolve all dependencies that the application requires to
+#                   run.
+
+set -e
+
+cd "$(dirname "$0")/.."
+source script/.config
+
+echo "==> Installing flake dependencies…"
+if [ ! -f ".envrc" ]; then
+    echo "use flake" > .envrc
+    echo "==> Created .envrc to load flake dev shell…"
+    echo "==> Check its contents and run \"direnv allow\" to approve loading"
+    echo "==> Re-run $0 to continue"
+fi
+
+if [ -f "pyproject.toml" ]; then
+    echo "==> Installing python dependencies…"
+    poetry env info -p >/dev/null 2>&1 || {
+        poetry install
+    }
+fi
+
+if [ -f "package.json" ]; then
+    echo "==> Installing NPM CSS & JS dependencies…"
+    [ -d "node_modules" ] || {
+        npm install
+    }
+fi
+
+echo "==> Installing non-NPM JS dependencies…"
+if [ ! -d "$THIRD_PARTY_DIR" ]; then
+    mkdir "$THIRD_PARTY_DIR"
+    git clone https://github.com/bigskysoftware/_hyperscript.git "$THIRD_PARTY_DIR/_hyperscript"
+fi
