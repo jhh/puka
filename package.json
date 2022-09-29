@@ -8,8 +8,6 @@
     }
   },
   "scripts": {
-    "build": "postcss puka/static/css/main.css -o puka/static/css/main.min.css",
-    "install": "gunzip --stdout --keep --force node_modules/htmx.org/dist/htmx.min.js.gz > puka/static/js/htmx.min.js",
     "watch": "npm-watch"
   },
   "devDependencies": {
