@@ -77,7 +77,7 @@
               after = [ "postgresql.service" ];
 
               environment = {
-                DJANGO_SETTINGS_MODULE = "config.settings.production";
+                DJANGO_SETTINGS_MODULE = "puka.settings.production";
               };
 
               preStart =
