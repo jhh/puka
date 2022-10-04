@@ -15,7 +15,7 @@ DATABASES = {
         "NAME": "puka",
         "USER": "puka",
         "PASSWORD": os.environ["DB_PASSWORD"],
-        "CONN_MAX_AGE": 60,
+        "CONN_MAX_AGE": 600,
         "OPTIONS": {
             "application_name": "puka.j3ff.io",
         },
