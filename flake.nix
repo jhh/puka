@@ -113,7 +113,7 @@
               ensureUsers = [
                 {
                   name = "puka";
-                  ensurePermissions."DATABASE puka" = "ALL PRIVILEGES";
+                  ensureDBOwnership = true;
                 }
               ];
               authentication = ''
