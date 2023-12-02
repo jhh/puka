@@ -31,7 +31,7 @@ in
         '';
 
       serviceConfig =
-        let pkg = self.packages.${pkgs.system}.default;
+        let pkg = self.packages.${pkgs.system}.default.dependencyEnv;
         in
         {
           # agenix secret in github:jhh/nixos-configs
