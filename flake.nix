@@ -24,8 +24,21 @@
         in
         {
           packages = {
-            main = mkPoetryApplication { inherit overrides; projectDir = self; groups = [ "main" ]; };
-            dev = mkPoetryApplication { inherit overrides; projectDir = self; groups = [ "main" "dev" ]; };
+            main = mkPoetryApplication {
+              projectDir = self;
+              inherit overrides;
+              groups = [ "main" ];
+              postInstall = ''
+                mkdir -p $out/bin/
+                cp -vf manage.py $out/bin/
+              '';
+            };
+
+            dev = mkPoetryApplication {
+              inherit overrides; projectDir = self;
+              groups = [ "main" "dev" ];
+            };
+
             default = self.packages.${system}.main;
           };
 
