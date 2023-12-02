@@ -1,140 +1,41 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    utils.url = "github:numtide/flake-utils";
-    poetry2nix.url = "github:nix-community/poetry2nix";
+    flake-utils.url = "github:numtide/flake-utils";
+    poetry2nix = {
+      url = "github:nix-community/poetry2nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, utils, poetry2nix }:
-    let
-      localOverlay = nixpkgs.lib.composeManyExtensions [
-        poetry2nix.overlay
-        (final: prev: {
-          puka = prev.poetry2nix.mkPoetryApplication {
-            projectDir = ./.;
-
-            overrides = prev.poetry2nix.overrides.withDefaults
-              (self: super: {
-                uwsgi = super.uwsgi.overridePythonAttrs
-                  (old:
-                    {
-                      buildInputs = (old.buildInputs or [ ]) ++ [ prev.expat prev.zlib ];
-                    });
-              });
-
-            postInstall = ''
-              mkdir -p $out/bin/
-              cp -vf manage.py $out/bin/
-            '';
-          };
-        })
-      ];
-
-      out = system:
+  outputs = { self, nixpkgs, flake-utils, poetry2nix }:
+    flake-utils.lib.eachDefaultSystem
+      (system:
         let
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = [ localOverlay ];
-          };
+          pkgs = nixpkgs.legacyPackages.${system};
+          poetry2nixPkg = poetry2nix.lib.mkPoetry2Nix { inherit pkgs; };
+          inherit (poetry2nixPkg) mkPoetryEnv mkPoetryApplication;
 
+          overrides = poetry2nixPkg.overrides.withDefaults (self: super: {
+            uwsgi = super.uwsgi.overridePythonAttrs (old: {
+              buildInputs = (old.buildInputs or [ ]) ++ [ super.setuptools pkgs.expat pkgs.zlib ];
+            });
+          });
         in
         {
-
-          devShell = pkgs.mkShell {
-            nativeBuildInputs = with pkgs; [
-              poetry
-              nodejs-16_x
-              postgresql
-              pre-commit
-              # watchman
-            ] ++ pkgs.lib.optional pkgs.stdenv.isLinux pkgs.httpie;
-
-            buildInputs = [ pkgs.expat pkgs.zlib ] ++ pkgs.lib.optional pkgs.stdenv.isDarwin pkgs.openssl;
+          packages = {
+            main = mkPoetryApplication { inherit overrides; projectDir = self; groups = [ "main" ]; };
+            dev = mkPoetryApplication { inherit overrides; projectDir = self; groups = [ "main" "dev" ]; };
+            default = self.packages.${system}.main;
           };
 
-          packages.default = pkgs.puka.dependencyEnv;
-
-        };
-    in
-    with utils.lib; eachSystem defaultSystems out // {
-
-      nixosModules.default = { config, lib, pkgs, ... }:
-        with lib;
-        let
-          cfg = config.j3ff.puka;
-        in
-        {
-          options.j3ff.puka = {
-            enable = mkEnableOption "Enable the Puka service";
+          devShells.default = pkgs.mkShell {
+            inputsFrom = [ self.packages.${system}.dev ];
+            packages = [ pkgs.poetry ];
           };
 
-          config = mkIf cfg.enable {
-            systemd.services.puka = {
-              description = "Puka Bookmarks";
-
-              wantedBy = [ "multi-user.target" ];
-              requires = [ "postgresql.service" ];
-              after = [ "postgresql.service" ];
-
-              environment = {
-                DJANGO_SETTINGS_MODULE = "puka.settings.production";
-              };
-
-              preStart =
-                let pkg = self.packages.${pkgs.system}.default;
-                in
-                ''
-                  ${pkg}/bin/manage.py migrate --no-input
-                  echo Copying static files to $STATE_DIRECTORY.
-                  ${pkg}/bin/manage.py collectstatic --no-input --clear --verbosity=0
-
-                '';
-
-              serviceConfig =
-                let pkg = self.packages.${pkgs.system}.default;
-                in
-                {
-                  # agenix secret in github:jhh/nixos-configs
-                  EnvironmentFile = "/run/agenix/puka_secrets";
-                  ExecStart = "${pkg}/bin/uwsgi  --http-socket 127.0.0.1:8000 --master --processes 2 --disable-logging --module puka.wsgi";
-
-                  Type = "notify";
-                  NotifyAccess = "all";
-                  KillSignal = "SIGQUIT";
-                  DynamicUser = true;
-                  StateDirectory = "puka";
-                  NoNewPrivileges = true;
-                  ProtectSystem = "strict";
-                };
-            };
-
-            services.postgresql = {
-              ensureDatabases = [ "puka" ];
-              ensureUsers = [
-                {
-                  name = "puka";
-                  ensureDBOwnership = true;
-                }
-              ];
-              authentication = ''
-                local puka puka md5
-              '';
-            };
-
-            services.nginx.virtualHosts."puka.j3ff.io" = {
-              # security.acme is configured for eris globally in nginx.nix
-              forceSSL = true;
-              enableACME = true;
-              acmeRoot = null;
-
-              locations = {
-                "/" = {
-                  proxyPass = "http://127.0.0.1:8000";
-                };
-              };
-            };
-          };
-        };
+        }) // {
+      nixosModules.puka = import ./nix/module.nix self;
+      nixosModules.default = self.nixosModules.puka;
     };
-
 }

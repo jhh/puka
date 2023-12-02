@@ -8,7 +8,7 @@ packages = [
 ]
 version = "2.0.4"
 
-[tool.poetry.dependencies]
+[tool.poetry.group.main.dependencies]
 Django = "^4.1"
 django-htmx = "^1.11.0"
 psycopg2 = "^2.9.3"
@@ -16,7 +16,7 @@ python = "^3.10"
 whitenoise = {extras = ["brotli"], version = "^6.1.0"}
 uWSGI = "^2.0.20"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 black = "^22.3.0"
 coverage = "^6.4"
 django-debug-toolbar = "^3.4.0"

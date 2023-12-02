@@ -14,3 +14,5 @@ DATABASES = {
         "PORT": "5432",
     },
 }
+
+TAILWIND_CSS = "css/main.css"
