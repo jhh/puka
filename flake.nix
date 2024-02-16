@@ -43,7 +43,6 @@
               phases = "installPhase";
               installPhase = ''
                 export DJANGO_SETTINGS_MODULE=puka.settings.production
-                export DB_PASSWORD=
                 export SECRET_KEY=
                 export STATIC_ROOT=$out
                 mkdir -p $out
