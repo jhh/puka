@@ -11,11 +11,18 @@ run check="none": update
     python {{ if check != "none" { "-X dev" } else { "" } }} manage.py runserver
 
 # update CSS and download all JS dependencies
-update: venv update-css
+update: venv update-css update-htmx
+    direnv reload
 
 # update CSS
 update-css mode="development":
     env NODE_ENV={{ mode }} npm run build
+
+# update the HTML library
+update-htmx: node
+    cp node_modules/htmx.org/dist/htmx.min.js puka/static/js/
+    cp node_modules/htmx.org/dist/ext/class-tools.js puka/static/js/
+
 
 # checks poetry.lock against the version of pyproject.toml and locks if neccessary
 poetry-check:
