@@ -28,14 +28,11 @@
               projectDir = self;
               inherit overrides;
               groups = [ "main" ];
-              postInstall = ''
-                mkdir -p $out/bin/
-                cp -vf manage.py $out/bin/
-              '';
             };
 
-            dev = mkPoetryApplication {
-              inherit overrides; projectDir = self;
+            devEnv = mkPoetryEnv {
+              inherit overrides;
+              projectDir = self;
               groups = [ "main" "dev" ];
             };
 
@@ -43,8 +40,8 @@
           };
 
           devShells.default = pkgs.mkShell {
-            inputsFrom = [ self.packages.${system}.dev ];
-            packages = [ pkgs.poetry ];
+            buildInputs = [ self.packages.${system}.devEnv ];
+            packages = with pkgs; [ just nodejs poetry pre-commit ];
           };
 
         }) // {
