@@ -7,7 +7,7 @@ _default:
 bootstrap: venv node pre-commit
 
 # run the development server
-run check="none": update
+run check="none":
     python {{ if check != "none" { "-X dev" } else { "" } }} manage.py runserver
 
 # update CSS and download all JS dependencies

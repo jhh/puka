@@ -28,6 +28,10 @@
               projectDir = self;
               inherit overrides;
               groups = [ "main" ];
+              postInstall = ''
+                mkdir -p $out/bin/
+                cp -vf manage.py $out/bin/
+              '';
             };
 
             devEnv = mkPoetryEnv {
