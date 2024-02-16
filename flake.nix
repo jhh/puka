@@ -12,9 +12,11 @@
     flake-utils.lib.eachDefaultSystem
       (system:
         let
+          version = "2.0.5";
           pkgs = nixpkgs.legacyPackages.${system};
           poetry2nixPkg = poetry2nix.lib.mkPoetry2Nix { inherit pkgs; };
           inherit (poetry2nixPkg) mkPoetryEnv mkPoetryApplication;
+          inherit (pkgs.stdenv) mkDerivation;
 
           overrides = poetry2nixPkg.overrides.withDefaults (self: super: {
             uwsgi = super.uwsgi.overridePythonAttrs (old: {
@@ -26,11 +28,26 @@
           packages = {
             main = mkPoetryApplication {
               projectDir = self;
-              inherit overrides;
+              inherit overrides version;
               groups = [ "main" ];
               postInstall = ''
                 mkdir -p $out/bin/
                 cp -vf manage.py $out/bin/
+              '';
+            };
+
+            static = mkDerivation {
+              pname = "puka-static";
+              inherit version;
+              src = self;
+              phases = "installPhase";
+              installPhase = ''
+                export DJANGO_SETTINGS_MODULE=puka.settings.production
+                export DB_PASSWORD=
+                export SECRET_KEY=
+                export STATIC_ROOT=$out
+                mkdir -p $out
+                ${self.packages.${system}.main}/bin/manage.py collectstatic --no-input
               '';
             };
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import os
+import os  # noqa
 
 from .base import *  # noqa
 
@@ -22,8 +22,12 @@ DATABASES = {
     },
 }
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-STATIC_ROOT = os.environ["STATE_DIRECTORY"]
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
