@@ -53,9 +53,6 @@ in
           ensureDBOwnership = true;
         }
       ];
-      authentication = ''
-        local puka puka md5
-      '';
     };
 
     services.nginx.virtualHosts."puka.j3ff.io" = {
