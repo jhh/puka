@@ -55,6 +55,14 @@ in
       ];
     };
 
+    systemd.services.postgresql.postStart = ''
+      $PSQL -d puka -tA << END_INPUT
+        ALTER ROLE puka SET client_encoding TO 'utf8';
+        ALTER ROLE puka SET default_transaction_isolation TO 'read committed';
+        ALTER ROLE puka SET timezone TO 'UTC';
+      END_INPUT
+    '';
+
     services.nginx.virtualHosts."puka.j3ff.io" = {
       # security.acme is configured for eris globally in nginx.nix
       forceSSL = true;
