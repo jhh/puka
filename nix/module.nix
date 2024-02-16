@@ -18,6 +18,7 @@ in
 
       environment = {
         DJANGO_SETTINGS_MODULE = "puka.settings.production";
+        STATIC_ROOT = self.packages.${pkgs.system}.static;
       };
 
       preStart =
@@ -25,9 +26,6 @@ in
         in
         ''
           ${pkg}/bin/manage.py migrate --no-input
-          echo Copying static files to $STATE_DIRECTORY.
-          ${pkg}/bin/manage.py collectstatic --no-input --clear --verbosity=0
-
         '';
 
       serviceConfig =
@@ -42,7 +40,6 @@ in
           NotifyAccess = "all";
           KillSignal = "SIGQUIT";
           DynamicUser = true;
-          StateDirectory = "puka";
           NoNewPrivileges = true;
           ProtectSystem = "strict";
         };

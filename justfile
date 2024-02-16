@@ -6,6 +6,10 @@ _default:
 # bootstrap the development environment
 bootstrap: venv node pre-commit
 
+# open the project in Pycharm
+edit:
+  pycharm .
+
 # run the development server
 run check="none":
     python {{ if check != "none" { "-X dev" } else { "" } }} manage.py runserver
