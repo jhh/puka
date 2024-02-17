@@ -23,7 +23,7 @@ update-css:
     tailwindcss -i puka/static/css/base.css -o puka/static/css/main.css
 
 CURL := "curl --no-progress-meter --location"
-JS_DIR := "--output puka/static/js"
+JS_DIR := "puka/static/js"
 
 HTMX_BASE := "https://unpkg.com/htmx.org/dist"
 HTMX_EXT_BASE := "https://unpkg.com/htmx.org/dist/ext"
@@ -32,15 +32,19 @@ CLASS_TOOLS_JS := "class-tools.js"
 
 # update the HTML library
 update-htmx:
-    {{ CURL }} {{ HTMX_BASE }}/{{ HTMX_JS }} {{ JS_DIR }}/{{ HTMX_JS }}
-    {{ CURL }} {{ HTMX_EXT_BASE }}/{{ CLASS_TOOLS_JS }} {{ JS_DIR }}/{{ CLASS_TOOLS_JS }}
+    {{ CURL }} {{ HTMX_BASE }}/{{ HTMX_JS }} --output {{ JS_DIR }}/{{ HTMX_JS }}
+    {{ CURL }} {{ HTMX_EXT_BASE }}/{{ CLASS_TOOLS_JS }} --output {{ JS_DIR }}/{{ CLASS_TOOLS_JS }}
+
+    # add newline so pre-commit doesn't complain
+    echo "" >> {{ JS_DIR }}/{{ HTMX_JS }}
+    echo "" >> {{ JS_DIR }}/{{ CLASS_TOOLS_JS }}
 
 HYPERSCRIPT_BASE := "https://unpkg.com/hyperscript.org"
 HYPERSCRIPT_VERSION := "0.9.12"
 HYPERSCRIPT_JS := "_hyperscript.min.js"
 
 update-hyperscript:
-    {{ CURL }} {{ HYPERSCRIPT_BASE }}@{{ HYPERSCRIPT_VERSION }} {{ JS_DIR }}/{{ HYPERSCRIPT_JS }}
+    {{ CURL }} {{ HYPERSCRIPT_BASE }}@{{ HYPERSCRIPT_VERSION }} --output {{ JS_DIR }}/{{ HYPERSCRIPT_JS }}
 
 # checks poetry.lock against the version of pyproject.toml and locks if neccessary
 poetry-check:
