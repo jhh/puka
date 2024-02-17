@@ -12,7 +12,7 @@
     flake-utils.lib.eachDefaultSystem
       (system:
         let
-          version = "2.0.5";
+          version = "2.0.6";
           pkgs = nixpkgs.legacyPackages.${system};
           poetry2nixPkg = poetry2nix.lib.mkPoetry2Nix { inherit pkgs; };
           inherit (poetry2nixPkg) mkPoetryEnv mkPoetryApplication;
@@ -30,6 +30,11 @@
               projectDir = self;
               inherit overrides version;
               groups = [ "main" ];
+
+              patchPhase = ''
+                ${pkgs.tailwindcss}/bin/tailwindcss -i puka/static/css/base.css -o puka/static/css/main.css --minify
+              '';
+
               postInstall = ''
                 mkdir -p $out/bin/
                 cp -vf manage.py $out/bin/
@@ -40,7 +45,7 @@
               pname = "puka-static";
               inherit version;
               src = self;
-              phases = "installPhase";
+              phases = "unpackPhase installPhase";
               installPhase = ''
                 export DJANGO_SETTINGS_MODULE=puka.settings.production
                 export SECRET_KEY=

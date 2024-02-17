@@ -58,5 +58,3 @@ LOGGING = {
         },
     },
 }
-
-TAILWIND_CSS = "css/main.min.css"
