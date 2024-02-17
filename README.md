@@ -1,7 +1,3 @@
 # Puka
 
-## Building CSS for deployment
-
-```sh
- env NODE_ENV=production npm run build
-```
+This project uses the [just](https://just.systems) command runner for development and [Nix](https://nixos.org) for deployment.
