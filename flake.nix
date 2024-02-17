@@ -61,7 +61,7 @@
 
           devShells.default = pkgs.mkShell {
             buildInputs = [ self.packages.${system}.devEnv ];
-            packages = with pkgs; [ just nodejs poetry pre-commit ];
+            packages = with pkgs; [ just poetry pre-commit tailwindcss ];
           };
 
         }) // {

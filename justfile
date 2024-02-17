@@ -4,7 +4,7 @@ _default:
   @just --list
 
 # bootstrap the development environment
-bootstrap: venv node pre-commit
+bootstrap: venv pre-commit
 
 # open the project in Pycharm
 edit:
@@ -19,14 +19,28 @@ update: venv update-css update-htmx
     direnv reload
 
 # update CSS
-update-css mode="development":
-    env NODE_ENV={{ mode }} npm run build
+update-css:
+    tailwindcss -i puka/static/css/base.css -o puka/static/css/main.css
+
+CURL := "curl --no-progress-meter --location"
+JS_DIR := "--output puka/static/js"
+
+HTMX_BASE := "https://unpkg.com/htmx.org/dist"
+HTMX_EXT_BASE := "https://unpkg.com/htmx.org/dist/ext"
+HTMX_JS := "htmx.min.js"
+CLASS_TOOLS_JS := "class-tools.js"
 
 # update the HTML library
-update-htmx: node
-    cp node_modules/htmx.org/dist/htmx.min.js puka/static/js/
-    cp node_modules/htmx.org/dist/ext/class-tools.js puka/static/js/
+update-htmx:
+    {{ CURL }} {{ HTMX_BASE }}/{{ HTMX_JS }} {{ JS_DIR }}/{{ HTMX_JS }}
+    {{ CURL }} {{ HTMX_EXT_BASE }}/{{ CLASS_TOOLS_JS }} {{ JS_DIR }}/{{ CLASS_TOOLS_JS }}
 
+HYPERSCRIPT_BASE := "https://unpkg.com/hyperscript.org"
+HYPERSCRIPT_VERSION := "0.9.12"
+HYPERSCRIPT_JS := "_hyperscript.min.js"
+
+update-hyperscript:
+    {{ CURL }} {{ HYPERSCRIPT_BASE }}@{{ HYPERSCRIPT_VERSION }} {{ JS_DIR }}/{{ HYPERSCRIPT_JS }}
 
 # checks poetry.lock against the version of pyproject.toml and locks if neccessary
 poetry-check:
@@ -35,10 +49,6 @@ poetry-check:
 # locks the python packages in pyproject.toml without updating the poetry env
 poetry-lock:
     poetry lock --no-update
-
-# install NPM CSS & JS dependencies
-node:
-    npm install
 
 # install pre-commit hooks
 pre-commit:
