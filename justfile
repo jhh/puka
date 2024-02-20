@@ -10,12 +10,16 @@ bootstrap: venv pre-commit
 edit:
   pycharm .
 
+# watch HTML templates and update CSS
+watch:
+    tailwindcss -i puka/static/css/base.css -o puka/static/css/main.css --watch
+
 # run the development server
 run check="none":
     python {{ if check != "none" { "-X dev" } else { "" } }} manage.py runserver
 
 # update CSS and download all JS dependencies
-update: venv update-css update-htmx
+update: venv update-css update-htmx update-alpine
     direnv reload
 
 # update CSS
@@ -39,12 +43,10 @@ update-htmx:
     echo "" >> {{ JS_DIR }}/{{ HTMX_JS }}
     echo "" >> {{ JS_DIR }}/{{ CLASS_TOOLS_JS }}
 
-HYPERSCRIPT_BASE := "https://unpkg.com/hyperscript.org"
-HYPERSCRIPT_VERSION := "0.9.12"
-HYPERSCRIPT_JS := "_hyperscript.min.js"
-
-update-hyperscript:
-    {{ CURL }} {{ HYPERSCRIPT_BASE }}@{{ HYPERSCRIPT_VERSION }} --output {{ JS_DIR }}/{{ HYPERSCRIPT_JS }}
+# update the Alpine JS library to latest version
+update-alpine:
+    curl --no-progress-meter --location https://unpkg.com/alpinejs --output {{ JS_DIR }}/alpine.js
+    curl --no-progress-meter --location https://unpkg.com/@alpinejs/focus --output {{ JS_DIR }}/alpine-focus.js
 
 # checks poetry.lock against the version of pyproject.toml and locks if neccessary
 poetry-check:
