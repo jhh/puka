@@ -34,7 +34,7 @@ in
         {
           # agenix secret in github:jhh/nixos-configs
           EnvironmentFile = "/run/agenix/puka_secrets";
-          ExecStart = "${pkg}/bin/uwsgi  --http-socket 127.0.0.1:8000 --master --processes 2 --disable-logging --module puka.wsgi";
+          ExecStart = "${pkg}/bin/gunicorn  --workers=2 --bind 127.0.0.1:8000 puka.wsgi";
 
           Type = "notify";
           NotifyAccess = "all";

@@ -12,23 +12,16 @@
     flake-utils.lib.eachDefaultSystem
       (system:
         let
-          version = "2.0.7"; # also set this version in pyproject.toml
+          version = "2.0.8"; # also set this version in pyproject.toml
           pkgs = nixpkgs.legacyPackages.${system};
           poetry2nixPkg = poetry2nix.lib.mkPoetry2Nix { inherit pkgs; };
           inherit (poetry2nixPkg) mkPoetryEnv mkPoetryApplication;
           inherit (pkgs.stdenv) mkDerivation;
-
-          overrides = poetry2nixPkg.overrides.withDefaults (self: super: {
-            uwsgi = super.uwsgi.overridePythonAttrs (old: {
-              buildInputs = (old.buildInputs or [ ]) ++ [ super.setuptools pkgs.expat pkgs.zlib ];
-            });
-          });
         in
         {
           packages = {
             main = mkPoetryApplication {
               projectDir = self;
-              inherit overrides;
               groups = [ "main" ];
 
               patchPhase = ''
@@ -56,7 +49,6 @@
             };
 
             devEnv = mkPoetryEnv {
-              inherit overrides;
               projectDir = self;
               groups = [ "main" "dev" ];
             };
