@@ -13,16 +13,11 @@
   <link rel="manifest" href="{% static 'manifest.webmanifest' %}">
   <link rel="stylesheet" href="https://rsms.me/inter/inter.css"/>
   <script defer src="{% static 'js/htmx.min.js' %}"></script>
-  <script defer src="{% static 'js/class-tools.js' %}"></script>
-  {#  <script defer src="{% static 'js/_hyperscript.min.js' %}"></script>#}
   <script defer src="{% static 'js/alpine-focus.js' %}"></script>
   <script defer src="{% static 'js/alpine.js' %}"></script>
   {% django_htmx_script %}
 </head>
-<body
-    x-data="{search: false}"
-    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
->
+<body>
 <div class="flex h-screen flex-col">
   <header class="bg-gray-900 px-6 py-4">
     <div class="md:flex md:items-center md:justify-between">
@@ -52,6 +47,7 @@
         </h2>
       </div>
       <div
+          x-data="{search: false}"
           x-on:keydown.meta.K.window="search = true"
           class="mr-4 relative flex items-center"
       >
@@ -78,6 +74,7 @@
         <button
             type="button"
             hx-get="{% url 'bookmark-create' %}"
+            hx-trigger="click"
             hx-target="#id_bookmark_edit"
             hx-swap="outerHTML"
             class="inline-flex items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
@@ -102,7 +99,7 @@
       </ul>
     </div>
   </main>
-  <div id="id_bookmark_edit" class="hidden"></div>
 </div>
+<div id="id_bookmark_edit"></div>
 </body>
 </html>

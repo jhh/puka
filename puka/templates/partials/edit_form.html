@@ -1,160 +1,138 @@
+<!--suppress XmlUnboundNsPrefix, CheckEmptyScriptTag -->
 <div
+    x-data="{editFormOpen: false}"
+    x-on:update-edit-form.window="editFormOpen = $event.detail.open; console.log($event)"
     id="id_bookmark_edit"
     class="relative z-10"
-    {% if not show_form %}
-    classes="add hidden:600ms"
-    {% endif %}
-    aria-labelledby="slide-over-title"
     role="dialog"
-    aria-modal="true"
-    hx-ext="class-tools"
->
-  {# Background backdrop, show/hide based on slide-over state.  #}
+    aria-labelledby="slide-over-title"
+    aria-modal="true">
   <div
-      class="fixed inset-0 bg-gray-600 opacity-50"
-      {% if not show_form %}
-      classes="add hidden:600ms"
-      {% endif %}
-  ></div>
+      x-show="editFormOpen"
+      x-transition:enter="ease-in-out duration-500"
+      x-transition:enter-start="opacity-0"
+      x-transition:enter-end="opacity-100"
+      x-transition:leave="ease-in-out duration-500"
+      x-transition:leave-start="opacity-100"
+      x-transition:leave-end="opacity-0"
+      class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
 
-  <div class="fixed inset-0 overflow-hidden">
+  <div x-show="editFormOpen" class="fixed inset-0 overflow-hidden">
     <div class="absolute inset-0 overflow-hidden">
-      <div
-          class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16"
-      >
+      <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
         <div
-            {% if show_form %}
-              classes="remove translate-x-full"
-              class="transform transition ease-in-out duration-500 sm:duration-700 translate-x-full pointer-events-auto w-screen max-w-xl"
-            {% else %}
-              classes="add translate-x-full"
-              class="transform transition ease-in-out duration-500 sm:duration-700 pointer-events-auto w-screen max-w-xl"
-            {% endif %}
-        >
-          <form
-              class="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl"
-              {% if form.instance.pk is None %}
-              hx-post="{% url 'bookmark-create' %}"
-              {% else %}
-              hx-post="{% url 'bookmark-update' form.instance.pk %}"
-              {% endif %}
-              hx-target="#id_bookmark_edit"
-              hx-swap="outerHTML"
-          >
-            <div class="h-0 flex-1 overflow-y-auto">
-              <div class="bg-black py-6 px-4 sm:px-6">
-                <div class="flex items-center justify-between">
-                  <h2
-                      class="text-lg font-medium text-white"
-                      id="slide-over-title"
-                  >
-                    New Bookmark
-                  </h2>
-                  <div class="ml-3 flex h-7 items-center">
-                    <button
-                        type="button"
-                        hx-get="{% url 'bookmark-cancel' %}"
-                        hx-target="#id_bookmark_edit"
-                        hx-swap="outerHTML"
-                        class="rounded-md bg-indigo-700 text-indigo-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
-                    >
-                      <span class="sr-only">Close panel</span>
-                      {# Heroicon name: outline/x #}
-                      <svg
-                          class="h-6 w-6"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke-width="2"
-                          stroke="currentColor"
-                          aria-hidden="true"
-                      >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M6 18L18 6M6 6l12 12"></path>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-                <div class="mt-1">
-                  <p class="text-sm text-indigo-200">
-                    Fill in the information below to create your new bookmark.
-                  </p>
-                </div>
-              </div>
-              <div class="flex flex-1 flex-col justify-between">
-                <div class="divide-y divide-gray-200 px-4 sm:px-6">
-                  <div class="space-y-6 pt-6 pb-5">
-                    <div>
-                      <label
-                          for="{{ form.title.id_for_label }}"
-                          class="block text-sm font-medium text-gray-900"
-                      >
-                        Bookmark name
-                      </label>
-                      <div class="mt-1">
-                        {{ form.title }}
-                      </div>
-                    </div>
-                    <div>
-                      <label
-                          for="{{ form.description.id_for_label }}"
-                          class="block text-sm font-medium text-gray-900"
-                      >
-                        Description
-                      </label>
-                      <div class="mt-1">
-                        {{ form.description }}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label
-                          for="{{ form.url.id_for_label }}"
-                          class="block text-sm font-medium text-gray-900"
-                      >
-                        URL
-                      </label>
-                      <div class="mt-1">
-                        {{ form.url }}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label
-                          for="{{ form.tags.id_for_label }}"
-                          class="block text-sm font-medium text-gray-900"
-                      >
-                        Tags
-                      </label>
-                      <div class="mt-1">
-                        {{ form.tags }}
-                      </div>
-                    </div>
-
-                  </div>
+            x-show="editFormOpen"
+            @click.outside="editFormOpen = false"
+            x-transition:enter="transform transition ease-in-out duration-500 sm:duration-700"
+            x-transition:enter-start="translate-x-full"
+            x-transition:enter-end="translate-x-0"
+            x-transition:leave="transform transition ease-in-out duration-500 sm:duration-700"
+            x-transition:leave-start="translate-x-0"
+            x-transition:leave-end="translate-x-full"
+            class="pointer-events-auto w-screen max-w-md">
+          <div class="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl">
+            <div class="px-4 sm:px-6">
+              <div class="flex items-start justify-between">
+                <h2 class="text-base font-semibold leading-6 text-gray-900" id="slide-over-title">
+                  Edit Bookmark
+                </h2>
+                <div class="ml-3 flex h-7 items-center">
+                  <button type="button"
+                          x-on:click="editFormOpen = false"
+                          class="relative rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    <span class="absolute -inset-2.5"></span>
+                    <span class="sr-only">Close panel</span>
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                         aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                  </button>
                 </div>
               </div>
             </div>
-            <div class="flex flex-shrink-0 justify-end px-4 py-4">
-              <button
-                  type="button"
-                  class="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                  hx-get="{% url 'bookmark-cancel' %}"
-                  hx-target="#id_bookmark_edit"
-                  hx-swap="outerHTML"
+            <div class="relative mt-6 flex-1 px-4 sm:px-6">
+
+              {# ==================== FORM ====================  #}
+
+              <form
+                  x-trap.noscroll="editFormOpen"
+                  {% if form.instance.pk is None %}
+                  hx-post="{% url 'bookmark-create' %}"
+                  {% else %}
+                  hx-post="{% url 'bookmark-update' form.instance.pk %}"
+                  {% endif %}
               >
-                Cancel
-              </button>
-              <button
-                  type="submit"
-                  class="ml-4 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              >
-                Save
-              </button>
+                {% csrf_token %}
+                <div class="space-y-12">
+                  <div class="border-b border-gray-900/10 pb-12"> {# box with bottom border #}
+                    <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6"> {# grid tight on all fields #}
+
+                      {# title #}
+                      <div class="sm:col-span-full"> {# box around label and input, sets input width #}
+                        <label for="{{ form.title.id_for_label }}"
+                               class="block text-sm font-medium leading-6 text-gray-900">Title</label>
+                        <div class="mt-2">
+                          <div
+                              class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                            {{ form.title }}
+                          </div>
+                        </div>
+                      </div>
+
+                      {# about #}
+                      <div class="col-span-full"> {# box around label, input and help text #}
+                        <label for="{{ form.description.id_for_label }}"
+                               class="block text-sm font-medium leading-6 text-gray-900">About</label>
+                        <div class="mt-2">
+                          {{ form.description }}
+                        </div>
+                        <p class="mt-3 text-sm leading-6 text-gray-600">Write a description for this bookmark.</p>
+                      </div>
+
+                      {# URL #}
+                      <div class="sm:col-span-full"> {# box around label and input, sets input width #}
+                        <label for="{{ form.url.id_for_label }}"
+                               class="block text-sm font-medium leading-6 text-gray-900">URL</label>
+                        <div class="mt-2">
+                          <div
+                              class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                            {{ form.url }}
+                          </div>
+                        </div>
+                      </div>
+
+                      {# tags #}
+                      <div class="sm:col-span-full"> {# box around label and input, sets input width #}
+                        <label for="{{ form.tags.id_for_label }}"
+                               class="block text-sm font-medium leading-6 text-gray-900">Tags</label>
+                        <div class="mt-2">
+                          <div
+                              class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                            {{ form.tags }}
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+                </div>
+
+                <div class="mt-6 flex items-center justify-end gap-x-6">
+                  <button x-on:click="editFormOpen = false"
+                          type="button" class="text-sm font-semibold leading-6 text-gray-900">
+                    Cancel
+                  </button>
+                  <button
+                      type="submit"
+                      class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                    Save
+                  </button>
+                </div>
+              </form>
+
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>

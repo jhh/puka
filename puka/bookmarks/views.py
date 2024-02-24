@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http import QueryDict
@@ -10,6 +12,8 @@ from django_htmx.http import trigger_client_event
 
 from .forms import BookmarkForm
 from .models import Bookmark
+
+logger = logging.getLogger(__name__)
 
 
 @login_required
@@ -66,25 +70,30 @@ def bookmark_create(request):
     if request.method == "POST":
         form = BookmarkForm(request.POST)
         if form.is_valid():
+            logger.debug("create: Bookmark form is valid")
             form.save()
-            response = render(
-                request,
-                "partials/edit_form.html",
-                {
-                    "form": form,
-                    "show_form": False,
-                },
+            response = render(request, "partials/edit_form.html", {"form": form})
+            trigger_client_event(
+                response,
+                "update-edit-form",
+                params={"open": False},
+                after="settle",
             )
-            return trigger_client_event(response, "bookmarkAdded", {})
+            return trigger_client_event(response, "bookmarkAdded", after="settle")
+        else:
+            logger.debug("create: Bookmark form is not valid")
 
     # GET
-    return render(
+    response = render(
         request,
         "partials/edit_form.html",
-        {
-            "form": BookmarkForm(),
-            "show_form": True,
-        },
+        {"form": BookmarkForm()},
+    )
+    return trigger_client_event(
+        response,
+        "update-edit-form",
+        params={"open": True},
+        after="settle",
     )
 
 
@@ -95,25 +104,34 @@ def bookmark_update(request, pk):
     if request.method == "POST":
         form = BookmarkForm(request.POST, instance=bookmark)
         if form.is_valid():
+            logger.debug("create: Bookmark form is valid")
             form.save()
             response = render(
                 request,
                 "partials/edit_form.html",
-                {
-                    "form": form,
-                    "show_form": False,
-                },
+                {"form": form},
             )
-            return trigger_client_event(response, "bookmarkAdded", {})
+            trigger_client_event(
+                response,
+                "update-edit-form",
+                params={"open": False},
+                after="settle",
+            )
+            return trigger_client_event(response, "bookmarkAdded", after="settle")
+        else:
+            logger.debug("create: Bookmark form is not valid")
 
     # GET
-    return render(
+    response = render(
         request,
         "partials/edit_form.html",
-        {
-            "form": BookmarkForm(instance=bookmark),
-            "show_form": True,
-        },
+        {"form": BookmarkForm(instance=bookmark)},
+    )
+    return trigger_client_event(
+        response,
+        "update-edit-form",
+        params={"open": True},
+        after="settle",
     )
 
 
