@@ -1,5 +1,4 @@
-# just manual: https://github.com/casey/just#readme
-
+# https://just.systems
 _default:
   @just --list
 
@@ -67,3 +66,12 @@ pre-commit:
 # refresh the python packages in the dev env
 venv: poetry-check
     nix build .#devEnv -o .venv
+
+# grep for version
+version:
+    @rg "version = " -m 1 pyproject.toml flake.nix
+
+
+set-version version: && version
+    @sed --in-place 's/^version = ".*"/version = "{{ version }}"/' pyproject.toml
+    @sed --in-place --regexp-extended 's/(\s+version = )".*";/\1"{{ version }}";/' flake.nix
