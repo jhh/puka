@@ -1,24 +1,15 @@
 from __future__ import annotations
 
-import os  # noqa
+import os
 
-from .base import *  # noqa
+from .base import *  # noqa: F403
 
 SECRET_KEY = os.environ["SECRET_KEY"]
 DEBUG = False
 
 ALLOWED_HOSTS = ["puka.j3ff.io"]
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "puka",
-        "CONN_MAX_AGE": 600,
-        "OPTIONS": {
-            "application_name": "puka.j3ff.io",
-        },
-    },
-}
+DATABASES["default"]["CONN_MAX_AGE"] = 600  # noqa: F405
 
 STORAGES = {
     "staticfiles": {

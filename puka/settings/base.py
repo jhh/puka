@@ -34,6 +34,13 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "puka.urls"
 
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "puka",
+    },
+}
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -93,7 +100,7 @@ STATIC_URL = "static/"
 STATIC_ROOT = os.environ.get("STATIC_ROOT", BASE_DIR / "static")
 
 # STATICFILES_DIR is where "django.contrib.staticfiles" looks during development
-STATICFILES_DIRS = [APPS_DIR / "static"]  # noqa
+STATICFILES_DIRS = [APPS_DIR / "static"]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
