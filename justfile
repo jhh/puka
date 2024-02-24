@@ -51,6 +51,13 @@ update-alpine:
     curl --no-progress-meter --location https://unpkg.com/alpinejs --output {{ JS_DIR }}/alpine.js
     curl --no-progress-meter --location https://unpkg.com/@alpinejs/focus --output {{ JS_DIR }}/alpine-focus.js
 
+# update dev dependencies to latest version
+update-dev: && poetry-check
+    poetry add --group=dev --lock black@latest
+    poetry add --group=dev --lock django-debug-toolbar@latest
+    poetry add --group=dev --lock ipython@latest
+    poetry add --group=dev --lock rich@latest
+
 # checks poetry.lock against the version of pyproject.toml and locks if neccessary
 poetry-check:
     poetry check --lock --quiet || (just poetry-lock)
