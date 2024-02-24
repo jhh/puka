@@ -133,17 +133,3 @@ def bookmark_update(request, pk):
         params={"open": True},
         after="settle",
     )
-
-
-@login_required
-@require_GET
-def cancel(request):
-    form = BookmarkForm()
-    return render(
-        request,
-        "partials/edit_form.html",
-        {
-            "form": form,
-            "show_form": False,
-        },
-    )
