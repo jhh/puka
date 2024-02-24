@@ -65,14 +65,14 @@ def test_edit_form_new(admin_client):
     url = reverse("bookmark-create")
     response = admin_client.get(url)
     assertTemplateUsed(response, "partials/edit_form.html")
-    assertContains(response, "remove translate-x-full")
+    assertContains(response, 'x-show="editFormOpen"')
 
 
 def test_edit_form_cancel(admin_client):
     url = reverse("bookmark-cancel")
     response = admin_client.get(url)
     assertTemplateUsed(response, "partials/edit_form.html")
-    assertContains(response, "add translate-x-full")
+    assertContains(response, 'x-show="editFormOpen"')
 
 
 def test_bookmarks_htmx_request(admin_client):

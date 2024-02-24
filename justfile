@@ -10,6 +10,10 @@ bootstrap: venv pre-commit
 edit:
   pycharm .
 
+# run tests
+test:
+    pytest
+
 # watch HTML templates and update CSS
 watch:
     tailwindcss -i puka/static/css/base.css -o puka/static/css/main.css --watch
