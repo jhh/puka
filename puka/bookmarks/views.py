@@ -45,7 +45,7 @@ def bookmarks(request):
     paginator = Paginator(bookmark_list, 25)
 
     if request.htmx:
-        template_name = "partials/bookmarks.html"
+        template_name = "partials/_bookmarks.html"
     else:
         template_name = "index.html"
 
@@ -72,7 +72,7 @@ def bookmark_create(request):
         if form.is_valid():
             logger.debug("create: Bookmark form is valid")
             form.save()
-            response = render(request, "partials/edit_form.html", {"form": form})
+            response = render(request, "partials/_edit_form.html", {"form": form})
             trigger_client_event(
                 response,
                 "update-edit-form",
@@ -86,7 +86,7 @@ def bookmark_create(request):
     # GET
     response = render(
         request,
-        "partials/edit_form.html",
+        "partials/_edit_form.html",
         {"form": BookmarkForm()},
     )
     return trigger_client_event(
@@ -108,7 +108,7 @@ def bookmark_update(request, pk):
             form.save()
             response = render(
                 request,
-                "partials/edit_form.html",
+                "partials/_edit_form.html",
                 {"form": form},
             )
             trigger_client_event(
@@ -124,7 +124,7 @@ def bookmark_update(request, pk):
     # GET
     response = render(
         request,
-        "partials/edit_form.html",
+        "partials/_edit_form.html",
         {"form": BookmarkForm(instance=bookmark)},
     )
     return trigger_client_event(

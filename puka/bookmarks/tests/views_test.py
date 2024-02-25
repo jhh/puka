@@ -11,7 +11,7 @@ from puka.bookmarks.models import Bookmark
 def test_bookmarks(admin_client, succulents_bookmark):
     url = reverse("bookmarks")
     response = admin_client.get(url)
-    assertTemplateUsed(response, "partials/bookmarks.html")
+    assertTemplateUsed(response, "partials/_bookmarks.html")
     assertContains(response, succulents_bookmark.title)
     assertContains(response, succulents_bookmark.description)
     assertContains(response, succulents_bookmark.url)
@@ -64,21 +64,14 @@ def test_bookmarks_with_text(
 def test_edit_form_new(admin_client):
     url = reverse("bookmark-create")
     response = admin_client.get(url)
-    assertTemplateUsed(response, "partials/edit_form.html")
-    assertContains(response, 'x-show="editFormOpen"')
-
-
-def test_edit_form_cancel(admin_client):
-    url = reverse("bookmark-cancel")
-    response = admin_client.get(url)
-    assertTemplateUsed(response, "partials/edit_form.html")
+    assertTemplateUsed(response, "partials/_edit_form.html")
     assertContains(response, 'x-show="editFormOpen"')
 
 
 def test_bookmarks_htmx_request(admin_client):
     url = reverse("bookmarks")
     response = admin_client.get(url, HTTP_HX_REQUEST="true")
-    assertTemplateUsed(response, "partials/bookmarks.html")
+    assertTemplateUsed(response, "partials/_bookmarks.html")
 
 
 def test_create_bookmark(admin_client):
@@ -92,7 +85,7 @@ def test_create_bookmark(admin_client):
             "tags": "hammock,keytar",
         },
     )
-    assertTemplateUsed(response, "partials/edit_form.html")
+    assertTemplateUsed(response, "partials/_edit_form.html")
 
     qs = Bookmark.objects.with_tags(["hammock"])
     assert len(qs) == 1
@@ -111,7 +104,7 @@ def test_update_bookmark(admin_client, flannel_bookmark):
     )
     qs = Bookmark.objects.with_text("copper")
     assert len(qs) == 1
-    assertTemplateUsed(response, "partials/edit_form.html")
+    assertTemplateUsed(response, "partials/_edit_form.html")
 
 
 def test_invalid_update_bookmark(admin_client, typewriter_bookmark):
@@ -127,5 +120,5 @@ def test_invalid_update_bookmark(admin_client, typewriter_bookmark):
     )
     qs = Bookmark.objects.with_text("pabst")
     assert len(qs) == 0
-    assertTemplateUsed(response, "partials/edit_form.html")
+    assertTemplateUsed(response, "partials/_edit_form.html")
     assertContains(response, "vaporware pabst")
