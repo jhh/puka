@@ -7,6 +7,7 @@ from django.contrib.postgres.search import SearchRank
 from django.contrib.postgres.search import SearchVectorField
 from django.db import models
 from django.db.models import F
+from django.db.models import Index
 
 from puka.core.models import TimeStampedModel
 
@@ -42,6 +43,7 @@ class Bookmark(TimeStampedModel):
 
     class Meta:
         indexes = [
+            Index(fields=["-created"]),
             GinIndex(fields=["tags"]),
             GinIndex(fields=["title_description_search"]),
         ]
