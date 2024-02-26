@@ -42,7 +42,7 @@ update-htmx:
     {{ CURL }} {{ HTMX_BASE }}/{{ HTMX_JS }} --output {{ JS_DIR }}/{{ HTMX_JS }}
     {{ CURL }} {{ HTMX_EXT_BASE }}/{{ CLASS_TOOLS_JS }} --output {{ JS_DIR }}/{{ CLASS_TOOLS_JS }}
 
-    # add newline so pre-commit doesn't complain
+    # add newline to avoid pre-commit fix
     echo "" >> {{ JS_DIR }}/{{ HTMX_JS }}
     echo "" >> {{ JS_DIR }}/{{ CLASS_TOOLS_JS }}
 
@@ -54,9 +54,11 @@ update-alpine:
 # update dev dependencies to latest version
 update-dev: && poetry-check
     poetry add --group=dev --lock black@latest
-    poetry add --group=dev --lock django-debug-toolbar@latest
+    # poetry add --group=dev --lock django-debug-toolbar@latest
     poetry add --group=dev --lock ipython@latest
     poetry add --group=dev --lock rich@latest
+    poetry add --group=dev --lock pytest-django@latest
+    poetry add --group=dev --lock coverage@latest
 
 # checks poetry.lock against the version of pyproject.toml and locks if neccessary
 poetry-check:
@@ -79,6 +81,13 @@ version:
     @rg "version = " -m 1 pyproject.toml flake.nix
 
 
+# update version
 set-version version: && version
     @sed --in-place 's/^version = ".*"/version = "{{ version }}"/' pyproject.toml
     @sed --in-place --regexp-extended 's/(\s+version = )".*";/\1"{{ version }}";/' flake.nix
+
+# run pytest and report coverage, pass "html" for report in browser
+coverage type="report":
+    coverage run --branch -m pytest
+    coverage {{ type }} {{ if type == "html" { "--show-contexts" } else { "" } }}
+    [[ "html" == "{{ type }}" ]] && open htmlcov/index.html || exit 0
