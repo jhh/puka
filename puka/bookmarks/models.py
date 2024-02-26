@@ -17,13 +17,12 @@ class ActiveBookmarkManager(models.Manager):
         return super().get_queryset().filter(active=True)
 
     def with_tags(self, tags: list[str]) -> models.QuerySet:
-        return super().get_queryset().filter(tags__overlap=tags)
+        return self.get_queryset().filter(tags__overlap=tags)
 
     def with_text(self, text: str) -> models.QuerySet:
         query = SearchQuery(text, search_type="websearch", config="english")
         return (
-            super()
-            .get_queryset()
+            self.get_queryset()
             .annotate(rank=SearchRank(F("title_description_search"), query))
             .filter(rank__gte=0.1)
             .order_by("-rank")
