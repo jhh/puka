@@ -25,23 +25,23 @@ def bookmarks(request):
 
     if "t" in request_query:
         tags = request_query.getlist("t")
-        bookmark_list = Bookmark.objects.with_tags(tags)
+        bookmark_list = Bookmark.active_objects.with_tags(tags)
         query.setlist("t", tags)
     elif "q" in request_query:
         search: str = request_query.get("q")
         if search.startswith("#"):
             tag = search.lstrip("#")
             query["t"] = tag
-            bookmark_list = Bookmark.objects.with_tags([tag])
+            bookmark_list = Bookmark.active_objects.with_tags([tag])
         elif search.strip():
             query["q"] = search
-            bookmark_list = Bookmark.objects.with_text(search)
+            bookmark_list = Bookmark.active_objects.with_text(search)
         else:
-            bookmark_list = Bookmark.objects.all()
+            bookmark_list = Bookmark.active_objects.all()
         clear_search = False
 
     else:
-        bookmark_list = Bookmark.objects.all()
+        bookmark_list = Bookmark.active_objects.all()
     paginator = Paginator(bookmark_list, 25)
 
     if request.htmx:
