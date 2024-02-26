@@ -17,3 +17,4 @@ class BookmarkAdmin(admin.ModelAdmin):
     )
     list_filter = ("created", "modified")
     date_hierarchy = "created"
+    search_fields = ("title", "description")
