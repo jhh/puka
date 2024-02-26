@@ -87,7 +87,7 @@ def test_create_bookmark(admin_client):
     )
     assertTemplateUsed(response, "partials/_edit_form.html")
 
-    qs = Bookmark.objects.with_tags(["hammock"])
+    qs = Bookmark.active_objects.with_tags(["hammock"])
     assert len(qs) == 1
 
 
@@ -102,7 +102,7 @@ def test_update_bookmark(admin_client, flannel_bookmark):
             "tags": "food,truck",
         },
     )
-    qs = Bookmark.objects.with_text("copper")
+    qs = Bookmark.active_objects.with_text("copper")
     assert len(qs) == 1
     assertTemplateUsed(response, "partials/_edit_form.html")
 
@@ -118,7 +118,7 @@ def test_invalid_update_bookmark(admin_client, typewriter_bookmark):
             "tags": "",
         },
     )
-    qs = Bookmark.objects.with_text("pabst")
+    qs = Bookmark.active_objects.with_text("pabst")
     assert len(qs) == 0
     assertTemplateUsed(response, "partials/_edit_form.html")
     assertContains(response, "vaporware pabst")

@@ -27,25 +27,25 @@ def test_with_tags(
     typewriter_bookmark,
     flannel_bookmark,
 ):
-    qs = Bookmark.objects.with_tags(["artisan"])
+    qs = Bookmark.active_objects.with_tags(["artisan"])
     assert len(qs) == 1
     assert qs.contains(flannel_bookmark)
 
-    qs = Bookmark.objects.with_tags(["humblebrag"])
+    qs = Bookmark.active_objects.with_tags(["humblebrag"])
     assert len(qs) == 1
     assert qs.contains(succulents_bookmark)
 
-    qs = Bookmark.objects.with_tags(["thundercats"])
+    qs = Bookmark.active_objects.with_tags(["thundercats"])
     assert len(qs) == 2
     assert qs.contains(succulents_bookmark)
     assert qs.contains(typewriter_bookmark)
 
-    qs = Bookmark.objects.with_tags(["banjo"])
+    qs = Bookmark.active_objects.with_tags(["banjo"])
     assert len(qs) == 2
     assert qs.contains(typewriter_bookmark)
     assert qs.contains(flannel_bookmark)
 
-    qs = Bookmark.objects.with_tags(["banjo", "thundercats"])
+    qs = Bookmark.active_objects.with_tags(["banjo", "thundercats"])
     assert len(qs) == 3
     assert qs.contains(succulents_bookmark)
     assert qs.contains(typewriter_bookmark)
@@ -58,6 +58,6 @@ def test_with_text(
     typewriter_bookmark,
     flannel_bookmark,
 ):
-    qs = Bookmark.objects.with_text("tumeric")
+    qs = Bookmark.active_objects.with_text("tumeric")
     assert len(qs) == 1
     assert qs.contains(succulents_bookmark)

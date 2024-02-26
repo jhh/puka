@@ -7,11 +7,15 @@ from django.contrib.postgres.search import SearchRank
 from django.contrib.postgres.search import SearchVectorField
 from django.db import models
 from django.db.models import F
+from django.db.models import Index
 
 from puka.core.models import TimeStampedModel
 
 
-class BookmarkManager(models.Manager):
+class ActiveBookmarkManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(active=True)
+
     def with_tags(self, tags: list[str]) -> models.QuerySet:
         return super().get_queryset().filter(tags__overlap=tags)
 
@@ -30,13 +34,16 @@ class Bookmark(TimeStampedModel):
     title = models.CharField(max_length=120)
     description = models.TextField(blank=True)
     url = models.URLField(max_length=500)
+    active = models.BooleanField(default=True)
     tags = ArrayField(models.CharField(max_length=50), blank=True)
     title_description_search = SearchVectorField(null=True, editable=False)
 
-    objects = BookmarkManager()
+    objects = models.Manager()
+    active_objects = ActiveBookmarkManager()
 
     class Meta:
         indexes = [
+            Index(fields=["-created"]),
             GinIndex(fields=["tags"]),
             GinIndex(fields=["title_description_search"]),
         ]
