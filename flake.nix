@@ -12,7 +12,7 @@
     flake-utils.lib.eachDefaultSystem
       (system:
         let
-          version = "2.1.0"; # also set this version in pyproject.toml
+          version = "2.1.1"; # also set this version in pyproject.toml
           pkgs = nixpkgs.legacyPackages.${system};
           poetry2nixPkg = poetry2nix.lib.mkPoetry2Nix { inherit pkgs; };
           inherit (poetry2nixPkg) mkPoetryEnv mkPoetryApplication;
