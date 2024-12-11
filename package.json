@@ -1,0 +1,8 @@
+{
+  "name": "puka",
+  "dependencies": {
+    "esbuild": "^0.24.0",
+    "htmx.org": "^1.9.12",
+    "tailwindcss": "^3.4.16"
+  }
+}
