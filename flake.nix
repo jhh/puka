@@ -74,6 +74,30 @@
           inherit (pkgs.stdenv) mkDerivation;
         in
         {
+          staticCssJsBundle =
+            let
+              pkgs = nixpkgs.legacyPackages.${system};
+            in
+            pkgs.buildNpmPackage {
+              name = "django-static-deps";
+              src = ./.;
+              # npmDepsHash = "sha256-RVFWKv0W/twUmEKzlmrYF/Q09Ee2a2mTQ6dd2aiEL8o=";
+              dontNpmBuild = true;
+
+              buildPhase = ''
+                runHook preBuild
+                node ./static-build.mjs
+                runHook postBuild
+              '';
+
+              installPhase = ''
+                runHook preInstall
+                mkdir -p $out/ui
+                mv upkeep/ui/static/ui/main.* $out/ui
+                runHook postInstall
+              '';
+            };
+
           static = mkDerivation {
             pname = "puka-static";
             inherit (pythonSet.puka) version;
@@ -95,6 +119,8 @@
           venv = venv;
         }
       );
+
+      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-rfc-style);
 
       devShells = forAllSystems (
         system:
