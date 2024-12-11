@@ -38,7 +38,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "puka.urls"
 
-# e.g. DJANGO_DATABASE_URL=postgres:///${REPO_NAME}?pool=true
+# Database configuration
+# DJANGO_DATABASE_URL e.g. postgres:///${REPO_NAME}?pool=true
 DATABASES = {
     "default": (
         env.dj_db_url(
@@ -48,11 +49,11 @@ DATABASES = {
     ),
 }
 
-# e.g. DJANGO_DATABASE_OPTIONS='{"pool": {"min_size": 2, "max_size": 4}}'
+# DJANGO_DATABASE_OPTIONS e.g. '{"pool": {"min_size": 2, "max_size": 4}}'
 if env.str("DJANGO_DATABASE_OPTIONS", ""):
     DATABASES["default"]["OPTIONS"] = DATABASES["default"].get("OPTIONS", {}) | env.json("DJANGO_DATABASE_OPTIONS")  # fmt: off
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+# Template configuration
 
 TEMPLATES = [
     {
@@ -113,7 +114,7 @@ STATIC_URL = "static/"
 STATIC_ROOT = os.environ.get("STATIC_ROOT", BASE_DIR / "static")
 
 # STATICFILES_DIR is where "django.contrib.staticfiles" looks during development
-STATICFILES_DIRS = [APPS_DIR / "static"]
+STATICFILES_DIRS = [str(APPS_DIR / "static")]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
