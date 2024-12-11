@@ -3,8 +3,12 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+import environs
+
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 APPS_DIR = BASE_DIR / "puka"
+
+env = environs.Env()
 
 ALLOWED_HOSTS: list[str] = []
 
@@ -34,17 +38,26 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "puka.urls"
 
+# e.g. DJANGO_DATABASE_URL=postgres:///${REPO_NAME}?pool=true
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "puka",
-    },
+    "default": (
+        env.dj_db_url(
+            "DJANGO_DATABASE_URL",
+            default=f"sqlite:///{BASE_DIR}/db.sqlite3",
+        )
+    ),
 }
+
+# e.g. DJANGO_DATABASE_OPTIONS='{"pool": {"min_size": 2, "max_size": 4}}'
+if env.str("DJANGO_DATABASE_OPTIONS", ""):
+    DATABASES["default"]["OPTIONS"] = DATABASES["default"].get("OPTIONS", {}) | env.json("DJANGO_DATABASE_OPTIONS")  # fmt: off
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [APPS_DIR / "templates"],
+        "DIRS": [str(APPS_DIR / "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

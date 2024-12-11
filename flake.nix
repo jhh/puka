@@ -23,7 +23,7 @@
 
   outputs =
     {
-      # self,
+      self,
       nixpkgs,
       uv2nix,
       pyproject-nix,
@@ -40,15 +40,14 @@
         sourcePreference = "wheel";
       };
 
-      editableOverlay = workspace.mkEditablePyprojectOverlay {
-        root = "$REPO_ROOT";
-      };
+      # editableOverlay = workspace.mkEditablePyprojectOverlay {
+      #   root = "$REPO_ROOT";
+      # };
 
       pythonSets = forAllSystems (
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          inherit (pkgs) stdenv;
 
           baseSet = pkgs.callPackage pyproject-nix.build.packages {
             python = pkgs.python312;
@@ -63,6 +62,40 @@
       );
     in
     {
+      nixosModules.puka = import ./lib/module.nix self;
+      nixosModules.default = self.nixosModules.puka;
+
+      packages = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          pythonSet = pythonSets.${system};
+          venv = pythonSet.mkVirtualEnv "puka-env" workspace.deps.default;
+          inherit (pkgs.stdenv) mkDerivation;
+        in
+        {
+          static = mkDerivation {
+            pname = "puka-static";
+            inherit (pythonSet.puka) version;
+            nativeBuildInputs = [ venv ];
+
+            dontUnpack = true;
+            dontConfigure = true;
+            dontBuild = true;
+
+            installPhase = ''
+              export DJANGO_SETTINGS_MODULE=puka.settings.production
+              export SECRET_KEY=
+              export STATIC_ROOT=$out
+              mkdir -p $out
+              ${venv}/bin/puka-manage collectstatic --no-input
+            '';
+
+          };
+          venv = venv;
+        }
+      );
+
       devShells = forAllSystems (
         system:
         let
