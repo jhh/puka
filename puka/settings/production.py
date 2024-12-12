@@ -13,7 +13,8 @@ DEBUG = False
 
 ALLOWED_HOSTS = ["puka.j3ff.io"]
 
-STATICFILES_DIRS.append(env.path("DJANGO_STATICFILES_DIR"))  # noqa: F405
+if env.path("DJANGO_STATICFILES_DIR", None):
+    STATICFILES_DIRS.append(env.path("DJANGO_STATICFILES_DIR"))  # noqa: F405
 
 STORAGES = {
     "staticfiles": {
