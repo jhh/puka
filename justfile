@@ -47,12 +47,10 @@ pre-commit:
 npm-install:
     npm install
 
-static-watch:
-    node static-build.mjs --watch
-
-static-build:
-    node static-build.mjs
-
-# temporarily update CSS
+# update CSS
 update-css:
-    tailwindcss -i puka/static/css/base.css -o puka/static/css/main.css
+    npx tailwindcss -i puka/static/css/base.css -o puka/static/css/main.css
+
+# update JS
+update-js:
+    npx esbuild --bundle --outfile=puka/static/js/main.js puka/static/js/base.js

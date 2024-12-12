@@ -1,5 +1,4 @@
-{% load static %}
-{% load django_htmx %}
+{% load django_htmx static %}
 <!DOCTYPE html>
 <!--suppress XmlUnboundNsPrefix -->
 <html lang="en">
@@ -13,9 +12,7 @@
   <link rel="manifest" href="{% static 'manifest.webmanifest' %}">
   <link rel="preconnect" href="https://rsms.me/">
   <link rel="stylesheet" href="https://rsms.me/inter/inter.css"/>
-  <script defer src="{% static 'js/htmx.min.js' %}"></script>
-  <script defer src="{% static 'js/alpine-focus.js' %}"></script>
-  <script defer src="{% static 'js/alpine.js' %}"></script>
+  <script defer src="{% static 'js/main.js' %}"></script>
   {% django_htmx_script %}
 </head>
 <body>

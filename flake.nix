@@ -116,7 +116,6 @@
             pkgs.nodejs
             pkgs.postgresql.dev
             pkgs.pre-commit
-            pkgs.tailwindcss
             uv
           ];
         in

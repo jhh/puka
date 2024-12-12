@@ -1,5 +1,6 @@
 # minified version built at deploy time
 /puka/static/css/main.css
+/puka/static/js/main.js
 
 staticfiles
 result

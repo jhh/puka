@@ -7,20 +7,17 @@ let
   pukaCssJs = pkgs.buildNpmPackage {
     name = "django-static-deps";
     src = ../.;
-    npmDepsHash = "sha256-VSYvzgzPYj/mGQ8SvdZB+UtaqgyAjy1fPivk1ioUU6o=";
+    npmDepsHash = "sha256-UKwbimfQT6tIbu+2oHi8WdICSE/b7kh9fL+hT7rTbEM=";
     dontNpmBuild = true;
 
     buildPhase = ''
       runHook preBuild
-      npx tailwindcss -m -i puka/static/css/base.css -o $out/css/main.css
-      # node ./static-build.mjs
+      npx tailwindcss --minify -i puka/static/css/base.css -o $out/css/main.css
+      npx esbuild --bundle --minify --outfile=$out/js/main.js puka/static/js/base.js
       runHook postBuild
     '';
 
     installPhase = ''
-      runHook preInstall
-      # mkdir -p $out/ui
-      # mv upkeep/ui/static/ui/main.* $out/ui
       runHook postInstall
     '';
   };
