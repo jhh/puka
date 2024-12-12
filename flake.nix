@@ -71,7 +71,7 @@
       );
     in
     {
-      nixosModules.default = import ./lib/module.nix self;
+      nixosModules.default = import ./lib/module.nix {inherit pythonSets workspace; packages = self.packages;};
 
       checks = forAllSystems (
         system:
