@@ -44,7 +44,7 @@ DATABASES = {
     "default": (
         env.dj_db_url(
             "DJANGO_DATABASE_URL",
-            default=f"sqlite:///{BASE_DIR}/db.sqlite3",
+            default="postgres:///puka",
         )
     ),
 }

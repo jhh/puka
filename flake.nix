@@ -43,6 +43,7 @@
       # editableOverlay = workspace.mkEditablePyprojectOverlay {
       #   root = "$REPO_ROOT";
       # };
+      #            pyprojectOverrides =
 
       pythonSets = forAllSystems (
         system:
@@ -52,11 +53,14 @@
           baseSet = pkgs.callPackage pyproject-nix.build.packages {
             python = pkgs.python312;
           };
+
+          psycopgOverrides = import ./lib/overrides-psycopg.nix { inherit pkgs; };
         in
         baseSet.overrideScope (
           lib.composeManyExtensions [
             pyproject-build-systems.overlays.default
             overlay
+            psycopgOverrides
           ]
         )
       );
@@ -74,7 +78,7 @@
           inherit (pkgs.stdenv) mkDerivation;
         in
         {
-          css-js =
+          puka-css-js =
             let
               pkgs = nixpkgs.legacyPackages.${system};
             in
@@ -110,7 +114,7 @@
 
             installPhase = ''
               export DJANGO_SETTINGS_MODULE=puka.settings.production
-              export DJANGO_STATICFILES_DIR="${self.packages.${system}.css-js}"
+              export DJANGO_STATICFILES_DIR="${self.packages.${system}.puka-css-js}"
               export SECRET_KEY=
               export STATIC_ROOT=$out
               mkdir -p $out
@@ -136,6 +140,7 @@
             pkgs.nil
             pkgs.nixfmt-rfc-style
             pkgs.nodejs
+            pkgs.postgresql.dev
             pkgs.pre-commit
             pkgs.tailwindcss
             uv
