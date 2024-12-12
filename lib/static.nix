@@ -12,7 +12,7 @@ let
 
     buildPhase = ''
       runHook preBuild
-      npx tailwindcss -m -i puka/static/css/base.css -o $out/puka/static/css/main.css
+      npx tailwindcss -m -i puka/static/css/base.css -o $out/css/main.css
       # node ./static-build.mjs
       runHook postBuild
     '';
