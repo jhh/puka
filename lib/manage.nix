@@ -1,4 +1,8 @@
-{ pkgs, pythonSet, venv }:
+{
+  pkgs,
+  pythonSet,
+  venv,
+}:
 pkgs.writeShellApplication {
   name = "puka-manage";
   text = ''

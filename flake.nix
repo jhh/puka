@@ -95,14 +95,20 @@
             inherit pkgs pythonSet venv;
           };
           manage = import ./lib/manage.nix {
-          inherit pkgs pythonSet venv;
+            inherit pkgs pythonSet venv;
           };
         in
         {
           inherit manage static venv;
-          default = manage;
         }
       );
+
+      apps = forAllSystems (system: {
+        default = {
+          type = "app";
+          program = "${self.packages.${system}.manage}/bin/puka-manage";
+        };
+      });
 
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-rfc-style);
 
