@@ -74,26 +74,27 @@
           inherit (pkgs.stdenv) mkDerivation;
         in
         {
-          staticCssJsBundle =
+          css-js =
             let
               pkgs = nixpkgs.legacyPackages.${system};
             in
             pkgs.buildNpmPackage {
               name = "django-static-deps";
               src = ./.;
-              # npmDepsHash = "sha256-RVFWKv0W/twUmEKzlmrYF/Q09Ee2a2mTQ6dd2aiEL8o=";
+              npmDepsHash = "sha256-VSYvzgzPYj/mGQ8SvdZB+UtaqgyAjy1fPivk1ioUU6o=";
               dontNpmBuild = true;
 
               buildPhase = ''
                 runHook preBuild
-                node ./static-build.mjs
+                npx tailwindcss -i puka/static/css/base.css -o $out/puka/static/css/main.css
+                # node ./static-build.mjs
                 runHook postBuild
               '';
 
               installPhase = ''
                 runHook preInstall
-                mkdir -p $out/ui
-                mv upkeep/ui/static/ui/main.* $out/ui
+                # mkdir -p $out/ui
+                # mv upkeep/ui/static/ui/main.* $out/ui
                 runHook postInstall
               '';
             };
@@ -109,6 +110,7 @@
 
             installPhase = ''
               export DJANGO_SETTINGS_MODULE=puka.settings.production
+              export DJANGO_STATICFILES_DIR="${self.packages.${system}.css-js}"
               export SECRET_KEY=
               export STATIC_ROOT=$out
               mkdir -p $out
