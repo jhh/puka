@@ -94,9 +94,13 @@
           static = import ./lib/static.nix {
             inherit pkgs pythonSet venv;
           };
+          manage = import ./lib/manage.nix {
+          inherit pkgs pythonSet venv;
+          };
         in
         {
-          inherit static venv;
+          inherit manage static venv;
+          default = manage;
         }
       );
 
