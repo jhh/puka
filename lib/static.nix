@@ -39,7 +39,7 @@ mkDerivation {
     export DJANGO_SETTINGS_MODULE=puka.settings.production
     export DJANGO_STATICFILES_DIR="${pukaCssJs}"
     export SECRET_KEY=
-    export STATIC_ROOT=$out
+    export DJANGO_STATIC_ROOT=$out
     mkdir -p $out
     ${venv}/bin/puka-manage collectstatic --no-input
   '';
