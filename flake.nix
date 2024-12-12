@@ -55,18 +55,32 @@
           };
 
           psycopgOverrides = import ./lib/overrides-psycopg.nix { inherit pkgs; };
+          pukaOverrides = import ./lib/overrides-puka.nix {
+            inherit lib pkgs workspace;
+            nixosModule = self.nixosModules.default;
+          };
         in
         baseSet.overrideScope (
           lib.composeManyExtensions [
             pyproject-build-systems.overlays.default
             overlay
             psycopgOverrides
+            pukaOverrides
           ]
         )
       );
     in
     {
       nixosModules.default = import ./lib/module.nix self;
+
+      checks = forAllSystems (
+        system:
+        let
+          pythonSet = pythonSets.${system};
+        in
+        # Inherit tests from passthru.tests into flake checks
+        pythonSet.puka.passthru.tests
+      );
 
       packages = forAllSystems (
         system:
@@ -75,12 +89,7 @@
           pythonSet = pythonSets.${system};
           venv = pythonSet.mkVirtualEnv "puka-env" workspace.deps.default;
           static = import ./lib/static.nix {
-            inherit
-              pkgs
-              pythonSet
-              workspace
-              venv
-              ;
+            inherit pkgs pythonSet venv;
           };
         in
         {

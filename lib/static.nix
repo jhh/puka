@@ -1,7 +1,6 @@
 {
   pkgs,
   pythonSet,
-  workspace,
   venv,
 }:
 let
