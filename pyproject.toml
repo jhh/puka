@@ -6,7 +6,7 @@ name = "puka"
 packages = [
   {include = "puka"},
 ]
-version = "2.1.2"
+version = "2.1.3"
 
 [tool.poetry.group.main.dependencies]
 Django = "^5.0"
