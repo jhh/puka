@@ -66,8 +66,7 @@
       );
     in
     {
-      nixosModules.puka = import ./lib/module.nix self;
-      nixosModules.default = self.nixosModules.puka;
+      nixosModules.default = import ./lib/module.nix self;
 
       packages = forAllSystems (
         system:
@@ -75,30 +74,17 @@
           pkgs = nixpkgs.legacyPackages.${system};
           pythonSet = pythonSets.${system};
           venv = pythonSet.mkVirtualEnv "puka-env" workspace.deps.default;
-          puka-css-js = import ./lib/css-js.nix { inherit pkgs; };
-          inherit (pkgs.stdenv) mkDerivation;
+          static = import ./lib/static.nix {
+            inherit
+              pkgs
+              pythonSet
+              workspace
+              venv
+              ;
+          };
         in
         {
-          static = mkDerivation {
-            pname = "puka-static";
-            inherit (pythonSet.puka) version;
-            nativeBuildInputs = [ venv ];
-
-            dontUnpack = true;
-            dontConfigure = true;
-            dontBuild = true;
-
-            installPhase = ''
-              export DJANGO_SETTINGS_MODULE=puka.settings.production
-              export DJANGO_STATICFILES_DIR="${puka-css-js}"
-              export SECRET_KEY=
-              export STATIC_ROOT=$out
-              mkdir -p $out
-              ${venv}/bin/puka-manage collectstatic --no-input
-            '';
-
-          };
-          venv = venv;
+          inherit static venv;
         }
       );
 
