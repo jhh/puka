@@ -75,34 +75,10 @@
           pkgs = nixpkgs.legacyPackages.${system};
           pythonSet = pythonSets.${system};
           venv = pythonSet.mkVirtualEnv "puka-env" workspace.deps.default;
+          puka-css-js = import ./lib/css-js.nix { inherit pkgs; };
           inherit (pkgs.stdenv) mkDerivation;
         in
         {
-          puka-css-js =
-            let
-              pkgs = nixpkgs.legacyPackages.${system};
-            in
-            pkgs.buildNpmPackage {
-              name = "django-static-deps";
-              src = ./.;
-              npmDepsHash = "sha256-VSYvzgzPYj/mGQ8SvdZB+UtaqgyAjy1fPivk1ioUU6o=";
-              dontNpmBuild = true;
-
-              buildPhase = ''
-                runHook preBuild
-                npx tailwindcss -m -i puka/static/css/base.css -o $out/puka/static/css/main.css
-                # node ./static-build.mjs
-                runHook postBuild
-              '';
-
-              installPhase = ''
-                runHook preInstall
-                # mkdir -p $out/ui
-                # mv upkeep/ui/static/ui/main.* $out/ui
-                runHook postInstall
-              '';
-            };
-
           static = mkDerivation {
             pname = "puka-static";
             inherit (pythonSet.puka) version;
@@ -114,7 +90,7 @@
 
             installPhase = ''
               export DJANGO_SETTINGS_MODULE=puka.settings.production
-              export DJANGO_STATICFILES_DIR="${self.packages.${system}.puka-css-js}"
+              export DJANGO_STATICFILES_DIR="${puka-css-js}"
               export SECRET_KEY=
               export STATIC_ROOT=$out
               mkdir -p $out
