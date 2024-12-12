@@ -1,36 +1,53 @@
-[tool.poetry]
-authors = ["Jeff Hutchison <jeff@jeffhutchison.com>"]
-description = "Puka Bookmarks"
-license = "MIT"
+[project]
 name = "puka"
-packages = [
-  {include = "puka"},
+version = "3.0.0"
+description = "Where evything finds its place."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "django>=5.1.4",
+    "django-crispy-forms>=2.3",
+    "django-htmx>=1.21.0",
+    "environs[django]>=11.2.1",
+    "gunicorn>=23.0.0",
+    "psycopg[c,pool]>=3.2.3",
+    "whitenoise>=6.8.2",
 ]
-version = "2.1.3"
 
-[tool.poetry.group.main.dependencies]
-Django = "^5.0"
-django-htmx = "^1.18.0"
-gunicorn = "^21.2.0"
-psycopg  = {extras = ["binary", "pool"], version = "^3.1"}
-python = "^3.11"
-whitenoise = {extras = ["brotli"], version = "^6.1.0"}
+[project.scripts]
+puka-manage = "puka.manage:main"
 
-[tool.poetry.group.dev.dependencies]
-black = "^24.2.0"
-coverage = "^7.4.3"
-django-debug-toolbar = "4.2"
-pytest-django = "^4.8.0"
-rich = "^13.7.0"
-ipython = "^8.22.1"
-
-[tool.black]
-line-length = 99
-target-version = ['py39']
-
-[tool.isort]
-profile = "black"
+[dependency-groups]
+dev = [
+    "djade>=1.3.2",
+    "django-debug-toolbar>=4.4.6",
+    "django-stubs[compatible-mypy]>=5.1.1",
+    "ipython>=8.30.0",
+    "mypy>=1.13.0",
+    "pytest-cov>=6.0.0",
+    "pytest-django>=4.9.0",
+    "rich>=13.9.4",
+    "ruff>=0.8.2",
+]
 
 [build-system]
-build-backend = "poetry.core.masonry.api"
-requires = ["poetry-core>=1.0.0"]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+testpaths = [ "puka" ]
+python_files = "*_test.py"
+DJANGO_SETTINGS_MODULE = "puka.settings.test"
+
+[tool.mypy]
+plugins = ["mypy_django_plugin.main"]
+ignore_missing_imports = true
+
+[tool.django-stubs]
+django_settings_module = "puka.settings.test"
+
+[tool.ruff]
+line-length = 99
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]

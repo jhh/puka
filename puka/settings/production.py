@@ -2,14 +2,18 @@ from __future__ import annotations
 
 import os
 
+import environs
+
 from .base import *  # noqa: F403
+
+env = environs.Env()
 
 SECRET_KEY = os.environ["SECRET_KEY"]
 DEBUG = False
 
 ALLOWED_HOSTS = ["puka.j3ff.io"]
 
-DATABASES["default"]["CONN_MAX_AGE"] = 600  # noqa: F405
+STATICFILES_DIRS.append(env.path("DJANGO_STATICFILES_DIR"))  # noqa: F405
 
 STORAGES = {
     "staticfiles": {

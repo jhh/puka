@@ -1,4 +1,10 @@
-self: { config, lib, pkgs, ... }:
+self:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 with lib;
 let
   cfg = config.j3ff.puka;
@@ -22,14 +28,16 @@ in
       };
 
       preStart =
-        let pkg = self.packages.${pkgs.system}.default;
+        let
+          pkg = self.packages.${pkgs.system}.default;
         in
         ''
           ${pkg}/bin/manage.py migrate --no-input
         '';
 
       serviceConfig =
-        let pkg = self.packages.${pkgs.system}.default.dependencyEnv;
+        let
+          pkg = self.packages.${pkgs.system}.default.dependencyEnv;
         in
         {
           # agenix secret in github:jhh/nixos-configs

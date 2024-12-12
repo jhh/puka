@@ -1,93 +1,58 @@
-# https://just.systems
+# just manual: https://github.com/casey/just#readme
 _default:
-  @just --list
+    @just --list
 
 # bootstrap the development environment
-bootstrap: venv pre-commit
+init: pre-commit npm-install
+    echo DEBUG=true > .env
 
-# open the project in Pycharm
-edit:
-  pycharm .
+# run mypy type checks
+mypy:
+    uv run mypy --check-untyped-defs .
 
 # run tests
 test:
-    pytest
+    uv run pytest
 
-# watch HTML templates and update CSS
-watch:
-    tailwindcss -i puka/static/css/base.css -o puka/static/css/main.css --watch
+# run tests and create coverage report
+coverage:
+    uv run pytest --cov --cov-report=html
+    [[ -x /usr/bin/open ]] && /usr/bin/open htmlcov/index.html
+
+# run manage.py with command
+manage command:
+    uv run --no-sync puka/manage.py {{ command }}
 
 # run the development server
-run check="none":
-    python {{ if check != "none" { "-X dev" } else { "" } }} manage.py runserver
+run: (manage "runserver")
 
-# update CSS and download all JS dependencies
-update: venv update-css update-htmx update-alpine
-    direnv reload
+# create database migrations if needed
+makemigrations: (manage "makemigrations")
 
-# update CSS
-update-css:
-    tailwindcss -i puka/static/css/base.css -o puka/static/css/main.css
+# migrate the database
+migrate: (manage "migrate")
 
-CURL := "curl --no-progress-meter --location"
-JS_DIR := "puka/static/js"
+# run the ipython repl
+shell: (manage "shell")
 
-HTMX_BASE := "https://unpkg.com/htmx.org/dist"
-HTMX_EXT_BASE := "https://unpkg.com/htmx.org/dist/ext"
-HTMX_JS := "htmx.min.js"
-CLASS_TOOLS_JS := "class-tools.js"
-
-# update the HTML library
-update-htmx:
-    {{ CURL }} {{ HTMX_BASE }}/{{ HTMX_JS }} --output {{ JS_DIR }}/{{ HTMX_JS }}
-    {{ CURL }} {{ HTMX_EXT_BASE }}/{{ CLASS_TOOLS_JS }} --output {{ JS_DIR }}/{{ CLASS_TOOLS_JS }}
-
-    # add newline to avoid pre-commit fix
-    echo "" >> {{ JS_DIR }}/{{ HTMX_JS }}
-    echo "" >> {{ JS_DIR }}/{{ CLASS_TOOLS_JS }}
-
-# update the Alpine JS library to latest version
-update-alpine:
-    curl --no-progress-meter --location https://unpkg.com/alpinejs --output {{ JS_DIR }}/alpine.js
-    curl --no-progress-meter --location https://unpkg.com/@alpinejs/focus --output {{ JS_DIR }}/alpine-focus.js
-
-# update dev dependencies to latest version
-update-dev: && poetry-check
-    poetry add --group=dev --lock black@latest
-    # poetry add --group=dev --lock django-debug-toolbar@latest
-    poetry add --group=dev --lock ipython@latest
-    poetry add --group=dev --lock rich@latest
-    poetry add --group=dev --lock pytest-django@latest
-    poetry add --group=dev --lock coverage@latest
-
-# checks poetry.lock against the version of pyproject.toml and locks if neccessary
-poetry-check:
-    poetry check --lock --quiet || (just poetry-lock)
-
-# locks the python packages in pyproject.toml without updating the poetry env
-poetry-lock:
-    poetry lock --no-update
+# start a new app in upkeep module
+startapp appname:
+    uv run config/manage.py startapp {{ appname }}
+    mv {{ appname }} upkeep/
 
 # install pre-commit hooks
 pre-commit:
     pre-commit install --install-hooks
 
-# refresh the python packages in the dev env
-venv: poetry-check
-    nix build .#devEnv -o .venv
+npm-install:
+    npm install
 
-# grep for version
-version:
-    @rg "version = " -m 1 pyproject.toml flake.nix
+static-watch:
+    node static-build.mjs --watch
 
+static-build:
+    node static-build.mjs
 
-# update version
-set-version version: && version
-    @sed --in-place 's/^version = ".*"/version = "{{ version }}"/' pyproject.toml
-    @sed --in-place --regexp-extended 's/(\s+version = )".*";/\1"{{ version }}";/' flake.nix
-
-# run pytest and report coverage, pass "html" for report in browser
-coverage type="report":
-    coverage run --branch -m pytest
-    coverage {{ type }} {{ if type == "html" { "--show-contexts" } else { "" } }}
-    [[ "html" == "{{ type }}" ]] && open htmlcov/index.html || exit 0
+# temporarily update CSS
+update-css:
+    tailwindcss -i puka/static/css/base.css -o puka/static/css/main.css

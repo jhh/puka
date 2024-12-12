@@ -3,8 +3,12 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+import environs
+
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 APPS_DIR = BASE_DIR / "puka"
+
+env = environs.Env()
 
 ALLOWED_HOSTS: list[str] = []
 
@@ -34,17 +38,27 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "puka.urls"
 
+# Database configuration
+# DJANGO_DATABASE_URL e.g. postgres:///${REPO_NAME}?pool=true
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "puka",
-    },
+    "default": (
+        env.dj_db_url(
+            "DJANGO_DATABASE_URL",
+            default="postgres:///puka",
+        )
+    ),
 }
+
+# DJANGO_DATABASE_OPTIONS e.g. '{"pool": {"min_size": 2, "max_size": 4}}'
+if env.str("DJANGO_DATABASE_OPTIONS", ""):
+    DATABASES["default"]["OPTIONS"] = DATABASES["default"].get("OPTIONS", {}) | env.json("DJANGO_DATABASE_OPTIONS")  # fmt: off
+
+# Template configuration
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [APPS_DIR / "templates"],
+        "DIRS": [str(APPS_DIR / "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -100,7 +114,7 @@ STATIC_URL = "static/"
 STATIC_ROOT = os.environ.get("STATIC_ROOT", BASE_DIR / "static")
 
 # STATICFILES_DIR is where "django.contrib.staticfiles" looks during development
-STATICFILES_DIRS = [APPS_DIR / "static"]
+STATICFILES_DIRS = [str(APPS_DIR / "static")]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field

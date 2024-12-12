@@ -1,68 +1,131 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
-    poetry2nix = {
-      url = "github:nix-community/poetry2nix";
+
+    pyproject-nix = {
+      url = "github:nix-community/pyproject.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    uv2nix = {
+      url = "github:adisbladis/uv2nix";
+      inputs.pyproject-nix.follows = "pyproject-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    pyproject-build-systems = {
+      url = "github:pyproject-nix/build-system-pkgs";
+      inputs.pyproject-nix.follows = "pyproject-nix";
+      inputs.uv2nix.follows = "uv2nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { self, nixpkgs, flake-utils, poetry2nix }:
-    flake-utils.lib.eachDefaultSystem
-      (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      uv2nix,
+      pyproject-nix,
+      pyproject-build-systems,
+      ...
+    }:
+    let
+      inherit (nixpkgs) lib;
+      forAllSystems = lib.genAttrs lib.systems.flakeExposed;
+
+      workspace = uv2nix.lib.workspace.loadWorkspace { workspaceRoot = ./.; };
+
+      overlay = workspace.mkPyprojectOverlay {
+        sourcePreference = "wheel";
+      };
+
+      # editableOverlay = workspace.mkEditablePyprojectOverlay {
+      #   root = "$REPO_ROOT";
+      # };
+      #            pyprojectOverrides =
+
+      pythonSets = forAllSystems (
+        system:
         let
-          version = "2.1.2"; # also set this version in pyproject.toml
           pkgs = nixpkgs.legacyPackages.${system};
-          poetry2nixPkg = poetry2nix.lib.mkPoetry2Nix { inherit pkgs; };
-          inherit (poetry2nixPkg) mkPoetryEnv mkPoetryApplication;
-          inherit (pkgs.stdenv) mkDerivation;
+
+          baseSet = pkgs.callPackage pyproject-nix.build.packages {
+            python = pkgs.python312;
+          };
+
+          psycopgOverrides = import ./lib/overrides-psycopg.nix { inherit pkgs; };
+          pukaOverrides = import ./lib/overrides-puka.nix {
+            inherit lib pkgs workspace;
+            nixosModule = self.nixosModules.default;
+          };
+        in
+        baseSet.overrideScope (
+          lib.composeManyExtensions [
+            pyproject-build-systems.overlays.default
+            overlay
+            psycopgOverrides
+            pukaOverrides
+          ]
+        )
+      );
+    in
+    {
+      nixosModules.default = import ./lib/module.nix self;
+
+      checks = forAllSystems (
+        system:
+        let
+          pythonSet = pythonSets.${system};
+        in
+        # Inherit tests from passthru.tests into flake checks
+        pythonSet.puka.passthru.tests
+      );
+
+      packages = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          pythonSet = pythonSets.${system};
+          venv = pythonSet.mkVirtualEnv "puka-env" workspace.deps.default;
+          static = import ./lib/static.nix {
+            inherit pkgs pythonSet venv;
+          };
         in
         {
-          packages = {
-            main = mkPoetryApplication {
-              projectDir = self;
-              groups = [ "main" ];
+          inherit static venv;
+        }
+      );
 
-              patchPhase = ''
-                ${pkgs.tailwindcss}/bin/tailwindcss -i puka/static/css/base.css -o puka/static/css/main.css --minify
-              '';
+      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-rfc-style);
 
-              postInstall = ''
-                mkdir -p $out/bin/
-                cp -vf manage.py $out/bin/
-              '';
-            };
-
-            static = mkDerivation {
-              pname = "puka-static";
-              inherit version;
-              src = self;
-              phases = "unpackPhase installPhase";
-              installPhase = ''
-                export DJANGO_SETTINGS_MODULE=puka.settings.production
-                export SECRET_KEY=
-                export STATIC_ROOT=$out
-                mkdir -p $out
-                ${self.packages.${system}.main}/bin/manage.py collectstatic --no-input
-              '';
-            };
-
-            devEnv = mkPoetryEnv {
-              projectDir = self;
-              groups = [ "main" "dev" ];
-            };
-
-            default = self.packages.${system}.main;
+      devShells = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          # editablePythonSet = pythonSets.${system}.overrideScope editableOverlay;
+          # venv = editablePythonSet.mkVirtualEnv "puka-dev-env" workspace.deps.all;
+          uv = uv2nix.packages.${system}.uv-bin;
+          packages = [
+            pkgs.just
+            pkgs.nil
+            pkgs.nixfmt-rfc-style
+            pkgs.nodejs
+            pkgs.postgresql.dev
+            pkgs.pre-commit
+            pkgs.tailwindcss
+            uv
+          ];
+        in
+        {
+          default = pkgs.mkShell {
+            inherit packages;
+            shellHook = ''
+              unset PYTHONPATH
+              export UV_PYTHON_DOWNLOADS=never
+            '';
           };
-
-          devShells.default = pkgs.mkShell {
-            buildInputs = [ self.packages.${system}.devEnv ];
-            packages = with pkgs; [ just poetry pre-commit tailwindcss ];
-          };
-
-        }) // {
-      nixosModules.puka = import ./nix/module.nix self;
-      nixosModules.default = self.nixosModules.puka;
+        }
+      );
     };
 }
