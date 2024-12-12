@@ -10,6 +10,9 @@ pkgs.writeShellApplication {
         echo "error: run this command as root."
         exit 1
     fi
-    sudo -u puka env DJANGO_DATABASE_URL=postgres:///puka ${venv}/bin/puka-manage "$@"
+    sudo -u puka env \
+      DJANGO_SETTINGS_MODULE=puka.settings.production \
+      DJANGO_DATABASE_URL=postgres:///puka \
+      ${venv}/bin/puka-manage "$@"
   '';
 }
