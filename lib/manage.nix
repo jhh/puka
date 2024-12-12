@@ -13,6 +13,7 @@ pkgs.writeShellApplication {
     sudo -u puka env \
       DJANGO_SETTINGS_MODULE=puka.settings.production \
       DJANGO_DATABASE_URL=postgres:///puka \
+      SECRET_KEY=not-secret \
       ${venv}/bin/puka-manage "$@"
   '';
 }
