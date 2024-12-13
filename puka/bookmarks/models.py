@@ -1,15 +1,17 @@
 from __future__ import annotations
 
+import logging
+
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex
-from django.contrib.postgres.search import SearchQuery
-from django.contrib.postgres.search import SearchRank
-from django.contrib.postgres.search import SearchVectorField
+from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVectorField
+from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import F
-from django.db.models import Index
+from django.db.models import F, Index
 
 from puka.core.models import TimeStampedModel
+
+logger = logging.getLogger(__name__)
 
 
 class ActiveBookmarkManager(models.Manager):
@@ -32,13 +34,19 @@ class ActiveBookmarkManager(models.Manager):
 class Bookmark(TimeStampedModel):
     title = models.CharField(max_length=120)
     description = models.TextField(blank=True)
-    url = models.URLField(max_length=500)
+    url = models.URLField(max_length=500, unique=True)
     active = models.BooleanField(default=True)
     tags = ArrayField(models.CharField(max_length=50), blank=True)
     title_description_search = SearchVectorField(null=True, editable=False)
 
     objects = models.Manager()
     active_objects = ActiveBookmarkManager()
+
+    def clean(self):
+        super().clean()
+        if Bookmark.objects.filter(url=self.url).exists():
+            logger.warning(f"Bookmark with this URL already exists: {self.url}")
+            raise ValidationError("Bookmark with this URL already exists!")
 
     class Meta:
         indexes = [
