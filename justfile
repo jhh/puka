@@ -49,8 +49,11 @@ npm-install:
 
 # update CSS
 update-css:
-    npx tailwindcss -i puka/static/css/base.css -o puka/static/css/main.css
+    npx @tailwindcss/cli --input=puka/static/css/base.css --output=puka/static/css/main.css
 
 # update JS
 update-js:
     npx esbuild --bundle --outfile=puka/static/js/main.js puka/static/js/base.js
+
+watch: update-css update-js
+    npx @tailwindcss/cli --watch --input=puka/static/css/base.css --output=puka/static/css/main.css

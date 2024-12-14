@@ -15,7 +15,7 @@
       x-transition:leave="ease-in-out duration-500"
       x-transition:leave-start="opacity-100"
       x-transition:leave-end="opacity-0"
-      class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+      class="fixed inset-0 bg-gray-500/75 transition-opacity"></div>
 
   <div x-show="editFormOpen" class="fixed inset-0 overflow-hidden">
     <div class="absolute inset-0 overflow-hidden">
@@ -39,7 +39,7 @@
                 <div class="ml-3 flex h-7 items-center">
                   <button type="button"
                           x-on:click="editFormOpen = false"
-                          class="relative rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                          class="relative rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                     <span class="absolute -inset-2.5"></span>
                     <span class="sr-only">Close panel</span>
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
@@ -52,7 +52,7 @@
             </div>
             <div class="relative mt-6 flex-1 px-4 sm:px-6">
 
-              {# ==================== FORM ====================  #}
+              {# ==================== FORM ==================== #}
 
               <form
                   x-trap.noscroll="editFormOpen"
@@ -73,7 +73,7 @@
                                class="block text-sm font-medium leading-6 text-gray-900">Title</label>
                         <div class="mt-2">
                           <div
-                              class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                              class="flex rounded-md shadow-xs ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
                             {{ form.title }}
                           </div>
                         </div>
@@ -95,7 +95,7 @@
                                class="block text-sm font-medium leading-6 text-gray-900">URL</label>
                         <div class="mt-2">
                           <div
-                              class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                              class="flex rounded-md shadow-xs ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
                             {{ form.url }}
                           </div>
                         </div>
@@ -107,7 +107,7 @@
                                class="block text-sm font-medium leading-6 text-gray-900">Tags</label>
                         <div class="mt-2">
                           <div
-                              class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                              class="flex rounded-md shadow-xs ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
                             {{ form.tags }}
                           </div>
                         </div>
@@ -117,7 +117,7 @@
                       <div
                           x-data="{enabled: {{ form.active.value|lower }} }"
                           class="flex items-center justify-between sm:col-span-2">
-  <span class="flex flex-grow flex-col">
+  <span class="flex grow flex-col">
     <span class="text-sm font-medium leading-6 text-gray-900" id="active-label">Active</span>
   </span>
                         <button
@@ -125,13 +125,13 @@
                             x-on:click="enabled = ! enabled; document.getElementById('id_active').checked = enabled"
                             x-bind:aria-checked="enabled"
                             x-bind:class="enabled ? 'bg-indigo-600' : 'bg-gray-200'"
-                            class="bg-gray-200 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
+                            class="bg-gray-200 relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
                             role="switch" aria-labelledby="active-label"
                         >
                           <span
                               x-bind:class="enabled ? 'translate-x-5' : 'translate-x-0'"
                               aria-hidden="true"
-                              class="translate-x-0 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+                              class="translate-x-0 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out"></span>
                         </button>
                         {{ form.active }}
                       </div>
@@ -148,7 +148,7 @@
                   </button>
                   <button
                       type="submit"
-                      class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                      class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                     Save
                   </button>
                 </div>
