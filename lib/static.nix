@@ -7,13 +7,13 @@ let
   pukaCssJs = pkgs.buildNpmPackage {
     name = "django-static-deps";
     src = ../.;
-    npmDepsHash = "sha256-cmDo+Lv6m2pg9b1m69rzm8b/xxXX4ljBXC83k3WSKAY=";
+    npmDepsHash = "sha256-5betlQyJXp0zB15wdGu4oF5NisajKuH/e54k2n5uSyk=";
     dontNpmBuild = true;
 
     buildPhase = ''
       runHook preBuild
-      npx tailwindcss --minify -i puka/static/css/base.css -o $out/css/main.css
-      npx esbuild --bundle --minify --outfile=$out/js/main.js puka/static/js/base.js
+      npx @tailwindcss/cli --minify --input=puka/static/puka/base.css --output=$out/puka/main.css
+      npx esbuild --bundle --minify --outfile=$out/puka/main.js puka/static/puka/base.js
       runHook postBuild
     '';
 
@@ -38,7 +38,7 @@ mkDerivation {
     export SECRET_KEY=
     export DJANGO_STATIC_ROOT=$out
     mkdir -p $out
-    ${venv}/bin/puka-manage collectstatic --no-input
+    ${venv}/bin/puka-manage collectstatic --no-input --ignore="base.*"
   '';
 
 }
