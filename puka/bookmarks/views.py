@@ -3,11 +3,11 @@ from __future__ import annotations
 import logging
 
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.http import QueryDict
 from django.shortcuts import render
-from django.views.decorators.http import require_GET
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_GET, require_http_methods
 from django_htmx.http import trigger_client_event
 
 from .forms import BookmarkForm
@@ -71,6 +71,9 @@ def bookmark_create(request):
         form = BookmarkForm(request.POST)
         if form.is_valid():
             logger.debug("create: Bookmark form is valid")
+            if Bookmark.objects.filter(url=form["url"]).exists():
+                logger.warning(f"Bookmark with this URL already exists: {form["url"]}")
+                raise ValidationError("Bookmark with this URL already exists!")
             form.save()
             response = render(request, "partials/_edit_form.html", {"form": form})
             trigger_client_event(

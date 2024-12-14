@@ -5,7 +5,6 @@ import logging
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVectorField
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import F, Index
 
@@ -41,12 +40,6 @@ class Bookmark(TimeStampedModel):
 
     objects = models.Manager()
     active_objects = ActiveBookmarkManager()
-
-    def clean(self):
-        super().clean()
-        if Bookmark.objects.filter(url=self.url).exists():
-            logger.warning(f"Bookmark with this URL already exists: {self.url}")
-            raise ValidationError("Bookmark with this URL already exists!")
 
     class Meta:
         indexes = [
