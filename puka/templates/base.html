@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Puka</title>
+  <title>{% block title %}Puka{% endblock %}</title>
   <link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
   <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml">
   <link rel="apple-touch-icon" href="{% static 'icon-512.png' %}">
@@ -82,7 +82,7 @@
           hx-get="{% url 'bookmarks' %}"
           hx-trigger="bookmarkAdded from:body"
       >
-        {% include "partials/_bookmarks.html" %}
+        {% block content %}{% endblock %}
       </ul>
     </div>
   </main>

@@ -44,17 +44,12 @@ def bookmarks(request):
         bookmark_list = Bookmark.active_objects.all()
     paginator = Paginator(bookmark_list, 25)
 
-    if request.htmx:
-        template_name = "partials/_bookmarks.html"
-    else:
-        template_name = "index.html"
-
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
     response = render(
         request,
-        template_name,
+        "bookmarks/_bookmark_list.html" if request.htmx else "bookmarks/index.html",
         {
             "page_obj": page_obj,
             "query": query.urlencode(),
@@ -75,7 +70,7 @@ def bookmark_create(request):
                 logger.warning(f"Bookmark with this URL already exists: {form["url"]}")
                 raise ValidationError("Bookmark with this URL already exists!")
             form.save()
-            response = render(request, "partials/_edit_form.html", {"form": form})
+            response = render(request, "bookmarks/_edit_form.html", {"form": form})
             trigger_client_event(
                 response,
                 "update-edit-form",
@@ -89,7 +84,7 @@ def bookmark_create(request):
     # GET
     response = render(
         request,
-        "partials/_edit_form.html",
+        "bookmarks/_edit_form.html",
         {"form": BookmarkForm()},
     )
     return trigger_client_event(
@@ -111,7 +106,7 @@ def bookmark_update(request, pk):
             form.save()
             response = render(
                 request,
-                "partials/_edit_form.html",
+                "bookmarks/_edit_form.html",
                 {"form": form},
             )
             trigger_client_event(
@@ -127,7 +122,7 @@ def bookmark_update(request, pk):
     # GET
     response = render(
         request,
-        "partials/_edit_form.html",
+        "bookmarks/_edit_form.html",
         {"form": BookmarkForm(instance=bookmark)},
     )
     return trigger_client_event(

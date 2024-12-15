@@ -26,7 +26,7 @@
         {% endfor %}
       </ul>
       <div class="text-xs text-slate-400">
-        {{ bookmark.created | date:'F Y' | lower }}
+        {{ bookmark.created|date:'F Y'|lower }}
         <button
             class="ml-3"
             hx-get="{% url 'bookmark-update' bookmark.id %}"
