@@ -1,0 +1,259 @@
+{% load django_htmx static %}
+<!DOCTYPE html>
+<!--suppress XmlUnboundNsPrefix, CheckEmptyScriptTag -->
+<html class="h-full bg-gray-100" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Puka{% endblock %}</title>
+  <link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
+  <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{% static 'icon-512.png' %}">
+  <link rel="manifest" href="{% static 'manifest.webmanifest' %}">
+  <link rel="preconnect" href="https://rsms.me/">
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css"/>
+  <link rel="stylesheet" href="{% static 'puka/main.css' %}">
+  <script defer src="{% static 'puka/main.js' %}"></script>
+  {% django_htmx_script %}
+</head>
+<body class="h-full">
+<div
+    x-data="{ isMobileOpen: false }"
+    class="min-h-full"
+>
+  {# Tailwind UI Stacked template #}
+  <nav class="bg-gray-800">
+    <div
+        class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div
+          class="flex h-16 items-center justify-between">
+        <div class="flex items-center">
+          <div class="shrink-0">
+            <img class="size-8 text-indigo-600" src="{% static 'logo.svg' %}" alt="Puka">
+          </div>
+          <div class="hidden md:block">
+            <div class="ml-10 flex items-baseline space-x-4">
+              <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
+              <a href="{% url 'bookmarks' %}" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white"
+                 aria-current="page">Bookmarks</a>
+              <a href="#"
+                 class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Upkeep</a>
+              <a href="#"
+                 class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Stuff</a>
+            </div>
+          </div>
+        </div>
+        <div class="hidden md:block">
+          <div class="ml-4 flex items-center md:ml-6">
+            <button type="button"
+                    class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden"
+            >
+              <span class="absolute -inset-1.5"></span>
+              <span class="sr-only">View notifications</span>
+              <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                   aria-hidden="true" data-slot="icon">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/>
+              </svg>
+            </button>
+
+            {# Profile dropdown #}
+            <div
+                x-data="{ isProfileOpen: false }"
+                class="relative ml-3"
+            >
+              <div>
+                <button type="button"
+                        @click="isProfileOpen = !isProfileOpen"
+                        class="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden"
+                        id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                  <span class="absolute -inset-1.5"></span>
+                  <span class="sr-only">Open user menu</span>
+                  <img class="size-8 rounded-full"
+                       src="{% static 'avatars/jeff.png' %}"
+                       alt="">
+                </button>
+              </div>
+              <div
+                  x-show="isProfileOpen"
+                  x-transition:enter="transition ease-out duration-100"
+                  x-transition:enter-start="transform opacity-0 scale-95"
+                  x-transition:enter-end="transform opacity-100 scale-100"
+                  x-transition:leave="transition ease-in duration-75"
+                  x-transition:leave-start="transform opacity-100 scale-100"
+                  x-transition:leave-end="transform opacity-0 scale-95"
+                  class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 focus:outline-hidden"
+                  role="menu"
+                  aria-orientation="vertical"
+                  aria-labelledby="user-menu-button"
+                  tabindex="-1"
+              >
+                {# Active: "bg-gray-100 outline-hidden", Not Active: "" #}
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
+                   id="user-menu-item-0">Your Profile</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
+                   id="user-menu-item-1">Settings</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
+                   id="user-menu-item-2">Sign out</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="-mr-2 flex md:hidden">
+          {# Mobile menu button #}
+          <button
+              @click="isMobileOpen = !isMobileOpen"
+              type="button"
+              class="relative inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden"
+              aria-controls="mobile-menu" aria-expanded="false">
+            <span class="absolute -inset-0.5"></span>
+            <span class="sr-only">Open main menu</span>
+            <svg
+                x-bind:class="{ 'hidden': isMobileOpen, 'block': !isMobileOpen }"
+                class="block size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                aria-hidden="true" data-slot="icon">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+            </svg>
+            <svg
+                x-bind:class="{ 'block': isMobileOpen, 'hidden': !isMobileOpen }"
+                class="hidden size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                aria-hidden="true" data-slot="icon">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    {# Mobile menu, show/hide based on menu state. #}
+    <div
+        x-show="isMobileOpen"
+        class="md:hidden"
+        id="mobile-menu">
+      <div class="space-y-1 px-2 pt-2 pb-3 sm:px-3">
+        <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
+        <a href="#" class="block rounded-md bg-gray-900 px-3 py-2 text-base font-medium text-white" aria-current="page">Bookmarks</a>
+        <a href="#"
+           class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Upkeep</a>
+        <a href="#"
+           class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Stuff</a>
+      </div>
+
+      <div class="border-t border-gray-700 pt-4 pb-3">
+        <div class="flex items-center px-5">
+          <div class="shrink-0">
+            <img class="size-10 rounded-full"
+                 src="{% static 'avatars/jeff.png' %}"
+                 alt="">
+          </div>
+          <div class="ml-3">
+            <div class="text-base font-medium text-white">Jeff Hutchison</div>
+            <div class="text-sm font-medium text-gray-400">jeff@j3ff.io</div>
+          </div>
+          <button type="button"
+                  class="relative ml-auto shrink-0 rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
+            <span class="absolute -inset-1.5"></span>
+            <span class="sr-only">View notifications</span>
+            <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                 aria-hidden="true" data-slot="icon">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/>
+            </svg>
+          </button>
+        </div>
+        <div class="mt-3 space-y-1 px-2">
+          <a href="#"
+             class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">Your
+            Profile</a>
+          <a href="#"
+             class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">Settings</a>
+          <a href="#"
+             class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">Sign
+            out</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+</div>
+
+{% comment %}
+<div class="flex h-screen flex-col">
+  <header class="bg-gray-900 px-6 py-4">
+    <div class="md:flex md:items-center md:justify-between">
+      <div class="min-w-0 flex-1">
+        <h2
+            class="text-2xl font-bold leading-7 text-white sm:truncate sm:text-3xl"
+        ><a
+            href="{% url 'bookmarks' %}"
+            hx-get="{% url 'bookmarks' %}"
+            hx-target="#id_bookmarks"
+        >
+          <img class="w-8 inline-block" src="{% static 'logo.svg' %}" alt="Logo">
+          Puka Bookmarks
+        </a>
+        </h2>
+      </div>
+      <div
+          x-data="{search: false}"
+          x-on:keydown.meta.K.window="search = true"
+          class="mr-4 relative flex items-center"
+      >
+        <label class="hidden" for="search">Search</label>
+        <input
+            type="text"
+            name="q"
+            id="search"
+            hx-get="{% url 'bookmarks' %}"
+            hx-trigger="keyup changed delay:0.5s"
+            hx-target="#id_bookmarks"
+            class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
+            x-on:keyup.esc.prevent.stop="$el.blur()"
+            x-on:blur="$el.value = ''; search = false"
+            x-trap="search"
+        >
+        <div class="absolute inset-y-0 right-0 flex py-1.5  pr-1.5">
+          <kbd
+              class="inline-flex items-center border border-gray-200 rounded-sm px-2 text-sm font-sans font-medium text-gray-400">
+            ⌘K </kbd>
+        </div>
+      </div>
+      <div class="mt-4 flex md:mt-0 md:ml-4">
+        <button
+            type="button"
+            hx-get="{% url 'bookmark-create' %}"
+            hx-trigger="click"
+            hx-target="#id_bookmark_edit"
+            hx-swap="outerHTML"
+            class="inline-flex items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-sm font-medium text-white shadow-xs hover:bg-gray-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+        >
+          New
+        </button>
+      </div>
+    </div>
+  </header>
+  <main
+      class="grow bg-neutral-100 px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8"
+  >
+    <div class="mx-auto max-w-4xl bg-white">
+      <ul
+          id="id_bookmarks"
+          role="list"
+          class="divide-y divide-gray-200 shadow-sm"
+          hx-get="{% url 'bookmarks' %}"
+          hx-trigger="bookmarkAdded from:body"
+      >
+        {% block content %}{% endblock %}
+      </ul>
+    </div>
+  </main>
+</div>
+<div id="id_bookmark_edit"></div>
+{% endcomment %}
+</body>
+</html>

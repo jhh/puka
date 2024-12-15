@@ -1,3 +1,10 @@
+<ul
+    id="id_bookmarks"
+    role="list"
+    class="divide-y divide-gray-200 shadow-sm bg-white"
+    hx-get="{% url 'bookmarks' %}"
+    hx-trigger="bookmarkAdded from:body"
+>
 {% for bookmark in page_obj %}
   <li
       class="p-4"
@@ -26,7 +33,7 @@
         {% endfor %}
       </ul>
       <div class="text-xs text-slate-400">
-        {{ bookmark.created | date:'F Y' | lower }}
+        {{ bookmark.created|date:'F Y'|lower }}
         <button
             class="ml-3"
             hx-get="{% url 'bookmark-update' bookmark.id %}"
@@ -38,3 +45,4 @@
     </article>
   </li>
 {% endfor %}
+</ul>

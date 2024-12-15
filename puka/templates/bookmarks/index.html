@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Bookmarks{% endblock %}
+
+{% block header %}
+  <h1 class="text-lg/6 font-semibold text-gray-900">Bookmarks</h1>
+{% endblock header %}
+
+{% block content %}
+  <div class="flex justify-end mb-2 mt-0 md:ml-4">
+    <div
+        x-data="{search: false}"
+        x-on:keydown.meta.K.window="search = true"
+        class="mr-4 relative flex items-center"
+    >
+      <label class="hidden" for="search">Search</label>
+      <input
+          type="text"
+          name="q"
+          id="search"
+          hx-get="{% url 'bookmarks' %}"
+          hx-trigger="keyup changed delay:0.5s"
+          hx-target="#id_bookmarks"
+          class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
+          x-on:keyup.esc.prevent.stop="$el.blur()"
+          x-on:blur="$el.value = ''; search = false"
+          x-trap="search"
+      >
+      <div class="absolute inset-y-0 right-0 flex py-1.5  pr-1.5">
+        <kbd
+            class="inline-flex items-center border border-gray-200 rounded-sm px-2 text-sm font-sans font-medium text-gray-400">
+          ⌘K </kbd>
+      </div>
+    </div>
+{# <div class="mt-4 flex md:mt-0 md:ml-4"> #}
+      <div class="flex md:mt-0 md:ml-4">
+      <button
+          type="button"
+          hx-get="{% url 'bookmark-create' %}"
+          hx-trigger="click"
+          hx-target="#id_bookmark_edit"
+          hx-swap="outerHTML"
+          class="inline-flex items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-sm font-medium text-white shadow-xs hover:bg-gray-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+      >
+        New
+      </button>
+    </div>
+  </div>
+  {% include "bookmarks/_bookmark_list.html" %}
+  <div id="id_bookmark_edit"></div>
+{% endblock content %}

@@ -5,7 +5,7 @@
       <configuration>
         <option name="rootFolder" value="$MODULE_DIR$" />
         <option name="settingsModule" value="puka/settings/local.py" />
-        <option name="manageScript" value="manage.py" />
+        <option name="manageScript" value="puka/manage.py" />
         <option name="environment" value="&lt;map/&gt;" />
         <option name="doNotUseTestRunner" value="false" />
         <option name="trackFilePattern" value="migrations" />
