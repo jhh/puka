@@ -1,3 +1,10 @@
+<ul
+    id="id_bookmarks"
+    role="list"
+    class="divide-y divide-gray-200 shadow-sm bg-white"
+    hx-get="{% url 'bookmarks' %}"
+    hx-trigger="bookmarkAdded from:body"
+>
 {% for bookmark in page_obj %}
   <li
       class="p-4"
@@ -38,3 +45,4 @@
     </article>
   </li>
 {% endfor %}
+</ul>
