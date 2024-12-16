@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     "django_htmx",
     "puka.core",
     "puka.bookmarks",
+    "puka.users",
 ]
 
 MIDDLEWARE = [
@@ -52,6 +53,9 @@ DATABASES = {
 # DJANGO_DATABASE_OPTIONS e.g. '{"pool": {"min_size": 2, "max_size": 4}}'
 if env.str("DJANGO_DATABASE_OPTIONS", ""):
     DATABASES["default"]["OPTIONS"] = DATABASES["default"].get("OPTIONS", {}) | env.json("DJANGO_DATABASE_OPTIONS")  # fmt: off
+
+# Custom User Model
+AUTH_USER_MODEL = "users.CustomUser"
 
 # Template configuration
 
