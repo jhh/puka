@@ -38,7 +38,7 @@ mkDerivation {
     export SECRET_KEY=
     export DJANGO_STATIC_ROOT=$out
     mkdir -p $out
-    ${venv}/bin/puka-manage collectstatic --no-input --ignore="base.*"
+    ${venv}/bin/puka-manage collectstatic --no-input --ignore="puka/base.*"
   '';
 
 }
