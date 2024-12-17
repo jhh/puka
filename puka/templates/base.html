@@ -91,10 +91,18 @@
                 {# Active: "bg-gray-100 outline-hidden", Not Active: "" #}
                 <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
                    id="user-menu-item-0">Your Profile</a>
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-                   id="user-menu-item-1">Settings</a>
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-                   id="user-menu-item-2">Sign out</a>
+                {% if user.is_authenticated and user.is_staff %}
+                  <a href="/admin/" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
+                     id="user-menu-item-1">Admin</a>
+                {% endif %}
+                <a
+                    hx-post="{% url 'logout' %}"
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+{# hx-target="body" #}
+{# hx-swap="outerHTML" #}
+                    href="#"
+                    class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
+                    id="user-menu-item-2">Sign out</a>
               </div>
             </div>
           </div>
