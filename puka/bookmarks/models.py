@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import logging
 
-from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVectorField
 from django.db import models
 from django.db.models import F, Index
+from taggit.managers import TaggableManager
 
 from puka.core.models import TimeStampedModel
 
@@ -18,7 +18,7 @@ class ActiveBookmarkManager(models.Manager):
         return super().get_queryset().filter(active=True)
 
     def with_tags(self, tags: list[str]) -> models.QuerySet:
-        return self.get_queryset().filter(tags__overlap=tags)
+        return self.get_queryset().filter(tags__name__in=tags)
 
     def with_text(self, text: str) -> models.QuerySet:
         query = SearchQuery(text, search_type="websearch", config="english")
@@ -34,8 +34,8 @@ class Bookmark(TimeStampedModel):
     title = models.CharField(max_length=120)
     description = models.TextField(blank=True)
     url = models.URLField(max_length=500, unique=True)
+    tags = TaggableManager()
     active = models.BooleanField(default=True)
-    tags = ArrayField(models.CharField(max_length=50), blank=True)
     title_description_search = SearchVectorField(null=True, editable=False)
 
     objects = models.Manager()
@@ -44,7 +44,6 @@ class Bookmark(TimeStampedModel):
     class Meta:
         indexes = [
             Index(fields=["-created"]),
-            GinIndex(fields=["tags"]),
             GinIndex(fields=["title_description_search"]),
         ]
         ordering = ["-created"]

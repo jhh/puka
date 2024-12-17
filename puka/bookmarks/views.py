@@ -42,7 +42,7 @@ def bookmarks(request):
 
     else:
         bookmark_list = Bookmark.active_objects.all()
-    paginator = Paginator(bookmark_list, 25)
+    paginator = Paginator(bookmark_list.prefetch_related("tags"), 25)
 
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)

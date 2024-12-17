@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_htmx",
+    "taggit",
     "puka.core",
     "puka.bookmarks",
     "puka.users",
@@ -126,3 +127,5 @@ STATICFILES_DIRS = [str(APPS_DIR / "static")]
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGIN_REDIRECT_URL = "/"
+
+TAGGIT_CASE_INSENSITIVE = False
