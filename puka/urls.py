@@ -2,17 +2,15 @@ from __future__ import annotations
 
 from django.conf import settings
 from django.contrib import admin
-from django.urls import include
-from django.urls import path
-from django.urls import URLPattern
-from django.urls import URLResolver
+from django.urls import URLPattern, URLResolver, include, path
 from django.views.generic import RedirectView
 
 urlpatterns: list[URLPattern | URLResolver] = [
     path("", RedirectView.as_view(url="/bookmarks/", permanent=False)),
     path("bookmarks/", include("puka.bookmarks.urls")),
-    path("admin/", admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),
+    path("users/", include("puka.users.urls")),
+    path("admin/", admin.site.urls),
 ]
 
 
