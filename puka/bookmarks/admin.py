@@ -11,7 +11,7 @@ class BookmarkAdmin(admin.ModelAdmin):
         "id",
         "title",
         "url",
-        "tags",
+        # "tags",
         "created",
         "modified",
     )

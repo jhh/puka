@@ -22,7 +22,7 @@
         {{ bookmark.description }}
       </p>
       <ul role="list" class="mt-4">
-        {% for tag in bookmark.tags %}
+        {% for tag in bookmark.tags.all %}
           <li class="inline text-sm text-red-700">
             <a
                 href="?t={{ tag }}"
