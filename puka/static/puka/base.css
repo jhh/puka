@@ -1,7 +1,10 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 /*noinspection CssInvalidAtRule*/
-@plugin '@tailwindcss/forms';
+@plugin "@tailwindcss/forms";
+
+/*noinspection CssInvalidAtRule*/
+@source "../../../.venv/lib/python3.12/site-packages/crispy_tailwind/templates/tailwind";
 
 /*noinspection CssInvalidAtRule*/
 @theme {
