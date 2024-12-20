@@ -65,11 +65,14 @@ def bookmarks_filter(request):
     paginator = Paginator(f.qs, 25)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
+    query = request.GET.copy()
+    if "page" in query:
+        query.pop("page")
 
     return render(
         request,
         "bookmarks/_bookmark_list.html" if request.htmx else "bookmarks/bookmark_filter.html",
-        {"page_obj": page_obj, "filter": f},
+        {"page_obj": page_obj, "filter": f, "query": query.urlencode()},
     )
 
 
