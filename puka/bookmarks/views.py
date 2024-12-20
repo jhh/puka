@@ -10,6 +10,7 @@ from django.shortcuts import render
 from django.views.decorators.http import require_GET, require_http_methods
 from django_htmx.http import trigger_client_event
 
+from .filters import BookmarkFilter
 from .forms import BookmarkForm
 from .models import Bookmark
 
@@ -49,7 +50,7 @@ def bookmarks(request):
 
     response = render(
         request,
-        "bookmarks/_bookmark_list.html" if request.htmx else "bookmarks/index.html",
+        "bookmarks/_bookmark_list.html" if request.htmx else "bookmarks/bookmark_list.html",
         {
             "page_obj": page_obj,
             "query": query.urlencode(),
@@ -57,6 +58,19 @@ def bookmarks(request):
     )
 
     return trigger_client_event(response, "clearSearch", {}) if clear_search else response
+
+
+def bookmarks_filter(request):
+    f = BookmarkFilter(request.GET, queryset=Bookmark.objects.prefetch_related("tags"))
+    paginator = Paginator(f.qs, 25)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    return render(
+        request,
+        "bookmarks/_bookmark_list.html" if request.htmx else "bookmarks/bookmark_filter.html",
+        {"page_obj": page_obj, "filter": f},
+    )
 
 
 @login_required

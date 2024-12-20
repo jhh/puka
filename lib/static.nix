@@ -5,7 +5,7 @@
 }:
 let
   baseCss = "puka/static/puka/base.css";
-  templates = "lib/python3.12/site-packages/crispy_tailwind/templates/tailwind";
+  templates = "lib/python3.12/site-packages/crispy_tailwind";
 
   pukaCssJs = pkgs.buildNpmPackage {
     name = "django-static-deps";

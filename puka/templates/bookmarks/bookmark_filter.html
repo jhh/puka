@@ -2,11 +2,15 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    <form method="get">
-        {{ filter.form|crispy }}
-        <input type="submit" />
-    </form>
-    {% for obj in filter.qs %}
-        {{ obj.title }} - {{ obj.url }}<br />
-    {% endfor %}
+  {% crispy filter.form %}
+  {% include "bookmarks/_bookmark_list.html" %}
+  <script>
+      function clearSearch() {
+          document.querySelector('#id_title').value = '';
+          document.querySelector('#id_url').value = '';
+          document.querySelector('#id_tags').value = '';
+          document.querySelector('#id_created').value = '';
+          document.querySelector('#id_active').value = 'unknown';
+      }
+  </script>
 {% endblock content %}
