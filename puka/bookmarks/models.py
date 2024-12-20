@@ -35,7 +35,7 @@ class Bookmark(TimeStampedModel):
     description = models.TextField(blank=True)
     url = models.URLField(max_length=500, unique=True)
     tags = TaggableManager()
-    active = models.BooleanField(default=True)
+    active = models.BooleanField(default=True, null=False)
     title_description_search = SearchVectorField(null=True, editable=False)
 
     objects = models.Manager()

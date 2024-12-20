@@ -17,6 +17,9 @@
     <article>
       <h2 class="pb-2 text-base font-medium text-slate-800">
         <a href="{{ bookmark.url }}" target="_blank" rel="noreferrer">{{ bookmark.title }}</a>
+        {% if not bookmark.active %}
+          <span class="text-sm text-red-700">(inactive)</span>
+        {% endif %}
       </h2>
       <p class="text-sm text-slate-600">
         {{ bookmark.description }}

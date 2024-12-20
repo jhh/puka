@@ -1,6 +1,6 @@
 [project]
 name = "puka"
-version = "3.0.5"
+version = "3.0.6"
 description = "Where evything finds its place."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -13,6 +13,8 @@ dependencies = [
     "gunicorn>=23.0.0",
     "psycopg[c,pool]>=3.2.3",
     "whitenoise>=6.8.2",
+    "django-filter>=24.3",
+    "crispy-tailwind>=1.0.3",
 ]
 
 [project.scripts]

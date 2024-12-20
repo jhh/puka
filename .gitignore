@@ -1,6 +1,6 @@
 # minified version built at deploy time
-/puka/static/puka/main.css
-/puka/static/puka/main.js
+puka/static/puka/main.css
+puka/static/puka/main.js
 
 bookmarks.json
 
