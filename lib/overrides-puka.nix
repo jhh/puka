@@ -35,30 +35,6 @@ final: prev: {
               mypy . --junit-xml $out/junit.xml
             '';
           };
-
-          pytest = mkDerivation {
-            name = "${final.puka.name}-pytest";
-            inherit (final.puka) src;
-
-            nativeBuildInputs = [
-              venv
-            ];
-
-            dontConfigure = true;
-
-            buildPhase = ''
-              runHook preBuild
-              # pytest --import-mode=importlib --cov tests --cov-report html
-              runHook postBuild
-            '';
-
-            installPhase = ''
-              runHook preInstall
-              echo "nothing to see here" > $out
-              # mv htmlcov $out
-              runHook postInstall
-            '';
-          };
         }
         // lib.optionalAttrs isLinux {
           #
@@ -66,8 +42,9 @@ final: prev: {
             let
               venv = final.mkVirtualEnv "puka-nixos-test-env" workspace.deps.default;
               secrets = pkgs.writeText "puka-test-secrets" ''
-                DEBUG=false
-                DJANGO_DATABASE_URL="sqlite:///tmp/db.sqlite3"
+                DJANGO_DATABASE_URL="postgres:///puka"
+                DJANGO_ALLOWED_HOSTS="localhost,127.0.0.1"
+                SECRET_KEY="test-secret-key"
               '';
             in
             pkgs.nixosTest {
@@ -87,6 +64,18 @@ final: prev: {
                     port = 8001;
                   };
 
+                  services.postgresql = {
+                    enable = true;
+                    package = pkgs.postgresql_16;
+                    ensureDatabases = [ "puka" ];
+                    ensureUsers = [
+                      {
+                        name = "puka";
+                        ensureDBOwnership = true;
+                      }
+                    ];
+                  };
+
                   system.stateVersion = "24.11";
                 };
 
@@ -96,10 +85,10 @@ final: prev: {
                   machine.wait_for_open_port(8001)
 
                 with subtest("Staticfiles are generated"):
-                  machine.succeed("curl -sf http://localhost:8001/static/ui/main.css")
+                  machine.succeed("curl -sf http://localhost:8001/static/puka/main.css")
 
                 with subtest("Home page is live"):
-                  machine.succeed("curl -sLf http://localhost:8001/ | grep 'Upkeep'")
+                  machine.succeed("curl -sLf http://localhost:8001/ | grep 'New Bookmark'")
               '';
             };
         };
