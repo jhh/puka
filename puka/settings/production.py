@@ -11,7 +11,7 @@ env = environs.Env()
 SECRET_KEY = os.environ["SECRET_KEY"]
 DEBUG = False
 
-ALLOWED_HOSTS = ["puka.j3ff.io"]
+ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["puka.j3ff.io"])
 
 if env.path("DJANGO_STATICFILES_DIR", None):
     STATICFILES_DIRS.append(env.path("DJANGO_STATICFILES_DIR"))  # noqa: F405
