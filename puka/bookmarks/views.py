@@ -3,12 +3,12 @@ from __future__ import annotations
 import logging
 
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.http import QueryDict
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_GET, require_http_methods
-from django_htmx.http import trigger_client_event
+from django_htmx.http import HttpResponseLocation, trigger_client_event
 
 from .filters import BookmarkFilter
 from .forms import BookmarkForm
@@ -50,7 +50,7 @@ def bookmarks(request):
 
     response = render(
         request,
-        "bookmarks/_bookmark_list.html" if request.htmx else "bookmarks/bookmark_list.html",
+        "bookmarks/_list.html" if request.htmx else "bookmarks/list.html",
         {
             "page_obj": page_obj,
             "query": query.urlencode(),
@@ -71,7 +71,7 @@ def bookmarks_filter(request):
 
     return render(
         request,
-        "bookmarks/_bookmark_list.html" if request.htmx else "bookmarks/bookmark_filter.html",
+        "bookmarks/_list.html" if request.htmx else "bookmarks/bookmark_filter.html",
         {"page_obj": page_obj, "filter": f, "query": query.urlencode()},
     )
 
@@ -83,9 +83,6 @@ def bookmark_create(request):
         form = BookmarkForm(request.POST)
         if form.is_valid():
             logger.debug("create: Bookmark form is valid")
-            if Bookmark.objects.filter(url=form["url"]).exists():
-                logger.warning(f"Bookmark with this URL already exists: {form["url"]}")
-                raise ValidationError("Bookmark with this URL already exists!")
             form.save()
             response = render(request, "bookmarks/_edit_form.html", {"form": form})
             trigger_client_event(
@@ -96,7 +93,7 @@ def bookmark_create(request):
             )
             return trigger_client_event(response, "bookmarkAdded", after="settle")
         else:
-            logger.debug("create: Bookmark form is not valid")
+            logger.debug("create: Bookmark form is not valid %s", form.errors)
 
     # GET
     response = render(
@@ -148,3 +145,51 @@ def bookmark_update(request, pk):
         params={"open": True},
         after="settle",
     )
+
+
+def bookmark_detail(request, pk):
+    bookmark = get_object_or_404(Bookmark, pk=pk)
+    return render(request, "bookmarks/detail.html", {"bookmark": bookmark})
+
+
+@require_http_methods(["GET", "POST"])
+def bookmark_new(request):
+    if request.method == "GET":
+        form = BookmarkForm()
+        return render(
+            request,
+            "bookmarks/form.html#form-partial" if request.htmx else "bookmarks/form.html",
+            {"form": form, "title": "New Bookmark"},
+        )
+
+    if request.method == "POST":
+        form = BookmarkForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("bookmarks")
+        return render(request, "bookmarks/form.html", {"form": form, "title": "New Bookmark"})
+
+
+@require_http_methods(["GET", "POST", "DELETE"])
+def bookmark_edit(request, pk):
+    bookmark = get_object_or_404(Bookmark, pk=pk)
+
+    if request.method == "GET":
+        form = BookmarkForm(instance=bookmark)
+        return render(
+            request,
+            "bookmarks/form.html#form-partial" if request.htmx else "bookmarks/form.html",
+            {"form": form, "title": "Edit Bookmark"},
+        )
+
+    if request.method == "POST":
+        form = BookmarkForm(request.POST, instance=bookmark)
+        if form.is_valid():
+            form.save()
+            return redirect("bookmarks")
+        return render(request, "bookmarks/form.html", {"form": form, "title": "Edit Bookmark"})
+
+    if request.method == "DELETE":
+        logger.debug("delete: Bookmark %s", bookmark)
+        bookmark.delete()
+        return HttpResponseLocation(reverse("bookmarks"), target="#id_content")
