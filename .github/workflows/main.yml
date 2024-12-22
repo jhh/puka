@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    name: Build
+    name: Check
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
