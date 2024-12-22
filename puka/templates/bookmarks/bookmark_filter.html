@@ -3,7 +3,7 @@
 
 {% block content %}
   {% crispy filter.form %}
-  {% include "bookmarks/_bookmark_list.html" %}
+  {% include "bookmarks/_list_ul.html" %}
   <script>
       function clearSearch() {
           document.querySelector('#id_title').value = '';
