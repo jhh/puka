@@ -1,8 +1,8 @@
-{
-  lib,
-  nixosModule,
-  pkgs,
-  workspace,
+{ lib
+, nixosModule
+, pkgs
+, workspace
+,
 }:
 let
   inherit (pkgs.stdenv) isLinux mkDerivation;
@@ -20,7 +20,7 @@ final: prev: {
           };
         in
         (old.tests or { })
-        // {
+          // {
 
           mypy = mkDerivation {
             name = "${final.puka.name}-mypy";
@@ -36,7 +36,7 @@ final: prev: {
             '';
           };
         }
-        // lib.optionalAttrs isLinux {
+          // lib.optionalAttrs isLinux {
           #
           nixos =
             let
@@ -79,17 +79,60 @@ final: prev: {
                   system.stateVersion = "24.11";
                 };
 
-              testScript = ''
-                with subtest("Check puka app comes up"):
-                  machine.wait_for_unit("puka.service")
-                  machine.wait_for_open_port(8001)
+              testScript =
+                { nodes, ... }:
+                let
+                  inherit (nodes.machine.services.puka) port venv;
+                in
+                ''
+                  base_url = "http://localhost:${toString port}"
+                  login_path = "/admin/login/"
+                  login_url = f"{base_url}{login_path}"
+                  cookie_jar_path = "/tmp/cookies.txt"
+                  curl = f"curl --cookie {cookie_jar_path} --cookie-jar {cookie_jar_path} --fail --header 'Origin: {base_url}' --show-error --silent"
 
-                with subtest("Staticfiles are generated"):
-                  machine.succeed("curl -sf http://localhost:8001/static/puka/main.css")
+                  with subtest("Check puka app comes up"):
+                    machine.wait_for_unit("puka.service")
+                    machine.wait_until_succeeds(f"{curl} -sLf {login_url}")
 
-                with subtest("Home page is live"):
-                  machine.succeed("curl -sLf http://localhost:8001/ | grep 'New Bookmark'")
-              '';
+                  username = "username"
+                  password = "password"
+
+                  print("Create superuser account")
+                  machine.succeed(
+                    f"""
+                    sudo -u puka env \
+                    DJANGO_SETTINGS_MODULE=puka.settings.production SECRET_KEY=test DJANGO_SUPERUSER_PASSWORD='{password}' \
+                    ${venv}/bin/puka-manage createsuperuser --no-input --username='{username}' --email=nobody@j3ff.io
+                    """
+                  )
+
+                  print("Log in as superuser")
+                  csrf_token = machine.succeed(f"grep csrftoken {cookie_jar_path} | cut --fields=7").rstrip()
+                  machine.succeed(
+                    f"{curl} --data 'csrfmiddlewaretoken={csrf_token}' --data 'username={username}' --data 'password={password}' {login_url}"
+                  )
+
+                  print("Get the contents of the logged in main page")
+                  machine.succeed(f"{curl} --location {base_url} | grep -q 'New Bookmark'")
+
+                  print("Create a new bookmark")
+                  csrf_token = machine.succeed(f"grep csrftoken {cookie_jar_path} | cut --fields=7").rstrip()
+                  machine.succeed(
+                    f""" {curl} -X POST \
+                    --data 'csrfmiddlewaretoken={csrf_token}' \
+                    --data 'title=Michigan' \
+                    --data 'description=USA' \
+                    --data-urlencode 'url=http://example.com' \
+                    --data 'tags=foobar' \
+                    --data 'active=on' \
+                    {base_url}/bookmarks/new/
+                    """
+                  )
+
+                  print("Check for new bookmark on main page")
+                  machine.succeed(f"{curl} --location {base_url} | grep -q 'Michigan'")
+                '';
             };
         };
     };

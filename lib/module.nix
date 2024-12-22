@@ -102,6 +102,7 @@ in
       };
 
       wantedBy = [ "multi-user.target" ];
+      after = [ "postgresql.service" ];
     };
   };
 }
