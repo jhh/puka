@@ -30,7 +30,7 @@ class DeleteButton(HTML):
         super().__init__(
             f"""<button type="button"
             class="rounded-md bg-white px-3 py-2 text-sm font-semibold text-red-600 ring-1 shadow-xs ring-red-300 ring-inset hover:bg-gray-50 ml-auto"
-            hx-delete="{{% url 'bookmark-edit' {kwargs["pk"]} %}}"
+            hx-post="{{% url 'bookmark-delete' {kwargs["pk"]} %}}"
             hx-confirm="Delete this bookmark?">Delete</button>""",
         )
 

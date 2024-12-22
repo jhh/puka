@@ -7,8 +7,8 @@ from django.core.paginator import Paginator
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.views.decorators.http import require_GET, require_http_methods
-from django_htmx.http import HttpResponseLocation, trigger_client_event
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
+from django_htmx.http import HttpResponseClientRedirect, trigger_client_event
 
 from .filters import BookmarkFilter
 from .forms import BookmarkForm
@@ -50,7 +50,7 @@ def bookmarks(request):
 
     response = render(
         request,
-        "bookmarks/_list.html" if request.htmx else "bookmarks/list.html",
+        "bookmarks/_list_ul.html" if request.htmx else "bookmarks/list.html",
         {
             "page_obj": page_obj,
             "query": query.urlencode(),
@@ -71,7 +71,7 @@ def bookmarks_filter(request):
 
     return render(
         request,
-        "bookmarks/_list.html" if request.htmx else "bookmarks/bookmark_filter.html",
+        "bookmarks/_list_ul.html" if request.htmx else "bookmarks/bookmark_filter.html",
         {"page_obj": page_obj, "filter": f, "query": query.urlencode()},
     )
 
@@ -170,7 +170,7 @@ def bookmark_new(request):
         return render(request, "bookmarks/form.html", {"form": form, "title": "New Bookmark"})
 
 
-@require_http_methods(["GET", "POST", "DELETE"])
+@require_http_methods(["GET", "POST"])
 def bookmark_edit(request, pk):
     bookmark = get_object_or_404(Bookmark, pk=pk)
 
@@ -189,7 +189,10 @@ def bookmark_edit(request, pk):
             return redirect("bookmarks")
         return render(request, "bookmarks/form.html", {"form": form, "title": "Edit Bookmark"})
 
-    if request.method == "DELETE":
-        logger.debug("delete: Bookmark %s", bookmark)
-        bookmark.delete()
-        return HttpResponseLocation(reverse("bookmarks"), target="#id_content")
+
+@require_POST
+def bookmark_delete(request, pk):
+    bookmark = get_object_or_404(Bookmark, pk=pk)
+    logger.debug("delete: Bookmark %s", bookmark)
+    bookmark.delete()
+    return HttpResponseClientRedirect(reverse("bookmarks"))
