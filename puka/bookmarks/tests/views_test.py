@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertTemplateUsed
 
@@ -10,13 +9,13 @@ from puka.bookmarks.models import Bookmark
 def test_bookmarks(admin_client, succulents_bookmark):
     url = reverse("bookmarks")
     response = admin_client.get(url)
-    assertTemplateUsed(response, "partials/_bookmarks.html")
+    assertTemplateUsed(response, "bookmarks/list.html")
     assertContains(response, succulents_bookmark.title)
     assertContains(response, succulents_bookmark.description)
     assertContains(response, succulents_bookmark.url)
     assertContains(response, succulents_bookmark.created.strftime("%B %Y").lower())
     print(succulents_bookmark.created)
-    for tag in succulents_bookmark.tags:
+    for tag in succulents_bookmark.tags.all():
         assertContains(response, tag)
 
 
@@ -65,39 +64,36 @@ def test_bookmarks_with_text(
 
 
 def test_edit_form_new(admin_client):
-    url = reverse("bookmark-create")
+    url = reverse("bookmark-new")
     response = admin_client.get(url)
-    assertTemplateUsed(response, "partials/_edit_form.html")
-    assertContains(response, 'x-show="editFormOpen"')
+    assertTemplateUsed(response, "bookmarks/form.html")
 
 
 def test_bookmarks_htmx_request(admin_client):
     url = reverse("bookmarks")
     response = admin_client.get(url, HTTP_HX_REQUEST="true")
-    assertTemplateUsed(response, "partials/_bookmarks.html")
+    assertTemplateUsed(response, "bookmarks/_list_ul.html")
 
 
-@pytest.mark.skip(reason="failing")
 def test_create_bookmark(admin_client):
-    url = reverse("bookmark-create")
+    url = reverse("bookmark-new")
     response = admin_client.post(
         url,
         {
             "title": "Glossier portland shaman",
             "description": "Sriracha adaptogen viral waistcoat glossier.",
-            "url": "https://example.com",
+            "url": "https://example.com/99",
             "tags": "hammock,keytar",
+            "active": True,
         },
     )
-    assertTemplateUsed(response, "partials/_edit_form.html")
-
+    assert response.status_code == 302
     qs = Bookmark.active_objects.with_tags(["hammock"])
     assert len(qs) == 1
 
 
-@pytest.mark.skip(reason="failing")
 def test_update_bookmark(admin_client, flannel_bookmark):
-    url = reverse("bookmark-update", args=[flannel_bookmark.id])
+    url = reverse("bookmark-edit", args=[flannel_bookmark.id])
     response = admin_client.post(
         url,
         {
@@ -105,15 +101,17 @@ def test_update_bookmark(admin_client, flannel_bookmark):
             "description": "copper mug pitchfork",
             "url": flannel_bookmark.url,
             "tags": "food,truck",
+            "active": True,
         },
     )
+    assert response.status_code == 302
+    qs = Bookmark.active_objects.with_tags(["hammock"])
     qs = Bookmark.active_objects.with_text("copper")
     assert len(qs) == 1
-    assertTemplateUsed(response, "partials/_edit_form.html")
 
 
 def test_invalid_update_bookmark(admin_client, typewriter_bookmark):
-    url = reverse("bookmark-update", args=[typewriter_bookmark.id])
+    url = reverse("bookmark-edit", args=[typewriter_bookmark.id])
     response = admin_client.post(
         url,
         {
@@ -125,5 +123,6 @@ def test_invalid_update_bookmark(admin_client, typewriter_bookmark):
     )
     qs = Bookmark.active_objects.with_text("pabst")
     assert len(qs) == 0
-    assertTemplateUsed(response, "partials/_edit_form.html")
+    assertTemplateUsed(response, "tailwind/whole_uni_form.html")
     assertContains(response, "vaporware pabst")
+    assertContains(response, "error")

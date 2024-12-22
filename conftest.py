@@ -13,12 +13,14 @@ def create_bookmark(
 ) -> Bookmark:
     if tags is None:
         tags = ["foo", "bar"]
-    return Bookmark(
+    bookmark = Bookmark(
         title=title,
         description=description,
         url=url,
-        tags=tags,
     )
+    bookmark.save()
+    bookmark.tags.set(tags)
+    return bookmark
 
 
 @pytest.fixture
@@ -29,7 +31,6 @@ def succulents_bookmark(db):
         url="https://hipsum.co/kombucha",
         tags=["thundercats", "humblebrag"],
     )
-    bookmark.save()
     return bookmark
 
 
@@ -41,7 +42,6 @@ def typewriter_bookmark(db):
         url="https://normcore.org/?q=shaman",
         tags=["banjo", "thundercats"],
     )
-    bookmark.save()
     return bookmark
 
 
@@ -53,7 +53,6 @@ def flannel_bookmark(db):
         url="https://organic.com/",
         tags=["artisan", "banjo"],
     )
-    bookmark.save()
     return bookmark
 
 
@@ -72,4 +71,4 @@ def all_bookmarks(
 
 @pytest.fixture
 def unsaved_bookmark() -> Bookmark:
-    return create_bookmark("unsaved bookmark")
+    return Bookmark(title="unsaved bookmark", url="http://example.com")

@@ -18,7 +18,7 @@ class ActiveBookmarkManager(models.Manager):
         return super().get_queryset().filter(active=True)
 
     def with_tags(self, tags: list[str]) -> models.QuerySet:
-        return self.get_queryset().filter(tags__name__in=tags)
+        return self.get_queryset().filter(tags__name__in=tags).distinct()
 
     def with_text(self, text: str) -> models.QuerySet:
         query = SearchQuery(text, search_type="websearch", config="english")
