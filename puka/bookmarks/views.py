@@ -60,6 +60,8 @@ def bookmarks(request):
     return trigger_client_event(response, "clearSearch", {}) if clear_search else response
 
 
+@login_required
+@require_GET
 def bookmarks_filter(request):
     f = BookmarkFilter(request.GET, queryset=Bookmark.objects.prefetch_related("tags"))
     paginator = Paginator(f.qs, 25)
@@ -77,81 +79,12 @@ def bookmarks_filter(request):
 
 
 @login_required
-@require_http_methods(["GET", "POST"])
-def bookmark_create(request):
-    if request.method == "POST":
-        form = BookmarkForm(request.POST)
-        if form.is_valid():
-            logger.debug("create: Bookmark form is valid")
-            form.save()
-            response = render(request, "bookmarks/_edit_form.html", {"form": form})
-            trigger_client_event(
-                response,
-                "update-edit-form",
-                params={"open": False},
-                after="settle",
-            )
-            return trigger_client_event(response, "bookmarkAdded", after="settle")
-        else:
-            logger.debug("create: Bookmark form is not valid %s", form.errors)
-
-    # GET
-    response = render(
-        request,
-        "bookmarks/_edit_form.html",
-        {"form": BookmarkForm()},
-    )
-    return trigger_client_event(
-        response,
-        "update-edit-form",
-        params={"open": True},
-        after="settle",
-    )
-
-
-@login_required
-@require_http_methods(["GET", "POST"])
-def bookmark_update(request, pk):
-    bookmark = Bookmark.objects.get(pk=pk)
-    if request.method == "POST":
-        form = BookmarkForm(request.POST, instance=bookmark)
-        if form.is_valid():
-            logger.debug("create: Bookmark form is valid")
-            form.save()
-            response = render(
-                request,
-                "bookmarks/_edit_form.html",
-                {"form": form},
-            )
-            trigger_client_event(
-                response,
-                "update-edit-form",
-                params={"open": False},
-                after="settle",
-            )
-            return trigger_client_event(response, "bookmarkAdded", after="settle")
-        else:
-            logger.debug("create: Bookmark form is not valid")
-
-    # GET
-    response = render(
-        request,
-        "bookmarks/_edit_form.html",
-        {"form": BookmarkForm(instance=bookmark)},
-    )
-    return trigger_client_event(
-        response,
-        "update-edit-form",
-        params={"open": True},
-        after="settle",
-    )
-
-
 def bookmark_detail(request, pk):
     bookmark = get_object_or_404(Bookmark, pk=pk)
     return render(request, "bookmarks/detail.html", {"bookmark": bookmark})
 
 
+@login_required
 @require_http_methods(["GET", "POST"])
 def bookmark_new(request):
     if request.method == "GET":
@@ -170,6 +103,7 @@ def bookmark_new(request):
         return render(request, "bookmarks/form.html", {"form": form, "title": "New Bookmark"})
 
 
+@login_required
 @require_http_methods(["GET", "POST"])
 def bookmark_edit(request, pk):
     bookmark = get_object_or_404(Bookmark, pk=pk)
@@ -190,6 +124,7 @@ def bookmark_edit(request, pk):
         return render(request, "bookmarks/form.html", {"form": form, "title": "Edit Bookmark"})
 
 
+@login_required
 @require_POST
 def bookmark_delete(request, pk):
     bookmark = get_object_or_404(Bookmark, pk=pk)
