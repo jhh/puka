@@ -85,6 +85,8 @@ final: prev: {
                   inherit (nodes.machine.services.puka) port venv;
                 in
                 ''
+                  import uuid
+
                   base_url = "http://localhost:${toString port}"
                   login_url = f"{base_url}/admin/login/"
                   cookie_jar_path = "/tmp/cookies.txt"
@@ -122,12 +124,14 @@ final: prev: {
                   assert "New Bookmark" in machine.succeed(f"{curl} --location {base_url}"), "T001"
 
                   # create a new bookmark
+
+                  title = str(uuid.uuid1())
                   csrf_token = machine.succeed(f"grep csrftoken {cookie_jar_path} | cut --fields=7").rstrip()
                   machine.succeed(f"""
                     {curl} -X POST \
                     --data 'csrfmiddlewaretoken={csrf_token}' \
-                    --data 'title=Michigan' \
-                    --data 'description=USA' \
+                    --data 'title={title}' \
+                    --data 'description=' \
                     --data-urlencode 'url=http://example.com' \
                     --data 'tags=foobar' \
                     --data 'active=on' \
@@ -136,7 +140,10 @@ final: prev: {
                   )
 
                   # check for this new bookmark in main bookmark list
-                  assert "Michigan" in machine.succeed(f"{curl} --location {base_url}"), "T002"
+                  output = machine.succeed(f"{curl} --location {base_url}")
+                  assert title in output, "T002"
+                  assert "http://example.com" in output, "T003"
+                  assert "foobar" in output, "T004"
                 '';
             };
         };
