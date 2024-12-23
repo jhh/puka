@@ -1,11 +1,11 @@
 import django_filters
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import HTML, Div, Field, Layout
-from crispy_tailwind.layout import Submit
+from crispy_forms.layout import Div, Field, Layout
 from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.db.models import F
 from taggit.forms import TagField
 
+from puka.bookmarks.forms import CancelButton, PrimaryButton
 from puka.bookmarks.models import Bookmark
 
 YEAR_CHOICES = [(year, str(year)) for year in range(2004, 2025) if year not in (2012, 2013, 2015)]
@@ -53,6 +53,7 @@ class BookmarkFilter(django_filters.FilterSet):
         form = super().form
         form.helper = FormHelper()
         form.helper.form_method = "GET"
+        form.helper.attrs = {"hx-get": "", "hx-target": "#id_content"}
         form.helper.layout = Layout(
             Div(
                 Field("title", wrapper_class="sm:col-span-3"),
@@ -63,14 +64,8 @@ class BookmarkFilter(django_filters.FilterSet):
                 css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
             ),
             Div(
-                HTML(
-                    """<button type="button" class="text-sm/6 font-semibold text-gray-900" @click="clearSearch()">Clear Search</button>""",
-                ),
-                Submit(
-                    "submit",
-                    "Search",
-                    css_class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600",
-                ),
+                CancelButton("clear", "Clear Search", onclick="clearSearch();"),
+                PrimaryButton("submit", "Search"),
                 css_class="mt-0 mb-4 flex items-center justify-end gap-x-6",
             ),
         )

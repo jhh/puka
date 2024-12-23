@@ -34,12 +34,21 @@
           <div class="hidden md:block">
             <div class="ml-10 flex items-baseline space-x-4">
               <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-              <a href="{% url 'bookmarks' %}" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white"
-                 aria-current="page">Bookmarks</a>
+              <a
+                  hx-get="{% url 'bookmarks' %}"
+                  hx-target="#id_content"
+                  hx-push-url="true"
+                  href="#"
+                  class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white"
+                  aria-current="page">Bookmarks</a>
               <a href="#"
                  class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Upkeep</a>
-              <a href="{% url 'bookmark-filter' %}"
-                 class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Stuff</a>
+              <a
+                  hx-get="{% url 'bookmark-filter' %}"
+                  hx-target="#id_content"
+                  hx-push-url="true"
+                  href="#"
+                  class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Stuff</a>
             </div>
           </div>
         </div>
@@ -97,9 +106,6 @@
                 {% endif %}
                 <a
                     hx-post="{% url 'logout' %}"
-                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-{# hx-target="body" #}
-{# hx-swap="outerHTML" #}
                     href="#"
                     class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
                     id="user-menu-item-2">Sign out</a>
@@ -140,10 +146,19 @@
         id="mobile-menu">
       <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
         <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-        <a href="#" class="block rounded-md bg-gray-900 px-3 py-2 text-base font-medium text-white" aria-current="page">Bookmarks</a>
+        <a
+            hx-get="{% url 'bookmarks' %}"
+            hx-target="#id_content"
+            hx-push-url="true"
+            href="#"
+            class="block rounded-md bg-gray-900 px-3 py-2 text-base font-medium text-white" aria-current="page">Bookmarks</a>
         <a href="#"
            class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Upkeep</a>
-        <a href="#"
+        <a
+            hx-get="{% url 'bookmark-filter' %}"
+            hx-target="#id_content"
+            hx-push-url="true"
+            href="#"
            class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Stuff</a>
       </div>
 

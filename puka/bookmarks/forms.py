@@ -21,7 +21,6 @@ class PrimaryButton(Submit):
 class CancelButton(Button):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("css_class", "text-sm/6 font-semibold text-gray-900")
-        kwargs.setdefault("onclick", "window.history.back();")
         super().__init__(*args, **kwargs)
 
 

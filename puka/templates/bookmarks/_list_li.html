@@ -1,15 +1,9 @@
-<ul
-    id="id_bookmarks"
-    role="list"
-    class="divide-y divide-gray-200 shadow-sm bg-white"
-    hx-get="{% url 'bookmarks' %}"
-    hx-trigger="bookmarkAdded from:body"
->
+<title>Page {{ page_obj.number }}</title>
   {% for bookmark in page_obj %}
     <li
         class="p-4"
         {% if forloop.last and page_obj.has_next %}
-        hx-get="?page={{ page_obj.next_page_number }}&{{ query }}"
+        hx-get="?page={{ page_obj.next_page_number }}&{{ query|safe }}"
         hx-trigger="revealed"
         hx-swap="afterend"
         {% endif %}
@@ -48,4 +42,3 @@
       </article>
     </li>
   {% endfor %}
-</ul>

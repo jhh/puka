@@ -1,0 +1,19 @@
+{% load crispy_forms_tags %}
+
+{% crispy filter.form %}
+<ul
+    id="id_bookmarks"
+    role="list"
+    class="divide-y divide-gray-200 shadow-sm bg-white"
+>
+  {% include "bookmarks/_list_li.html" %}
+</ul>
+<script>
+    function clearSearch() {
+        document.querySelector('#id_title').value = '';
+        document.querySelector('#id_url').value = '';
+        document.querySelector('#id_tags').value = '';
+        document.querySelector('#id_created').value = '';
+        document.querySelector('#id_active').value = 'unknown';
+    }
+</script>

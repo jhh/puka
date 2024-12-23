@@ -1,3 +1,4 @@
+<title>Bookmarks</title>
 <div class="flex justify-end mb-4 mt-0 md:ml-4">
   <div
       x-data="{search: false}"
@@ -9,7 +10,8 @@
         type="text"
         name="q"
         id="search"
-        hx-get="{% url 'bookmarks' %}"
+        {# "page" => use _list_li.html. "x" (non-int) => paginator.get_page() returns first page #}
+        hx-get="{% url 'bookmarks' %}?page=x"
         hx-trigger="keyup changed delay:0.5s"
         hx-target="#id_bookmarks"
         class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
@@ -31,10 +33,26 @@
         hx-trigger="click"
         hx-target="#id_content"
         hx-push-url="true"
-        class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-xs hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+        class="hidden md:inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-xs hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
     >
       New Bookmark
     </button>
+    <button
+        type="button"
+        hx-get="{% url 'bookmark-new' %}"
+        hx-trigger="click"
+        hx-target="#id_content"
+        hx-push-url="true"
+        class="md:hidden inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-xs hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+    >
+      New
+    </button>
   </div>
 </div>
-{% include "bookmarks/_list_ul.html" %}
+<ul
+    id="id_bookmarks"
+    role="list"
+    class="divide-y divide-gray-200 shadow-sm bg-white"
+>
+  {% include "bookmarks/_list_li.html" %}
+</ul>

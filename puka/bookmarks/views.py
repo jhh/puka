@@ -20,43 +20,40 @@ logger = logging.getLogger(__name__)
 @login_required
 @require_GET
 def bookmarks(request):
-    request_query = request.GET
     clear_search = True
     query = QueryDict(mutable=True)
 
-    if "t" in request_query:
-        tags = request_query.getlist("t")
-        bookmark_list = Bookmark.active_objects.with_tags(tags)
+    if "t" in request.GET:
+        tags = request.GET.getlist("t")
+        bookmarks = Bookmark.active_objects.with_tags(tags)
         query.setlist("t", tags)
-    elif "q" in request_query:
-        search: str = request_query.get("q")
+    elif "q" in request.GET:
+        search: str = request.GET.get("q")
         if search.startswith("#"):
             tag = search.lstrip("#")
             query["t"] = tag
-            bookmark_list = Bookmark.active_objects.with_tags([tag])
+            bookmarks = Bookmark.active_objects.with_tags([tag])
         elif search.strip():
             query["q"] = search
-            bookmark_list = Bookmark.active_objects.with_text(search)
+            bookmarks = Bookmark.active_objects.with_text(search)
         else:
-            bookmark_list = Bookmark.active_objects.all()
+            bookmarks = Bookmark.active_objects.all()
         clear_search = False
 
     else:
-        bookmark_list = Bookmark.active_objects.all()
-    paginator = Paginator(bookmark_list.prefetch_related("tags"), 25)
+        bookmarks = Bookmark.active_objects.all()
+    paginator = Paginator(bookmarks.prefetch_related("tags"), 25)
 
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
-    response = render(
-        request,
-        "bookmarks/_list_ul.html" if request.htmx else "bookmarks/list.html",
-        {
-            "page_obj": page_obj,
-            "query": query.urlencode(),
-        },
-    )
+    if request.htmx:
+        # if paging, just render the list items, otherwise this is a navigation to the list page contents
+        template = "bookmarks/_list_li.html" if page_number else "bookmarks/_list.html"
+    else:
+        template = "bookmarks/list.html"
 
+    response = render(request, template, {"page_obj": page_obj, "query": query.urlencode()})
     return trigger_client_event(response, "clearSearch", {}) if clear_search else response
 
 
@@ -67,13 +64,22 @@ def bookmarks_filter(request):
     paginator = Paginator(f.qs, 25)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
-    query = request.GET.copy()
-    if "page" in query:
+    if page_number:
+        query = request.GET.copy()
         query.pop("page")
+    else:
+        query = request.GET
 
+    if request.htmx:
+        # if paging, just render the list items, otherwise this is a navigation to the list page contents
+        template = "bookmarks/_list_li.html" if page_number else "bookmarks/_filter.html"
+    else:
+        template = "bookmarks/filter.html"
+
+    logger.debug("template: %s, query: %s", template, query)
     return render(
         request,
-        "bookmarks/_list_ul.html" if request.htmx else "bookmarks/bookmark_filter.html",
+        template,
         {"page_obj": page_obj, "filter": f, "query": query.urlencode()},
     )
 
