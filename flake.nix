@@ -122,6 +122,7 @@
           packages = [
             pkgs.just
             pkgs.nil
+            pkgs.nix-output-monitor
             pkgs.nixfmt-rfc-style
             pkgs.nodejs
             pkgs.postgresql.dev
