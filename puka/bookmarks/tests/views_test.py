@@ -72,7 +72,7 @@ def test_edit_form_new(admin_client):
 def test_bookmarks_htmx_request(admin_client):
     url = reverse("bookmarks")
     response = admin_client.get(url, HTTP_HX_REQUEST="true")
-    assertTemplateUsed(response, "bookmarks/_list_li.html")
+    assert "<head>" not in response.content.decode()
 
 
 def test_create_bookmark(admin_client):
