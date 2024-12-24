@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "sidebar.html" %}
 {% load partials %}
 
 {% block title %}Bookmarks{% endblock %}
@@ -8,7 +8,12 @@
 {% endblock content %}
 
 {% partialdef list-partial %}
-  <title>Bookmarks</title>
+  {% if request.htmx %}
+    <title>Bookmarks - HTMX</title>
+    {% include "sidebar.html#nav-mobile-partial" %}
+    {% include "sidebar.html#nav-desktop-partial" %}
+  {% endif %}
+
   <div class="flex justify-end mb-4 mt-0 md:ml-4">
     <div
         x-data="{search: false}"
