@@ -1,6 +1,30 @@
-{% extends "base.html" %}
-{% load crispy_forms_tags %}
+{% extends "sidebar.html" %}
+{% load crispy_forms_tags partials %}
+
+{% block title %}Filter{% endblock %}
 
 {% block content %}
-  {% include "bookmarks/_filter.html" %}
+  {% partial filter-partial %}
 {% endblock content %}
+
+{% partialdef filter-partial %}
+  {% if request.htmx %}
+    <title>Filter - HTMX</title>
+    {% include "sidebar.html#nav-mobile-partial" %}
+    {% include "sidebar.html#nav-desktop-partial" %}
+  {% endif %}
+  {% crispy filter.form %}
+  <ul id="id_bookmarks" role="list" class="divide-y divide-gray-200 shadow-sm bg-white">
+    {% include "bookmarks/list.html#list-items-partial" %}
+  </ul>
+
+  <script>
+      function clearSearch() {
+          document.querySelector('#id_title').value = '';
+          document.querySelector('#id_url').value = '';
+          document.querySelector('#id_tags').value = '';
+          document.querySelector('#id_created').value = '';
+          document.querySelector('#id_active').value = 'unknown';
+      }
+  </script>
+{% endpartialdef filter-partial %}

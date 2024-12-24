@@ -25,11 +25,11 @@ class CancelButton(Button):
 
 
 class DeleteButton(HTML):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, pk):
         super().__init__(
             f"""<button type="button"
             class="rounded-md bg-white px-3 py-2 text-sm font-semibold text-red-600 ring-1 shadow-xs ring-red-300 ring-inset hover:bg-gray-50 ml-auto"
-            hx-post="{{% url 'bookmark-delete' {kwargs["pk"]} %}}"
+            hx-post="{{% url 'bookmark-delete' {pk} %}}" hx-params="none"
             hx-confirm="Delete this bookmark?">Delete</button>""",
         )
 
@@ -62,7 +62,7 @@ class BookmarkForm(ModelForm):
             Div(
                 PrimaryButton("submit", "Save Bookmark"),
                 CancelButton("cancel", "Cancel", onclick="window.history.back();"),
-                DeleteButton(pk=self.instance.id) if is_edit else None,
+                DeleteButton(self.instance.id) if is_edit else None,
                 css_class="mt-4 flex gap-x-4",
             ),
         )
