@@ -1,7 +1,5 @@
-{% extends "sidebar.html" %}
+{% extends "bookmarks/base.html" %}
 {% load partials %}
-
-{% block title %}Bookmarks{% endblock %}
 
 {% block content %}
   {% partial list-partial %}
@@ -12,6 +10,7 @@
     <title>Bookmarks - HTMX</title>
     {% include "sidebar.html#nav-mobile-partial" %}
     {% include "sidebar.html#nav-desktop-partial" %}
+    {% include "bookmarks/base.html#menu-partial" %}
   {% endif %}
 
   <div class="flex justify-end mb-4 mt-0 md:ml-4">
