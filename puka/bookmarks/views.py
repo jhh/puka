@@ -4,10 +4,10 @@ import logging
 
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
-from django_htmx.http import HttpResponseClientRedirect, trigger_client_event
+from django_htmx.http import HttpResponseLocation, trigger_client_event
 
 from .filters import BookmarkFilter
 from .forms import BookmarkForm
@@ -96,7 +96,7 @@ def bookmark_new(request):
         form = BookmarkForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect("bookmarks")
+            return HttpResponseLocation(reverse("bookmarks"), target="#id_content")
         return render(request, "bookmarks/form.html", {"form": form, "title": "New Bookmark"})
 
 
@@ -117,7 +117,7 @@ def bookmark_edit(request, pk):
         form = BookmarkForm(request.POST, instance=bookmark)
         if form.is_valid():
             form.save()
-            return redirect("bookmarks")
+            return HttpResponseLocation(reverse("bookmarks"), target="#id_content")
         return render(request, "bookmarks/form.html", {"form": form, "title": "Edit Bookmark"})
 
 
@@ -127,4 +127,4 @@ def bookmark_delete(request, pk):
     bookmark = get_object_or_404(Bookmark, pk=pk)
     logger.debug("delete: Bookmark %s", bookmark)
     bookmark.delete()
-    return HttpResponseClientRedirect(reverse("bookmarks"))
+    return HttpResponseLocation(reverse("bookmarks"), target="#id_content")

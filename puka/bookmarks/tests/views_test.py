@@ -87,7 +87,7 @@ def test_create_bookmark(admin_client):
             "active": True,
         },
     )
-    assert response.status_code == 302
+    assert response.status_code == 200
     qs = Bookmark.active_objects.with_tags(["hammock"])
     assert len(qs) == 1
 
@@ -104,7 +104,7 @@ def test_update_bookmark(admin_client, flannel_bookmark):
             "active": True,
         },
     )
-    assert response.status_code == 302
+    assert response.status_code == 200
     qs = Bookmark.active_objects.with_tags(["hammock"])
     qs = Bookmark.active_objects.with_text("copper")
     assert len(qs) == 1

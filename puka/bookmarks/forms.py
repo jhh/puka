@@ -41,15 +41,16 @@ class BookmarkForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        is_edit = self.instance.id is not None
+
+        if self.instance.id is not None:
+            action = reverse("bookmark-edit", args=[self.instance.id])
+            delete_button = DeleteButton(self.instance.id)
+        else:
+            action = reverse("bookmark-new")
+            delete_button = None
 
         self.helper = FormHelper()
-        self.helper.form_method = "post"
-        self.helper.form_action = (
-            reverse("bookmark-edit", args=[self.instance.id])
-            if is_edit
-            else reverse("bookmark-new")
-        )
+        self.helper.attrs = {"hx-post": action}
         self.helper.layout = Layout(
             Div(
                 Field("title", wrapper_class="sm:col-span-6", autofocus=""),
@@ -62,7 +63,7 @@ class BookmarkForm(ModelForm):
             Div(
                 PrimaryButton("submit", "Save Bookmark"),
                 CancelButton("cancel", "Cancel", onclick="window.history.back();"),
-                DeleteButton(self.instance.id) if is_edit else None,
+                delete_button,
                 css_class="mt-4 flex gap-x-4",
             ),
         )
