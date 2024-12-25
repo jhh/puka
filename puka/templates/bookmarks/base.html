@@ -11,17 +11,17 @@
 {% partialdef menu-partial %}
   <ul
       hx-swap-oob="true"
-      id="id_bookmarks_menu"
+      id="id_extra_menu"
       role="list"
       class="-mx-2 mt-2 space-y-1"
   >
     <li>
       <a
-          hx-get="{% url 'bookmark-filter' %}"
+          hx-get="{% url 'bookmarks:filter' %}"
           hx-target="#id_content"
           hx-push-url="true"
           href="#"
-          class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold {% get_current_class 'bookmark-filter' %}"
+          class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold {% get_current_class 'bookmarks:filter' %}"
       >
         <span
             class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-[0.625rem] font-medium text-gray-400 group-hover:text-white">F</span>
@@ -30,11 +30,11 @@
     </li>
     <li>
       <a
-          hx-get="{% url 'bookmark-tags' %}"
+          hx-get="{% url 'bookmarks:tags' %}"
           hx-target="#id_content"
           hx-push-url="true"
           href="#"
-          class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold {% get_current_class 'bookmark-tags' %}"
+          class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold {% get_current_class 'bookmarks:tags' %}"
       >
         <span
             class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-[0.625rem] font-medium text-gray-400 group-hover:text-white">F</span>

@@ -7,7 +7,7 @@ from puka.bookmarks.models import Bookmark
 
 
 def test_bookmarks(admin_client, succulents_bookmark):
-    url = reverse("bookmarks")
+    url = reverse("bookmarks:list")
     response = admin_client.get(url)
     assertTemplateUsed(response, "bookmarks/list.html")
     assertContains(response, succulents_bookmark.title)
@@ -19,7 +19,7 @@ def test_bookmarks(admin_client, succulents_bookmark):
 
 
 def test_bookmarks_with_tag(admin_client, succulents_bookmark, typewriter_bookmark):
-    url = reverse("bookmarks")
+    url = reverse("bookmarks:list")
     response = admin_client.get(f"{url}?tags=humblebrag")
     assertContains(response, succulents_bookmark.title)
     assertNotContains(response, typewriter_bookmark.title)
@@ -30,7 +30,7 @@ def test_bookmarks_with_search_tag(
     succulents_bookmark,
     typewriter_bookmark,
 ):
-    url = reverse("bookmarks")
+    url = reverse("bookmarks:list")
     response = admin_client.get(f"{url}?q=%23humblebrag")
     assertContains(response, succulents_bookmark.title)
     assertNotContains(response, typewriter_bookmark.title)
@@ -42,7 +42,7 @@ def test_bookmarks_with_blank_search(
     typewriter_bookmark,
     flannel_bookmark,
 ):
-    url = reverse("bookmarks")
+    url = reverse("bookmarks:list")
     response = admin_client.get(f"{url}?q=")
     assertContains(response, succulents_bookmark.title)
     assertContains(response, typewriter_bookmark.title)
@@ -55,7 +55,7 @@ def test_bookmarks_with_text(
     flannel_bookmark,
     typewriter_bookmark,
 ):
-    url = reverse("bookmarks")
+    url = reverse("bookmarks:list")
     response = admin_client.get(f"{url}?q=aesthetic")
     assertContains(response, flannel_bookmark.title)
     assertContains(response, typewriter_bookmark.title)
@@ -63,19 +63,19 @@ def test_bookmarks_with_text(
 
 
 def test_edit_form_new(admin_client):
-    url = reverse("bookmark-new")
+    url = reverse("bookmarks:new")
     response = admin_client.get(url)
     assertTemplateUsed(response, "bookmarks/form.html")
 
 
 def test_bookmarks_htmx_request(admin_client):
-    url = reverse("bookmarks")
+    url = reverse("bookmarks:list")
     response = admin_client.get(url, HTTP_HX_REQUEST="true")
     assert "<head>" not in response.content.decode()
 
 
 def test_create_bookmark(admin_client):
-    url = reverse("bookmark-new")
+    url = reverse("bookmarks:new")
     response = admin_client.post(
         url,
         {
@@ -92,7 +92,7 @@ def test_create_bookmark(admin_client):
 
 
 def test_update_bookmark(admin_client, flannel_bookmark):
-    url = reverse("bookmark-edit", args=[flannel_bookmark.id])
+    url = reverse("bookmarks:edit", args=[flannel_bookmark.id])
     response = admin_client.post(
         url,
         {
@@ -110,7 +110,7 @@ def test_update_bookmark(admin_client, flannel_bookmark):
 
 
 def test_invalid_update_bookmark(admin_client, typewriter_bookmark):
-    url = reverse("bookmark-edit", args=[typewriter_bookmark.id])
+    url = reverse("bookmarks:edit", args=[typewriter_bookmark.id])
     response = admin_client.post(
         url,
         {

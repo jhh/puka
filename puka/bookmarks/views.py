@@ -97,7 +97,7 @@ def bookmark_new(request):
         form = BookmarkForm(request.POST)
         if form.is_valid():
             form.save()
-            return HttpResponseLocation(reverse("bookmarks"), target="#id_content")
+            return HttpResponseLocation(reverse("bookmarks:list"), target="#id_content")
         return render(request, "bookmarks/form.html", {"form": form, "title": "New Bookmark"})
 
     return None
@@ -120,7 +120,7 @@ def bookmark_edit(request, pk):
         form = BookmarkForm(request.POST, instance=bookmark)
         if form.is_valid():
             form.save()
-            return HttpResponseLocation(reverse("bookmarks"), target="#id_content")
+            return HttpResponseLocation(reverse("bookmarks:list"), target="#id_content")
         return render(request, "bookmarks/form.html", {"form": form, "title": "Edit Bookmark"})
 
     return None
@@ -132,7 +132,7 @@ def bookmark_delete(_request, pk):
     bookmark = get_object_or_404(Bookmark, pk=pk)
     logger.debug("delete: Bookmark %s", bookmark)
     bookmark.delete()
-    return HttpResponseLocation(reverse("bookmarks"), target="#id_content")
+    return HttpResponseLocation(reverse("bookmarks:list"), target="#id_content")
 
 
 @login_required

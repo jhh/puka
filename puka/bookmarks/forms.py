@@ -29,7 +29,7 @@ class DeleteButton(HTML):
         super().__init__(
             f"""<button type="button"
             class="rounded-md bg-white px-3 py-2 text-sm font-semibold text-red-600 ring-1 shadow-xs ring-red-300 ring-inset hover:bg-gray-50 ml-auto"
-            hx-post="{{% url 'bookmark-delete' {pk} %}}" hx-params="none"
+            hx-post="{{% url 'bookmarks:delete' {pk} %}}" hx-params="none"
             hx-confirm="Delete this bookmark?">Delete</button>""",
         )
 
@@ -43,10 +43,10 @@ class BookmarkForm(ModelForm):
         super().__init__(*args, **kwargs)
 
         if self.instance.id is not None:
-            action = reverse("bookmark-edit", args=[self.instance.id])
+            action = reverse("bookmarks:edit", args=[self.instance.id])
             delete_button = DeleteButton(self.instance.id)
         else:
-            action = reverse("bookmark-new")
+            action = reverse("bookmarks:new")
             delete_button = None
 
         self.helper = FormHelper()
