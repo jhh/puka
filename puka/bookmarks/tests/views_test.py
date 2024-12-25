@@ -21,7 +21,7 @@ def test_bookmarks(admin_client, succulents_bookmark):
 
 def test_bookmarks_with_tag(admin_client, succulents_bookmark, typewriter_bookmark):
     url = reverse("bookmarks")
-    response = admin_client.get(f"{url}?t=humblebrag")
+    response = admin_client.get(f"{url}?tags=humblebrag")
     assertContains(response, succulents_bookmark.title)
     assertNotContains(response, typewriter_bookmark.title)
 

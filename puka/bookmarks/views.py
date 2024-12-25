@@ -19,24 +19,20 @@ logger = logging.getLogger(__name__)
 @login_required
 @require_GET
 def bookmarks(request):
-    clear_search = True
+    clear_search = False
 
-    if "tags" in request.GET:
-        tags = request.GET.getlist("tags")
-        bm = Bookmark.active_objects.with_tags(tags)
-    elif "q" in request.GET:
-        search: str = request.GET.get("q")
-        if search.startswith("#"):
+    match request.GET:
+        case {"tags": tag}:
+            bm = Bookmark.active_objects.with_tags([tag])
+        case {"q": search} if search.startswith("#"):
             tag = search.lstrip("#")
             bm = Bookmark.active_objects.with_tags([tag])
-        elif search.strip():
+        case {"q": search} if search.strip():
             bm = Bookmark.active_objects.with_text(search)
-        else:
+        case _:
             bm = Bookmark.active_objects.all()
-        clear_search = False
+            clear_search = True
 
-    else:
-        bm = Bookmark.active_objects.all()
     paginator = Paginator(bm.prefetch_related("tags"), 25)
 
     page_number = request.GET.get("page")
