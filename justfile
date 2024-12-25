@@ -35,10 +35,10 @@ migrate: (manage "migrate")
 # run the ipython repl
 shell: (manage "shell")
 
-# start a new app in upkeep module
+# start a new app in puka module
 startapp appname:
-    uv run config/manage.py startapp {{ appname }}
-    mv {{ appname }} upkeep/
+    uv run puka/manage.py startapp {{ appname }}
+    mv {{ appname }} puka/
 
 # install pre-commit hooks
 pre-commit:
