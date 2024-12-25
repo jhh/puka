@@ -24,36 +24,33 @@ def create_bookmark(
 
 
 @pytest.fixture
-def succulents_bookmark(db):
-    bookmark = create_bookmark(
+def succulents_bookmark():
+    return create_bookmark(
         title="Hexagon bespoke succulents",
         description="Tumeric tumblr poutine.",
         url="https://hipsum.co/kombucha",
         tags=["thundercats", "humblebrag"],
     )
-    return bookmark
 
 
 @pytest.fixture
-def typewriter_bookmark(db):
-    bookmark = create_bookmark(
+def typewriter_bookmark():
+    return create_bookmark(
         title="Tote bag typewriter aesthetic",
         description="Before they sold out.",
         url="https://normcore.org/?q=shaman",
         tags=["banjo", "thundercats"],
     )
-    return bookmark
 
 
 @pytest.fixture
-def flannel_bookmark(db):
-    bookmark = create_bookmark(
+def flannel_bookmark():
+    return create_bookmark(
         title="Flannel four dollar toast",
         description=" Kale chips aesthetic.",
         url="https://organic.com/",
         tags=["artisan", "banjo"],
     )
-    return bookmark
 
 
 @pytest.fixture

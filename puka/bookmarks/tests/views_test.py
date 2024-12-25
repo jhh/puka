@@ -14,7 +14,6 @@ def test_bookmarks(admin_client, succulents_bookmark):
     assertContains(response, succulents_bookmark.description)
     assertContains(response, succulents_bookmark.url)
     assertContains(response, succulents_bookmark.created.strftime("%B %Y").lower())
-    print(succulents_bookmark.created)
     for tag in succulents_bookmark.tags.all():
         assertContains(response, tag)
 

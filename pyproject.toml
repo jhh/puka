@@ -52,6 +52,13 @@ django_settings_module = "puka.settings.test"
 
 [tool.ruff]
 line-length = 99
+exclude = ["puka/*/migrations"]
 
 [tool.ruff.lint]
-select = ["E4", "E7", "E9", "F", "I"]
+select = ["ALL"]
+ignore = ["ANN", "D1", "D203", "D212", "E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"puka/*/tests/*" = ["ARG001", "PLR2004", "S101"]
+"puka/manage.py" = ["EM101", "TRY003"]
+"puka/settings/*.py" = ["S105"]

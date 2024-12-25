@@ -20,7 +20,7 @@ class TagFilter(django_filters.CharFilter):
         super().__init__(*args, **kwargs)
 
 
-def filter_full_text_search(queryset, name, value):
+def filter_full_text_search(queryset, _name, value):
     query = SearchQuery(value, search_type="websearch", config="english")
     return (
         queryset.annotate(rank=SearchRank(F("title_description_search"), query))
@@ -46,7 +46,7 @@ class BookmarkFilter(django_filters.FilterSet):
 
     class Meta:
         model = Bookmark
-        fields = ["text", "created", "url", "tags", "active"]
+        fields = ("text", "created", "url", "tags", "active")
 
     @property
     def form(self):

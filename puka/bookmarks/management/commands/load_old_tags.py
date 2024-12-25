@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 from django.core.management import BaseCommand
 
@@ -9,8 +10,8 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("file_name", type=str, help="The name of the file to process")
 
-    def handle(self, *args, **options):
-        with open(options["file_name"]) as f:
+    def handle(self, *_args, **options):
+        with Path(options["file_name"]).open() as f:
             bookmarks = json.load(f)
 
         for tags in bookmarks:

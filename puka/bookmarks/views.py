@@ -99,6 +99,8 @@ def bookmark_new(request):
             return HttpResponseLocation(reverse("bookmarks"), target="#id_content")
         return render(request, "bookmarks/form.html", {"form": form, "title": "New Bookmark"})
 
+    return None
+
 
 @login_required
 @require_http_methods(["GET", "POST"])
@@ -120,10 +122,12 @@ def bookmark_edit(request, pk):
             return HttpResponseLocation(reverse("bookmarks"), target="#id_content")
         return render(request, "bookmarks/form.html", {"form": form, "title": "Edit Bookmark"})
 
+    return None
+
 
 @login_required
 @require_POST
-def bookmark_delete(request, pk):
+def bookmark_delete(_request, pk):
     bookmark = get_object_or_404(Bookmark, pk=pk)
     logger.debug("delete: Bookmark %s", bookmark)
     bookmark.delete()

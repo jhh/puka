@@ -37,7 +37,7 @@ class DeleteButton(HTML):
 class BookmarkForm(ModelForm):
     class Meta:
         model = Bookmark
-        fields = ["title", "description", "url", "tags", "active"]
+        fields = ("title", "description", "url", "tags", "active")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

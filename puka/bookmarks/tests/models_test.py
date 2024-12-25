@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from ..models import Bookmark
+from puka.bookmarks.models import Bookmark
 
 
 def test_str(unsaved_bookmark):

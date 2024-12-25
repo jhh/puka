@@ -42,11 +42,11 @@ class Bookmark(TimeStampedModel):
     active_objects = ActiveBookmarkManager()
 
     class Meta:
-        indexes = [
+        indexes = (
             Index(fields=["-created"]),
             GinIndex(fields=["title_description_search"]),
-        ]
-        ordering = ["-created"]
+        )
+        ordering = ("-created",)
 
     def __str__(self) -> str:
         return self.title
