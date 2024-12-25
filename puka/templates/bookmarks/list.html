@@ -75,7 +75,7 @@
     <li
         class="p-4"
         {% if forloop.last and page_obj.has_next %}
-        hx-get="?page={{ page_obj.next_page_number }}&{{ query|safe }}"
+        hx-get="{% querystring page=page_obj.next_page_number %}"
         hx-trigger="revealed"
         hx-swap="afterend"
         {% endif %}
@@ -94,8 +94,8 @@
           {% for tag in bookmark.tags.all %}
             <li class="inline text-sm text-red-700">
               <a
-                  href="?t={{ tag }}"
-                  hx-get="?t={{ tag }}"
+                  href="?tags={{ tag }}"
+                  hx-get="?tags={{ tag }}"
                   hx-target="#id_content"
               >{{ tag }}
               </a></li>
@@ -108,7 +108,7 @@
               hx-get="{% url 'bookmark-edit' bookmark.id %}"
               hx-target="#id_content"
               hx-push-url="true"
-          >edit
+          >edit {% querystring %}
           </button>
         </div>
       </article>

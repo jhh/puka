@@ -4,7 +4,6 @@ import logging
 
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.http import QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
@@ -21,28 +20,24 @@ logger = logging.getLogger(__name__)
 @require_GET
 def bookmarks(request):
     clear_search = True
-    query = QueryDict(mutable=True)
 
-    if "t" in request.GET:
-        tags = request.GET.getlist("t")
-        bookmarks = Bookmark.active_objects.with_tags(tags)
-        query.setlist("t", tags)
+    if "tags" in request.GET:
+        tags = request.GET.getlist("tags")
+        bm = Bookmark.active_objects.with_tags(tags)
     elif "q" in request.GET:
         search: str = request.GET.get("q")
         if search.startswith("#"):
             tag = search.lstrip("#")
-            query["t"] = tag
-            bookmarks = Bookmark.active_objects.with_tags([tag])
+            bm = Bookmark.active_objects.with_tags([tag])
         elif search.strip():
-            query["q"] = search
-            bookmarks = Bookmark.active_objects.with_text(search)
+            bm = Bookmark.active_objects.with_text(search)
         else:
-            bookmarks = Bookmark.active_objects.all()
+            bm = Bookmark.active_objects.all()
         clear_search = False
 
     else:
-        bookmarks = Bookmark.active_objects.all()
-    paginator = Paginator(bookmarks.prefetch_related("tags"), 25)
+        bm = Bookmark.active_objects.all()
+    paginator = Paginator(bm.prefetch_related("tags"), 25)
 
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
@@ -58,7 +53,7 @@ def bookmarks(request):
     else:
         template = "bookmarks/list.html"
 
-    response = render(request, template, {"page_obj": page_obj, "query": query.urlencode()})
+    response = render(request, template, {"page_obj": page_obj})
     return trigger_client_event(response, "clearSearch", {}) if clear_search else response
 
 
@@ -69,11 +64,6 @@ def bookmarks_filter(request):
     paginator = Paginator(f.qs, 25)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
-    if page_number:
-        query = request.GET.copy()
-        query.pop("page")
-    else:
-        query = request.GET
 
     if request.htmx:
         # if paging, just render the list items, otherwise this is a navigation to the list page contents
@@ -85,12 +75,8 @@ def bookmarks_filter(request):
     else:
         template = "bookmarks/filter.html"
 
-    logger.debug("template: %s, query: %s", template, query)
-    return render(
-        request,
-        template,
-        {"page_obj": page_obj, "filter": f, "query": query.urlencode()},
-    )
+    logger.debug("template: %s", template)
+    return render(request, template, {"page_obj": page_obj, "filter": f})
 
 
 @login_required
