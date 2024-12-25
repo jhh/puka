@@ -4,6 +4,7 @@ import logging
 
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.db.models import Case, Count, Value, When
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
@@ -132,3 +133,38 @@ def bookmark_delete(_request, pk):
     logger.debug("delete: Bookmark %s", bookmark)
     bookmark.delete()
     return HttpResponseLocation(reverse("bookmarks"), target="#id_content")
+
+
+@login_required
+@require_GET
+def tags_list(request):
+    tags = Bookmark.tags.annotate(
+        num_times=Count(Bookmark.tags.through.tag_relname()),
+        bucket=Case(
+            When(
+                num_times__gt=100,
+                then=Value("> 100"),
+            ),
+            When(
+                num_times__gte=50,
+                num_times__lte=100,
+                then=Value("50—100"),
+            ),
+            When(
+                num_times__gte=10,
+                num_times__lt=50,
+                then=Value("10—50"),
+            ),
+            When(
+                num_times__gte=5,
+                num_times__lt=10,
+                then=Value("5—10"),
+            ),
+            default=Value("< 5"),
+        ),
+    ).order_by("-num_times")
+    return render(
+        request,
+        "bookmarks/tags.html#tags-partial" if request.htmx else "bookmarks/tags.html",
+        {"tags": tags},
+    )

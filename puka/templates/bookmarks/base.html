@@ -28,5 +28,18 @@
         <span class="truncate">Filter Bookmarks</span>
       </a>
     </li>
+    <li>
+      <a
+          hx-get="{% url 'bookmark-tags' %}"
+          hx-target="#id_content"
+          hx-push-url="true"
+          href="#"
+          class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold {% get_current_class 'bookmark-tags' %}"
+      >
+        <span
+            class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-[0.625rem] font-medium text-gray-400 group-hover:text-white">F</span>
+        <span class="truncate">Bookmark Tags</span>
+      </a>
+    </li>
   </ul>
 {% endpartialdef menu-partial %}

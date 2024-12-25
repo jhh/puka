@@ -1,0 +1,46 @@
+{% extends "bookmarks/base.html" %}
+{% load partials %}
+
+{% block title %}Tags{% endblock %}
+
+{% partialdef tags-partial %}
+  {% if request.htmx %}
+    <title>Tags - HTMX</title>
+    {% include "sidebar.html#nav-mobile-partial" %}
+    {% include "sidebar.html#nav-desktop-partial" %}
+    {% include "bookmarks/base.html#menu-partial" %}
+  {% endif %}
+  <div class="md:flex md:items-center md:justify-between">
+  <div class="min-w-0 flex-1">
+    <h1 class="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">Tags</h1>
+  </div>
+  </div>
+  {% for tag in tags %}
+    {% ifchanged tag.bucket %}
+      {% if not forloop.first %}</ul>{% endif %}
+      <div class="border-b border-gray-200 py-5">
+        <h2 class="text-base font-semibold text-gray-900">{{ tag.bucket }}</h2>
+      </div>
+
+      <ul class="flex flex-wrap space-x-2">
+    {% endifchanged %}
+  <li class="inline">
+
+    <a
+        href="{% url 'bookmarks' %}?tags={{ tag.name }}"
+        hx-get="{% url 'bookmarks' %}?tags={{ tag.name }}"
+        hx-push-url="true"
+        hx-target="#id_content"
+    >
+    <span
+        class="inline-flex items-center rounded-full bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700 ring-1 ring-indigo-700/10 ring-inset"
+    >{{ tag.name }} {{ tag.num_times }}</span>
+    </a>
+  </li>
+  {% if forloop.last %}</ul>{% endif %}
+  {% endfor %}
+{% endpartialdef tags-partial %}
+
+{% block content %}
+  {% partial tags-partial %}
+{% endblock content %}

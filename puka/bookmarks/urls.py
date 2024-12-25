@@ -9,6 +9,7 @@ from .views import (
     bookmark_new,
     bookmarks,
     bookmarks_filter,
+    tags_list,
 )
 
 urlpatterns: list[URLPattern | URLResolver] = [
@@ -18,4 +19,5 @@ urlpatterns: list[URLPattern | URLResolver] = [
     path("<int:pk>/edit/", bookmark_edit, name="bookmark-edit"),
     path("<int:pk>/delete/", bookmark_delete, name="bookmark-delete"),
     path("filter/", bookmarks_filter, name="bookmark-filter"),
+    path("tags/", tags_list, name="bookmark-tags"),
 ]
