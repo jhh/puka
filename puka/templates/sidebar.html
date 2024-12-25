@@ -198,12 +198,12 @@
     <li>
       <!-- Current: "bg-gray-800 text-white", Default: "text-gray-400 hover:text-white hover:bg-gray-800" -->
       <a
-          hx-get="{% url 'bookmarks' %}"
+          hx-get="{% url 'bookmarks:list' %}"
           hx-target="#id_content"
           hx-push-url="true"
           @click="sidebarOpen = false"
           href="#"
-          class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold {% get_current_class 'bookmarks' %}"
+          class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold {% get_current_class 'bookmarks:list' %}"
       >
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
              stroke="currentColor" class="size-6">
@@ -228,12 +228,12 @@
     </li>
     <li>
       <a
-          hx-get="{% url 'bookmark-filter' %}"
+          hx-get="{% url 'bookmarks:filter' %}"
           hx-target="#id_content"
           hx-push-url="true"
           @click="sidebarOpen = false"
           href="#"
-          class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold {% get_current_class 'bookmark-filter' %}"
+          class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold {% get_current_class 'bookmarks:filter' %}"
       >
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
              stroke="currentColor" class="size-6">
@@ -256,11 +256,11 @@
     <li>
       <!-- Current: "bg-gray-800 text-white", Default: "text-gray-400 hover:text-white hover:bg-gray-800" -->
       <a
-          hx-get="{% url 'bookmarks' %}"
+          hx-get="{% url 'bookmarks:list' %}"
           hx-target="#id_content"
           hx-push-url="true"
           href="#"
-          class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold {% get_current_class 'bookmarks' %}"
+          class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold {% get_current_class 'bookmarks:list' %}"
       >
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
              stroke="currentColor" class="size-6">
@@ -286,7 +286,7 @@
     </li>
     <li>
       <a
-          hx-get="{% url 'bookmark-filter' %}"
+          hx-get="{% url 'bookmarks:filter' %}"
           hx-target="#id_content"
           hx-push-url="true"
           href="#"

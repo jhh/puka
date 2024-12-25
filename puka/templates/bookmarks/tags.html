@@ -27,8 +27,8 @@
   <li class="inline">
 
     <a
-        href="{% url 'bookmarks' %}?tags={{ tag.name }}"
-        hx-get="{% url 'bookmarks' %}?tags={{ tag.name }}"
+        href="{% url 'bookmarks:list' %}?tags={{ tag.name }}"
+        hx-get="{% url 'bookmarks:list' %}?tags={{ tag.name }}"
         hx-push-url="true"
         hx-target="#id_content"
     >

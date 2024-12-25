@@ -25,7 +25,7 @@
           name="q"
           id="search"
           {# fake pagination to force list-items-partial to be returned #}
-          hx-get="{% url 'bookmarks' %}?page=x"
+          hx-get="{% url 'bookmarks:list' %}?page=x"
           hx-trigger="keyup changed delay:0.5s"
           hx-target="#id_bookmarks"
           class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
@@ -43,7 +43,7 @@
     <div class="flex md:mt-0 md:ml-4">
       <button
           type="button"
-          hx-get="{% url 'bookmark-new' %}"
+          hx-get="{% url 'bookmarks:new' %}"
           hx-trigger="click"
           hx-target="#id_content"
           hx-push-url="true"
@@ -53,7 +53,7 @@
       </button>
       <button
           type="button"
-          hx-get="{% url 'bookmark-new' %}"
+          hx-get="{% url 'bookmarks:new' %}"
           hx-trigger="click"
           hx-target="#id_content"
           hx-push-url="true"
@@ -104,7 +104,7 @@
           {{ bookmark.created|date:'F Y'|lower }}
           <button
               class="ml-3"
-              hx-get="{% url 'bookmark-edit' bookmark.id %}"
+              hx-get="{% url 'bookmarks:edit' bookmark.id %}"
               hx-target="#id_content"
               hx-push-url="true"
           >edit
