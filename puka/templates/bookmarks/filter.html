@@ -12,6 +12,7 @@
     <title>Filter - HTMX</title>
     {% include "sidebar.html#nav-mobile-partial" %}
     {% include "sidebar.html#nav-desktop-partial" %}
+    {% include "bookmarks/base.html#menu-partial" %}
   {% endif %}
   {% crispy filter.form %}
   <ul id="id_bookmarks" role="list" class="divide-y divide-gray-200 shadow-sm bg-white">
