@@ -30,7 +30,7 @@ def filter_full_text_search(queryset, name, value):
 
 
 class BookmarkFilter(django_filters.FilterSet):
-    title = django_filters.CharFilter(
+    text = django_filters.CharFilter(
         method=filter_full_text_search,
         label="Title or description contains words",
     )
@@ -46,7 +46,7 @@ class BookmarkFilter(django_filters.FilterSet):
 
     class Meta:
         model = Bookmark
-        fields = ["title", "created", "url", "tags", "active"]
+        fields = ["text", "created", "url", "tags", "active"]
 
     @property
     def form(self):
@@ -56,7 +56,7 @@ class BookmarkFilter(django_filters.FilterSet):
         form.helper.attrs = {"hx-get": "", "hx-target": "#id_content"}
         form.helper.layout = Layout(
             Div(
-                Field("title", wrapper_class="sm:col-span-3"),
+                Field("text", wrapper_class="sm:col-span-3"),
                 Field("tags", wrapper_class="sm:col-span-3"),
                 Field("created", wrapper_class="sm:col-span-1"),
                 Field("active", wrapper_class="sm:col-span-1"),
@@ -64,7 +64,7 @@ class BookmarkFilter(django_filters.FilterSet):
                 css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
             ),
             Div(
-                CancelButton("clear", "Clear Search", onclick="clearSearch();"),
+                CancelButton("clear", "Clear Search", onclick="clearSearch();", hx_get=""),
                 PrimaryButton("submit", "Search"),
                 css_class="mt-0 mb-4 flex items-center justify-end gap-x-6",
             ),
