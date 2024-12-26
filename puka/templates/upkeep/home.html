@@ -1,0 +1,24 @@
+{% extends "stuff/base.html" %}
+{% load partials %}
+
+{% block title %}Upkeep{% endblock %}
+
+{% partialdef home-partial %}
+  {% if request.htmx %}
+    <title>Upkeep - HTMX</title>
+    {% include "sidebar.html#nav-mobile-partial" %}
+    {% include "sidebar.html#nav-desktop-partial" %}
+    {% include "upkeep/base.html#menu-partial" %}
+  {% endif %}
+  <div class="md:flex md:items-center md:justify-between">
+    <div class="min-w-0 flex-1">
+      <h1
+          class="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight"
+      >Upkeep</h1>
+    </div>
+  </div>
+{% endpartialdef home-partial %}
+
+{% block content %}
+  {% partial home-partial %}
+{% endblock content %}

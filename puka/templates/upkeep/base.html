@@ -1,0 +1,19 @@
+{% extends "sidebar.html" %}
+{% load partials utils %}
+
+{% block title %}Upkeep{% endblock %}
+
+{% block menu %}
+  <div class="text-xs/6 font-semibold text-gray-400">Tasks</div>
+  {% partial menu-partial %}
+{% endblock menu %}
+
+{% partialdef menu-partial %}
+  <ul
+      hx-swap-oob="true"
+      id="id_extra_menu"
+      role="list"
+      class="-mx-2 mt-2 space-y-1"
+  >
+  </ul>
+ {% endpartialdef %}
