@@ -25,8 +25,10 @@ INSTALLED_APPS = [
     "crispy_forms",
     "crispy_tailwind",
     "taggit",
-    "puka.core",
     "puka.bookmarks",
+    "puka.core",
+    "puka.stuff",
+    "puka.upkeep",
     "puka.users",
 ]
 
