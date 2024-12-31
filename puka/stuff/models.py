@@ -1,7 +1,6 @@
 from django.db import models
 
 from puka.bookmarks.models import Bookmark
-from puka.core.models import TimeStampedModel
 
 
 class Category(models.Model):
@@ -24,7 +23,7 @@ class Location(models.Model):
         return self.name
 
 
-class Product(TimeStampedModel):
+class Product(models.Model):
     name = models.CharField(max_length=100, unique=True)
     current_stock = models.PositiveIntegerField()
     reorder_level = models.PositiveIntegerField()

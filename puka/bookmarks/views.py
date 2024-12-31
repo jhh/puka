@@ -5,6 +5,7 @@ import logging
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Case, Count, Value, When
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
@@ -100,7 +101,7 @@ def bookmark_new(request):
             return HttpResponseLocation(reverse("bookmarks:list"), target="#id_content")
         return render(request, "bookmarks/form.html", {"form": form, "title": "New Bookmark"})
 
-    return None
+    return HttpResponse()
 
 
 @login_required
@@ -123,7 +124,7 @@ def bookmark_edit(request, pk):
             return HttpResponseLocation(reverse("bookmarks:list"), target="#id_content")
         return render(request, "bookmarks/form.html", {"form": form, "title": "Edit Bookmark"})
 
-    return None
+    return HttpResponse()
 
 
 @login_required

@@ -62,3 +62,11 @@ ignore = ["ANN", "COM812", "D1", "D203", "D212", "E501", "ISC001"]
 "puka/*/tests/*" = ["ARG001", "PLR2004", "S101"]
 "puka/manage.py" = ["EM101", "TRY003"]
 "puka/settings/*.py" = ["S105"]
+
+[tool.basedpyright]
+venvPath = "."
+venv = ".venv"
+typeCheckingMode = "standard"
+pythonVersion = "3.12"
+reportUnusedParameter = false
+reportIncompatibleVariableOverride = false
