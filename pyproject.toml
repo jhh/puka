@@ -33,6 +33,7 @@ dev = [
     "rich>=13.9.4",
     "ruff>=0.8.2",
     "pywatchman>=2.0.0",
+    "django-browser-reload>=1.17.0",
 ]
 
 [build-system]
