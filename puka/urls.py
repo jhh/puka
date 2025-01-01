@@ -5,14 +5,17 @@ from django.contrib import admin
 from django.urls import URLPattern, URLResolver, include, path
 from django.views.generic import RedirectView
 
+from puka.core.views import view_404
+
 urlpatterns: list[URLPattern | URLResolver] = [
-    path("", RedirectView.as_view(url="/bookmarks/", permanent=False)),
+    path("", RedirectView.as_view(url="/bookmarks/", permanent=False), name="home"),
     path("bookmarks/", include("puka.bookmarks.urls", namespace="bookmarks")),
     path("stuff/", include("puka.stuff.urls", namespace="stuff")),
     path("upkeep/", include("puka.upkeep.urls", namespace="upkeep")),
     path("accounts/", include("django.contrib.auth.urls")),
     path("users/", include("puka.users.urls")),
     path("admin/", admin.site.urls),
+    path("404/", view_404),
 ]
 
 
