@@ -27,5 +27,18 @@
             <span class="truncate">Categories</span>
         </a>
     </li>
+    <li>
+        <a
+            hx-get="{% url 'stuff:location-list' %}"
+            hx-target="#id_content"
+            hx-push-url="true"
+            href="#"
+            class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold {% get_current_class 'stuff:location-list' %}" >
+            <span
+                class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-[0.625rem] font-medium text-gray-400 group-hover:text-white"
+                >L</span>
+            <span class="truncate">Locations</span>
+        </a>
+    </li>
 </ul>
 {% endpartialdef %}
