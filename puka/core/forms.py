@@ -20,10 +20,10 @@ class CancelButton(Button):
 
 
 class DeleteButton(HTML):
-    def __init__(self, pk):
+    def __init__(self, url_name, pk, name):
         super().__init__(
             f"""<button type="button"
             class="rounded-md bg-white px-3 py-2 text-sm font-semibold text-red-600 ring-1 shadow-xs ring-red-300 ring-inset hover:bg-gray-50 ml-auto"
-            hx-post="{{% url 'bookmarks:delete' {pk} %}}" hx-params="none"
-            hx-confirm="Delete this bookmark?">Delete</button>""",
+            hx-post="{{% url '{url_name}' {pk} %}}" hx-params="none"
+            hx-confirm="Delete this {name}?">Delete</button>""",
         )

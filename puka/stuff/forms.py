@@ -5,38 +5,36 @@ from crispy_forms.layout import Div, Field, Layout
 from django.forms import ModelForm
 from django.urls import reverse
 
-from puka.bookmarks.models import Bookmark
 from puka.core.forms import CancelButton, DeleteButton, PrimaryButton
+from puka.stuff.models import Category
 
 
-class BookmarkForm(ModelForm):
+class CategoryForm(ModelForm):
     class Meta:
-        model = Bookmark
-        fields = ("title", "description", "url", "tags", "active")
+        model = Category
+        fields = ("name",)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         if self.instance.id is not None:
-            action = reverse("bookmarks:edit", args=[self.instance.id])
-            delete_button = DeleteButton("bookmarks:delete", self.instance.id, "bookmark")
+            action = reverse("stuff:category-edit", args=[self.instance.id])
+            delete_button = DeleteButton("stuff:category-delete", self.instance.id, "category")
+            autofocus = {}
         else:
-            action = reverse("bookmarks:new")
+            action = reverse("stuff:category-new")
             delete_button = None
+            autofocus = {"autofocus": ""}
 
         self.helper = FormHelper()
         self.helper.attrs = {"hx-post": action}
         self.helper.layout = Layout(
             Div(
-                Field("title", wrapper_class="sm:col-span-6", autofocus=""),
-                Field("description", wrapper_class="sm:col-span-6"),
-                Field("url", wrapper_class="sm:col-span-6"),
-                Field("tags", wrapper_class="sm:col-span-4"),
-                Field("active", wrapper_class="sm:col-span-2"),
+                Field("name", wrapper_class="sm:col-span-6", **autofocus),
                 css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
             ),
             Div(
-                PrimaryButton("submit", "Save Bookmark"),
+                PrimaryButton("submit", "Save Category"),
                 CancelButton("cancel", "Cancel", onclick="window.history.back();"),
                 delete_button,
                 css_class="mt-4 flex gap-x-4",

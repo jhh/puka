@@ -72,3 +72,4 @@ typeCheckingMode = "standard"
 pythonVersion = "3.12"
 reportUnusedParameter = false
 reportIncompatibleVariableOverride = false
+reportAttributeAccessIssue = false
