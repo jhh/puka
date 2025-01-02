@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 
-from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Case, Count, Value, When
 from django.http import HttpResponse
@@ -18,7 +17,6 @@ from .models import Bookmark
 logger = logging.getLogger(__name__)
 
 
-@login_required
 @require_GET
 def bookmarks(request):
     clear_search = False
@@ -55,7 +53,6 @@ def bookmarks(request):
     return trigger_client_event(response, "clearSearch", {}) if clear_search else response
 
 
-@login_required
 @require_GET
 def bookmarks_filter(request):
     f = BookmarkFilter(request.GET, queryset=Bookmark.objects.prefetch_related("tags"))
@@ -77,13 +74,11 @@ def bookmarks_filter(request):
     return render(request, template, {"page_obj": page_obj, "filter": f})
 
 
-@login_required
 def bookmark_detail(request, pk):
     bookmark = get_object_or_404(Bookmark, pk=pk)
     return render(request, "bookmarks/detail.html", {"bookmark": bookmark})
 
 
-@login_required
 @require_http_methods(["GET", "POST"])
 def bookmark_new(request):
     if request.method == "GET":
@@ -104,7 +99,6 @@ def bookmark_new(request):
     return HttpResponse()
 
 
-@login_required
 @require_http_methods(["GET", "POST"])
 def bookmark_edit(request, pk):
     bookmark = get_object_or_404(Bookmark, pk=pk)
@@ -127,7 +121,6 @@ def bookmark_edit(request, pk):
     return HttpResponse()
 
 
-@login_required
 @require_POST
 def bookmark_delete(_request, pk):
     bookmark = get_object_or_404(Bookmark, pk=pk)
@@ -136,7 +129,6 @@ def bookmark_delete(_request, pk):
     return HttpResponseLocation(reverse("bookmarks:list"), target="#id_content")
 
 
-@login_required
 @require_GET
 def tags_list(request):
     tags = Bookmark.tags.annotate(
