@@ -1,5 +1,8 @@
 from django.shortcuts import render
 
+from puka.core.views import get_template
+
 
 def home_view(request):
-    return render(request, "upkeep/home.html#home-partial" if request.htmx else "upkeep/home.html")
+    template = get_template(request, "upkeep/home.html", "#home-partial")
+    return render(request, template, {})

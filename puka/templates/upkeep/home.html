@@ -4,7 +4,7 @@
 {% block title %}Upkeep{% endblock %}
 
 {% partialdef home-partial %}
-  {% if request.htmx %}
+  {% if htmx %}
     <title>Upkeep - HTMX</title>
     {% include "sidebar.html#nav-mobile-partial" %}
     {% include "sidebar.html#nav-desktop-partial" %}

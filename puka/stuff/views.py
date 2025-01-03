@@ -3,15 +3,14 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, ListView, TemplateView, UpdateView, View
 from django_htmx.http import HttpResponseLocation
 
+from puka.core.views import get_template
 from puka.stuff.forms import CategoryForm, LocationForm
 from puka.stuff.models import Category, Location
 
 
 class HomeView(TemplateView):
     def get_template_names(self):
-        if self.request.htmx:
-            return ["stuff/home.html#home-partial"]
-        return ["stuff/home.html"]
+        return get_template(self.request, "stuff/home.html", "#home-partial")
 
 
 class CategoryListView(ListView):
@@ -19,9 +18,7 @@ class CategoryListView(ListView):
     context_object_name = "categories"
 
     def get_template_names(self):
-        if self.request.htmx:
-            return ["stuff/category_list.html#list-partial"]
-        return ["stuff/category_list.html"]
+        return get_template(self.request, "stuff/category_list.html", "#list-partial")
 
 
 class CategoryCreateView(CreateView):
@@ -30,9 +27,7 @@ class CategoryCreateView(CreateView):
     success_url = reverse_lazy("stuff:category-list")
 
     def get_template_names(self):
-        if self.request.htmx:
-            return ["stuff/form.html#form-partial"]
-        return ["stuff/form.html"]
+        return get_template(self.request, "stuff/form.html", "#form-partial")
 
 
 class CategoryUpdateView(UpdateView):
@@ -41,9 +36,7 @@ class CategoryUpdateView(UpdateView):
     success_url = reverse_lazy("stuff:category-list")
 
     def get_template_names(self):
-        if self.request.htmx:
-            return ["stuff/form.html#form-partial"]
-        return ["stuff/form.html"]
+        return get_template(self.request, "stuff/form.html", "#form-partial")
 
 
 class CategoryDeleteView(View):
@@ -58,9 +51,7 @@ class LocationListView(ListView):
     context_object_name = "locations"
 
     def get_template_names(self):
-        if self.request.htmx:
-            return ["stuff/location_list.html#list-partial"]
-        return ["stuff/location_list.html"]
+        return get_template(self.request, "stuff/location_list.html", "#list-partial")
 
 
 class LocationCreateView(CreateView):
@@ -69,9 +60,7 @@ class LocationCreateView(CreateView):
     success_url = reverse_lazy("stuff:location-list")
 
     def get_template_names(self):
-        if self.request.htmx:
-            return ["stuff/form.html#form-partial"]
-        return ["stuff/form.html"]
+        return get_template(self.request, "stuff/form.html", "#form-partial")
 
 
 class LocationUpdateView(UpdateView):
@@ -80,9 +69,7 @@ class LocationUpdateView(UpdateView):
     success_url = reverse_lazy("stuff:location-list")
 
     def get_template_names(self):
-        if self.request.htmx:
-            return ["stuff/form.html#form-partial"]
-        return ["stuff/form.html"]
+        return get_template(self.request, "stuff/form.html", "#form-partial")
 
 
 class LocationDeleteView(View):

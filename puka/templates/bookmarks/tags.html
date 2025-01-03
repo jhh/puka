@@ -4,7 +4,7 @@
 {% block title %}Tags{% endblock %}
 
 {% partialdef tags-partial %}
-  {% if request.htmx %}
+  {% if htmx %}
     <title>Tags - HTMX</title>
     {% include "sidebar.html#nav-mobile-partial" %}
     {% include "sidebar.html#nav-desktop-partial" %}

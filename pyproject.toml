@@ -73,3 +73,8 @@ pythonVersion = "3.12"
 reportUnusedParameter = false
 reportIncompatibleVariableOverride = false
 reportAttributeAccessIssue = false
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+typeCheckingMode = "standard"
