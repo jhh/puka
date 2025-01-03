@@ -77,4 +77,5 @@ reportAttributeAccessIssue = false
 [tool.pyright]
 venvPath = "."
 venv = ".venv"
+pythonVersion = "3.12"
 typeCheckingMode = "standard"
