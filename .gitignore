@@ -259,4 +259,4 @@ sketch
 .third_party
 .envrc
 .nixos-test-history
-static
+/static
