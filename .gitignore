@@ -257,6 +257,6 @@ sketch
 
 # End of https://www.toptal.com/developers/gitignore/api/yarn
 .third_party
-.envrc
+.envrc.local
 .nixos-test-history
 /static
