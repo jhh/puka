@@ -128,6 +128,7 @@
             pkgs.postgresql.dev
             pkgs.pre-commit
             uv
+            pkgs.watchman
           ];
         in
         {

@@ -6,7 +6,7 @@
 {% endblock content %}
 
 {% partialdef list-partial %}
-  {% if request.htmx %}
+  {% if htmx %}
     <title>Bookmarks - HTMX</title>
     {% include "sidebar.html#nav-mobile-partial" %}
     {% include "sidebar.html#nav-desktop-partial" %}

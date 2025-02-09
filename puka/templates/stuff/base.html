@@ -4,16 +4,41 @@
 {% block title %}Stuff{% endblock %}
 
 {% block menu %}
-  <div class="text-xs/6 font-semibold text-gray-400">Tasks</div>
-  {% partial menu-partial %}
+<div class="text-xs/6 font-semibold text-gray-400">Tasks</div>
+{% partial menu-partial %}
 {% endblock menu %}
 
 {% partialdef menu-partial %}
-  <ul
-      hx-swap-oob="true"
-      id="id_extra_menu"
-      role="list"
-      class="-mx-2 mt-2 space-y-1"
-  >
-  </ul>
- {% endpartialdef %}
+<ul
+    hx-swap-oob="true"
+    id="id_extra_menu"
+    role="list"
+    class="-mx-2 mt-2 space-y-1" >
+    <li>
+        <a
+            hx-get="{% url 'stuff:category-list' %}"
+            hx-target="#id_content"
+            hx-push-url="true"
+            href="#"
+            class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold {% get_current_class 'stuff:category-list' %}" >
+            <span
+                class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-[0.625rem] font-medium text-gray-400 group-hover:text-white"
+                >C</span>
+            <span class="truncate">Categories</span>
+        </a>
+    </li>
+    <li>
+        <a
+            hx-get="{% url 'stuff:location-list' %}"
+            hx-target="#id_content"
+            hx-push-url="true"
+            href="#"
+            class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold {% get_current_class 'stuff:location-list' %}" >
+            <span
+                class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-[0.625rem] font-medium text-gray-400 group-hover:text-white"
+                >L</span>
+            <span class="truncate">Locations</span>
+        </a>
+    </li>
+</ul>
+{% endpartialdef %}

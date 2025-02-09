@@ -32,6 +32,8 @@ dev = [
     "pytest-django>=4.9.0",
     "rich>=13.9.4",
     "ruff>=0.8.2",
+    "pywatchman>=2.0.0",
+    "django-browser-reload>=1.17.0",
 ]
 
 [build-system]
@@ -62,3 +64,18 @@ ignore = ["ANN", "COM812", "D1", "D203", "D212", "E501", "ISC001"]
 "puka/*/tests/*" = ["ARG001", "PLR2004", "S101"]
 "puka/manage.py" = ["EM101", "TRY003"]
 "puka/settings/*.py" = ["S105"]
+
+[tool.basedpyright]
+venvPath = "."
+venv = ".venv"
+typeCheckingMode = "standard"
+pythonVersion = "3.12"
+reportUnusedParameter = false
+reportIncompatibleVariableOverride = false
+reportAttributeAccessIssue = false
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+pythonVersion = "3.12"
+typeCheckingMode = "standard"
