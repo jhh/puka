@@ -563,6 +563,12 @@ dev = [
     { name = "rich" },
     { name = "ruff" },
 ]
+test = [
+    { name = "django-stubs", extra = ["compatible-mypy"] },
+    { name = "mypy" },
+    { name = "pytest-cov" },
+    { name = "pytest-django" },
+]
 
 [package.metadata]
 requires-dist = [
@@ -592,6 +598,12 @@ dev = [
     { name = "pywatchman", specifier = ">=2.0.0" },
     { name = "rich", specifier = ">=13.9.4" },
     { name = "ruff", specifier = ">=0.8.2" },
+]
+test = [
+    { name = "django-stubs", extras = ["compatible-mypy"], specifier = ">=5.1.1" },
+    { name = "mypy", specifier = ">=1.13.0" },
+    { name = "pytest-cov", specifier = ">=6.0.0" },
+    { name = "pytest-django", specifier = ">=4.9.0" },
 ]
 
 [[package]]

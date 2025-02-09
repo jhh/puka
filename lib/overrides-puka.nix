@@ -1,8 +1,8 @@
-{ lib
-, nixosModule
-, pkgs
-, workspace
-,
+{
+  lib,
+  nixosModule,
+  pkgs,
+  workspace,
 }:
 let
   inherit (pkgs.stdenv) isLinux mkDerivation;
@@ -16,11 +16,11 @@ final: prev: {
       tests =
         let
           venv = final.mkVirtualEnv "puka-check-env" {
-            puka = [ "dev" ];
+            puka = [ "test" ];
           };
         in
         (old.tests or { })
-          // {
+        // {
 
           mypy = mkDerivation {
             name = "${final.puka.name}-mypy";
@@ -36,7 +36,7 @@ final: prev: {
             '';
           };
         }
-          // lib.optionalAttrs isLinux {
+        // lib.optionalAttrs isLinux {
           #
           nixos =
             let
