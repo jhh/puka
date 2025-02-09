@@ -56,6 +56,8 @@ in
   };
 
   config = mkIf cfg.enable {
+    environment.systemPackages = [ manage ];
+
     systemd.services.puka = {
       description = "Puka server";
 
@@ -63,8 +65,6 @@ in
         DJANGO_SETTINGS_MODULE = cfg.settings-module;
         DJANGO_STATIC_ROOT = cfg.static-root;
       };
-
-      environment.systemPackages = [ manage ];
 
       serviceConfig = {
         EnvironmentFile = cfg.secrets;
