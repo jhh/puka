@@ -1,7 +1,7 @@
 {
   pkgs,
-  pythonSet,
-  venv,
+  perSystem,
+  ...
 }:
 pkgs.writeShellApplication {
   name = "puka-manage";
@@ -14,6 +14,6 @@ pkgs.writeShellApplication {
       DJANGO_SETTINGS_MODULE=puka.settings.production \
       DJANGO_DATABASE_URL=postgres:///puka \
       SECRET_KEY=not-secret \
-      ${venv}/bin/puka-manage "$@"
+      ${perSystem.self.venv}/bin/puka-manage "$@"
   '';
 }

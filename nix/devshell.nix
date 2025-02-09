@@ -1,7 +1,14 @@
-{ perSystem, pkgs }:
+{
+  flake,
+  perSystem,
+  pkgs,
+}:
+let
+  pythonSet = flake.lib.pythonSets pkgs;
+in
 pkgs.mkShell {
   packages = with pkgs; [
-    python312
+    pythonSet.python
     just
     nil
     nix-output-monitor

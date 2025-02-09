@@ -1,15 +1,19 @@
 {
+  flake,
   pkgs,
-  pythonSet,
-  venv,
+  perSystem,
+  ...
 }:
 let
+  pythonSet = flake.lib.pythonSets pkgs;
+  inherit (perSystem.self) venv;
+
   baseCss = "puka/static/puka/base.css";
-  templates = "lib/python3.12/site-packages/crispy_tailwind";
+  templates = "${pythonSet.python.sitePackages}/crispy_tailwind";
 
   pukaCssJs = pkgs.buildNpmPackage {
     name = "django-static-deps";
-    src = ../.;
+    src = ../../.;
     npmDepsHash = "sha256-JiWc6gmRf2Z6dPrXNuD9+sleSKsmuz9J5FSE5vA/ejI=";
     dontNpmBuild = true;
 

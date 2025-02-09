@@ -1,8 +1,4 @@
-{
-  pythonSets,
-  workspace,
-  packages,
-}:
+{ flake, ... }:
 {
   config,
   lib,
@@ -12,8 +8,7 @@
 let
   cfg = config.services.puka;
   inherit (pkgs) system;
-
-  pythonSet = pythonSets.${system};
+  inherit (flake.packages.${system}) manage static venv;
 
   inherit (lib.options) mkOption;
   inherit (lib.modules) mkIf;
@@ -40,13 +35,13 @@ in
 
     venv = mkOption {
       type = lib.types.package;
-      default = pythonSet.mkVirtualEnv "puka-env" workspace.deps.default;
+      default = venv;
       description = "Puka virtual environment package";
     };
 
     static-root = mkOption {
       type = lib.types.package;
-      default = packages.${system}.static;
+      default = static;
       description = "Puka static root package";
     };
 
@@ -68,6 +63,8 @@ in
         DJANGO_SETTINGS_MODULE = cfg.settings-module;
         DJANGO_STATIC_ROOT = cfg.static-root;
       };
+
+      environment.systemPackages = [ manage ];
 
       serviceConfig = {
         EnvironmentFile = cfg.secrets;
@@ -104,5 +101,10 @@ in
       wantedBy = [ "multi-user.target" ];
       after = [ "postgresql.service" ];
     };
+
+    networking.firewall.allowedTCPPorts = [
+      443
+      80
+    ];
   };
 }
