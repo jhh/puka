@@ -54,8 +54,8 @@
             python = pkgs.python312;
           };
 
-          psycopgOverrides = import ./lib/overrides-psycopg.nix { inherit pkgs; };
-          pukaOverrides = import ./lib/overrides-puka.nix {
+          psycopgOverrides = import ./nix/overrides-psycopg.nix { inherit pkgs; };
+          pukaOverrides = import ./nix/overrides-puka.nix {
             inherit lib pkgs workspace;
             nixosModule = self.nixosModules.default;
           };
@@ -71,7 +71,7 @@
       );
     in
     {
-      nixosModules.default = import ./lib/module.nix {
+      nixosModules.default = import ./nix/module.nix {
         inherit pythonSets workspace;
         packages = self.packages;
       };
@@ -91,10 +91,10 @@
           pkgs = nixpkgs.legacyPackages.${system};
           pythonSet = pythonSets.${system};
           venv = pythonSet.mkVirtualEnv "puka-env" workspace.deps.default;
-          static = import ./lib/static.nix {
+          static = import ./nix/static.nix {
             inherit pkgs pythonSet venv;
           };
-          manage = import ./lib/manage.nix {
+          manage = import ./nix/manage.nix {
             inherit pkgs pythonSet venv;
           };
         in
