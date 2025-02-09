@@ -5,66 +5,118 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('bookmarks', '0003_alter_bookmark_options_and_more_squashed_0009_alter_bookmark_options'),
+        ("bookmarks", "0003_alter_bookmark_options_and_more_squashed_0009_alter_bookmark_options"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Category',
+            name="Category",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, unique=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100, unique=True)),
             ],
             options={
-                'ordering': ['name'],
+                "ordering": ["name"],
             },
         ),
         migrations.CreateModel(
-            name='Location',
+            name="Location",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, unique=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100, unique=True)),
             ],
             options={
-                'ordering': ['name'],
+                "ordering": ["name"],
             },
         ),
         migrations.CreateModel(
-            name='Product',
+            name="Product",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('modified', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=100, unique=True)),
-                ('current_stock', models.PositiveIntegerField()),
-                ('reorder_level', models.PositiveIntegerField()),
-                ('notes', models.TextField(blank=True)),
-                ('bookmarks', models.ManyToManyField(related_name='+', to='bookmarks.bookmark')),
-                ('category', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='products', to='stuff.category')),
-                ('location', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='products', to='stuff.location')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("modified", models.DateTimeField(auto_now=True)),
+                ("name", models.CharField(max_length=100, unique=True)),
+                ("current_stock", models.PositiveIntegerField()),
+                ("reorder_level", models.PositiveIntegerField()),
+                ("notes", models.TextField(blank=True)),
+                ("bookmarks", models.ManyToManyField(related_name="+", to="bookmarks.bookmark")),
+                (
+                    "category",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="products",
+                        to="stuff.category",
+                    ),
+                ),
+                (
+                    "location",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="products",
+                        to="stuff.location",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['name'],
+                "ordering": ["name"],
             },
         ),
         migrations.CreateModel(
-            name='InventoryTransaction',
+            name="InventoryTransaction",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date', models.DateField(auto_now_add=True)),
-                ('type', models.CharField(choices=[('IN', 'In'), ('OUT', 'Out')], max_length=4)),
-                ('quantity', models.PositiveIntegerField()),
-                ('notes', models.TextField(blank=True)),
-                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='transactions', to='stuff.product')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("date", models.DateField(auto_now_add=True)),
+                ("type", models.CharField(choices=[("IN", "In"), ("OUT", "Out")], max_length=4)),
+                ("quantity", models.PositiveIntegerField()),
+                ("notes", models.TextField(blank=True)),
+                (
+                    "product",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="transactions",
+                        to="stuff.product",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Inventory Transaction',
-                'verbose_name_plural': 'Inventory Transactions',
-                'ordering': ['-date'],
+                "verbose_name": "Inventory Transaction",
+                "verbose_name_plural": "Inventory Transactions",
+                "ordering": ["-date"],
             },
         ),
     ]

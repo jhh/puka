@@ -27,7 +27,6 @@ TRIGGER_DROP = """
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("bookmarks", "0001_initial"),
     ]

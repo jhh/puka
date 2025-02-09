@@ -14,8 +14,9 @@ inputs.treefmt-nix.lib.mkWrapper pkgs {
 
   settings = {
     global.excludes = [
-      "*.{age,gif,png,svg,env,envrc,gitignore,tmTheme,sublime-syntax,theme,pickle,toml}"
+      "*.{age,gif,png,svg,env,envrc,gitignore,pickle}"
       ".idea/*"
+      ".vscode/*"
       "puka/static/*"
       "puka/templates/*"
       ".python-version"
