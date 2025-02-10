@@ -18,6 +18,8 @@ pythonSet.mkVirtualEnv "puka-env" workspace.deps.default
       inherit (pkgs.stdenvNoCC) mkDerivation;
     in
     {
+      # pytests are not included in checks due to requiring postgres
+
       mypy = mkDerivation {
         name = "puka-mypy";
         inherit (pythonSet.puka) src;
@@ -27,8 +29,10 @@ pythonSet.mkVirtualEnv "puka-env" workspace.deps.default
         dontConfigure = true;
         dontInstall = true;
         buildPhase = ''
+          runHook preBuild
           export MYPYPATH=apps
           mypy . --junit-xml $out/junit.xml
+          runHook postBuild
         '';
       };
     };

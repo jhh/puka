@@ -12,11 +12,11 @@ mypy:
 
 # run tests
 test:
-    uv run pytest
+    uv run pytest tests
 
 # run tests and create coverage report
 coverage:
-    uv run pytest --cov --cov-report=html
+    uv run pytest --cov --cov-report=html tests
     [[ -x /usr/bin/open ]] && /usr/bin/open htmlcov/index.html
 
 # run manage.py with command
