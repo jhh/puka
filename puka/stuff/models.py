@@ -15,7 +15,7 @@ class Category(models.Model):
 
 
 class Location(MP_Node):
-    name = models.CharField(max_length=100, unique=True)
+    name: models.CharField = models.CharField(max_length=100, unique=True)
     alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
     node_order_by = ("name",)
 
