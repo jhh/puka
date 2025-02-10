@@ -16,6 +16,7 @@ dependencies = [
     "django-filter>=24.3",
     "crispy-tailwind>=1.0.3",
     "django-template-partials>=24.4",
+    "django-treebeard>=4.7.1",
 ]
 
 [project.scripts]

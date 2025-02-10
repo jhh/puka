@@ -1,4 +1,5 @@
 from django.db import models
+from treebeard.mp_tree import MP_Node
 
 from puka.bookmarks.models import Bookmark
 
@@ -13,14 +14,13 @@ class Category(models.Model):
         return self.name
 
 
-class Location(models.Model):
+class Location(MP_Node):
     name = models.CharField(max_length=100, unique=True)
-
-    class Meta:
-        ordering = ("name",)
+    alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    node_order_by = ("name",)
 
     def __str__(self):
-        return self.name
+        return f"Location: {self.name}"
 
 
 class Product(models.Model):
