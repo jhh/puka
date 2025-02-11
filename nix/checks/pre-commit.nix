@@ -23,6 +23,7 @@ inputs.pre-commit-hooks.lib.${system}.run {
       end-of-file-fixer.enable = true;
       check-yaml.enable = true;
       check-added-large-files.enable = true;
+      check-added-large-files.args = [ "--maxkb=25" ];
       pyupgrade.enable = true;
       pyupgrade.args = [ "--py312-plus" ];
       add-trailing-comma = {
