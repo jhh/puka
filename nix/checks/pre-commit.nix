@@ -24,12 +24,20 @@ inputs.pre-commit-hooks.lib.${system}.run {
       check-yaml.enable = true;
       check-added-large-files.enable = true;
       pyupgrade.enable = true;
+      pyupgrade.args = [ "--py312-plus" ];
       djade = {
         enable = true;
         name = "djade";
         description = "A Django template formatter.";
         entry = "${venv}/bin/djade";
         types = [ "html" ];
+      };
+      django-upgrade = {
+        enable = true;
+        name = "django-upgrade";
+        description = "Automatically upgrade your Django project code.";
+        entry = "${venv}/bin/django-upgrade --target-version=5.2";
+        types = [ "python" ];
       };
     };
 }
