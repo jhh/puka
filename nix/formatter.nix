@@ -10,7 +10,6 @@ inputs.treefmt-nix.lib.mkWrapper pkgs {
   programs.yamlfmt.enable = true;
   programs.just.enable = true;
   programs.jsonfmt.enable = true;
-  programs.taplo.enable = true;
 
   settings = {
     global.excludes = [
