@@ -28,6 +28,7 @@ inputs.pre-commit-hooks.lib.${system}.run {
       check-json.enable = true;
       check-toml.enable = true;
       check-merge-conflicts.enable = true;
+      check-symlinks.enable = true;
       pyupgrade.enable = true;
       pyupgrade.args = [ "--py312-plus" ];
       add-trailing-comma = {
