@@ -24,6 +24,7 @@ inputs.pre-commit-hooks.lib.${system}.run {
       check-yaml.enable = true;
       check-added-large-files.enable = true;
       check-added-large-files.args = [ "--maxkb=25" ];
+      check-case-conflicts.enable = true;
       pyupgrade.enable = true;
       pyupgrade.args = [ "--py312-plus" ];
       add-trailing-comma = {
