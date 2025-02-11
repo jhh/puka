@@ -260,3 +260,4 @@ sketch
 .envrc.local
 .nixos-test-history
 /static
+.pre-commit-config.yaml

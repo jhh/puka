@@ -62,6 +62,7 @@ django_settings_module = "puka.settings.test"
 [tool.ruff]
 line-length = 99
 exclude = ["puka/*/migrations"]
+force-exclude = true
 
 [tool.ruff.lint]
 select = ["ALL"]
