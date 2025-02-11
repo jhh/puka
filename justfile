@@ -44,8 +44,13 @@ startapp appname:
 pre-commit:
     pre-commit install --install-hooks
 
+# install npm deppendencies
 npm-install:
     npm install
+
+# update npm deppendencies to latest versions
+npm-update:
+    npm install tailwindcss@latest @tailwindcss/cli@latest @tailwindcss/forms@latest htmx.org@next alpinejs@latest @alpinejs/focus@latest esbuild@latest
 
 # update CSS
 update-css:
