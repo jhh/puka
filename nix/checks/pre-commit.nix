@@ -25,6 +25,13 @@ inputs.pre-commit-hooks.lib.${system}.run {
       check-added-large-files.enable = true;
       pyupgrade.enable = true;
       pyupgrade.args = [ "--py312-plus" ];
+      add-trailing-comma = {
+        enable = true;
+        name = "add-trailing-comma";
+        description = "Automatically add trailing commas to calls and literals.";
+        entry = "${venv}/bin/add-trailing-comma";
+        types = [ "python" ];
+      };
       djade = {
         enable = true;
         name = "djade";
