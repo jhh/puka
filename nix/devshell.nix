@@ -7,6 +7,7 @@
 }:
 let
   pythonSet = flake.lib.pythonSets pkgs;
+  inherit (inputs.self.checks.${system}) pre-commit;
 in
 pkgs.mkShell {
   packages =
@@ -22,7 +23,7 @@ pkgs.mkShell {
       perSystem.uv2nix.uv-bin
       watchman
     ]
-    ++ inputs.self.checks.${system}.pre-commit.enabledPackages;
+    ++ pre-commit.enabledPackages;
 
   env = {
     UV_PYTHON_DOWNLOADS = "never";
@@ -30,6 +31,6 @@ pkgs.mkShell {
 
   shellHook = ''
     unset PYTHONPATH
-    ${inputs.self.checks.${system}.pre-commit.shellHook}
+    ${pre-commit.shellHook}
   '';
 }
