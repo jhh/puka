@@ -21,7 +21,7 @@ class Location(MP_Node):
     node_order_by = ("name",)
 
     def __str__(self):
-        return f"Location: {self.name}"
+        return self.name
 
 
 class Product(models.Model):

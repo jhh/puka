@@ -1,5 +1,6 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
+from django.views.decorators.http import require_GET
 from django.views.generic import CreateView, ListView, TemplateView, UpdateView, View
 from django_htmx.http import HttpResponseLocation
 
@@ -46,12 +47,15 @@ class CategoryDeleteView(View):
         return HttpResponseLocation(reverse("stuff:category-list"), target="#id_content")
 
 
-class LocationListView(ListView):
-    model = Location
-    context_object_name = "locations"
-
-    def get_template_names(self):
-        return get_template(self.request, "stuff/location_list.html", "#list-partial")
+@require_GET
+def locations(request, pk=None):
+    if pk is None:
+        locations = Location.get_root_nodes()
+    else:
+        parent = get_object_or_404(Location, pk=pk)
+        locations = parent.get_children()
+    template = get_template(request, "stuff/location_list.html", "#list-partial")
+    return render(request, template, {"locations": locations})
 
 
 class LocationCreateView(CreateView):
