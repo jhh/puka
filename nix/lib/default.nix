@@ -10,7 +10,7 @@ let
     pkgs:
     let
       baseSet = pkgs.callPackage inputs.pyproject-nix.build.packages {
-        python = pkgs.python312;
+        python = pkgs.python313;
       };
 
       psycopgOverrides = import ./overrides/overrides-psycopg.nix { inherit pkgs; };
