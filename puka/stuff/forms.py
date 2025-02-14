@@ -4,9 +4,10 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Field, Layout
 from django.forms import ModelForm
 from django.urls import reverse
+from treebeard.forms import MoveNodeForm
 
 from puka.core.forms import CancelButton, DeleteButton, PrimaryButton
-from puka.stuff.models import Category, Location
+from puka.stuff.models import Category
 
 
 class CategoryForm(ModelForm):
@@ -42,11 +43,7 @@ class CategoryForm(ModelForm):
         )
 
 
-class LocationForm(ModelForm):
-    class Meta:
-        model = Location
-        fields = ("name",)
-
+class LocationForm(MoveNodeForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -64,6 +61,14 @@ class LocationForm(ModelForm):
         self.helper.layout = Layout(
             Div(
                 Field("name", wrapper_class="sm:col-span-6", **autofocus),
+                css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
+            ),
+            Div(
+                Field("_position", wrapper_class="sm:col-span-6", **autofocus),
+                css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
+            ),
+            Div(
+                Field("_ref_node_id", wrapper_class="sm:col-span-6", **autofocus),
                 css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
             ),
             Div(
