@@ -52,7 +52,6 @@ class CategoryDeleteView(View):
 
 
 class LocationListView(ListView):
-    model = Location
     template_name = "stuff/location_list.html"
     context_object_name = "locations"
 
