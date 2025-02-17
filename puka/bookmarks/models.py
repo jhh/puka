@@ -41,7 +41,7 @@ class Bookmark(TimeStampedModel):
     objects = models.Manager()
     active_objects = ActiveBookmarkManager()
 
-    class Meta:
+    class Meta(TimeStampedModel.Meta):
         indexes = (
             Index(fields=["-created"]),
             GinIndex(fields=["title_description_search"]),

@@ -1,18 +1,8 @@
 from django.db import models
+from taggit.managers import TaggableManager
 from treebeard.mp_tree import MP_Node
 
 from puka.bookmarks.models import Bookmark
-
-
-class Category(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-
-    class Meta:
-        ordering = ("name",)
-        verbose_name_plural = "Categories"
-
-    def __str__(self):
-        return self.name
 
 
 class Location(MP_Node):
@@ -28,9 +18,9 @@ class Product(models.Model):
     name = models.CharField(max_length=100, unique=True)
     current_stock = models.PositiveIntegerField()
     reorder_level = models.PositiveIntegerField()
-    category = models.ForeignKey(Category, related_name="products", on_delete=models.CASCADE)
     location = models.ForeignKey(Location, related_name="products", on_delete=models.CASCADE)
     bookmarks = models.ManyToManyField(Bookmark, related_name="+")
+    tags = TaggableManager()
     notes = models.TextField(blank=True)
 
     class Meta:

@@ -1,11 +1,11 @@
 {% extends "stuff/base.html" %}
 {% load partials %}
 
-{% block title %}Locations{% endblock %}
+{% block title %}Products{% endblock %}
 
 {% partialdef list-partial %}
 {% if htmx %}
-<title>Locations - HTMX</title>
+<title>Products - HTMX</title>
 {% include "sidebar.html#nav-mobile-partial" %}
 {% include "sidebar.html#nav-desktop-partial" %}
 {% include "stuff/base.html#menu-partial" %}
@@ -13,53 +13,53 @@
 <div class="px-4 sm:px-6 lg:px-8">
     <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
-            <h1 class="text-base font-semibold text-gray-900">{{ parent_name }} Locations</h1>
-            <p class="mt-2 text-sm text-gray-700">A list of inventory locations.</p>
+            <h1 class="text-base font-semibold text-gray-900">Stuff</h1>
+            <p class="mt-2 text-sm text-gray-700">Parts, supplies, and consumables.</p>
         </div>
         <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
             <button
-                    hx-get="{% url 'stuff:location-new' %}{% querystring parent=parent_id %}"
+                    hx-get="{% url 'stuff:product-new' %}{% querystring parent=parent_id %}"
                     hx-target="#id_content"
                     hx-push-url="true"
                     type="button"
-                    class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Add location</button>
+                    class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                        Add product
+                    </button>
         </div>
     </div>
     <div class="mt-8 flow-root">
         <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div class="inline-block min-w-full py-2 align-middle bg-white rounded-sm shadow-sm sm:px-6 lg:px-8">
-                <table class="min-w-full divide-y divide-gray-300">
+                <table class="min-w-full divide-y divide-gray-300 ">
                     <thead>
                         <tr>
-                            <th scope="col" class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">Location</th>
-                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Children</th>
-                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Products</th>
+                            <th scope="col" class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">Product</th>
+                            <th scope="col" class="hidden sm:table-cell px-3 py-3.5 text-left text-sm font-semibold text-gray-900">On Hand</th>
+                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Location</th>
+                            <th scope="col" class="hidden md:table-cell px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Tags</th>
                             <th scope="col" class="relative py-3.5 pr-4 pl-3 sm:pr-0">
                                 <span class="sr-only">Edit</span>
                             </th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
-                        {% for location in locations %}
+                        {% for product in products %}
                         <tr>
                             <td class="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-0">
-                                {% if location.get_children_count %}
-                                <a hx-get="{% url 'stuff:location-list-children' location.pk %}"
+                                <a hx-get="{% url 'stuff:product-detail' product.pk %}"
                                    hx-target="#id_content"
                                    hx-push-url="true"
                                    href="#"
                                    class="text-indigo-600 hover:text-indigo-900" >
-                                    {{ location }}
+                                    {{ product.name }}
                                 </a>
-                                {% else %}
-                                    {{ location }}
-                                {% endif %}
                             </td>
-                            <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ location.get_children_count }}</td>
-                            <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500">0</td>
+                            <td class="hidden sm:table-cell px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ product.current_stock }}</td>
+                            <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ product.location }}</td>
+                            <td class="hidden md:table-cell px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ product.tags.all|join:", " }}</td>
                             <td class="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-0">
                                 <a href="#"
-                                   hx-get="{% url 'stuff:location-edit' location.pk %}"
+                                   hx-get="{% url 'stuff:product-edit' product.pk %}"
                                    hx-target="#id_content"
                                    hx-push-url="true"
                                    class="text-indigo-600 hover:text-indigo-900">Edit</a>
