@@ -35,5 +35,29 @@ pythonSet.mkVirtualEnv "puka-env" workspace.deps.default
           runHook postBuild
         '';
       };
+
+      pytest = mkDerivation {
+        name = "puka-pytest";
+        inherit (pythonSet.puka) src;
+
+        nativeBuildInputs = [ venv ];
+        nativeCheckInputs = with pkgs; [
+          postgresql
+          postgresqlTestHook
+        ];
+        dontConfigure = true;
+        dontBuild = true;
+        dontInstall = true;
+
+        doCheck = true;
+        postgresqlTestUserOptions = "LOGIN SUPERUSER";
+        checkPhase = ''
+          runHook preCheck
+          mkdir -p $out
+          export DJANGO_SETTINGS_MODULE=puka.settings.test
+          pytest tests --junit-xml=$out/junit.xml
+          runHook postCheck
+        '';
+      };
     };
 }

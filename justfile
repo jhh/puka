@@ -11,7 +11,7 @@ mypy:
     uv run mypy --check-untyped-defs .
 
 # run tests
-test:
+test $DJANGO_SETTINGS_MODULE="puka.settings.test":
     uv run pytest tests
 
 # run tests and create coverage report
