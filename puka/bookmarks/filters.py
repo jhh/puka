@@ -3,21 +3,12 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Field, Layout
 from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.db.models import F
-from taggit.forms import TagField
 
 from puka.bookmarks.forms import CancelButton, PrimaryButton
 from puka.bookmarks.models import Bookmark
+from puka.core.filters import TagFilter
 
 YEAR_CHOICES = [(year, str(year)) for year in range(2004, 2025) if year not in (2012, 2013, 2015)]
-
-
-class TagFilter(django_filters.CharFilter):
-    field_class = TagField
-
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault("lookup_expr", "in")
-        kwargs.setdefault("distinct", True)
-        super().__init__(*args, **kwargs)
 
 
 def filter_full_text_search(queryset, _name, value):
