@@ -1,4 +1,6 @@
+from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVectorField
 from django.db import models
+from django.db.models import F
 from taggit.managers import TaggableManager
 from treebeard.mp_tree import MP_Node
 
@@ -14,6 +16,20 @@ class Location(MP_Node):
         return self.name
 
 
+class ProductManager(models.Manager["Product"]):
+    def with_tags(self, tags: list[str]) -> models.QuerySet["Product"]:
+        return self.get_queryset().filter(tags__name__in=tags).distinct()
+
+    def with_text(self, text: str) -> models.QuerySet["Product"]:
+        query = SearchQuery(text, search_type="websearch", config="english")
+        return (
+            self.get_queryset()
+            .annotate(rank=SearchRank(F("name_notes_search"), query))
+            .filter(rank__gte=0.1)
+            .order_by("-rank")
+        )
+
+
 class Product(models.Model):
     name = models.CharField(max_length=100, unique=True)
     current_stock = models.PositiveIntegerField()
@@ -22,6 +38,9 @@ class Product(models.Model):
     bookmarks = models.ManyToManyField(Bookmark, related_name="+")
     tags = TaggableManager()
     notes = models.TextField(blank=True)
+    name_notes_search = SearchVectorField(null=True, editable=False)
+
+    objects: ProductManager = ProductManager()  # type: ignore[override]
 
     class Meta:
         ordering = ("name",)
