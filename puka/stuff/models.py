@@ -17,8 +17,8 @@ class Location(MP_Node):
 
 
 class ProductManager(models.Manager["Product"]):
-    def with_tags(self, tags: list[str]) -> models.QuerySet["Product"]:
-        return self.get_queryset().filter(tags__name__in=tags).distinct()
+    def with_tag(self, tag: str) -> models.QuerySet["Product"]:
+        return self.get_queryset().filter(tags__name__iexact=tag)
 
     def with_text(self, text: str) -> models.QuerySet["Product"]:
         query = SearchQuery(text, search_type="websearch", config="english")
@@ -28,6 +28,19 @@ class ProductManager(models.Manager["Product"]):
             .filter(rank__gte=0.1)
             .order_by("-rank")
         )
+
+    def with_location(self, location: str) -> models.QuerySet["Product"]:
+        return self.filter(location__name__istartswith=location)
+
+    def search(self, text: str) -> models.QuerySet["Product"]:
+        query = text.strip()
+        if query.startswith("#"):
+            tag = query[1:]
+            return self.with_tag(tag)
+        if query.startswith("@"):
+            location = query[1:]
+            return self.with_location(location)
+        return self.with_text(query)
 
 
 class Product(models.Model):
