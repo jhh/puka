@@ -16,11 +16,11 @@ class Location(MP_Node):
         return self.name
 
 
-class ProductManager(models.Manager):
-    def with_tags(self, tags: list[str]) -> models.QuerySet:
+class ProductManager(models.Manager["Product"]):
+    def with_tags(self, tags: list[str]) -> models.QuerySet["Product"]:
         return self.get_queryset().filter(tags__name__in=tags).distinct()
 
-    def with_text(self, text: str) -> models.QuerySet:
+    def with_text(self, text: str) -> models.QuerySet["Product"]:
         query = SearchQuery(text, search_type="websearch", config="english")
         return (
             self.get_queryset()
@@ -40,7 +40,7 @@ class Product(models.Model):
     notes = models.TextField(blank=True)
     name_notes_search = SearchVectorField(null=True, editable=False)
 
-    objects = ProductManager()
+    objects: ProductManager = ProductManager()  # type: ignore[override]
 
     class Meta:
         ordering = ("name",)
