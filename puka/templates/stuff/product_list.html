@@ -28,8 +28,8 @@
         </div>
     </div>
     <div class="mt-8 flow-root">
-        <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-            <div class="inline-block min-w-full py-2 align-middle bg-white rounded-sm shadow-sm sm:px-6 lg:px-8">
+        <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8 bg-white rounded-sm shadow-sm">
+            <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                 <table class="min-w-full divide-y divide-gray-300 ">
                     <thead>
                         <tr>
@@ -68,7 +68,40 @@
                         {% endfor %}
                     </tbody>
                 </table>
+
             </div>
+
+            <nav class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6" aria-label="Pagination">
+                <div class="hidden sm:block">
+                    <p class="text-sm text-gray-700">
+                        Showing
+                        <span class="font-medium">{{ page_obj.start_index }}</span>
+                        to
+                        <span class="font-medium">{{ page_obj.end_index }}</span>
+                        of
+                        <span class="font-medium">{{ paginator.count }}</span>
+                        results
+                    </p>
+                </div>
+                <div class="flex flex-1 justify-between sm:justify-end">
+                    {% if page_obj.has_previous %}
+                    <a href="{% querystring page=page_obj.previous_page_number %}"
+                        hx-get="{% querystring page=page_obj.previous_page_number %}"
+                        hx-target="#id_content"
+                        hx-push-url="true"
+                        class="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:outline-offset-0">Previous</a>
+                    {% endif %}
+
+                    {% if page_obj.has_next %}
+                    <a href="{% querystring page=page_obj.next_page_number %}"
+                        hx-get="{% querystring page=page_obj.next_page_number %}"
+                        hx-target="#id_content"
+                        hx-push-url="true"
+                        class="relative ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:outline-offset-0">Next</a>
+                    {% endif %}
+                </div>
+            </nav>
+
         </div>
     </div>
 </div>

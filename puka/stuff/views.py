@@ -76,6 +76,7 @@ class LocationDeleteView(View):
 
 class ProductListView(ListView):
     context_object_name = "products"
+    paginate_by = 10
 
     def get_template_names(self):
         return get_template(self.request, "stuff/product_list.html", "#list-partial")
