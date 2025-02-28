@@ -61,8 +61,6 @@
 {% endpartialdef list-partial %}
 
 {% partialdef list-items-partial %}
-<title>Page {{ page_obj.number }}</title>
-
 {% for bookmark in page_obj %}
     <li class="p-4"
         {% if forloop.last and page_obj.has_next %}
