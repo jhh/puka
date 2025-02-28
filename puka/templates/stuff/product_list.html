@@ -5,11 +5,12 @@
 
 {% partialdef list-partial %}
 {% if htmx %}
-<title>Products - HTMX</title>
-{% include "sidebar.html#nav-mobile-partial" %}
-{% include "sidebar.html#nav-desktop-partial" %}
-{% include "stuff/base.html#menu-partial" %}
+    <title>Products - HTMX</title>
+    {% include "sidebar.html#nav-mobile-partial" %}
+    {% include "sidebar.html#nav-desktop-partial" %}
+    {% include "stuff/base.html#menu-partial" %}
 {% endif %}
+
 <div class="px-4 sm:px-6 lg:px-8">
     <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
@@ -17,16 +18,16 @@
             <p class="mt-2 text-sm text-gray-700">Parts, supplies, and consumables.</p>
         </div>
         <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-            <button
-                    hx-get="{% url 'stuff:product-new' %}{% querystring parent=parent_id %}"
-                    hx-target="#id_content"
-                    hx-push-url="true"
-                    type="button"
-                    class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                        Add product
-                    </button>
+            <button hx-get="{% url 'stuff:product-new' %}{% querystring parent=parent_id %}"
+                hx-target="#id_content"
+                hx-push-url="true"
+                type="button"
+                class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                Add product
+            </button>
         </div>
     </div>
+
     <div class="mt-8 flow-root">
         <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8 bg-white rounded-sm shadow-sm">
             <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
@@ -68,7 +69,6 @@
                         {% endfor %}
                     </tbody>
                 </table>
-
             </div>
 
             <nav class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6" aria-label="Pagination">
@@ -85,23 +85,22 @@
                 </div>
                 <div class="flex flex-1 justify-between sm:justify-end">
                     {% if page_obj.has_previous %}
-                    <a href="{% querystring page=page_obj.previous_page_number %}"
-                        hx-get="{% querystring page=page_obj.previous_page_number %}"
-                        hx-target="#id_content"
-                        hx-push-url="true"
-                        class="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:outline-offset-0">Previous</a>
+                        <a href="{% querystring page=page_obj.previous_page_number %}"
+                            hx-get="{% querystring page=page_obj.previous_page_number %}"
+                            hx-target="#id_content"
+                            hx-push-url="true"
+                            class="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:outline-offset-0">Previous</a>
                     {% endif %}
 
                     {% if page_obj.has_next %}
-                    <a href="{% querystring page=page_obj.next_page_number %}"
-                        hx-get="{% querystring page=page_obj.next_page_number %}"
-                        hx-target="#id_content"
-                        hx-push-url="true"
-                        class="relative ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:outline-offset-0">Next</a>
+                        <a href="{% querystring page=page_obj.next_page_number %}"
+                            hx-get="{% querystring page=page_obj.next_page_number %}"
+                            hx-target="#id_content"
+                            hx-push-url="true"
+                            class="relative ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:outline-offset-0">Next</a>
                     {% endif %}
                 </div>
             </nav>
-
         </div>
     </div>
 </div>
