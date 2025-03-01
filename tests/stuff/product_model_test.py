@@ -169,3 +169,26 @@ def test_search_locations_are_case_insensitive(location):
 
     assert len(results) == 1
     assert results[0].name == "EEE"
+
+
+@pytest.mark.django_db
+def test_search_blank_returns_all_products(location):
+    create_product("AAA", "BBB", location)
+    create_product("CCC", "DDD", location)
+    create_product("EEE", "FFF", location)
+
+    qs = Product.objects.search("  ")
+    results = list(qs)
+
+    assert len(results) == 3
+
+
+@pytest.mark.django_db
+def test_search_empty_returns_all_products(location):
+    create_product("AAA", "BBB", location)
+    create_product("CCC", "DDD", location)
+
+    qs = Product.objects.search("")
+    results = list(qs)
+
+    assert len(results) == 2
