@@ -192,3 +192,24 @@ def test_search_empty_returns_all_products(location):
     results = list(qs)
 
     assert len(results) == 2
+
+
+@pytest.mark.django_db
+def test_search_location_sorted_by_name(location):
+    # Z02-11
+    location = Location.objects.get(pk=location.pk).add_sibling(name="Z02-11")
+    create_product("EEE", "", location)
+    # Z02-02
+    location = Location.objects.get(pk=location.pk).add_sibling(name="Z02-02")
+    create_product("CCC", "", location)
+    # Z02-01
+    location = Location.objects.get(pk=location.pk).add_sibling(name="Z02-01")
+    create_product("ZZZ", "", location)
+
+    qs = Product.objects.search("@Z")
+    results = list(qs)
+
+    assert len(results) == 3
+    assert results[0].name == "ZZZ"
+    assert results[1].name == "CCC"
+    assert results[2].name == "EEE"

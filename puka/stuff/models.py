@@ -39,7 +39,7 @@ class ProductManager(models.Manager["Product"]):
             return self.with_tag(tag)
         if query.startswith("@"):
             location = query[1:]
-            return self.with_location(location)
+            return self.with_location(location).order_by("location__name")
         if query:
             return self.with_text(query)
         return self.all()
