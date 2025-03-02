@@ -16,16 +16,16 @@
         x-on:keydown.meta.K.window="search = true"
         class="mr-4 relative flex items-center" >
         <label class="hidden" for="search">Search</label>
-        <input type="text"
-            name="q"
+        <input hx-get="{% url 'stuff:product-list' %}"
+            hx-trigger="change"
+            hx-push-url="true"
+            type="text"
+            name="query"
             id="search"
-            {# fake pagination to force list-items-partial to be returned #}
-            hx-get="{% url 'bookmarks:list' %}?page=x"
-            hx-trigger="keyup changed delay:0.5s"
-            hx-target="#id_bookmarks"
+            value="{{ query }}"
+            hx-target="#id_content"
             class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
             x-on:keyup.esc.prevent.stop="$el.blur()"
-            x-on:blur="$el.value = ''; search = false"
             x-trap="search" />
         <div class="absolute inset-y-0 right-0 flex py-1.5  pr-1.5">
             <kbd class="inline-flex items-center border border-gray-200 rounded-sm px-2 text-sm font-sans font-medium text-gray-400">
@@ -40,9 +40,9 @@
             hx-target="#id_content"
             hx-push-url="true"
             class="hidden md:inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-xs hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800" >
-            New Bookmark
+            New Product
         </button>
-        <button hx-get="{% url 'bookmarks:new' %}"
+        <button hx-get="{% url 'stuff:product-new' %}"
             type="button"
             hx-trigger="click"
             hx-target="#id_content"
@@ -109,16 +109,16 @@
         </div>
         <div class="flex flex-1 justify-between sm:justify-end">
             {% if page_obj.has_previous %}
-                <a href="{% querystring page=page_obj.previous_page_number %}"
-                    hx-get="{% querystring page=page_obj.previous_page_number %}"
+                <a href="{% querystring page=page_obj.previous_page_number query=query %}"
+                    hx-get="{% querystring page=page_obj.previous_page_number query=query %}"
                     hx-target="#id_content"
                     hx-push-url="true"
                     class="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:outline-offset-0">Previous</a>
             {% endif %}
 
             {% if page_obj.has_next %}
-                <a href="{% querystring page=page_obj.next_page_number %}"
-                    hx-get="{% querystring page=page_obj.next_page_number %}"
+                <a href="{% querystring page=page_obj.next_page_number query=query %}"
+                    hx-get="{% querystring page=page_obj.next_page_number query=query %}"
                     hx-target="#id_content"
                     hx-push-url="true"
                     class="relative ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:outline-offset-0">Next</a>

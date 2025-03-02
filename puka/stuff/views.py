@@ -82,7 +82,14 @@ class ProductListView(ListView):
         return get_template(self.request, "stuff/product_list.html", "#list-partial")
 
     def get_queryset(self):
-        return Product.objects.all().select_related("location").prefetch_related("tags")
+        if "query" in self.request.GET:
+            query = self.request.GET["query"]
+            query_set = Product.objects.search(query)
+            self.extra_context = {"query": query}
+        else:
+            query_set = Product.objects.all()
+
+        return query_set.select_related("location").prefetch_related("tags")
 
 
 class ProductDetailView(DetailView):
