@@ -3,7 +3,7 @@
 from django.db import migrations
 
 TRIGGER_CREATE = """
-    CREATE FUNCTION product_trigger() RETURNS trigger as $$
+    CREATE FUNCTION item_trigger() RETURNS trigger as $$
     begin
         new.name_notes_search :=
             setweight(to_tsvector('pg_catalog.english', coalesce(new.name, '')), 'A') ||
@@ -12,23 +12,23 @@ TRIGGER_CREATE = """
     end
     $$ LANGUAGE plpgsql;
 
-    CREATE TRIGGER product_update BEFORE INSERT OR UPDATE
-        ON stuff_product FOR EACH ROW EXECUTE FUNCTION product_trigger();
+    CREATE TRIGGER item_update BEFORE INSERT OR UPDATE
+        ON stuff_item FOR EACH ROW EXECUTE FUNCTION item_trigger();
 
     -- Force triggers to run and populate the name_notes_search column.
-    UPDATE stuff_product SET id = id;
+    UPDATE stuff_item SET id = id;
 """
 
 TRIGGER_DROP = """
-    DROP TRIGGER product_update ON stuff_product;
-    DROP FUNCTION product_trigger();
+    DROP TRIGGER item_update ON stuff_item;
+    DROP FUNCTION item_trigger();
 """
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('stuff', '0003_product_name_notes_search'),
+        ('stuff', '0001_initial'),
     ]
 
     operations = [

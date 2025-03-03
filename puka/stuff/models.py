@@ -16,11 +16,11 @@ class Location(MP_Node):
         return self.name
 
 
-class ProductManager(models.Manager["Product"]):
-    def with_tag(self, tag: str) -> models.QuerySet["Product"]:
+class ItemManager(models.Manager["Item"]):
+    def with_tag(self, tag: str) -> models.QuerySet["Item"]:
         return self.get_queryset().filter(tags__name__iexact=tag)
 
-    def with_text(self, text: str) -> models.QuerySet["Product"]:
+    def with_text(self, text: str) -> models.QuerySet["Item"]:
         query = SearchQuery(text, search_type="websearch", config="english")
         return (
             self.get_queryset()
@@ -29,10 +29,10 @@ class ProductManager(models.Manager["Product"]):
             .order_by("-rank")
         )
 
-    def with_location(self, location: str) -> models.QuerySet["Product"]:
+    def with_location(self, location: str) -> models.QuerySet["Item"]:
         return self.filter(location__name__istartswith=location)
 
-    def search(self, text: str) -> models.QuerySet["Product"]:
+    def search(self, text: str) -> models.QuerySet["Item"]:
         query = text.strip()
         if query.startswith("#"):
             tag = query[1:]
@@ -45,17 +45,17 @@ class ProductManager(models.Manager["Product"]):
         return self.all()
 
 
-class Product(models.Model):
+class Item(models.Model):
     name = models.CharField(max_length=100, unique=True)
     current_stock = models.PositiveIntegerField()
     reorder_level = models.PositiveIntegerField()
-    location = models.ForeignKey(Location, related_name="products", on_delete=models.CASCADE)
+    location = models.ForeignKey(Location, related_name="items", on_delete=models.CASCADE)
     bookmarks = models.ManyToManyField(Bookmark, related_name="+")
     tags = TaggableManager()
     notes = models.TextField(blank=True)
     name_notes_search = SearchVectorField(null=True, editable=False)
 
-    objects: ProductManager = ProductManager()  # type: ignore[override]
+    objects: ItemManager = ItemManager()  # type: ignore[override]
 
     class Meta:
         ordering = ("name",)
@@ -65,7 +65,7 @@ class Product(models.Model):
 
 
 class InventoryTransaction(models.Model):
-    product = models.ForeignKey(Product, related_name="transactions", on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, related_name="transactions", on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)
     type = models.CharField(max_length=4, choices=(("IN", "In"), ("OUT", "Out")))
     quantity = models.PositiveIntegerField()
@@ -77,4 +77,4 @@ class InventoryTransaction(models.Model):
         verbose_name_plural = "Inventory Transactions"
 
     def __str__(self):
-        return f"{self.product} {self.type} {self.quantity} on {self.date}"
+        return f"{self.item} {self.type} {self.quantity} on {self.date}"
