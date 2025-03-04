@@ -1,5 +1,6 @@
 import logging
 
+from django.db.models import Sum
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, TemplateView, UpdateView, View
@@ -89,7 +90,11 @@ class ItemListView(ListView):
         else:
             query_set = Item.objects.all()
 
-        return query_set.select_related("location").prefetch_related("tags")
+        return (
+            query_set.annotate(quantity=Sum("inventories__quantity"))
+            .prefetch_related("locations")
+            .prefetch_related("tags")
+        )
 
 
 class ItemDetailView(DetailView):

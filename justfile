@@ -21,7 +21,7 @@ coverage:
 
 # run manage.py with command
 manage command:
-    uv run --no-sync puka/manage.py {{ command }}
+    uv run puka/manage.py {{ command }}
 
 # run the development server
 run: (manage "runserver")

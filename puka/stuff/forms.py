@@ -50,7 +50,7 @@ class LocationForm(MoveNodeForm):
 class ItemForm(ModelForm):
     class Meta:
         model = Item
-        fields = ("name", "current_stock", "reorder_level", "location", "notes")
+        fields = ("name", "reorder_level", "notes")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -69,14 +69,6 @@ class ItemForm(ModelForm):
         self.helper.layout = Layout(
             Div(
                 Field("name", wrapper_class="sm:col-span-6", **autofocus),
-                css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
-            ),
-            Div(
-                Field("location", wrapper_class="sm:col-span-6"),
-                css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
-            ),
-            Div(
-                Field("current_stock", wrapper_class="sm:col-span-6"),
                 css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
             ),
             Div(

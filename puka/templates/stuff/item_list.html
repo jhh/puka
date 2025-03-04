@@ -79,8 +79,8 @@
                             {{ item.name }}
                         </a>
                     </td>
-                    <td class="hidden sm:table-cell px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ item.current_stock }}</td>
-                    <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ item.location }}</td>
+                    <td class="hidden sm:table-cell px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ item.quantity }}</td>
+                    <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ item.locations.all|join:", " }}</td>
                     <td class="hidden md:table-cell px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ item.tags.all|join:", " }}</td>
                     <td class="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-0">
                         <a href="#"

@@ -1,7 +1,7 @@
 import pytest
 from django.db import models
 
-from puka.stuff.models import Item, Location
+from puka.stuff.models import Inventory, Item, Location
 
 
 @pytest.fixture
@@ -11,13 +11,13 @@ def location():
 
 
 def create_item(name, notes, location):
-    return Item.objects.create(
+    item = Item.objects.create(
         name=name,
-        current_stock=0,
         reorder_level=0,
-        location=location,
         notes=notes,
     )
+    Inventory.objects.create(item=item, location=location, quantity=1)
+    return item
 
 
 @pytest.mark.django_db
