@@ -7,7 +7,7 @@ from django.urls import reverse
 from treebeard.forms import MoveNodeForm
 
 from puka.core.forms import CancelButton, DeleteButton, PrimaryButton
-from puka.stuff.models import Product
+from puka.stuff.models import Item
 
 
 class LocationForm(MoveNodeForm):
@@ -47,20 +47,20 @@ class LocationForm(MoveNodeForm):
         )
 
 
-class ProductForm(ModelForm):
+class ItemForm(ModelForm):
     class Meta:
-        model = Product
-        fields = ("name", "current_stock", "reorder_level", "location", "notes")
+        model = Item
+        fields = ("name", "reorder_level", "notes")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         if self.instance.id is not None:
-            action = reverse("stuff:product-edit", args=[self.instance.id])
-            delete_button = DeleteButton("stuff:product-delete", self.instance.id, "product")
+            action = reverse("stuff:item-edit", args=[self.instance.id])
+            delete_button = DeleteButton("stuff:item-delete", self.instance.id, "item")
             autofocus = {}
         else:
-            action = reverse("stuff:product-new")
+            action = reverse("stuff:item-new")
             delete_button = None
             autofocus = {"autofocus": ""}
 
@@ -69,14 +69,6 @@ class ProductForm(ModelForm):
         self.helper.layout = Layout(
             Div(
                 Field("name", wrapper_class="sm:col-span-6", **autofocus),
-                css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
-            ),
-            Div(
-                Field("location", wrapper_class="sm:col-span-6"),
-                css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
-            ),
-            Div(
-                Field("current_stock", wrapper_class="sm:col-span-6"),
                 css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
             ),
             Div(

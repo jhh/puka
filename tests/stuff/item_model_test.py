@@ -1,7 +1,7 @@
 import pytest
 from django.db import models
 
-from puka.stuff.models import Location, Product
+from puka.stuff.models import Inventory, Item, Location
 
 
 @pytest.fixture
@@ -10,30 +10,30 @@ def location():
     return Location.objects.get(pk=root.pk).add_child(name="A01-02")
 
 
-def create_product(name, notes, location):
-    return Product.objects.create(
+def create_item(name, notes, location):
+    item = Item.objects.create(
         name=name,
-        current_stock=0,
         reorder_level=0,
-        location=location,
         notes=notes,
     )
+    Inventory.objects.create(item=item, location=location, quantity=1)
+    return item
 
 
 @pytest.mark.django_db
 def test_with_text_returns_queryset(location):
-    create_product("Test Product", "Some notes", location)
-    qs = Product.objects.with_text("Test")
+    create_item("Test Item", "Some notes", location)
+    qs = Item.objects.with_text("Test")
     assert isinstance(qs, models.QuerySet)
 
 
 @pytest.mark.django_db
 def test_with_text_filters_correctly(location):
-    create_product("Python Tutorial", "A description", location)
-    create_product("Django Guide", "Another description", location)
-    create_product("JavaScript Basics", "Yet another description", location)
+    create_item("Python Tutorial", "A description", location)
+    create_item("Django Guide", "Another description", location)
+    create_item("JavaScript Basics", "Yet another description", location)
 
-    qs = Product.objects.with_text("Python")
+    qs = Item.objects.with_text("Python")
     results = list(qs)
 
     assert qs.count() == 1
@@ -42,11 +42,11 @@ def test_with_text_filters_correctly(location):
 
 @pytest.mark.django_db
 def test_with_text_orders_by_rank(location):
-    create_product("Advanced Python", "Deep Dive into Python", location)
-    create_product("Python Programming", "Learn Programming", location)
-    create_product("Programming Basics", "Introduction to Python", location)
+    create_item("Advanced Python", "Deep Dive into Python", location)
+    create_item("Python Programming", "Learn Programming", location)
+    create_item("Programming Basics", "Introduction to Python", location)
 
-    qs = Product.objects.with_text("Python")
+    qs = Item.objects.with_text("Python")
     results = list(qs)
 
     assert len(results) == 3
@@ -57,11 +57,11 @@ def test_with_text_orders_by_rank(location):
 
 @pytest.mark.django_db
 def test_with_locations_filters_correctly(location):
-    create_product("Advanced Python", "A01", location)
-    create_product("Python Programming", "A01-02", location)
-    create_product("Programming Basics", "Introduction to Python", location)
+    create_item("Advanced Python", "A01", location)
+    create_item("Python Programming", "A01-02", location)
+    create_item("Programming Basics", "Introduction to Python", location)
 
-    qs = Product.objects.with_text("A01-02")
+    qs = Item.objects.with_text("A01-02")
     results = list(qs)
 
     assert len(results) == 1
@@ -70,11 +70,11 @@ def test_with_locations_filters_correctly(location):
 
 @pytest.mark.django_db
 def test_with_locations_orders_by_rank(location):
-    create_product("Advanced Python", "A01", location)
-    create_product("Python Programming", "A01-02", location)
-    create_product("Programming Basics", "Introduction to Python", location)
+    create_item("Advanced Python", "A01", location)
+    create_item("Python Programming", "A01-02", location)
+    create_item("Programming Basics", "Introduction to Python", location)
 
-    qs = Product.objects.with_text("A01")
+    qs = Item.objects.with_text("A01")
     results = list(qs)
 
     assert len(results) == 2
@@ -84,18 +84,18 @@ def test_with_locations_orders_by_rank(location):
 
 @pytest.mark.django_db
 def test_search_returns_queryset(location):
-    create_product("Test Product", "Some notes", location)
-    qs = Product.objects.search("Test")
+    create_item("Test Item", "Some notes", location)
+    qs = Item.objects.search("Test")
     assert isinstance(qs, models.QuerySet)
 
 
 @pytest.mark.django_db
 def test_search_filters_text_correctly(location):
-    create_product("Python Tutorial", "A description", location)
-    create_product("Django Guide", "Another description", location)
-    create_product("JavaScript Basics", "Yet another description", location)
+    create_item("Python Tutorial", "A description", location)
+    create_item("Django Guide", "Another description", location)
+    create_item("JavaScript Basics", "Yet another description", location)
 
-    qs = Product.objects.search("Python")
+    qs = Item.objects.search("Python")
     results = list(qs)
 
     assert len(results) == 1
@@ -104,14 +104,14 @@ def test_search_filters_text_correctly(location):
 
 @pytest.mark.django_db
 def test_search_filters_tags_correctly(location):
-    p = create_product("Python Tutorial", "A description", location)
+    p = create_item("Python Tutorial", "A description", location)
     p.tags.add("python")
-    p = create_product("Django Guide", "Another description", location)
+    p = create_item("Django Guide", "Another description", location)
     p.tags.add("python", "django")
-    p = create_product("JavaScript Basics", "Yet another description", location)
+    p = create_item("JavaScript Basics", "Yet another description", location)
     p.tags.add("javascript")
 
-    qs = Product.objects.search("#python")
+    qs = Item.objects.search("#python")
     results = list(qs)
 
     assert len(results) == 2
@@ -121,12 +121,12 @@ def test_search_filters_tags_correctly(location):
 
 @pytest.mark.django_db
 def test_search_tags_are_case_and_whitespace_insensitive(location):
-    p = create_product("Python Tutorial", "A description", location)
+    p = create_item("Python Tutorial", "A description", location)
     p.tags.add("python")
-    p = create_product("Django Guide", "Another description", location)
+    p = create_item("Django Guide", "Another description", location)
     p.tags.add("python", "django")
 
-    qs = Product.objects.search(" #Python")
+    qs = Item.objects.search(" #Python")
     results = list(qs)
 
     assert len(results) == 2
@@ -137,15 +137,15 @@ def test_search_tags_are_case_and_whitespace_insensitive(location):
 @pytest.mark.django_db
 def test_search_locations_filter_correctly(location):
     # A01-02
-    create_product("AAA", "BBB", location)
+    create_item("AAA", "BBB", location)
     # A01-03
     location = Location.objects.get(pk=location.pk).add_sibling(name="A01-03")
-    create_product("CCC", "DDD", location)
+    create_item("CCC", "DDD", location)
     # A02-01
     location = Location.objects.get(pk=location.pk).add_sibling(name="A02-01")
-    create_product("EEE", "FFF", location)
+    create_item("EEE", "FFF", location)
 
-    qs = Product.objects.search("@A01")
+    qs = Item.objects.search("@A01")
     results = list(qs)
 
     assert len(results) == 2
@@ -156,15 +156,15 @@ def test_search_locations_filter_correctly(location):
 @pytest.mark.django_db
 def test_search_locations_are_case_insensitive(location):
     # A01-02
-    create_product("AAA", "BBB", location)
+    create_item("AAA", "BBB", location)
     # A01-03
     location = Location.objects.get(pk=location.pk).add_sibling(name="A01-03")
-    create_product("CCC", "DDD", location)
+    create_item("CCC", "DDD", location)
     # A02-01
     location = Location.objects.get(pk=location.pk).add_sibling(name="A02-01")
-    create_product("EEE", "FFF", location)
+    create_item("EEE", "FFF", location)
 
-    qs = Product.objects.search("@a02-01")
+    qs = Item.objects.search("@a02-01")
     results = list(qs)
 
     assert len(results) == 1
@@ -172,23 +172,23 @@ def test_search_locations_are_case_insensitive(location):
 
 
 @pytest.mark.django_db
-def test_search_blank_returns_all_products(location):
-    create_product("AAA", "BBB", location)
-    create_product("CCC", "DDD", location)
-    create_product("EEE", "FFF", location)
+def test_search_blank_returns_all_items(location):
+    create_item("AAA", "BBB", location)
+    create_item("CCC", "DDD", location)
+    create_item("EEE", "FFF", location)
 
-    qs = Product.objects.search("  ")
+    qs = Item.objects.search("  ")
     results = list(qs)
 
     assert len(results) == 3
 
 
 @pytest.mark.django_db
-def test_search_empty_returns_all_products(location):
-    create_product("AAA", "BBB", location)
-    create_product("CCC", "DDD", location)
+def test_search_empty_returns_all_items(location):
+    create_item("AAA", "BBB", location)
+    create_item("CCC", "DDD", location)
 
-    qs = Product.objects.search("")
+    qs = Item.objects.search("")
     results = list(qs)
 
     assert len(results) == 2
@@ -198,15 +198,15 @@ def test_search_empty_returns_all_products(location):
 def test_search_location_sorted_by_name(location):
     # Z02-11
     location = Location.objects.get(pk=location.pk).add_sibling(name="Z02-11")
-    create_product("EEE", "", location)
+    create_item("EEE", "", location)
     # Z02-02
     location = Location.objects.get(pk=location.pk).add_sibling(name="Z02-02")
-    create_product("CCC", "", location)
+    create_item("CCC", "", location)
     # Z02-01
     location = Location.objects.get(pk=location.pk).add_sibling(name="Z02-01")
-    create_product("ZZZ", "", location)
+    create_item("ZZZ", "", location)
 
-    qs = Product.objects.search("@Z")
+    qs = Item.objects.search("@Z")
     results = list(qs)
 
     assert len(results) == 3

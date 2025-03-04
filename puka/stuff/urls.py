@@ -3,24 +3,24 @@ from __future__ import annotations
 from django.urls import URLPattern, URLResolver, path
 
 from puka.stuff.views import (
+    ItemCreateView,
+    ItemDeleteView,
+    ItemDetailView,
+    ItemListView,
+    ItemUpdateView,
     LocationCreateView,
     LocationDeleteView,
     LocationListView,
     LocationUpdateView,
-    ProductCreateView,
-    ProductDeleteView,
-    ProductDetailView,
-    ProductListView,
-    ProductUpdateView,
 )
 
 app_name = "stuff"
 urlpatterns: list[URLPattern | URLResolver] = [
-    path("", ProductListView.as_view(), name="product-list"),
-    path("<int:pk>/", ProductDetailView.as_view(), name="product-detail"),
-    path("product/new/", ProductCreateView.as_view(), name="product-new"),
-    path("product/<int:pk>/edit/", ProductUpdateView.as_view(), name="product-edit"),
-    path("product/<int:pk>/delete/", ProductDeleteView.as_view(), name="product-delete"),
+    path("", ItemListView.as_view(), name="item-list"),
+    path("<int:pk>/", ItemDetailView.as_view(), name="item-detail"),
+    path("item/new/", ItemCreateView.as_view(), name="item-new"),
+    path("item/<int:pk>/edit/", ItemUpdateView.as_view(), name="item-edit"),
+    path("item/<int:pk>/delete/", ItemDeleteView.as_view(), name="item-delete"),
     # Location
     path("location/", LocationListView.as_view(), name="location-list-root"),
     path("location/<int:pk>/", LocationListView.as_view(), name="location-list-children"),

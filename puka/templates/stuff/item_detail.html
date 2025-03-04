@@ -1,41 +1,41 @@
 {% extends "stuff/base.html" %}
 {% load partials %}
 
-{% block title %}{{ product.name }}{% endblock %}
+{% block title %}{{ item.name }}{% endblock %}
 
 {% partialdef detail-partial %}
   {% if htmx %}
-    <title>{{ product.name }} - HTMX</title>
+    <title>{{ item.name }} - HTMX</title>
     {% include "sidebar.html#nav-mobile-partial" %}
     {% include "sidebar.html#nav-desktop-partial" %}
     {% include "stuff/base.html#menu-partial" %}
   {% endif %}
   <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
     <div class="px-4 py-6 sm:px-6">
-      <h3 class="text-base/7 font-semibold text-gray-900">Product Detail</h3>
-      <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">Product details and links.</p>
+      <h3 class="text-base/7 font-semibold text-gray-900">Item Detail</h3>
+      <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">Item details and links.</p>
     </div>
     <div class="border-t border-gray-100">
       <dl class="divide-y divide-gray-100">
         <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-900">Name</dt>
-          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ product.name }}</dd>
+          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ item.name }}</dd>
         </div>
         <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-900">Location</dt>
-          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ product.location }}</dd>
+          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ item.location }}</dd>
         </div>
         <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-900">Current Stock</dt>
-          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ product.current_stock }}</dd>
+          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{# item.current_stock #}</dd>
         </div>
         <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-900">Reorder Level</dt>
-          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ product.reorder_level }}</dd>
+          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ item.reorder_level }}</dd>
         </div>
         <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-900">Notes</dt>
-          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ product.notes }}</dd>
+          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ item.notes }}</dd>
         </div>
         <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm/6 font-medium text-gray-900">Attachments</dt>

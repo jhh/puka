@@ -1,11 +1,11 @@
 {% extends "stuff/base.html" %}
 {% load partials %}
 
-{% block title %}Products{% endblock %}
+{% block title %}Items{% endblock %}
 
 {% partialdef list-partial %}
 {% if htmx %}
-    <title>Products - HTMX</title>
+    <title>Items - HTMX</title>
     {% include "sidebar.html#nav-mobile-partial" %}
     {% include "sidebar.html#nav-desktop-partial" %}
     {% include "stuff/base.html#menu-partial" %}
@@ -16,7 +16,7 @@
         x-on:keydown.meta.K.window="search = true"
         class="mr-4 relative flex items-center" >
         <label class="hidden" for="search">Search</label>
-        <input hx-get="{% url 'stuff:product-list' %}"
+        <input hx-get="{% url 'stuff:item-list' %}"
             hx-trigger="change"
             hx-push-url="true"
             type="text"
@@ -40,9 +40,9 @@
             hx-target="#id_content"
             hx-push-url="true"
             class="hidden md:inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-xs hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800" >
-            New Product
+            New Item
         </button>
-        <button hx-get="{% url 'stuff:product-new' %}"
+        <button hx-get="{% url 'stuff:item-new' %}"
             type="button"
             hx-trigger="click"
             hx-target="#id_content"
@@ -58,7 +58,7 @@
         <table class="min-w-full divide-y divide-gray-300 ">
             <thead>
                 <tr>
-                    <th scope="col" class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">Product</th>
+                    <th scope="col" class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">Item</th>
                     <th scope="col" class="hidden sm:table-cell px-3 py-3.5 text-left text-sm font-semibold text-gray-900">On Hand</th>
                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Location</th>
                     <th scope="col" class="hidden md:table-cell px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Tags</th>
@@ -68,23 +68,23 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
-                {% for product in products %}
+                {% for item in items %}
                 <tr>
                     <td class="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-0">
-                        <a hx-get="{% url 'stuff:product-detail' product.pk %}"
+                        <a hx-get="{% url 'stuff:item-detail' item.pk %}"
                             hx-target="#id_content"
                             hx-push-url="true"
                             href="#"
                             class="text-indigo-600 hover:text-indigo-900" >
-                            {{ product.name }}
+                            {{ item.name }}
                         </a>
                     </td>
-                    <td class="hidden sm:table-cell px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ product.current_stock }}</td>
-                    <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ product.location }}</td>
-                    <td class="hidden md:table-cell px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ product.tags.all|join:", " }}</td>
+                    <td class="hidden sm:table-cell px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ item.quantity }}</td>
+                    <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ item.locations.all|join:", " }}</td>
+                    <td class="hidden md:table-cell px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ item.tags.all|join:", " }}</td>
                     <td class="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-0">
                         <a href="#"
-                            hx-get="{% url 'stuff:product-edit' product.pk %}"
+                            hx-get="{% url 'stuff:item-edit' item.pk %}"
                             hx-target="#id_content"
                             hx-push-url="true"
                             class="text-indigo-600 hover:text-indigo-900">Edit</a>

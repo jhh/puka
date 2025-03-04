@@ -1,5 +1,6 @@
 import logging
 
+from django.db.models import Sum
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, TemplateView, UpdateView, View
@@ -7,8 +8,8 @@ from django_htmx.http import HttpResponseLocation
 from treebeard.forms import movenodeform_factory
 
 from puka.core.views import get_template
-from puka.stuff.forms import LocationForm, ProductForm
-from puka.stuff.models import Location, Product
+from puka.stuff.forms import ItemForm, LocationForm
+from puka.stuff.models import Item, Location
 
 logger = logging.getLogger(__name__)
 
@@ -74,52 +75,56 @@ class LocationDeleteView(View):
         return HttpResponseLocation(reverse("stuff:location-list-root"), target="#id_content")
 
 
-class ProductListView(ListView):
-    context_object_name = "products"
+class ItemListView(ListView):
+    context_object_name = "items"
     paginate_by = 10
 
     def get_template_names(self):
-        return get_template(self.request, "stuff/product_list.html", "#list-partial")
+        return get_template(self.request, "stuff/item_list.html", "#list-partial")
 
     def get_queryset(self):
         if "query" in self.request.GET:
             query = self.request.GET["query"]
-            query_set = Product.objects.search(query)
+            query_set = Item.objects.search(query)
             self.extra_context = {"query": query}
         else:
-            query_set = Product.objects.all()
+            query_set = Item.objects.all()
 
-        return query_set.select_related("location").prefetch_related("tags")
-
-
-class ProductDetailView(DetailView):
-    model = Product
-    context_object_name = "product"
-
-    def get_template_names(self):
-        return get_template(self.request, "stuff/product_detail.html", "#detail-partial")
+        return (
+            query_set.annotate(quantity=Sum("inventories__quantity"))
+            .prefetch_related("locations")
+            .prefetch_related("tags")
+        )
 
 
-class ProductCreateView(CreateView):
-    model = Product
-    form_class = ProductForm
-    success_url = reverse_lazy("stuff:product-list")
+class ItemDetailView(DetailView):
+    model = Item
+    context_object_name = "item"
 
     def get_template_names(self):
-        return get_template(self.request, "stuff/form.html", "#form-partial")
+        return get_template(self.request, "stuff/item_detail.html", "#detail-partial")
 
 
-class ProductUpdateView(UpdateView):
-    model = Product
-    form_class = ProductForm
-    success_url = reverse_lazy("stuff:product-list")
+class ItemCreateView(CreateView):
+    model = Item
+    form_class = ItemForm
+    success_url = reverse_lazy("stuff:item-list")
 
     def get_template_names(self):
         return get_template(self.request, "stuff/form.html", "#form-partial")
 
 
-class ProductDeleteView(View):
+class ItemUpdateView(UpdateView):
+    model = Item
+    form_class = ItemForm
+    success_url = reverse_lazy("stuff:item-list")
+
+    def get_template_names(self):
+        return get_template(self.request, "stuff/form.html", "#form-partial")
+
+
+class ItemDeleteView(View):
     def post(self, _request, pk):
-        product = get_object_or_404(Product, pk=pk)
-        product.delete()
-        return HttpResponseLocation(reverse("stuff:product-list"), target="#id_content")
+        item = get_object_or_404(Item, pk=pk)
+        item.delete()
+        return HttpResponseLocation(reverse("stuff:item-list"), target="#id_content")
