@@ -261,3 +261,4 @@ sketch
 .nixos-test-history
 /static
 .pre-commit-config.yaml
+full_backup.json

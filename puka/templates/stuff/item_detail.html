@@ -3,78 +3,92 @@
 
 {% block title %}{{ item.name }}{% endblock %}
 
+{% partialdef field-partial %}
+<div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+    <dt class="text-sm font-medium text-gray-900">{{ label }}</dt>
+    <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ value }}</dd>
+</div>
+{% endpartialdef field-partial %}
+
+{% partialdef bookmark-partial %}
+<li class="flex items-center justify-between py-4 pr-5 pl-4 text-sm/6" >
+    <div class="flex w-0 flex-1 items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"></path>
+        </svg>
+        <div class="ml-4 flex min-w-0 flex-1 gap-2">
+            <a href="{{ bookmark.url }}" target="_blank" rel="noreferrer" class="truncate font-medium text-indigo-600 hover:text-indigo-500">{{ bookmark.title }}</a>
+            <span class="shrink-0 text-gray-400">{{ bookmark.created|date:'F Y'|lower }}</span>
+        </div>
+        <ul role="list" class="ml-4 shrink-0">
+            {% for tag in bookmark.tags.all %}
+                <li class="inline text-red-700">
+                    <a href="{% url 'bookmarks:filter' %}?tags={{ tag }}"
+                        hx-get="{% url 'bookmarks:filter' %}?tags={{ tag }}"
+                        hx-push-url="true"
+                        hx-target="#id_content" >{{ tag }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+        <!-- <div class="text-xs text-slate-400">
+            {{ bookmark.created|date:'F Y'|lower }}
+            <button hx-get="{% url 'bookmarks:edit' bookmark.id %}"
+                type="button"
+                class="ml-3"
+                hx-target="#id_content"
+                hx-push-url="true" >
+                edit
+            </button>
+        </div> -->
+    </div>
+</li>
+{% endpartialdef bookmark-partial %}
+
 {% partialdef detail-partial %}
-  {% if htmx %}
+{% if htmx %}
     <title>{{ item.name }} - HTMX</title>
     {% include "sidebar.html#nav-mobile-partial" %}
     {% include "sidebar.html#nav-desktop-partial" %}
     {% include "stuff/base.html#menu-partial" %}
-  {% endif %}
-  <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-    <div class="px-4 py-6 sm:px-6">
-      <h3 class="text-base/7 font-semibold text-gray-900">Item Detail</h3>
-      <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">Item details and links.</p>
-    </div>
-    <div class="border-t border-gray-100">
-      <dl class="divide-y divide-gray-100">
+{% endif %}
+<div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+<div class="px-4 py-6 sm:px-6">
+    <h3 class="text-base/7 font-semibold text-gray-900">Item Detail</h3>
+    <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">Item details and links.</p>
+</div>
+<div class="border-t border-gray-100">
+    <dl class="divide-y divide-gray-100">
+        {% with label="Name" value=item.name %}
+            {% partial field-partial %}
+        {% endwith %}
+        {% with label="Location" value=item.locations.all|join:", " %}
+            {% partial field-partial %}
+        {% endwith %}
+        {% with label="On Hand" value=none %}
+            {% partial field-partial %}
+        {% endwith %}
+        {% with label="Reorder Level" value=item.reorder_level %}
+            {% partial field-partial %}
+        {% endwith %}
+        {% with label="Notes" value=item.notes %}
+            {% partial field-partial %}
+        {% endwith %}
+        {% with label="Tags" value=item.tags.all|join:", " %}
+            {% partial field-partial %}
+        {% endwith %}
         <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-900">Name</dt>
-          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ item.name }}</dd>
+            <dt class="text-sm/6 font-medium text-gray-900">Bookmarks</dt>
+            <dd class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                <ul role="list" class="divide-y divide-gray-100 rounded-md border border-gray-200">
+                    {% for bookmark in item.bookmarks.all %}
+                        {% partial bookmark-partial %}
+                    {% endfor %}
+                </ul>
+            </dd>
         </div>
-        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-900">Location</dt>
-          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ item.location }}</dd>
-        </div>
-        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-900">Current Stock</dt>
-          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{# item.current_stock #}</dd>
-        </div>
-        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-900">Reorder Level</dt>
-          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ item.reorder_level }}</dd>
-        </div>
-        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-900">Notes</dt>
-          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ item.notes }}</dd>
-        </div>
-        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm/6 font-medium text-gray-900">Attachments</dt>
-          <dd class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-            <ul role="list" class="divide-y divide-gray-100 rounded-md border border-gray-200">
-              <li class="flex items-center justify-between py-4 pr-5 pl-4 text-sm/6">
-                <div class="flex w-0 flex-1 items-center">
-                  <svg class="size-5 shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
-                    <path fill-rule="evenodd" d="M15.621 4.379a3 3 0 0 0-4.242 0l-7 7a3 3 0 0 0 4.241 4.243h.001l.497-.5a.75.75 0 0 1 1.064 1.057l-.498.501-.002.002a4.5 4.5 0 0 1-6.364-6.364l7-7a4.5 4.5 0 0 1 6.368 6.36l-3.455 3.553A2.625 2.625 0 1 1 9.52 9.52l3.45-3.451a.75.75 0 1 1 1.061 1.06l-3.45 3.451a1.125 1.125 0 0 0 1.587 1.595l3.454-3.553a3 3 0 0 0 0-4.242Z" clip-rule="evenodd" />
-                  </svg>
-                  <div class="ml-4 flex min-w-0 flex-1 gap-2">
-                    <span class="truncate font-medium">resume_back_end_developer.pdf</span>
-                    <span class="shrink-0 text-gray-400">2.4mb</span>
-                  </div>
-                </div>
-                <div class="ml-4 shrink-0">
-                  <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">Download</a>
-                </div>
-              </li>
-              <li class="flex items-center justify-between py-4 pr-5 pl-4 text-sm/6">
-                <div class="flex w-0 flex-1 items-center">
-                  <svg class="size-5 shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
-                    <path fill-rule="evenodd" d="M15.621 4.379a3 3 0 0 0-4.242 0l-7 7a3 3 0 0 0 4.241 4.243h.001l.497-.5a.75.75 0 0 1 1.064 1.057l-.498.501-.002.002a4.5 4.5 0 0 1-6.364-6.364l7-7a4.5 4.5 0 0 1 6.368 6.36l-3.455 3.553A2.625 2.625 0 1 1 9.52 9.52l3.45-3.451a.75.75 0 1 1 1.061 1.06l-3.45 3.451a1.125 1.125 0 0 0 1.587 1.595l3.454-3.553a3 3 0 0 0 0-4.242Z" clip-rule="evenodd" />
-                  </svg>
-                  <div class="ml-4 flex min-w-0 flex-1 gap-2">
-                    <span class="truncate font-medium">coverletter_back_end_developer.pdf</span>
-                    <span class="shrink-0 text-gray-400">4.5mb</span>
-                  </div>
-                </div>
-                <div class="ml-4 shrink-0">
-                  <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">Download</a>
-                </div>
-              </li>
-            </ul>
-          </dd>
-        </div>
-      </dl>
-    </div>
-  </div>
+    </dl>
+</div>
+</div>
 {% endpartialdef detail-partial %}
 
 {% block content %}

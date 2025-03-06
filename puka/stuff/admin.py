@@ -5,7 +5,7 @@ from django.contrib import admin
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
 
-from puka.stuff.models import InventoryTransaction, Item, Location
+from puka.stuff.models import Inventory, InventoryTransaction, Item, Location
 
 
 @admin.register(Location)
@@ -14,4 +14,5 @@ class LocationAdmin(TreeAdmin):
 
 
 admin.site.register(Item)
+admin.site.register(Inventory)
 admin.site.register(InventoryTransaction)
