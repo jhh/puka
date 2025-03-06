@@ -30,16 +30,6 @@
                 </li>
             {% endfor %}
         </ul>
-        <!-- <div class="text-xs text-slate-400">
-            {{ bookmark.created|date:'F Y'|lower }}
-            <button hx-get="{% url 'bookmarks:edit' bookmark.id %}"
-                type="button"
-                class="ml-3"
-                hx-target="#id_content"
-                hx-push-url="true" >
-                edit
-            </button>
-        </div> -->
     </div>
 </li>
 {% endpartialdef bookmark-partial %}
@@ -52,42 +42,42 @@
     {% include "stuff/base.html#menu-partial" %}
 {% endif %}
 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-<div class="px-4 py-6 sm:px-6">
-    <h3 class="text-base/7 font-semibold text-gray-900">Item Detail</h3>
-    <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">Item details and links.</p>
-</div>
-<div class="border-t border-gray-100">
-    <dl class="divide-y divide-gray-100">
-        {% with label="Name" value=item.name %}
-            {% partial field-partial %}
-        {% endwith %}
-        {% with label="Location" value=item.locations.all|join:", " %}
-            {% partial field-partial %}
-        {% endwith %}
-        {% with label="On Hand" value=none %}
-            {% partial field-partial %}
-        {% endwith %}
-        {% with label="Reorder Level" value=item.reorder_level %}
-            {% partial field-partial %}
-        {% endwith %}
-        {% with label="Notes" value=item.notes %}
-            {% partial field-partial %}
-        {% endwith %}
-        {% with label="Tags" value=item.tags.all|join:", " %}
-            {% partial field-partial %}
-        {% endwith %}
-        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt class="text-sm/6 font-medium text-gray-900">Bookmarks</dt>
-            <dd class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                <ul role="list" class="divide-y divide-gray-100 rounded-md border border-gray-200">
-                    {% for bookmark in item.bookmarks.all %}
-                        {% partial bookmark-partial %}
-                    {% endfor %}
-                </ul>
-            </dd>
-        </div>
-    </dl>
-</div>
+    <div class="px-4 py-6 sm:px-6">
+        <h3 class="text-base/7 font-semibold text-gray-900">Item Detail</h3>
+        <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">Item details and links.</p>
+    </div>
+    <div class="border-t border-gray-100">
+        <dl class="divide-y divide-gray-100">
+            {% with label="Name" value=item.name %}
+                {% partial field-partial %}
+            {% endwith %}
+            {% with label="Location" value=item.locations.all|join:", " %}
+                {% partial field-partial %}
+            {% endwith %}
+            {% with label="On Hand" value=none %}
+                {% partial field-partial %}
+            {% endwith %}
+            {% with label="Reorder Level" value=item.reorder_level %}
+                {% partial field-partial %}
+            {% endwith %}
+            {% with label="Notes" value=item.notes %}
+                {% partial field-partial %}
+            {% endwith %}
+            {% with label="Tags" value=item.tags.all|join:", " %}
+                {% partial field-partial %}
+            {% endwith %}
+            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt class="text-sm/6 font-medium text-gray-900">Bookmarks</dt>
+                <dd class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                    <ul role="list" class="divide-y divide-gray-100 rounded-md border border-gray-200">
+                        {% for bookmark in item.bookmarks.all %}
+                            {% partial bookmark-partial %}
+                        {% endfor %}
+                    </ul>
+                </dd>
+            </div>
+        </dl>
+    </div>
 </div>
 {% endpartialdef detail-partial %}
 
