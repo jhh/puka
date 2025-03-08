@@ -9,12 +9,13 @@ from puka.bookmarks.models import Bookmark
 
 
 class Location(MP_Node):
-    name: models.CharField = models.CharField(max_length=100, unique=True)
+    name: models.CharField = models.CharField(max_length=100)
+    code: models.CharField = models.CharField(max_length=25, unique=True)
     alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
     node_order_by = ("name",)
 
     def __str__(self):
-        return self.name
+        return self.code
 
 
 class ItemManager(models.Manager["Item"]):
@@ -31,7 +32,7 @@ class ItemManager(models.Manager["Item"]):
         )
 
     def with_location(self, location: str) -> models.QuerySet["Item"]:
-        return self.filter(locations__name__istartswith=location)
+        return self.filter(locations__code__istartswith=location)
 
     def search(self, text: str) -> models.QuerySet["Item"]:
         query = text.strip()
@@ -40,7 +41,7 @@ class ItemManager(models.Manager["Item"]):
             return self.with_tag(tag)
         if query.startswith("@"):
             location = query[1:]
-            return self.with_location(location).order_by("locations__name")
+            return self.with_location(location).order_by("locations__code")
         if query:
             return self.with_text(query)
         return self.all()

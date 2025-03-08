@@ -6,8 +6,8 @@ from puka.stuff.models import Inventory, Item, Location
 
 @pytest.fixture
 def location():
-    root = Location.add_root(name="A01")
-    return Location.objects.get(pk=root.pk).add_child(name="A01-02")
+    root = Location.add_root(name="A01", code="A01")
+    return Location.objects.get(pk=root.pk).add_child(name="A01-02", code="A01-02")
 
 
 def create_item(name, notes, location):
@@ -139,10 +139,10 @@ def test_search_locations_filter_correctly(location):
     # A01-02
     create_item("AAA", "BBB", location)
     # A01-03
-    location = Location.objects.get(pk=location.pk).add_sibling(name="A01-03")
+    location = Location.objects.get(pk=location.pk).add_sibling(name="AAA-01-03", code="A01-03")
     create_item("CCC", "DDD", location)
     # A02-01
-    location = Location.objects.get(pk=location.pk).add_sibling(name="A02-01")
+    location = Location.objects.get(pk=location.pk).add_sibling(name="A02-01", code="A02-01")
     create_item("EEE", "FFF", location)
 
     qs = Item.objects.search("@A01")
@@ -158,10 +158,10 @@ def test_search_locations_are_case_insensitive(location):
     # A01-02
     create_item("AAA", "BBB", location)
     # A01-03
-    location = Location.objects.get(pk=location.pk).add_sibling(name="A01-03")
+    location = Location.objects.get(pk=location.pk).add_sibling(name="A01-03", code="A01-03")
     create_item("CCC", "DDD", location)
     # A02-01
-    location = Location.objects.get(pk=location.pk).add_sibling(name="A02-01")
+    location = Location.objects.get(pk=location.pk).add_sibling(name="AAA-02-01", code="A02-01")
     create_item("EEE", "FFF", location)
 
     qs = Item.objects.search("@a02-01")
@@ -197,13 +197,13 @@ def test_search_empty_returns_all_items(location):
 @pytest.mark.django_db
 def test_search_location_sorted_by_name(location):
     # Z02-11
-    location = Location.objects.get(pk=location.pk).add_sibling(name="Z02-11")
+    location = Location.objects.get(pk=location.pk).add_sibling(name="Z02-11", code="Z02-11")
     create_item("EEE", "", location)
     # Z02-02
-    location = Location.objects.get(pk=location.pk).add_sibling(name="Z02-02")
+    location = Location.objects.get(pk=location.pk).add_sibling(name="Z02-02", code="Z02-02")
     create_item("CCC", "", location)
     # Z02-01
-    location = Location.objects.get(pk=location.pk).add_sibling(name="Z02-01")
+    location = Location.objects.get(pk=location.pk).add_sibling(name="Z02-01", code="Z02-01")
     create_item("ZZZ", "", location)
 
     qs = Item.objects.search("@Z")
