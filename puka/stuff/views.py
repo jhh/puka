@@ -104,6 +104,13 @@ class ItemDetailView(DetailView):
     def get_template_names(self):
         return get_template(self.request, "stuff/item_detail.html", "#detail-partial")
 
+    def get_queryset(self):
+        return (
+            Item.objects.annotate(quantity=Sum("inventories__quantity"))
+            .prefetch_related("locations")
+            .prefetch_related("tags")
+        )
+
 
 class ItemCreateView(CreateView):
     model = Item

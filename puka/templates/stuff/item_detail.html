@@ -54,7 +54,7 @@
             {% with label="Location" value=item.locations.all|join:", " %}
                 {% partial field-partial %}
             {% endwith %}
-            {% with label="On Hand" value=none %}
+            {% with label="On Hand" value=item.quantity %}
                 {% partial field-partial %}
             {% endwith %}
             {% with label="Reorder Level" value=item.reorder_level %}
@@ -63,19 +63,23 @@
             {% with label="Notes" value=item.notes %}
                 {% partial field-partial %}
             {% endwith %}
-            {% with label="Tags" value=item.tags.all|join:", " %}
-                {% partial field-partial %}
-            {% endwith %}
-            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm/6 font-medium text-gray-900">Bookmarks</dt>
-                <dd class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                    <ul role="list" class="divide-y divide-gray-100 rounded-md border border-gray-200">
-                        {% for bookmark in item.bookmarks.all %}
-                            {% partial bookmark-partial %}
-                        {% endfor %}
-                    </ul>
-                </dd>
-            </div>
+            {% if item.tags.all %}
+                {% with label="Tags" value=item.tags.all|join:", " %}
+                    {% partial field-partial %}
+                {% endwith %}
+            {% endif %}
+            {% if item.bookmarks.all %}
+                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm/6 font-medium text-gray-900">Bookmarks</dt>
+                    <dd class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                        <ul role="list" class="divide-y divide-gray-100 rounded-md border border-gray-200">
+                            {% for bookmark in item.bookmarks.all %}
+                                {% partial bookmark-partial %}
+                            {% endfor %}
+                        </ul>
+                    </dd>
+                </div>
+            {% endif %}
         </dl>
     </div>
 </div>

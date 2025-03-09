@@ -38,7 +38,10 @@ class Command(BaseCommand):
                     reorder_level=0,
                     notes=row[3],
                 )
-                item.tags.add(row[4].lower())
+
+                tags = row[4].strip().lower()
+                if tags:
+                    item.tags.add(tags)
 
                 InventoryTransaction.objects.create(
                     item=item,
