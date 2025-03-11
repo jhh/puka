@@ -91,9 +91,21 @@
                 {% partial field-partial %}
             {% endwith %}
             {% if item.tags.all %}
-                {% with label="Tags" value=item.tags.all|join:", " %}
-                    {% partial field-partial %}
-                {% endwith %}
+                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-900">Item Tags</dt>
+                    <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
+                        <ul role="list" class="ml-4 shrink-0">
+                        {% for tag in item.tags.all %}
+                            <li class="inline text-red-700">
+                                <a href="{% url 'stuff:item-list' %}?query=%23{{ tag }}"
+                                    hx-get="{% url 'stuff:item-list' %}?query=%23{{ tag }}"
+                                    hx-push-url="true"
+                                    hx-target="#id_content" >{{ tag }}</a>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </dd>
+                </div>
             {% endif %}
             {% if item.bookmarks.all %}
                 <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
