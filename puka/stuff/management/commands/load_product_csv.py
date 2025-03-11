@@ -5,7 +5,7 @@ from django.core.management import BaseCommand
 from django.db import transaction
 
 from puka.bookmarks.models import Bookmark
-from puka.stuff.models import Inventory, InventoryTransaction, Item, Location
+from puka.stuff.models import Inventory, Item, Location
 
 
 class Command(BaseCommand):
@@ -16,7 +16,6 @@ class Command(BaseCommand):
     def handle(self, *_args, **options):
         Bookmark.objects.filter(tags__name__in=["stuff"]).delete()
         Item.objects.all().delete()
-        receiving = Location.objects.get(name="Receiving")
 
         with Path(options["file_name"]).open() as f:
             csv_reader = csv.reader(f)
@@ -42,13 +41,6 @@ class Command(BaseCommand):
                 tags = row[4].strip().lower()
                 if tags:
                     item.tags.add(tags)
-
-                InventoryTransaction.objects.create(
-                    item=item,
-                    from_location=receiving,
-                    to_location=loc,
-                    quantity=row[1],
-                )
 
                 Inventory.objects.create(
                     item=item,

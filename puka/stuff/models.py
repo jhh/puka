@@ -85,28 +85,3 @@ class Inventory(models.Model):
 
     def __str__(self):
         return f"{self.item} {self.quantity}"
-
-
-class InventoryTransaction(models.Model):
-    item = models.ForeignKey(Item, related_name="transactions", on_delete=models.CASCADE)
-    from_location = models.ForeignKey(
-        Location,
-        related_name="from_transactions",
-        on_delete=models.CASCADE,
-    )
-    to_location = models.ForeignKey(
-        Location,
-        related_name="to_transactions",
-        on_delete=models.CASCADE,
-    )
-    date = models.DateField(auto_now_add=True)
-    quantity = models.PositiveIntegerField()
-    notes = models.TextField(blank=True)
-
-    class Meta:
-        ordering = ("-date",)
-        verbose_name = "Inventory Transaction"
-        verbose_name_plural = "Inventory Transactions"
-
-    def __str__(self):
-        return f"{self.item} {self.quantity} on {self.date}"
