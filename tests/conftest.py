@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 
 from puka.bookmarks.models import Bookmark
+from puka.stuff.models import Location
 
 
 def create_bookmark(
@@ -69,3 +70,22 @@ def all_bookmarks(
 @pytest.fixture
 def unsaved_bookmark() -> Bookmark:
     return Bookmark(title="unsaved bookmark", url="http://example.com")
+
+
+@pytest.fixture
+def location():
+    system = Location.add_root(name="System", code="SYS")
+    Location.objects.get(pk=system.pk).add_child(name="Receiving", code="RCV")
+    Location.objects.get(pk=system.pk).add_child(name="Consumption", code="USE")
+    a1 = Location.add_root(name="A01", code="A01")
+    return Location.objects.get(pk=a1.pk).add_child(name="A01-02", code="A01-02")
+
+
+@pytest.fixture
+def receiving():
+    return Location.objects.get(code="RCV")
+
+
+@pytest.fixture
+def consumption():
+    return Location.objects.get(code="USE")

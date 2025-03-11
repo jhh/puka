@@ -4,12 +4,6 @@ from django.db import models
 from puka.stuff.models import Inventory, Item, Location
 
 
-@pytest.fixture
-def location():
-    root = Location.add_root(name="A01", code="A01")
-    return Location.objects.get(pk=root.pk).add_child(name="A01-02", code="A01-02")
-
-
 def create_item(name, notes, location):
     item = Item.objects.create(
         name=name,

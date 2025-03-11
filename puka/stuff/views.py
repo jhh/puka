@@ -1,6 +1,7 @@
 import logging
 
 from django.db.models import Sum
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, TemplateView, UpdateView, View
@@ -9,7 +10,8 @@ from treebeard.forms import movenodeform_factory
 
 from puka.core.views import get_template
 from puka.stuff.forms import ItemForm, LocationForm
-from puka.stuff.models import Item, Location
+from puka.stuff.models import Inventory, Item, Location
+from puka.stuff.services import adjust_inventory_quantity
 
 logger = logging.getLogger(__name__)
 
@@ -135,3 +137,10 @@ class ItemDeleteView(View):
         item = get_object_or_404(Item, pk=pk)
         item.delete()
         return HttpResponseLocation(reverse("stuff:item-list"), target="#id_content")
+
+
+def adjust_inventory(_request, pk, quantity):
+    quantity = int(quantity)
+    inventory = get_object_or_404(Inventory, pk=pk)
+    adjust_inventory_quantity(inventory, quantity)
+    return HttpResponse(str(inventory.quantity), content_type="text/plain")

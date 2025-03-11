@@ -12,6 +12,7 @@ from puka.stuff.views import (
     LocationDeleteView,
     LocationListView,
     LocationUpdateView,
+    adjust_inventory,
 )
 
 app_name = "stuff"
@@ -27,4 +28,6 @@ urlpatterns: list[URLPattern | URLResolver] = [
     path("location/new/", LocationCreateView.as_view(), name="location-new"),
     path("location/<int:pk>/edit/", LocationUpdateView.as_view(), name="location-edit"),
     path("location/<int:pk>/delete/", LocationDeleteView.as_view(), name="location-delete"),
+    # Inventory
+    path("inventory/<int:pk>/<str:quantity>/", adjust_inventory, name="inventory-adjust"),
 ]
