@@ -30,22 +30,41 @@ class LocationListView(ListView):
 
     def get_queryset(self):
         pk = self.kwargs.get("pk")
-        if pk:
-            self.parent = get_object_or_404(Location, pk=pk)
-            return self.parent.get_children()
-        return Location.get_root_nodes()
+
+        if pk == 0:
+            self.ancestors = []
+            return Location.get_root_nodes()
+
+        parent = get_object_or_404(Location, pk=pk)
+        if hasattr(parent, "get_ancestors"):
+            self.ancestors = [(node.id, node.name) for node in parent.get_ancestors()]
+        self.ancestors.append((parent.id, parent.name))
+        return parent.get_children()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["parent_id"] = self.kwargs.get("pk")
-        if hasattr(self, "parent"):
-            context["parent_name"] = self.parent.name
+        context["ancestors"] = self.ancestors
+        return context
+
+
+class LocationDetailView(DetailView):
+    model = Location
+    template_name = "stuff/location_detail.html"
+    context_object_name = "location"
+
+    def get_template_names(self):
+        return get_template(self.request, "stuff/location_detail.html", "#detail-partial")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["ancestors"] = self.object.get_ancestors()
         return context
 
 
 class LocationCreateView(CreateView):
     model = Location
-    success_url = reverse_lazy("stuff:location-list-root")
+    success_url = reverse_lazy("stuff:location-list", args=[0])
 
     def get_template_names(self):
         return get_template(self.request, "stuff/form.html", "#form-partial")
@@ -61,7 +80,7 @@ class LocationCreateView(CreateView):
 
 class LocationUpdateView(UpdateView):
     model = Location
-    success_url = reverse_lazy("stuff:location-list-root")
+    success_url = reverse_lazy("stuff:location-list", args=[0])
 
     def get_template_names(self):
         return get_template(self.request, "stuff/form.html", "#form-partial")
@@ -74,7 +93,7 @@ class LocationDeleteView(View):
     def post(self, _request, pk):
         location = get_object_or_404(Location, pk=pk)
         location.delete()
-        return HttpResponseLocation(reverse("stuff:location-list-root"), target="#id_content")
+        return HttpResponseLocation(reverse("stuff:location-list", args=[0]), target="#id_content")
 
 
 class ItemListView(ListView):

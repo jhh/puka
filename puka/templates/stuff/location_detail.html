@@ -1,0 +1,80 @@
+{% extends "stuff/base.html" %}
+{% load partials %}
+
+{% block title %}{{ location.name }}{% endblock %}
+
+{% partialdef field-partial %}
+<div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+    <dt class="text-sm font-medium text-gray-900">{{ label }}</dt>
+    <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ value }}</dd>
+</div>
+{% endpartialdef field-partial %}
+
+
+{% partialdef detail-partial %}
+{% if htmx %}
+    <title>{{ location.name }} - HTMX</title>
+    {% include "sidebar.html#nav-mobile-partial" %}
+    {% include "sidebar.html#nav-desktop-partial" %}
+    {% include "stuff/base.html#menu-partial" %}
+{% endif %}
+<div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+    <div class="px-4 py-6 sm:px-6">
+        <h3 class="text-base/7 font-semibold text-gray-900">Location Detail</h3>
+        <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">Location details for {{ location.name }}.</p>
+    </div>
+    <div class="border-t border-gray-100">
+        <dl class="divide-y divide-gray-100">
+            {% with label="Name" value=location.name %}
+                {% partial field-partial %}
+            {% endwith %}
+            {% with label="Code" value=location.code %}
+                {% partial field-partial %}
+            {% endwith %}
+            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt class="text-sm/6 font-medium text-gray-900">Inventory</dt>
+                <dd class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                    <ul role="list" class="divide-y divide-gray-100 rounded-md border border-gray-200">
+                    {% for inv in location.inventories.all %}
+                        <li class="flex items-center justify-between py-4 pr-5 pl-4 text-sm/6" >
+                            <div>
+                                <a href="{% url 'stuff:item-detail' pk=inv.item.id %}"
+                                    hx-get="{% url 'stuff:item-detail' pk=inv.item.id %}"
+                                    hx-target="#id_content"
+                                    hx-push-url="true"
+                                    class="text-indigo-600 hover:text-indigo-900">
+                                        {{ inv.item.name }}
+                                </a>
+                            </div>
+                            <div>
+                                <button hx-post="{% url 'stuff:inventory-adjust' pk=inv.id quantity='-1' %}"
+                                    hx-target="#id_quantity_{{ inv.id }}"
+                                    type="button"
+                                    class="mr-2 rounded-full bg-indigo-600 p-1 text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                                    <svg class="size-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" >
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
+                                    </svg>
+                                </button>
+                                <span id="id_quantity_{{ inv.id }}">{{ inv.quantity }}</span>
+                                <button hx-post="{% url 'stuff:inventory-adjust' pk=inv.id quantity='1' %}"
+                                    hx-target="#id_quantity_{{ inv.id }}"
+                                    type="button"
+                                    class="ml-2 rounded-full bg-indigo-600 p-1 text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                                    <svg class="size-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+                                        <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                </dd>
+            </div>
+        </dl>
+    </div>
+</div>
+{% endpartialdef detail-partial %}
+
+{% block content %}
+  {% partial detail-partial %}
+{% endblock content %}

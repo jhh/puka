@@ -16,11 +16,11 @@
     class="-mx-2 mt-2 space-y-1" >
     <li>
         <a
-            hx-get="{% url 'stuff:location-list-root' %}"
+            hx-get="{% url 'stuff:location-list' pk=0 %}"
             hx-target="#id_content"
             hx-push-url="true"
             href="#"
-            class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold {% get_current_class 'stuff:location-list-root' %}" >
+            class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold {% get_current_class 'stuff:location' %}" >
             <span
                 class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-[0.625rem] font-medium text-gray-400 group-hover:text-white"
                 >L</span>

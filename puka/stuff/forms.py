@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Field, Layout
-from django.forms import ModelForm
+from django.forms import ModelForm, inlineformset_factory
 from django.urls import reverse
 from treebeard.forms import MoveNodeForm
 
 from puka.core.forms import CancelButton, DeleteButton, PrimaryButton
-from puka.stuff.models import Item
+from puka.stuff.models import Inventory, Item
 
 
 class LocationForm(MoveNodeForm):
@@ -47,10 +47,13 @@ class LocationForm(MoveNodeForm):
         )
 
 
+InventoryFormSet = inlineformset_factory(Item, Inventory, fields=("location", "quantity"), extra=1)
+
+
 class ItemForm(ModelForm):
     class Meta:
         model = Item
-        fields = ("name", "reorder_level", "notes")
+        fields = ("name", "reorder_level", "tags", "notes")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -69,10 +72,9 @@ class ItemForm(ModelForm):
         self.helper.layout = Layout(
             Div(
                 Field("name", wrapper_class="sm:col-span-6", **autofocus),
-                css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
-            ),
-            Div(
-                Field("reorder_level", wrapper_class="sm:col-span-6"),
+                Field("reorder_level", wrapper_class="sm:col-span-2"),
+                Field("tags", wrapper_class="sm:col-span-4"),
+                Field("notes", wrapper_class="sm:col-span-6"),
                 css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
             ),
             Div(
