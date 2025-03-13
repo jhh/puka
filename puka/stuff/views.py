@@ -90,7 +90,7 @@ class ItemListView(ListView):
             query_set = Item.objects.search(query)
             self.extra_context = {"query": query}
         else:
-            query_set = Item.objects.all()
+            query_set = Item.objects.all().order_by("name")
 
         return (
             query_set.annotate(quantity=Sum("inventories__quantity"))

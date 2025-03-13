@@ -20,7 +20,7 @@ class Location(MP_Node):
 
 class ItemManager(models.Manager["Item"]):
     def with_tag(self, tag: str) -> models.QuerySet["Item"]:
-        return self.get_queryset().filter(tags__name__iexact=tag)
+        return self.get_queryset().filter(tags__name__iexact=tag).order_by("name")
 
     def with_text(self, text: str) -> models.QuerySet["Item"]:
         query = SearchQuery(text, search_type="websearch", config="english")
