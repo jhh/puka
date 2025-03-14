@@ -2,18 +2,20 @@ from __future__ import annotations
 
 from django.urls import URLPattern, URLResolver, path
 
-from puka.stuff.views import (
+from puka.stuff.views.item import (
     ItemCreateView,
     ItemDeleteView,
     ItemDetailView,
     ItemListView,
     ItemUpdateView,
+    adjust_inventory,
+)
+from puka.stuff.views.location import (
     LocationCreateView,
     LocationDeleteView,
     LocationDetailView,
     LocationListView,
     LocationUpdateView,
-    adjust_inventory,
 )
 
 app_name = "stuff"
