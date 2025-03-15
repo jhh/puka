@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Field, Layout
-from django.forms import ModelForm, inlineformset_factory
+from django.forms import ModelForm
 from django.urls import reverse
 from treebeard.forms import MoveNodeForm
 
 from puka.core.forms import CancelButton, DeleteButton, PrimaryButton
-from puka.stuff.models import Inventory, Item
+from puka.stuff.models import Item
 
 
 class LocationForm(MoveNodeForm):
@@ -45,9 +45,6 @@ class LocationForm(MoveNodeForm):
                 css_class="mt-4 flex gap-x-4",
             ),
         )
-
-
-InventoryFormSet = inlineformset_factory(Item, Inventory, fields=("location", "quantity"), extra=1)
 
 
 class ItemForm(ModelForm):
