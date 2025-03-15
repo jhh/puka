@@ -75,7 +75,7 @@ class ItemForm(ModelForm):
                 css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
             ),
             Div(
-                PrimaryButton("submit", "Save location"),
+                PrimaryButton("submit", "Save item"),
                 CancelButton("cancel", "Cancel", onclick="window.history.back();"),
                 delete_button,
                 css_class="mt-4 flex gap-x-4",
