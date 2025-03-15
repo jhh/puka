@@ -47,6 +47,7 @@ class ItemDetailView(DetailView):
     def get_queryset(self):
         return (
             Item.objects.annotate(quantity=Sum("inventories__quantity"))
+            .prefetch_related("bookmarks")
             .prefetch_related("locations")
             .prefetch_related("tags")
         )
