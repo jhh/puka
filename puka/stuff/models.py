@@ -44,7 +44,7 @@ class ItemManager(models.Manager["Item"]):
             return self.with_location(location).order_by("locations__code")
         if query:
             return self.with_text(query)
-        return self.all()
+        return self.order_by("name").all()
 
 
 class Item(models.Model):
