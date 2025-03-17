@@ -17,14 +17,58 @@
     {% include "sidebar.html#nav-desktop-partial" %}
     {% include "stuff/base.html#menu-partial" %}
 {% endif %}
+
 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-    <div class="px-4 py-6 sm:px-6">
+    <div class="flex justify-between px-4 py-6 sm:px-6">
+        <div>
         <h3 class="text-base/7 font-semibold text-gray-900">Item Detail</h3>
         <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">Item details for {{ item.name }}.</p>
+        </div>
+        <div x-data="{ open: false }" class="relative">
+          <button  @click="open = ! open" type="button" class="inline-flex items-center gap-x-1 text-sm/6 font-semibold text-gray-900" aria-expanded="false">
+            <span>Manage</span>
+            <svg class="size-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+              <path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+            </svg>
+          </button>
+
+          <div x-show="open"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 translate-y-1"
+                x-transition:enter-end="opacity-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100 translate-y-0"
+                x-transition:leave-end="opacity-0 translate-y-1"
+                class="absolute left-1/2 z-10 mt-5 flex w-screen max-w-min -translate-x-3/4 px-4">
+                <div class="w-56 shrink rounded-xl bg-white p-4 text-sm/6 font-semibold text-gray-900 ring-1 shadow-lg ring-gray-900/5">
+                    <a href="{% url 'stuff:item-edit' item.id %}"
+                        hx-get="{% url 'stuff:item-edit' item.id %}"
+                        hx-push-url="true"
+                        hx-target="#id_content"
+                        class="block p-2 hover:text-indigo-600">Edit item</a>
+                    <a href="#"
+                        hx-get="{% url 'stuff:inventory-new' item.id %}"
+                        hx-push-url="true"
+                        hx-target="#id_content"
+                        class="block p-2 hover:text-indigo-600">Create inventory</a>
+                    <a href="#"
+                        class="block p-2 hover:text-indigo-600">Edit bookmarks</a>
+                    <a href="#"
+                        hx-post="{% url 'stuff:item-delete' item.id %}"
+                        hx-confirm="Are you sure you want to delete this item?"
+                        hx-params="none"
+                        hx-target="#id_content"
+                        class="block p-2 hover:text-indigo-600">Delete item</a>
+                </div>
+          </div>
+        </div>
     </div>
     <div class="border-t border-gray-100">
         <dl class="divide-y divide-gray-100">
             {% with label="Name" value=item.name %}
+                {% partial field-partial %}
+            {% endwith %}
+            {% with label="Notes" value=item.notes %}
                 {% partial field-partial %}
             {% endwith %}
             <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -32,28 +76,36 @@
                 <dd class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                     <ul role="list" class="divide-y divide-gray-100 rounded-md border border-gray-200">
                     {% for inv in item.inventories.all %}
-                        <li class="flex items-center justify-between py-4 pr-5 pl-4 text-sm/6" >
-                            <div>
+                        <li class="group flex items-center justify-between py-4 pr-5 pl-4 text-sm/6" >
+                            <div >
                                 <a href="{% url 'stuff:location-detail' pk=inv.location.id %}"
                                     hx-get="{% url 'stuff:location-detail' pk=inv.location.id %}"
                                     hx-target="#id_content"
                                     hx-push-url="true"
-                                    class="text-indigo-600 hover:text-indigo-900">
+                                    class="text-indigo-600 hover:text-indigo-900 ">
                                     {{ inv.location }}
                                 </a>
+                                <button hx-get="{% url 'stuff:inventory-edit' inv.id %}"
+                                    hx-target="#id_content"
+                                    hx-push-url="true"
+                                    type="button"
+                                    class="hidden group-hover:inline-block rounded-sm bg-indigo-50 ml-2 px-2 py-1 text-xs font-semibold text-indigo-600 shadow-xs hover:bg-indigo-100">edit</button>
+
                             </div>
-                            <div>
-                                <button hx-post="{% url 'stuff:inventory-adjust' pk=inv.id quantity='-1' %}"
+                            <div >
+                                <button hx-post="{% url 'stuff:inventory-adjust' pk=inv.id %}"
                                     hx-target="#id_quantity_{{ inv.id }}"
+                                    hx-vals='{"quantity": -1}'
                                     type="button"
                                     class="mr-2 rounded-full bg-indigo-600 p-1 text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                                     <svg class="size-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" >
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
                                     </svg>
                                 </button>
-                                <span id="id_quantity_{{ inv.id }}">{{ inv.quantity }}</span>
-                                <button hx-post="{% url 'stuff:inventory-adjust' pk=inv.id quantity='1' %}"
+                                <span class="inline-block text-center w-6 font-medium" id="id_quantity_{{ inv.id }}">{{ inv.quantity }}</span>
+                                <button hx-post="{% url 'stuff:inventory-adjust' pk=inv.id %}"
                                     hx-target="#id_quantity_{{ inv.id }}"
+                                    hx-vals='{"quantity": 1}'
                                     type="button"
                                     class="ml-2 rounded-full bg-indigo-600 p-1 text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                                     <svg class="size-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
@@ -67,9 +119,6 @@
                 </dd>
             </div>
             {% with label="Reorder Level" value=item.reorder_level %}
-                {% partial field-partial %}
-            {% endwith %}
-            {% with label="Notes" value=item.notes %}
                 {% partial field-partial %}
             {% endwith %}
             {% if item.tags.all %}
@@ -121,6 +170,21 @@
                     </dd>
                 </div>
             {% endif %}
+            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt class="text-sm/6 font-medium text-gray-900">Actions</dt>
+                <dd class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                    <a href="{% url 'stuff:item-edit' item.id %}"
+                        hx-get="{% url 'stuff:item-edit' item.id %}"
+                        hx-push-url="true"
+                        hx-target="#id_content" >Edit</a>
+                    <a href="{% url 'stuff:item-delete' item.id %}"
+                        hx-post="{% url 'stuff:item-delete' item.id %}"
+                        hx-confirm="Are you sure you want to delete this item?"
+                        hx-params="none"
+                        hx-target="#id_content"
+>Delete</a>
+                </dd>
+            </div>
         </dl>
     </div>
 </div>

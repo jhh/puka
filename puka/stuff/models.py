@@ -2,6 +2,7 @@ from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVectorField
 from django.db import models
 from django.db.models import F
+from django.urls import reverse
 from taggit.managers import TaggableManager
 from treebeard.mp_tree import MP_Node
 
@@ -44,7 +45,7 @@ class ItemManager(models.Manager["Item"]):
             return self.with_location(location).order_by("locations__code")
         if query:
             return self.with_text(query)
-        return self.all()
+        return self.order_by("name").all()
 
 
 class Item(models.Model):
@@ -69,6 +70,9 @@ class Item(models.Model):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return reverse("stuff:item-detail", kwargs={"pk": self.pk})
+
 
 class Inventory(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name="inventories")
@@ -76,7 +80,7 @@ class Inventory(models.Model):
     quantity = models.PositiveIntegerField()
 
     class Meta:
-        ordering = ("item__name",)
+        ordering = ("location__name",)
         verbose_name = "Inventory"
         verbose_name_plural = "Inventories"
         constraints = (
@@ -85,3 +89,6 @@ class Inventory(models.Model):
 
     def __str__(self):
         return f"{self.item} {self.quantity}"
+
+    def get_absolute_url(self):
+        return reverse("stuff:item-detail", kwargs={"pk": self.item.pk})
