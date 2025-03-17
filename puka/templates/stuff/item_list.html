@@ -59,7 +59,7 @@
             <thead>
                 <tr>
                     <th scope="col" class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">Item</th>
-                    <th scope="col" class="hidden sm:table-cell px-3 py-3.5 text-left text-sm font-semibold text-gray-900">On Hand</th>
+                    <th scope="col" class="hidden sm:table-cell px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Quantity</th>
                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Location</th>
                     <th scope="col" class="hidden md:table-cell px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Tags</th>
                 </tr>
@@ -77,7 +77,8 @@
                         </a>
                     </td>
                     <td class="hidden sm:table-cell px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ item.quantity }}</td>
-                    <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ item.locations.all|join:", " }}</td>
+                    {# max-w-0 w-full hack from https://stackoverflow.com/questions/5239758/how-can-i-truncate-table-cells-but-fit-as-much-as-content-possible #}
+                    <td class="px-3 py-4 text-sm max-w-0 w-full truncate text-gray-500">{{ item.locations.all|join:", " }}</td>
                     <td class="hidden md:table-cell px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ item.tags.all|join:", " }}</td>
                 </tr>
                 {% endfor %}
