@@ -7,7 +7,7 @@ from django.urls import reverse
 from treebeard.forms import MoveNodeForm
 
 from puka.core.forms import CancelButton, DeleteButton, PrimaryButton
-from puka.stuff.models import Item
+from puka.stuff.models import Inventory, Item
 
 
 class LocationForm(MoveNodeForm):
