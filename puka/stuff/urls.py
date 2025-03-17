@@ -3,6 +3,9 @@ from __future__ import annotations
 from django.urls import URLPattern, URLResolver, path
 
 from puka.stuff.views.item import (
+    InventoryCreateView,
+    InventoryDeleteView,
+    InventoryUpdateView,
     ItemCreateView,
     ItemDeleteView,
     ItemDetailView,
@@ -33,5 +36,8 @@ urlpatterns: list[URLPattern | URLResolver] = [
     path("location/<int:pk>/edit/", LocationUpdateView.as_view(), name="location-edit"),
     path("location/<int:pk>/delete/", LocationDeleteView.as_view(), name="location-delete"),
     # Inventory
-    path("inventory/<int:pk>/<str:quantity>/", adjust_inventory, name="inventory-adjust"),
+    path("item/<int:pk>/inventory/new/", InventoryCreateView.as_view(), name="inventory-new"),
+    path("inventory/<int:pk>/edit/", InventoryUpdateView.as_view(), name="inventory-edit"),
+    path("inventory/<int:pk>/delete/", InventoryDeleteView.as_view(), name="inventory-delete"),
+    path("inventory/<int:pk>/adjust/", adjust_inventory, name="inventory-adjust"),
 ]

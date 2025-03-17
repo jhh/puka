@@ -7,7 +7,7 @@ from django.urls import reverse
 from treebeard.forms import MoveNodeForm
 
 from puka.core.forms import CancelButton, DeleteButton, PrimaryButton
-from puka.stuff.models import Item
+from puka.stuff.models import Inventory, Item
 
 
 class LocationForm(MoveNodeForm):
@@ -72,6 +72,39 @@ class ItemForm(ModelForm):
                 Field("reorder_level", wrapper_class="sm:col-span-2"),
                 Field("tags", wrapper_class="sm:col-span-4"),
                 Field("notes", wrapper_class="sm:col-span-6"),
+                css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
+            ),
+            Div(
+                PrimaryButton("submit", "Save item"),
+                CancelButton("cancel", "Cancel", onclick="window.history.back();"),
+                delete_button,
+                css_class="mt-4 flex gap-x-4",
+            ),
+        )
+
+
+class InventoryForm(ModelForm):
+    class Meta:
+        model = Inventory
+        fields = ("item", "location", "quantity")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.instance.id is not None:
+            action = reverse("stuff:inventory-edit", args=[self.instance.id])
+            delete_button = DeleteButton("stuff:inventory-delete", self.instance.id, "item")
+        else:
+            action = reverse("stuff:inventory-new", args=[self.initial["item"]])
+            delete_button = None
+
+        self.helper = FormHelper()
+        self.helper.attrs = {"hx-post": action}
+        self.helper.layout = Layout(
+            Field("item", type="hidden"),
+            Div(
+                Field("location", wrapper_class="sm:col-span-4"),
+                Field("quantity", wrapper_class="sm:col-span-2"),
                 css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
             ),
             Div(

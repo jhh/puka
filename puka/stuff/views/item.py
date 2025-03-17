@@ -8,7 +8,7 @@ from django.views.generic import CreateView, DetailView, ListView, UpdateView, V
 from django_htmx.http import HttpResponseLocation
 
 from puka.core.views import get_template
-from puka.stuff.forms import ItemForm
+from puka.stuff.forms import InventoryForm, ItemForm
 from puka.stuff.models import Inventory, Item
 from puka.stuff.services import adjust_inventory_quantity
 
@@ -78,8 +78,38 @@ class ItemDeleteView(View):
         return HttpResponseLocation(reverse("stuff:item-list"), target="#id_content")
 
 
-def adjust_inventory(_request, pk, quantity):
-    quantity = int(quantity)
+def adjust_inventory(request, pk):
+    quantity = int(request.POST.get("quantity", 0))
     inventory = get_object_or_404(Inventory, pk=pk)
     adjust_inventory_quantity(inventory, quantity)
     return HttpResponse(str(inventory.quantity), content_type="text/plain")
+
+
+class InventoryCreateView(CreateView):
+    model = Inventory
+    form_class = InventoryForm
+
+    def get_template_names(self):
+        return get_template(self.request, "stuff/form.html", "#form-partial")
+
+    def get_initial(self):
+        return {"item": self.kwargs["pk"]}
+
+
+class InventoryUpdateView(UpdateView):
+    model = Inventory
+    form_class = InventoryForm
+
+    def get_template_names(self):
+        return get_template(self.request, "stuff/form.html", "#form-partial")
+
+
+class InventoryDeleteView(View):
+    def post(self, _request, pk):
+        inventory = get_object_or_404(Inventory, pk=pk)
+        item_id = inventory.item.id
+        inventory.delete()
+        return HttpResponseLocation(
+            reverse("stuff:item-detail", kwargs={"pk": item_id}),
+            target="#id_content",
+        )
