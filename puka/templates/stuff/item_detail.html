@@ -52,7 +52,10 @@
                         hx-target="#id_content"
                         class="block p-2 hover:text-indigo-600">Create inventory</a>
                     <a href="#"
-                        class="block p-2 hover:text-indigo-600">Edit bookmarks</a>
+                        hx-get="{% url 'stuff:bookmark-list' item.id %}"
+                        hx-push-url="true"
+                        hx-target="#id_content"
+                        class="block p-2 hover:text-indigo-600">Add bookmark</a>
                     <a href="#"
                         hx-post="{% url 'stuff:item-delete' item.id %}"
                         hx-confirm="Are you sure you want to delete this item?"
@@ -144,14 +147,21 @@
                     <dd class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                         <ul role="list" class="divide-y divide-gray-100 rounded-md border border-gray-200">
                         {% for bookmark in item.bookmarks.all %}
-                            <li class="flex items-center justify-between py-4 pr-5 pl-4 text-sm/6" >
-                                <div class="flex w-0 flex-1 items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"></path>
-                                    </svg>
-                                    <div class="ml-4 flex min-w-0 flex-1 gap-2">
+                            <li class="group flex items-center justify-between py-4 pr-5 pl-4 text-sm/6" >
+                                <buttondiv class="flex w-0 flex-1 items-center">
+                                    {% comment %}
+                                    <a href="{% url 'bookmarks:filter' %}?text={{ bookmark.title }}"
+                                        hx-get="{% url 'bookmarks:filter' %}?text={{ bookmark.title }}"
+                                        hx-push-url="true"
+                                        hx-target="#id_content">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"></path>
+                                        </svg>
+                                    </a>
+                                    {% endcomment %}
+                                    <div class="flex min-w-0 flex-1 gap-2">
                                         <a href="{{ bookmark.url }}" target="_blank" rel="noreferrer" class="truncate font-medium text-indigo-600 hover:text-indigo-500">{{ bookmark.title }}</a>
-                                        <span class="shrink-0 text-gray-400">{{ bookmark.created|date:'F Y'|lower }}</span>
+                                        <span class="shrink-0 text-gray-400 text-xs pt-1 inline-block">{{ bookmark.created|date:'b y' }}</span>
                                     </div>
                                     <ul role="list" class="ml-4 shrink-0">
                                     {% for tag in bookmark.tags.all %}
@@ -163,28 +173,23 @@
                                         </li>
                                     {% endfor %}
                                     </ul>
-                                </div>
+                                    <div class="w-2">
+                                        <button hx-post="{% url 'stuff:bookmark-delete' item.id %}"
+                                            hx-confirm="Are you sure you want to delete this bookmark?"
+                                            type="button"
+                                            hx-vals='{"bookmark_pk": {{ bookmark.id }}}'
+                                            class="ml-1 hidden group-hover:block">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="fill-indigo-600 size-5">
+                                              <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
+                                            </svg>
+                                        </button>
+                                    </div>
                             </li>
                         {% endfor %}
                         </ul>
                     </dd>
                 </div>
             {% endif %}
-            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm/6 font-medium text-gray-900">Actions</dt>
-                <dd class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                    <a href="{% url 'stuff:item-edit' item.id %}"
-                        hx-get="{% url 'stuff:item-edit' item.id %}"
-                        hx-push-url="true"
-                        hx-target="#id_content" >Edit</a>
-                    <a href="{% url 'stuff:item-delete' item.id %}"
-                        hx-post="{% url 'stuff:item-delete' item.id %}"
-                        hx-confirm="Are you sure you want to delete this item?"
-                        hx-params="none"
-                        hx-target="#id_content"
->Delete</a>
-                </dd>
-            </div>
         </dl>
     </div>
 </div>

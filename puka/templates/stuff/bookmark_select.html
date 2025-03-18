@@ -1,0 +1,72 @@
+{% extends "stuff/base.html" %}
+{% load crispy_forms_tags partials %}
+
+{% block title %}Select Bookmark{% endblock %}
+
+{% block content %}
+  {% partial filter-partial %}
+{% endblock content %}
+
+{% partialdef filter-partial %}
+  {% if htmx %}
+    <title>Select Bookmark - HTMX</title>
+    {% include "sidebar.html#nav-mobile-partial" %}
+    {% include "sidebar.html#nav-desktop-partial" %}
+    {% include "stuff/base.html#menu-partial" %}
+  {% endif %}
+  {% crispy filter.form %}
+  <ul id="id_bookmarks" role="list" class="divide-y divide-gray-200 shadow-sm bg-white">
+      {% for bookmark in bookmarks %}
+        <li>
+          <a href="#"
+              hx-post="{% url 'stuff:bookmark-add' item_id %}"
+              hx-vals='{"bookmark_pk": {{ bookmark.id }} }'
+              class="block px-4 py-2 hover:bg-gray-100">
+            {{ bookmark.title }}
+          </a>
+        </li>
+      {% empty %}
+        <li class="px-4 py-2 text-gray-500">No bookmarks found.</li>
+      {% endfor %}
+  </ul>
+  <nav class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6" aria-label="Pagination">
+      <div class="hidden sm:block">
+          <p class="text-sm text-gray-700">
+              Showing
+              <span class="font-medium">{{ page_obj.start_index }}</span>
+              to
+              <span class="font-medium">{{ page_obj.end_index }}</span>
+              of
+              <span class="font-medium">{{ paginator.count }}</span>
+              results
+          </p>
+      </div>
+      <div class="flex flex-1 justify-between sm:justify-end">
+          {% if page_obj.has_previous %}
+              <a href="{% querystring page=page_obj.previous_page_number query=query %}"
+                  hx-get="{% querystring page=page_obj.previous_page_number query=query %}"
+                  hx-target="#id_content"
+                  hx-push-url="true"
+                  class="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:outline-offset-0">Previous</a>
+          {% endif %}
+
+          {% if page_obj.has_next %}
+              <a href="{% querystring page=page_obj.next_page_number query=query %}"
+                  hx-get="{% querystring page=page_obj.next_page_number query=query %}"
+                  hx-target="#id_content"
+                  hx-push-url="true"
+                  class="relative ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:outline-offset-0">Next</a>
+          {% endif %}
+      </div>
+  </nav>
+
+  <script>
+      function clearSearch() {
+          document.querySelector('#id_text').value = '';
+          document.querySelector('#id_url').value = '';
+          document.querySelector('#id_tags').value = '';
+          document.querySelector('#id_created').value = '';
+          document.querySelector('#id_active').value = 'unknown';
+      }
+  </script>
+{% endpartialdef filter-partial %}
