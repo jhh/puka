@@ -36,6 +36,7 @@ test = [
     "mypy>=1.13.0",
     "pytest-cov>=6.0.0",
     "pytest-django>=4.9.0",
+    "pytest-factoryboy>=2.7.0",
 ]
 pre-commit = [
     "add-trailing-comma>=3.1.0",

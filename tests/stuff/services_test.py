@@ -5,7 +5,7 @@ from puka.stuff.services import adjust_inventory_quantity
 
 
 @pytest.mark.django_db
-def test_receive(location, receiving):
+def test_receive(location):
     item = Item.objects.create(name="Stuff", reorder_level=0)
     inventory = Inventory.objects.create(item=item, location=location, quantity=1)
     adjust_inventory_quantity(inventory, 2)
@@ -15,7 +15,7 @@ def test_receive(location, receiving):
 
 
 @pytest.mark.django_db
-def test_consume(location, consumption):
+def test_consume(location):
     item = Item.objects.create(name="Stuff", reorder_level=0)
     inventory = Inventory.objects.create(item=item, location=location, quantity=1)
     adjust_inventory_quantity(inventory, -1)
@@ -25,7 +25,7 @@ def test_consume(location, consumption):
 
 
 @pytest.mark.django_db
-def test_inventory_negative(location, consumption):
+def test_inventory_negative(location):
     item = Item.objects.create(name="Stuff", reorder_level=0)
     inventory = Inventory.objects.create(item=item, location=location, quantity=1)
     with pytest.raises(ValueError, match="-3"):

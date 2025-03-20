@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import pytest
+from pytest_factoryboy import register
 
 from puka.bookmarks.models import Bookmark
-from puka.stuff.models import Location
+
+from .factories import ItemFactory, ItemWithInventoryFactory, LocationFactory
 
 
 def create_bookmark(
@@ -72,20 +74,11 @@ def unsaved_bookmark() -> Bookmark:
     return Bookmark(title="unsaved bookmark", url="http://example.com")
 
 
-@pytest.fixture
-def location():
-    system = Location.add_root(name="System", code="SYS")
-    Location.objects.get(pk=system.pk).add_child(name="Receiving", code="RCV")
-    Location.objects.get(pk=system.pk).add_child(name="Consumption", code="USE")
-    a1 = Location.add_root(name="A01", code="A01")
-    return Location.objects.get(pk=a1.pk).add_child(name="A01-02", code="A01-02")
+register(LocationFactory)
 
+register(ItemFactory)
+register(ItemFactory, "filter_item", name="Water Filter", notes="Purifies water")
+register(ItemFactory, "salt_item", name="Water Softener Salt", notes="Yellow bag")
+register(ItemFactory, "container_item", name="Deli Container", notes="Also holds water")
 
-@pytest.fixture
-def receiving():
-    return Location.objects.get(code="RCV")
-
-
-@pytest.fixture
-def consumption():
-    return Location.objects.get(code="USE")
+register(ItemWithInventoryFactory)
