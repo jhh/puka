@@ -96,6 +96,16 @@ class ItemForm(ModelForm):
             ),
         )
 
+    def clean_name(self):
+        value = self.cleaned_data["name"]
+        try:
+            Item.objects.get(name=value)
+        except Item.DoesNotExist:
+            return value
+
+        msg = "This item already exists."
+        raise ValidationError(msg)
+
     def clean_location_code(self):
         value = self.cleaned_data["location_code"]
         if not value:
