@@ -19,12 +19,18 @@ class TestItemForm:
         assert len(form.errors) == 1
         assert form.errors["name"] == FIELD_REQUIRED
 
-    def test_name_unique(self, item_form_data, item_factory):
+    def test_name_unique_for_create(self, item_form_data, item_factory):
         item = item_factory()
         item_form_data["name"] = item.name
         form = ItemForm(data=item_form_data)
         assert len(form.errors) == 1
         assert form.errors["name"] == ["This item already exists."]
+
+    def test_name_not_unique_for_update(self, item_form_data, item_factory):
+        item = item_factory()
+        item_form_data["name"] = item.name
+        form = ItemForm(data=item_form_data, instance=item)
+        assert form.errors == {}
 
     @pytest.mark.parametrize(
         ("reorder_level", "msg"),

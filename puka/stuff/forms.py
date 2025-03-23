@@ -62,11 +62,11 @@ class ItemForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if self.instance.id is not None:
+        if self.instance.id:
             action = reverse("stuff:item-edit", args=[self.instance.id])
             delete_button = DeleteButton("stuff:item-delete", self.instance.id, "item")
             autofocus = {}
-            extra_fields = (None, None)
+            extra_fields = (None, None, None)
         else:
             action = reverse("stuff:item-new")
             delete_button = None
@@ -81,7 +81,7 @@ class ItemForm(ModelForm):
         self.helper.attrs = {"hx-post": action}
         self.helper.layout = Layout(
             Div(
-                Field("name", wrapper_class="sm:col-span-6", **autofocus),
+                Field("name", wrapper_class="sm:col-span-6", autocomplete="off", **autofocus),
                 Field("reorder_level", wrapper_class="sm:col-span-2"),
                 Field("tags", wrapper_class="sm:col-span-4"),
                 Field("notes", wrapper_class="sm:col-span-6"),
@@ -98,6 +98,10 @@ class ItemForm(ModelForm):
 
     def clean_name(self):
         value = self.cleaned_data["name"]
+
+        if self.instance.id:
+            return value
+
         try:
             Item.objects.get(name=value)
         except Item.DoesNotExist:
