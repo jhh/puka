@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import pytest
+from faker import Faker
 from pytest_factoryboy import register
 
 from puka.bookmarks.models import Bookmark
+from puka.stuff.forms import ItemForm
 
-from .factories import ItemFactory, ItemWithInventoryFactory, LocationFactory
+from .factories import BookmarkFactory, ItemFactory, ItemWithInventoryFactory, LocationFactory
 
 
 def create_bookmark(
@@ -74,6 +76,8 @@ def unsaved_bookmark() -> Bookmark:
     return Bookmark(title="unsaved bookmark", url="http://example.com")
 
 
+register(BookmarkFactory)
+
 register(LocationFactory)
 
 register(ItemFactory)
@@ -82,3 +86,31 @@ register(ItemFactory, "salt_item", name="Water Softener Salt", notes="Yellow bag
 register(ItemFactory, "container_item", name="Deli Container", notes="Also holds water")
 
 register(ItemWithInventoryFactory)
+
+
+@pytest.fixture
+def items(filter_item, salt_item, container_item):
+    return [
+        filter_item,
+        salt_item,
+        container_item,
+    ]
+
+
+@pytest.fixture
+def item_form_data(location):
+    faker = Faker()
+    return {
+        "name": faker.sentence(),
+        "notes": faker.paragraph(),
+        "tags": ",".join(faker.words(nb=3)),
+        "reorder_level": 3,
+        "location_code": location.code,
+        "quantity": 10,
+        "bookmark_url": faker.url(),
+    }
+
+
+@pytest.fixture
+def item_form(item_form_data):
+    return ItemForm(data=item_form_data)

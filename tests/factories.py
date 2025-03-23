@@ -2,7 +2,18 @@ from factory.declarations import RelatedFactory, SubFactory
 from factory.django import DjangoModelFactory
 from factory.faker import Faker
 
+from puka.bookmarks.models import Bookmark
 from puka.stuff.models import Inventory, Item, Location
+
+
+class BookmarkFactory(DjangoModelFactory):
+    class Meta:  # type: ignore[override]
+        model = Bookmark
+
+    title = Faker("sentence")
+    description = Faker("sentence")
+    url = Faker("url")
+    active = Faker("boolean")
 
 
 class LocationFactory(DjangoModelFactory):

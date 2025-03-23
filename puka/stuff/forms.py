@@ -2,12 +2,15 @@ from __future__ import annotations
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Field, Layout
+from django import forms
+from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from django.urls import reverse
 from treebeard.forms import MoveNodeForm
 
 from puka.core.forms import CancelButton, DeleteButton, PrimaryButton
-from puka.stuff.models import Inventory, Item
+from puka.stuff.models import Inventory, Item, Location
+from puka.stuff.services import parse_location_code
 
 
 class LocationForm(MoveNodeForm):
@@ -48,6 +51,10 @@ class LocationForm(MoveNodeForm):
 
 
 class ItemForm(ModelForm):
+    location_code = forms.CharField(max_length=25, empty_value=None, required=False)
+    quantity = forms.IntegerField(min_value=0, required=False)
+    bookmark_url = forms.URLField(max_length=255, empty_value=None, required=False)
+
     class Meta:
         model = Item
         fields = ("name", "reorder_level", "tags", "notes")
@@ -59,10 +66,16 @@ class ItemForm(ModelForm):
             action = reverse("stuff:item-edit", args=[self.instance.id])
             delete_button = DeleteButton("stuff:item-delete", self.instance.id, "item")
             autofocus = {}
+            extra_fields = (None, None)
         else:
             action = reverse("stuff:item-new")
             delete_button = None
             autofocus = {"autofocus": ""}
+            extra_fields = (
+                Field("location_code", wrapper_class="sm:col-span-4"),
+                Field("quantity", wrapper_class="sm:col-span-2"),
+                Field("bookmark_url", wrapper_class="sm:col-span-6"),
+            )
 
         self.helper = FormHelper()
         self.helper.attrs = {"hx-post": action}
@@ -72,6 +85,7 @@ class ItemForm(ModelForm):
                 Field("reorder_level", wrapper_class="sm:col-span-2"),
                 Field("tags", wrapper_class="sm:col-span-4"),
                 Field("notes", wrapper_class="sm:col-span-6"),
+                *extra_fields,
                 css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
             ),
             Div(
@@ -81,6 +95,34 @@ class ItemForm(ModelForm):
                 css_class="mt-4 flex gap-x-4",
             ),
         )
+
+    def clean_location_code(self):
+        value = self.cleaned_data["location_code"]
+        if not value:
+            return value
+
+        try:
+            parent, _ = parse_location_code(value)
+        except ValueError as e:
+            msg = f"Enter a value with a valid location code ({e})."
+            raise ValidationError(msg) from e
+
+        try:
+            Location.objects.get(code=parent)
+        except Location.DoesNotExist as e:
+            msg = f"Enter a location code with a valid parent location code ({parent} not found)."
+            raise ValidationError(msg) from e
+
+        return value
+
+    def clean(self):
+        if "location_code" not in self.cleaned_data or not self.cleaned_data["location_code"]:
+            return
+
+        quantity = self.cleaned_data["quantity"]
+        if not quantity or quantity <= 0:
+            msg = "Quantity must be greater than zero if location provided."
+            self.add_error("quantity", msg)
 
 
 class InventoryForm(ModelForm):

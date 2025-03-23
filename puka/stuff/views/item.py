@@ -1,5 +1,6 @@
 import logging
 
+from django.db import transaction
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -9,8 +10,8 @@ from django_htmx.http import HttpResponseLocation
 
 from puka.core.views import get_template
 from puka.stuff.forms import InventoryForm, ItemForm
-from puka.stuff.models import Inventory, Item
-from puka.stuff.services import adjust_inventory_quantity
+from puka.stuff.models import Bookmark, Inventory, Item
+from puka.stuff.services import adjust_inventory_quantity, get_or_create_location
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +61,28 @@ class ItemCreateView(CreateView):
 
     def get_template_names(self):
         return get_template(self.request, "stuff/form.html", "#form-partial")
+
+    @transaction.atomic
+    def form_valid(self, form):
+        self.object: Item = form.save()
+
+        location_code = form.cleaned_data["location_code"]
+        quantity = form.cleaned_data["quantity"]
+
+        if location_code and quantity:
+            location, _ = get_or_create_location(location_code)
+            Inventory.objects.create(item=self.object, location=location, quantity=quantity)
+
+        bookmark_url = form.cleaned_data["bookmark_url"]
+        if bookmark_url:
+            bookmark, _ = Bookmark.objects.get_or_create(
+                url=bookmark_url,
+                defaults={"title": self.object.name, "active": False},
+            )
+            bookmark.tags.add("stuff")
+            self.object.bookmarks.add(bookmark)
+
+        return super().form_valid(form)
 
 
 class ItemUpdateView(UpdateView):
