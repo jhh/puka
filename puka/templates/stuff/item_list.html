@@ -78,8 +78,26 @@
                     </td>
                     <td class="hidden sm:table-cell px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ item.quantity }}</td>
                     {# max-w-0 w-full hack from https://stackoverflow.com/questions/5239758/how-can-i-truncate-table-cells-but-fit-as-much-as-content-possible #}
-                    <td class="px-3 py-4 text-sm max-w-0 w-full truncate text-gray-500">{{ item.locations.all|join:", " }}</td>
-                    <td class="hidden md:table-cell px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ item.tags.all|join:", " }}</td>
+                    <td class="px-3 py-4 text-sm max-w-0 w-full truncate text-gray-500">
+                    {% for inv in item.inventories.all %}
+                        <a href="{% url 'stuff:location-detail' pk=inv.location.id %}"
+                            hx-get="{% url 'stuff:location-detail' pk=inv.location.id %}"
+                            hx-target="#id_content"
+                            hx-push-url="true"
+                            class="text-indigo-600 hover:text-indigo-900 ">
+                            {{ inv.location.name }}</a>{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                    </td>
+                    <td class="hidden md:table-cell px-3 py-4 text-sm whitespace-nowrap text-gray-500">
+                    {% for tag in item.tags.all %}
+                        <li class="inline text-red-700">
+                            <a href="{% url 'stuff:item-list' %}?query=%23{{ tag }}"
+                                hx-get="{% url 'stuff:item-list' %}?query=%23{{ tag }}"
+                                hx-push-url="true"
+                                hx-target="#id_content" >{{ tag }}</a>
+                        </li>
+                    {% endfor %}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

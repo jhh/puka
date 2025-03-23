@@ -25,7 +25,7 @@
                     Locations
                 {% endif %}
                 {% for id, name in ancestors %}
-                    :
+                    ::
                     {% if not forloop.last %}
                         <a href="{% url 'stuff:location-list' id %}"
                             hx-get="{% url 'stuff:location-list' id %}"
