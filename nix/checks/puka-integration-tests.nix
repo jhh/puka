@@ -1,11 +1,9 @@
 {
   flake,
   pkgs,
-  system,
   ...
 }:
 let
-  inherit (pkgs) lib;
   secrets = pkgs.writeText "puka-test-secrets" ''
     DJANGO_DATABASE_URL="postgres:///puka"
     DJANGO_ALLOWED_HOSTS="localhost,127.0.0.1"
@@ -14,34 +12,34 @@ let
 in
 pkgs.nixosTest {
   name = "puka-integration-tests";
-  meta.platforms = lib.platforms.linux;
 
-  nodes.machine = {
-    imports = [
-      flake.modules.nixos.puka
-    ];
-
-    services.puka = {
-      enable = true;
-      inherit (flake.packages.${system}) venv;
-      secrets = [ secrets ];
-      port = 8001;
-    };
-
-    services.postgresql = {
-      enable = true;
-      package = pkgs.postgresql_16;
-      ensureDatabases = [ "puka" ];
-      ensureUsers = [
-        {
-          name = "puka";
-          ensureDBOwnership = true;
-        }
+  nodes.machine =
+    { pkgs, ... }:
+    {
+      imports = [
+        flake.modules.nixos.puka
       ];
-    };
 
-    system.stateVersion = "24.11";
-  };
+      services.puka = {
+        enable = true;
+        secrets = [ secrets ];
+        port = 8001;
+      };
+
+      services.postgresql = {
+        enable = true;
+        package = pkgs.postgresql_16;
+        ensureDatabases = [ "puka" ];
+        ensureUsers = [
+          {
+            name = "puka";
+            ensureDBOwnership = true;
+          }
+        ];
+      };
+
+      system.stateVersion = "24.11";
+    };
 
   testScript =
     { nodes, ... }:
