@@ -16,7 +16,3 @@ class Command(BaseCommand):
         d1 = Location.objects.get(pk=studio.pk).add_child(name="D01", code="S-D01")
         for i in range(1, 9):
             Location.objects.get(pk=d1.pk).add_child(name=f"D01-{i:02}", code=f"S-D01-{i:02}")
-
-        system = Location.add_root(name="System", code="SYS")
-        Location.objects.get(pk=system.pk).add_child(name="Receiving", code="RCV")
-        Location.objects.get(pk=system.pk).add_child(name="Consumption", code="USE")
