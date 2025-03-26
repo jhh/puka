@@ -67,8 +67,6 @@ pkgs.nixosTest {
       machine.wait_for_unit("puka.service")
       machine.wait_until_succeeds(f"{curl} -sLf {login_url}")
 
-      # check for missing static files
-      machine.succeed(f"wget -nv --level=1 --spider --recursive {login_url}")
 
       with subtest("create superuser account"):
         username = "username"
@@ -93,6 +91,8 @@ pkgs.nixosTest {
             """
         )
 
+      with subtest("check static files"):
+        machine.succeed(f"wget --no-verbose --load-cookies {cookie_jar_path} --level=1 --spider --recursive {base_url}")
       with subtest("create a bookmark"):
         # test that main bookmarks list is available
         assert "New Bookmark" in machine.succeed(f"{curl} --location {base_url}"), "T001"
