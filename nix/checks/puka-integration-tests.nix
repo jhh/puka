@@ -20,6 +20,10 @@ pkgs.nixosTest {
         flake.modules.nixos.puka
       ];
 
+      environment.systemPackages = with pkgs; [
+        wget
+      ];
+
       services.puka = {
         enable = true;
         secrets = [ secrets ];
@@ -62,6 +66,9 @@ pkgs.nixosTest {
       # wait for service
       machine.wait_for_unit("puka.service")
       machine.wait_until_succeeds(f"{curl} -sLf {login_url}")
+
+      # check for missing static files
+      machine.succeed(f"wget -nv --level=1 --spider --recursive {login_url}")
 
       # create a superuser
       username = "username"
