@@ -25,7 +25,7 @@ from puka.stuff.views.location import (
 app_name = "stuff"
 urlpatterns: list[URLPattern | URLResolver] = [
     path("", ItemListView.as_view(), name="item-list"),
-    path("<int:pk>/", ItemDetailView.as_view(), name="item-detail"),
+    path("item/<int:pk>/", ItemDetailView.as_view(), name="item-detail"),
     path("item/new/", ItemCreateView.as_view(), name="item-new"),
     path("item/<int:pk>/edit/", ItemUpdateView.as_view(), name="item-edit"),
     path("item/<int:pk>/delete/", ItemDeleteView.as_view(), name="item-delete"),
