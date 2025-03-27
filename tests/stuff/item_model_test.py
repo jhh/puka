@@ -164,8 +164,6 @@ def test_deserialize_with_natural_foreign_key(flannel_bookmark, flannel_bookmark
     ):
         item.save()
 
-    assert flannel_bookmark_item_json == ""
-
     assert Item.objects.all().count() == 1
     assert Bookmark.objects.all().count() == 1
 
