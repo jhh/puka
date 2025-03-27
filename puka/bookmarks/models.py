@@ -13,6 +13,11 @@ from puka.core.models import TimeStampedModel
 logger = logging.getLogger(__name__)
 
 
+class BookmarkManager(models.Manager):
+    def get_by_natural_key(self, url):
+        return self.get(url=url)
+
+
 class ActiveBookmarkManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(active=True)
@@ -38,7 +43,7 @@ class Bookmark(TimeStampedModel):
     active = models.BooleanField(default=True, null=False)
     title_description_search = SearchVectorField(null=True, editable=False)
 
-    objects = models.Manager()
+    objects = BookmarkManager()
     active_objects = ActiveBookmarkManager()
 
     class Meta(TimeStampedModel.Meta):
@@ -50,3 +55,6 @@ class Bookmark(TimeStampedModel):
 
     def __str__(self) -> str:
         return self.title
+
+    def natural_key(self):
+        return (self.url,)

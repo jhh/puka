@@ -47,6 +47,9 @@ class ItemManager(models.Manager["Item"]):
             return self.with_text(query)
         return self.order_by("name").all()
 
+    def get_by_natural_key(self, name):
+        return self.get(name=name)
+
 
 class Item(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -72,6 +75,9 @@ class Item(models.Model):
 
     def get_absolute_url(self):
         return reverse("stuff:item-detail", kwargs={"pk": self.pk})
+
+    def natural_key(self):
+        return (self.name,)
 
 
 class Inventory(models.Model):

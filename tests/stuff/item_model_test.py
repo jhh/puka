@@ -1,6 +1,8 @@
 import pytest
+from django.core import serializers
 from django.db import models
 
+from puka.bookmarks.models import Bookmark
 from puka.stuff.models import Item
 
 
@@ -150,3 +152,27 @@ def test_search_location_sorted_by_name(item_with_inventory_factory, location_fa
     assert results[0].name == "ZZZ"
     assert results[1].name == "CCC"
     assert results[2].name == "EEE"
+
+
+@pytest.mark.django_db
+def test_deserialize_with_natural_foreign_key(flannel_bookmark, flannel_bookmark_item_json):
+    for item in serializers.deserialize(
+        "json",
+        flannel_bookmark_item_json,
+        use_natural_foreign_keys=True,
+        use_natural_primary_keys=True,
+    ):
+        item.save()
+
+    assert flannel_bookmark_item_json == ""
+
+    assert Item.objects.all().count() == 1
+    assert Bookmark.objects.all().count() == 1
+
+    item = Item.objects.first()
+    assert item
+    bookmarks = list(item.bookmarks.all())
+    assert len(bookmarks) == 1
+    assert bookmarks[0].title == flannel_bookmark.title
+    assert bookmarks[0].description == flannel_bookmark.description
+    assert bookmarks[0].url == flannel_bookmark.url

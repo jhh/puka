@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 import pytest
 from faker import Faker
 from pytest_factoryboy import register
@@ -46,6 +48,25 @@ def typewriter_bookmark():
         url="https://normcore.org/?q=shaman",
         tags=["banjo", "thundercats"],
     )
+
+
+@pytest.fixture
+def typewriter_json():
+    data = """[
+        {
+        "model": "bookmarks.bookmark",
+        "fields": {
+            "created": "2025-03-27T10:49:15.718Z",
+            "modified": "2025-03-27T10:49:15.718Z",
+            "title": "Tote bag typewriter aesthetic",
+            "description": "Before they sold out.",
+            "url": "https://normcore.org/?q=shaman",
+            "active": true,
+            "title_description_search": null
+            }
+        }
+    ]"""
+    return json.loads(data)
 
 
 @pytest.fixture
@@ -114,3 +135,24 @@ def item_form_data(location):
 @pytest.fixture
 def item_form(item_form_data):
     return ItemForm(data=item_form_data)
+
+
+@pytest.fixture
+def flannel_bookmark_item_json(flannel_bookmark, item_factory):
+    return f"""
+    [
+        {{
+            "fields": {{
+                "bookmarks": [
+                    [
+                        "{flannel_bookmark.url}"
+                    ]
+                ],
+                "name": "Test Item",
+                "notes": "Simple surface expert whole company place such.",
+                "reorder_level": 1
+            }},
+            "model": "stuff.item"
+        }}
+    ]
+    """

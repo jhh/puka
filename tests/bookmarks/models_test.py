@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import json
+
 import pytest
+from django.core import serializers
 
 from puka.bookmarks.models import Bookmark
 
@@ -61,3 +64,20 @@ def test_with_text(
     qs = Bookmark.active_objects.with_text("tumeric")
     assert len(qs) == 1
     assert qs.contains(succulents_bookmark)
+
+
+@pytest.mark.django_db
+def test_serialize_with_natural_primary_key(typewriter_bookmark, typewriter_json):
+    data = serializers.serialize(
+        "json",
+        [typewriter_bookmark],
+        indent=2,
+        use_natural_primary_keys=True,
+    )
+    result = json.loads(data)
+    assert result[0]["model"] == typewriter_json[0]["model"]
+    assert result[0]["fields"]["title"] == typewriter_json[0]["fields"]["title"]
+    assert result[0]["fields"]["description"] == typewriter_json[0]["fields"]["description"]
+    assert result[0]["fields"]["url"] == typewriter_json[0]["fields"]["url"]
+    assert result[0]["fields"]["active"] == typewriter_json[0]["fields"]["active"]
+    assert "pk" not in result[0]
