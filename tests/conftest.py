@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from datetime import date, timedelta
 
 import pytest
 from faker import Faker
@@ -8,6 +9,7 @@ from pytest_factoryboy import register
 
 from puka.bookmarks.models import Bookmark
 from puka.stuff.forms import ItemForm
+from puka.upkeep.models import Area, Schedule, Task
 
 from .factories import BookmarkFactory, ItemFactory, ItemWithInventoryFactory, LocationFactory
 
@@ -156,3 +158,28 @@ def flannel_bookmark_item_json(flannel_bookmark, item_factory):
         }}
     ]
     """
+
+
+@pytest.fixture
+def start_date():
+    return date(2024, 1, 1)
+
+
+# noinspection PyUnusedLocal
+@pytest.fixture
+def area(db, start_date):
+    area = Area.objects.create(name="Test Area")
+
+    for i in range(3):
+        # create tasks 0, 1, 2
+        task = Task.objects.create(name=f"{i}", area=area)
+        for j in range(3):
+            Schedule.objects.create(
+                task=task,
+                due_date=start_date + timedelta(days=i + j),
+                notes=f"{i}.{j}",
+            )
+    # create task 4
+    Task.objects.create(name="empty", area=area)
+
+    return area

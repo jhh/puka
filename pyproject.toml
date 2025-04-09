@@ -17,6 +17,7 @@ dependencies = [
     "crispy-tailwind>=1.0.3",
     "django-template-partials>=24.4",
     "django-treebeard>=4.7.1",
+    "python-dateutil>=2.9.0.post0",
 ]
 
 [project.scripts]
