@@ -130,7 +130,6 @@ def test_task_consumable_unique(area, filter_item):
         TaskItem.objects.create(task=tasks[0], item=filter_item, quantity=1)
 
 
-@pytest.mark.xfail
 @pytest.mark.django_db
 def test_task_consumable_needed(area, salt_item):
     tasks = Task.objects.all()

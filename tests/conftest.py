@@ -165,7 +165,6 @@ def start_date():
     return date(2024, 1, 1)
 
 
-# noinspection PyUnusedLocal
 @pytest.fixture
 def area(db, start_date):
     area = Area.objects.create(name="Test Area")
