@@ -80,7 +80,7 @@ class TaskItem(models.Model):
         unique_together = ("task", "item")
 
     def __str__(self):
-        return f"{self.task.name} - {self.item.name} ({self.quantity} {self.item.unit})"
+        return f"{self.task.name} - {self.item.name} ({self.quantity})"
 
 
 class Schedule(models.Model):

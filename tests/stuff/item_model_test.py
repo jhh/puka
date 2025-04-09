@@ -156,13 +156,13 @@ def test_search_location_sorted_by_name(item_with_inventory_factory, location_fa
 
 @pytest.mark.django_db
 def test_deserialize_with_natural_foreign_key(flannel_bookmark, flannel_bookmark_item_json):
-    for item in serializers.deserialize(
+    for deserialized_item in serializers.deserialize(
         "json",
         flannel_bookmark_item_json,
         use_natural_foreign_keys=True,
         use_natural_primary_keys=True,
     ):
-        item.save()
+        deserialized_item.save()
 
     assert Item.objects.all().count() == 1
     assert Bookmark.objects.all().count() == 1

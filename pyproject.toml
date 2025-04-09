@@ -18,6 +18,7 @@ dependencies = [
     "django-template-partials>=24.4",
     "django-treebeard>=4.7.1",
     "python-dateutil>=2.9.0.post0",
+    "types-python-dateutil>=2.9.0.20241206",
 ]
 
 [project.scripts]
