@@ -11,7 +11,14 @@ from puka.bookmarks.models import Bookmark
 from puka.stuff.forms import ItemForm
 from puka.upkeep.models import Area, Schedule, Task
 
-from .factories import BookmarkFactory, ItemFactory, ItemWithInventoryFactory, LocationFactory
+from .factories import (
+    AreaFactory,
+    BookmarkFactory,
+    ItemFactory,
+    ItemWithInventoryFactory,
+    LocationFactory,
+    TaskFactory,
+)
 
 
 def create_bookmark(
@@ -109,6 +116,9 @@ register(ItemFactory, "salt_item", name="Water Softener Salt", notes="Yellow bag
 register(ItemFactory, "container_item", name="Deli Container", notes="Also holds water")
 
 register(ItemWithInventoryFactory)
+
+register(AreaFactory)
+register(TaskFactory)
 
 
 @pytest.fixture

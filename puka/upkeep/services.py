@@ -1,8 +1,10 @@
 import logging
+from itertools import chain
 from operator import attrgetter
 from typing import Any
 
-from django.db.models import Count, Sum
+from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
+from django.db.models import CharField, Count, Sum, Value
 
 from puka.stuff.models import Item
 from puka.upkeep.models import Area, Schedule, Task, TaskItem
@@ -80,3 +82,48 @@ def get_upcoming_due_tasks(within_days=14) -> list[dict[str, Any]]:
         )
 
     return tasks
+
+
+def search_areas_and_tasks(query_text, limit=None):
+    """
+    Perform a full-text search across both Area and Task models.
+
+    Args:
+        query_text (str): The text to search for
+        limit (int, optional): Maximum number of results to return per model
+
+    Returns:
+        list: Combined search results from both models, sorted by relevance
+
+    """
+    search_query = SearchQuery(query_text)
+
+    # Search Areas
+    area_results = (
+        Area.objects.annotate(
+            search_vector=SearchVector("name", "notes"),
+            rank=SearchRank("search_vector", search_query),
+            model_name=Value("area", output_field=CharField()),
+        )
+        .filter(search_vector=search_query)
+        .order_by("-rank")
+    )
+
+    # Search Tasks
+    task_results = (
+        Task.objects.annotate(
+            search_vector=SearchVector("name", "notes"),
+            rank=SearchRank("search_vector", search_query),
+            model_name=Value("task", output_field=CharField()),
+        )
+        .filter(search_vector=search_query)
+        .order_by("-rank")
+    )
+
+    # Apply limit to each query if specified
+    if limit:
+        area_results = area_results[:limit]
+        task_results = task_results[:limit]
+
+    # Combine results and sort by rank
+    return sorted(chain(area_results, task_results), key=attrgetter("rank"), reverse=True)
