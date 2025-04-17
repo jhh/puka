@@ -22,7 +22,7 @@
             type="text"
             name="query"
             id="search"
-            value="{{ query }}"
+            value="{{ request.GET.query }}"
             hx-target="#id_content"
             class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
             x-on:keyup.esc.prevent.stop="$el.blur(); search = false"
