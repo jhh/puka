@@ -16,7 +16,7 @@
         x-on:keydown.meta.K.window="search = true"
         class="mr-4 relative flex items-center" >
         <label class="hidden" for="search">Search</label>
-        <input hx-get="{% url 'upkeep:home' %}"
+        <input hx-get="{% url 'upkeep:task-list' %}"
             hx-trigger="change"
             hx-push-url="true"
             type="text"
@@ -40,7 +40,7 @@
             hx-target="#id_content"
             hx-push-url="true"
             class="hidden md:inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-xs hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800" >
-            New Item
+            New Task
         </button>
         <button hx-get="{% url 'stuff:item-new' %}"
             type="button"
@@ -76,13 +76,13 @@
                             {{ task.name }}
                         </a>
                     </td>
-                    <td class="hidden sm:table-cell px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ task.area }}</td>
+                    <td class="hidden sm:table-cell px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ task.area.name }}</td>
                     {# max-w-0 w-full hack from https://stackoverflow.com/questions/5239758/how-can-i-truncate-table-cells-but-fit-as-much-as-content-possible #}
                     <td class="px-3 py-4 text-sm max-w-0 w-full truncate text-gray-500">
-                        {{ task.due_date }}
+                        {{ task.earliest_due_date|default:"" }}
                     </td>
                     <td class="hidden md:table-cell px-3 py-4 text-sm whitespace-nowrap text-gray-500">
-                        {% if task.is_ready %}
+                        {% if task.are_consumables_stocked %}
                             in-stock
                         {% else %}
                             out-of-stock
@@ -108,16 +108,16 @@
         </div>
         <div class="flex flex-1 justify-between sm:justify-end">
             {% if page_obj.has_previous %}
-                <a href="{% querystring page=page_obj.previous_page_number query=query %}"
-                    hx-get="{% querystring page=page_obj.previous_page_number query=query %}"
+                <a href="{% querystring page=page_obj.previous_page_number %}"
+                    hx-get="{% querystring page=page_obj.previous_page_number %}"
                     hx-target="#id_content"
                     hx-push-url="true"
                     class="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:outline-offset-0">Previous</a>
             {% endif %}
 
             {% if page_obj.has_next %}
-                <a href="{% querystring page=page_obj.next_page_number query=query %}"
-                    hx-get="{% querystring page=page_obj.next_page_number query=query %}"
+                <a href="{% querystring page=page_obj.next_page_number %}"
+                    hx-get="{% querystring page=page_obj.next_page_number %}"
                     hx-target="#id_content"
                     hx-push-url="true"
                     class="relative ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:outline-offset-0">Next</a>

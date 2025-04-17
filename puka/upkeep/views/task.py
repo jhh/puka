@@ -1,31 +1,41 @@
-from django.db.models import Sum
+from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 from django.views.generic import DetailView, ListView
 
 from puka.core.views import get_template
-from puka.stuff.models import Item
 from puka.upkeep.models import Task, TaskItem
+from puka.upkeep.services import get_tasks_with_earliest_due_date
 
 
 class TaskListView(ListView):
-    context_object_name = "items"
+    context_object_name = "tasks"
     paginate_by = 10
+    paginate_orphans = 2
 
     def get_template_names(self):
-        return get_template(self.request, "stuff/item_list.html", "#list-partial")
+        return get_template(self.request, "upkeep/task_list.html", "#list-partial")
 
     def get_queryset(self):
         if "query" in self.request.GET:
-            query = self.request.GET["query"]
-            query_set = Item.objects.search(query)
-            self.extra_context = {"query": query}
+            query_text = self.request.GET["query"]
+            search_query = SearchQuery(query_text)
+            query_set = (
+                Task.objects.annotate(
+                    search_vector=SearchVector("name", weight="A")
+                    + SearchVector("notes", weight="B")
+                    + SearchVector("area__name", weight="B"),
+                    rank=SearchRank("search_vector", search_query),
+                )
+                .filter(search_vector=search_query)
+                .order_by("-rank")
+            )
         else:
-            query_set = Item.objects.all().order_by("name")
+            query_set = (
+                get_tasks_with_earliest_due_date()
+                .select_related("area")
+                .order_by("area__name", "name")
+            )
 
-        return (
-            query_set.annotate(quantity=Sum("inventories__quantity"))
-            .prefetch_related("locations")
-            .prefetch_related("tags")
-        )
+        return query_set
 
 
 class TaskDetailView(DetailView):

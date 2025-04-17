@@ -9,24 +9,29 @@
 {% endblock menu %}
 
 {% partialdef menu-partial %}
-  <ul
-      hx-swap-oob="true"
-      id="id_extra_menu"
-      role="list"
-      class="-mx-2 mt-2 space-y-1"
-  >
-      <li>
-          <a
-              hx-get="{% url 'upkeep:area-list' %}"
-              hx-target="#id_content"
-              hx-push-url="true"
-              href="#"
-              class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold {% get_current_class 'upkeep:area-list' %}" >
-              <span
-                  class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-[0.625rem] font-medium text-gray-400 group-hover:text-white"
-                  >A</span>
-              <span class="truncate">Areas</span>
-          </a>
-      </li>
-  </ul>
+<ul hx-swap-oob="true"
+    id="id_extra_menu"
+    role="list"
+    class="-mx-2 mt-2 space-y-1" >
+    <li>
+        <a hx-get="{% url 'upkeep:area-list' %}"
+            hx-target="#id_content"
+            hx-push-url="true"
+            href="#"
+            class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold {% get_current_class 'upkeep:area-list' %}" >
+            <span class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-[0.625rem] font-medium text-gray-400 group-hover:text-white" >A</span>
+            <span class="truncate">Areas</span>
+        </a>
+    </li>
+    <li>
+        <a hx-get="{% url 'upkeep:task-list' %}"
+            hx-target="#id_content"
+            hx-push-url="true"
+            href="#"
+            class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold {% get_current_class 'upkeep:task-list' %}" >
+            <span class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-[0.625rem] font-medium text-gray-400 group-hover:text-white" >T</span>
+            <span class="truncate">Tasks</span>
+        </a>
+    </li>
+</ul>
  {% endpartialdef %}

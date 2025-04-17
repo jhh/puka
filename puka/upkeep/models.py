@@ -21,6 +21,9 @@ class Area(models.Model):
 
 
 class TaskManager(models.Manager):
+    def search(self, _query):
+        return self.order_by("area__name", "name")
+
     def get_upcoming_due_tasks(self, within_days: int = 14, start_date=None):
         if start_date is None:
             start_date = datetime.datetime.now(tz=datetime.UTC).date()
@@ -69,6 +72,14 @@ class Task(models.Model):
 
     def first_due_schedule(self) -> "Schedule | None":
         return self.schedules.filter(completion_date__isnull=True).order_by("due_date").first()
+
+    def are_consumables_stocked(self) -> bool:
+        task_consumables = TaskItem.objects.filter(task=self)
+        is_ready = True
+        for tc in task_consumables:
+            if tc.quantity > tc.item.quantity():
+                is_ready = False
+        return is_ready
 
 
 class TaskItem(models.Model):

@@ -4,7 +4,7 @@ from operator import attrgetter
 from typing import Any
 
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
-from django.db.models import CharField, Count, Sum, Value
+from django.db.models import CharField, Count, OuterRef, Subquery, Sum, Value
 
 from puka.stuff.models import Item
 from puka.upkeep.models import Area, Schedule, Task, TaskItem
@@ -59,29 +59,16 @@ def get_tasks_schedules(area=None) -> list[dict[str, Any]]:
     return tasks
 
 
-def get_upcoming_due_tasks(within_days=14) -> list[dict[str, Any]]:
-    """Return all upcoming tasks due with within_days with due date."""
-    tasks_queryset = Task.objects.get_upcoming_due_tasks(within_days=within_days).select_related()
+def get_tasks_with_earliest_due_date():
+    # Get the earliest due_date for each task where completion_date is None
+    earliest_due_date_subquery = (
+        Schedule.objects.filter(task=OuterRef("pk"), completion_date__isnull=True)
+        .order_by("due_date")
+        .values("due_date")[:1]
+    )
 
-    tasks = []
-    for task in tasks_queryset:
-        task_consumables = TaskItem.objects.filter(task=task).all()
-        is_ready = True
-        for tc in task_consumables:
-            if tc.quantity > tc.item.quantity():
-                is_ready = False
-
-        tasks.append(
-            {
-                "id": task.id,
-                "name": task.name,
-                "area": task.area.name,
-                "due_date": task.first_due_schedule().due_date,
-                "is_ready": is_ready,
-            },
-        )
-
-    return tasks
+    # Annotate each Task with its earliest incomplete schedule's due_date
+    return Task.objects.annotate(earliest_due_date=Subquery(earliest_due_date_subquery))
 
 
 def search_areas_and_tasks(query_text, limit=None):
