@@ -68,7 +68,7 @@ def get_upcoming_due_tasks(within_days=14) -> list[dict[str, Any]]:
         task_consumables = TaskItem.objects.filter(task=task).all()
         is_ready = True
         for tc in task_consumables:
-            if tc.quantity > tc.consumable.quantity:
+            if tc.quantity > tc.item.quantity():
                 is_ready = False
 
         tasks.append(
@@ -101,7 +101,7 @@ def search_areas_and_tasks(query_text, limit=None):
     # Search Areas
     area_results = (
         Area.objects.annotate(
-            search_vector=SearchVector("name", "notes"),
+            search_vector=SearchVector("name", weight="A") + SearchVector("notes", weight="B"),
             rank=SearchRank("search_vector", search_query),
             model_name=Value("area", output_field=CharField()),
         )
@@ -112,7 +112,7 @@ def search_areas_and_tasks(query_text, limit=None):
     # Search Tasks
     task_results = (
         Task.objects.annotate(
-            search_vector=SearchVector("name", "notes"),
+            search_vector=SearchVector("name", weight="A") + SearchVector("notes", weight="B"),
             rank=SearchRank("search_vector", search_query),
             model_name=Value("task", output_field=CharField()),
         )

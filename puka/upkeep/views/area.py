@@ -12,5 +12,5 @@ class AreaListView(ListView):
     def get_template_names(self):
         return get_template(self.request, "upkeep/area_list.html", "#list-partial")
 
-    def get_queryset(self):  # type: ignore[override]
+    def get_queryset(self):
         return get_areas_tasks_schedules()

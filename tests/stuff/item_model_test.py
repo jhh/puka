@@ -174,3 +174,20 @@ def test_deserialize_with_natural_foreign_key(flannel_bookmark, flannel_bookmark
     assert bookmarks[0].title == flannel_bookmark.title
     assert bookmarks[0].description == flannel_bookmark.description
     assert bookmarks[0].url == flannel_bookmark.url
+
+
+@pytest.mark.django_db
+def test_item_quantity(inventory_factory, location_factory):
+    inventory = inventory_factory()
+    item = inventory.item
+    assert item.quantity() == 10
+
+    location = location_factory(name="A", code="A")
+    inventory_factory(item=item, location=location, quantity=3)
+
+    assert item.quantity() == 13
+
+    location = location_factory(name="B", code="B")
+    inventory_factory(item=item, location=location, quantity=5)
+
+    assert item.quantity() == 18

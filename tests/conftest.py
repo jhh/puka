@@ -14,6 +14,7 @@ from puka.upkeep.models import Area, Schedule, Task
 from .factories import (
     AreaFactory,
     BookmarkFactory,
+    InventoryFactory,
     ItemFactory,
     ItemWithInventoryFactory,
     LocationFactory,
@@ -115,6 +116,7 @@ register(ItemFactory, "filter_item", name="Water Filter", notes="Purifies water"
 register(ItemFactory, "salt_item", name="Water Softener Salt", notes="Yellow bag")
 register(ItemFactory, "container_item", name="Deli Container", notes="Also holds water")
 
+register(InventoryFactory)
 register(ItemWithInventoryFactory)
 
 register(AreaFactory)

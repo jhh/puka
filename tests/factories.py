@@ -10,7 +10,7 @@ from puka.upkeep.models import Area, Task
 
 
 class BookmarkFactory(DjangoModelFactory):
-    class Meta:  # type: ignore[override]
+    class Meta:
         model = Bookmark
 
     title = Faker("sentence")
@@ -20,7 +20,7 @@ class BookmarkFactory(DjangoModelFactory):
 
 
 class LocationFactory(DjangoModelFactory):
-    class Meta:  # type: ignore[override]
+    class Meta:
         model = Location
         django_get_or_create = ("code",)
 
@@ -36,7 +36,7 @@ class LocationFactory(DjangoModelFactory):
 
 
 class ItemFactory(DjangoModelFactory):
-    class Meta:  # type: ignore[override]
+    class Meta:
         model = Item
 
     name = "Test Item"
@@ -45,7 +45,7 @@ class ItemFactory(DjangoModelFactory):
 
 
 class InventoryFactory(DjangoModelFactory):
-    class Meta:  # type: ignore[override]
+    class Meta:
         model = Inventory
 
     item = SubFactory(ItemFactory)
@@ -54,14 +54,14 @@ class InventoryFactory(DjangoModelFactory):
 
 
 class ItemWithInventoryFactory(ItemFactory):
-    class Meta:  # type: ignore[override]
+    class Meta:
         skip_postgeneration_save = True
 
     inventory = RelatedFactory(InventoryFactory, factory_related_name="item")
 
 
 class AreaFactory(DjangoModelFactory):
-    class Meta:  # type: ignore[override]
+    class Meta:
         model = Area
 
     name = "Test Area"
@@ -69,7 +69,7 @@ class AreaFactory(DjangoModelFactory):
 
 
 class TaskFactory(DjangoModelFactory):
-    class Meta:  # type: ignore[override]
+    class Meta:
         model = Task
 
     name = "Test Task"
