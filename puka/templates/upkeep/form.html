@@ -1,0 +1,12 @@
+{% extends "upkeep/base.html" %}
+{% load crispy_forms_tags partials %}
+
+{% partialdef form-partial %}
+  {% crispy form %}
+{% endpartialdef form-partial %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+  {% partial form-partial %}
+{% endblock content %}
