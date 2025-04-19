@@ -60,6 +60,10 @@
                         hx-params="none"
                         hx-target="#id_content"
                         class="block p-2 hover:text-indigo-600">Delete task</a>
+                    <a href="{% url 'upkeep:schedule-new' task.id %}"
+                        hx-get="{% url 'upkeep:schedule-new' task.id %}"
+                        hx-target="#id_content"
+                        class="block p-2 hover:text-indigo-600">Create schedule</a>
                 </div>
           </div>
         </div>
@@ -79,12 +83,18 @@
             <tbody class="divide-y divide-gray-200">
                 {% for schedule in task.schedules.all %}
                 <tr>
-                    <td class="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-0">
+                    <td class="group my-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-0">
                         <input
-                            hx-post="{# url 'schedule_toggle' schedule.id #}"
+                            hx-patch="{% url 'upkeep:schedule-toggle' schedule.id %}"
                             type="checkbox"
-                            class="appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
+                            class="my-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
                             {% if schedule.is_complete %}checked{% endif %} >
+                        <button hx-get="{% url 'upkeep:schedule-edit' schedule.id %}"
+                            hx-target="#id_content"
+                            hx-push-url="true"
+                            type="button"
+                            class="hidden group-hover:inline-block rounded-sm bg-indigo-50 ml-2 px-2 py-1 text-xs font-semibold text-indigo-600 shadow-xs hover:bg-indigo-100">edit</button>
+
                     </td>
                     <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ schedule.due_date }}</td>
                     <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ schedule.completion_date|default:'' }}</td>

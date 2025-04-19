@@ -110,6 +110,9 @@ class Schedule(models.Model):
     def __str__(self):
         return f"{self.task.name} due on {self.due_date}"
 
+    def get_absolute_url(self):
+        return reverse("upkeep:task-detail", args=[self.task.id])
+
     def is_complete(self) -> bool:
         return self.completion_date is not None
 

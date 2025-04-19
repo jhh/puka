@@ -87,44 +87,32 @@ class ScheduleForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        is_edit = self.instance.id is not None
+        if self.instance.id:
+            action = reverse("upkeep:schedule-edit", args=[self.instance.id])
+            delete_button = DeleteButton("upkeep:schedule-delete", self.instance.id, "schedule")
+        else:
+            action = reverse("upkeep:schedule-new", args=[self.initial["task"]])
+            delete_button = None
 
         self.helper = FormHelper()
-        self.helper.render_hidden_fields = True
-        self.helper.form_method = "post"
-        self.helper.form_action = (
-            reverse("schedule_edit", args=[self.instance.id])
-            if is_edit
-            else reverse("schedule_new")
-        )
+        self.helper.attrs = {"hx-post": action}
 
         tasks = Task.objects.select_related().values_list("id", "area__name", "name")
         self.fields["task"].choices = [(t[0], f"{t[1]}: {t[2]}") for t in tasks]  # type:ignore[attr-defined]
 
         self.helper.layout = Layout(
-            Field("task"),
-            Field("due_date", css_class="form-control"),
-            Field("completion_date", css_class="form-control"),
-            Field("notes", css_class="form-control"),
             Div(
-                Submit(
-                    "submit",
-                    "Update" if is_edit else "Save",
-                    css_class="btn btn-primary",
-                ),
-                StrictButton(
-                    "Cancel",
-                    name="cancel",
-                    css_class="btn-secondary ms-2",
-                    onclick="window.history.back();",
-                ),
-                HTML(f"""<button type="button" class="btn btn-outline-danger ms-auto"
-                hx-delete="{{% url 'schedule_edit' {self.instance.id} %}}"
-                hx-confirm="Delete this schedule?"
-                >Delete</button>""")
-                if is_edit
-                else None,
-                css_class="d-flex",
+                Field("task", wrapper_class="sm:col-span-6"),
+                Field("due_date", wrapper_class="sm:col-span-3"),
+                Field("completion_date", wrapper_class="sm:col-span-3"),
+                Field("notes", wrapper_class="sm:col-span-6"),
+                css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
+            ),
+            Div(
+                PrimaryButton("submit", "Save schedule"),
+                CancelButton("cancel", "Cancel", onclick="window.history.back();"),
+                delete_button,
+                css_class="mt-4 flex gap-x-4",
             ),
         )
 
