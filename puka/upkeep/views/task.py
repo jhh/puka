@@ -47,7 +47,7 @@ class TaskDetailView(DetailView):
     def get_template_names(self):
         return get_template(self.request, "upkeep/task_detail.html", "#detail-partial")
 
-    def get_object(self):
+    def get_object(self, _queryset=None):
         pk = self.kwargs.get("pk")
         task = (
             Task.objects.select_related("area")

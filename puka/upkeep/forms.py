@@ -115,7 +115,7 @@ class ScheduleForm(forms.ModelForm):
         )
 
         tasks = Task.objects.select_related().values_list("id", "area__name", "name")
-        self.fields["task"].choices = [(t[0], f"{t[1]}: {t[2]}") for t in tasks]
+        self.fields["task"].choices = [(t[0], f"{t[1]}: {t[2]}") for t in tasks]  # type:ignore[attr-defined]
 
         self.helper.layout = Layout(
             Field("task"),
