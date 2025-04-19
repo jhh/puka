@@ -1,10 +1,10 @@
-from crispy_forms.bootstrap import StrictButton
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import HTML, Div, Field, Layout, Submit
+from crispy_forms.layout import Div, Field, Layout
 from django import forms
 from django.urls import reverse
 
 from puka.core.forms import CancelButton, DeleteButton, PrimaryButton
+from puka.stuff.models import Item
 
 from .models import Area, Schedule, Task, TaskItem
 
@@ -124,38 +124,36 @@ class TaskItemForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        is_edit = self.instance.id is not None
+        if self.instance.id:
+            action = reverse("upkeep:task-item-edit", args=[self.instance.id])
+            delete_button = DeleteButton("upkeep:task-item-delete", self.instance.id, "item")
+        else:
+            action = reverse("upkeep:task-item-new", args=[self.initial["task"]])
+            delete_button = None
 
         self.helper = FormHelper()
-        self.helper.form_method = "post"
+        self.helper.attrs = {"hx-post": action}
 
-        self.helper.form_action = (
-            reverse("task_consumable_edit", args=[self.instance.id])
-            if is_edit
-            else reverse("task_consumable_new", args=[self["task"].value()])
+        tasks = Task.objects.select_related().values_list("id", "area__name", "name")
+        self.fields["task"].choices = [(t[0], f"{t[1]}: {t[2]}") for t in tasks]  # type:ignore[attr-defined]
+        items = (
+            Item.objects.filter(tags__name__in=["upkeep"])
+            .order_by("name")
+            .values_list("id", "name")
         )
+        self.fields["item"].choices = [(None, "---")] + [(i[0], i[1]) for i in items]  # type:ignore[attr-defined]
+
         self.helper.layout = Layout(
-            Field("task", css_class="form-control"),
-            Field("consumable", css_class="form-control"),
-            Field("quantity", css_class="form-control"),
             Div(
-                Submit(
-                    "submit",
-                    "Update" if is_edit else "Save",
-                    css_class="btn btn-primary",
-                ),
-                StrictButton(
-                    "Cancel",
-                    name="cancel",
-                    css_class="btn-secondary ms-2",
-                    onclick="window.history.back();",
-                ),
-                HTML(f"""<button type="button" class="btn btn-outline-danger ms-auto"
-                hx-delete="{{% url 'task_consumable_edit' {self.instance.id} %}}"
-                hx-confirm="Delete this consumable from {self.instance.task.name}?"
-                >Delete</button>""")
-                if is_edit
-                else None,
-                css_class="d-flex",
+                Field("task", wrapper_class="sm:col-span-6"),
+                Field("item", wrapper_class="sm:col-span-6"),
+                Field("quantity", wrapper_class="sm:col-span-3"),
+                css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
+            ),
+            Div(
+                PrimaryButton("submit", "Save item"),
+                CancelButton("cancel", "Cancel", onclick="window.history.back();"),
+                delete_button,
+                css_class="mt-4 flex gap-x-4",
             ),
         )

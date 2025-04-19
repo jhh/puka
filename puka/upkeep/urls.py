@@ -4,6 +4,11 @@ from django.urls import URLPattern, URLResolver, path
 
 from puka.upkeep.views.area import AreaCreateView, AreaDeleteView, AreaListView, AreaUpdateView
 from puka.upkeep.views.home import HomeListView
+from puka.upkeep.views.item import (
+    TaskItemCreateView,
+    TaskItemDeleteView,
+    TaskItemUpdateView,
+)
 from puka.upkeep.views.schedule import (
     ScheduleCreateView,
     ScheduleDeleteView,
@@ -37,4 +42,8 @@ urlpatterns: list[URLPattern | URLResolver] = [
     path("schedule/<int:pk>/edit/", ScheduleUpdateView.as_view(), name="schedule-edit"),
     path("schedule/<int:pk>/delete/", ScheduleDeleteView.as_view(), name="schedule-delete"),
     path("schedule/<int:pk>/toggle/", ScheduleToggleView.as_view(), name="schedule-toggle"),
+    # TaskItem
+    path("task/<int:pk>/item/new/", TaskItemCreateView.as_view(), name="task-item-new"),
+    path("item/<int:pk>/edit/", TaskItemUpdateView.as_view(), name="task-item-edit"),
+    path("item/<int:pk>/delete/", TaskItemDeleteView.as_view(), name="task-item-delete"),
 ]

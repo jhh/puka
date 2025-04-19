@@ -97,6 +97,9 @@ class TaskItem(models.Model):
     def __str__(self):
         return f"{self.task.name} - {self.item.name} ({self.quantity})"
 
+    def get_absolute_url(self):
+        return reverse("upkeep:task-detail", args=[self.task.id])
+
 
 class Schedule(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="schedules")

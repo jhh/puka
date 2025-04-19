@@ -18,10 +18,8 @@ class ScheduleCreateView(CreateView):
         return get_template(self.request, "upkeep/form.html", "#form-partial")
 
     def get_initial(self):
-        initial = super().get_initial()
         task = Task.objects.get(pk=self.kwargs["pk"])
-        initial.update({"task": task.id, "due_date": task.next_date()})
-        return initial
+        return {"task": task.id, "due_date": task.next_date()}
 
 
 class ScheduleUpdateView(UpdateView):
@@ -54,6 +52,6 @@ class ScheduleToggleView(View):
             schedule.completion_date = datetime.datetime.now(datetime.UTC).date()
         schedule.save()
         return HttpResponseLocation(
-            reverse("upkeep:task-detail", args=[schedule.task.id]),
+            reverse("upkeep:task-detail", args=[schedule.task_id]),
             target="#id_content",
         )
