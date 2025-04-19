@@ -18,7 +18,7 @@
     {% include "upkeep/base.html#menu-partial" %}
 {% endif %}
 
-<div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+<div class="pb-4 overflow-hidden bg-white shadow-sm sm:rounded-lg">
 
     {# Header #}
     <div class="flex justify-between px-4 py-6 sm:px-6">
@@ -109,13 +109,16 @@
 
                     </td>
                 </tr>
+                {% empty %}
+                <tr>
+                    <td class="text-sm text-gray-500" colspan="5">No schedules</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 
     {# Consumable table #}
-    {% if task_consumables %}
     <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
         <table class="min-w-full divide-y divide-gray-300 table-fixed">
             <thead>
@@ -151,11 +154,14 @@
                     </td>
 
                 </tr>
+                {% empty %}
+                <tr>
+                    <td class="text-sm text-gray-500" colspan="5">No consumables</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-    {% endif %}
 </div>
 {% endpartialdef detail-partial %}
 
