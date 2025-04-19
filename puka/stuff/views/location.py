@@ -64,10 +64,8 @@ class LocationCreateView(CreateView):
     def get_form_class(self):
         return movenodeform_factory(Location, form=LocationForm)
 
-    def get(self, request, *args, **kwargs):
-        if "parent" in request.GET:
-            self.initial = {"_ref_node_id": request.GET["parent"]}
-        return super().get(request, *args, **kwargs)
+    def get_initial(self):
+        return {"_ref_node_id": self.request.GET.get("parent")}
 
 
 class LocationUpdateView(UpdateView):

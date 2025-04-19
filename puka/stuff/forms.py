@@ -30,7 +30,8 @@ class LocationForm(MoveNodeForm):
         self.helper.attrs = {"hx-post": action}
         self.helper.layout = Layout(
             Div(
-                Field("name", wrapper_class="sm:col-span-6", **autofocus),
+                Field("name", wrapper_class="sm:col-span-4", **autofocus),
+                Field("code", wrapper_class="sm:col-span-2"),
                 css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
             ),
             Div(
