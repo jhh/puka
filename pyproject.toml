@@ -1,6 +1,6 @@
 [project]
 name = "puka"
-version = "3.1.1"
+version = "3.2.0"
 description = "Where evything finds its place."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -17,6 +17,8 @@ dependencies = [
     "crispy-tailwind>=1.0.3",
     "django-template-partials>=24.4",
     "django-treebeard>=4.7.1",
+    "python-dateutil>=2.9.0.post0",
+    "types-python-dateutil>=2.9.0.20241206",
 ]
 
 [project.scripts]
@@ -90,5 +92,5 @@ reportAttributeAccessIssue = false
 venvPath = "."
 venv = ".venv"
 pythonVersion = "3.12"
-typeCheckingMode = "standard"
+typeCheckingMode = "basic"
 reportAttributeAccessIssue = "none"

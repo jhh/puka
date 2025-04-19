@@ -1,0 +1,85 @@
+{% extends "upkeep/base.html" %}
+{% load partials %}
+
+{% block title %}Areas{% endblock %}
+
+{% partialdef list-partial %}
+{% if htmx %}
+<title>Areas - HTMX</title>
+{% include "sidebar.html#nav-mobile-partial" %}
+{% include "sidebar.html#nav-desktop-partial" %}
+{% include "upkeep/base.html#menu-partial" %}
+{% endif %}
+
+<div class="px-4 sm:px-6 lg:px-8">
+    <div class="sm:flex sm:items-center">
+        <div class="sm:flex-auto">
+            <h1 class="text-lg font-semibold text-gray-900">
+                Areas
+            </h1>
+        </div>
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+            <button hx-get="{% url 'upkeep:area-new' %}"
+                hx-target="#id_content"
+                hx-push-url="true"
+                type="button"
+                class="hidden sm:block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                New area
+            </button>
+        </div>
+    </div>
+
+    <div class="mt-8 flow-root">
+        <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+            <div class="inline-block min-w-full py-2 align-middle bg-white rounded-sm shadow-sm sm:px-6 lg:px-8">
+                <table class="min-w-full divide-y divide-gray-300">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">Area</th>
+                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Tasks</th>
+                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Next Due</th>
+                            <th scope="col" class="relative py-3.5 pr-4 pl-3 sm:pr-0">
+                                <span class="sr-only">Edit</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for area in areas %}
+                        <tr>
+                            <td class="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-0">
+                                <a hx-get="{% url 'upkeep:task-list' %}{% querystring query=area.name %}"
+                                   href="{% url 'upkeep:task-list' %}{% querystring query=area.name %}"
+                                   hx-target="#id_content"
+                                   hx-push-url="true"
+                                   class="text-indigo-600 hover:text-indigo-900" >
+                                    {{ area.name }}
+                                </a>
+                            </td>
+                            <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500">
+                                {{ area.task_count }}
+                            </td>
+                            <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500">
+                               {% if area.due_task_id %}
+                                    {{ area.due_date }}
+                               {% endif %}
+                            </td>
+                            <td class="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-0">
+                                <a href="#"
+                                   hx-get="{% url 'upkeep:area-edit' area.id %}"
+                                   hx-target="#id_content"
+                                   hx-push-url="true"
+                                   class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endpartialdef list-partial %}
+
+{% block content %}
+{% partial list-partial %}
+{% endblock content %}

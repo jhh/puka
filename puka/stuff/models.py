@@ -1,7 +1,7 @@
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVectorField
 from django.db import models
-from django.db.models import F
+from django.db.models import F, Sum
 from django.urls import reverse
 from taggit.managers import TaggableManager
 from treebeard.mp_tree import MP_Node
@@ -64,7 +64,7 @@ class Item(models.Model):
     notes = models.TextField(blank=True)
     name_notes_search = SearchVectorField(null=True, editable=False)
 
-    objects: ItemManager = ItemManager()  # type: ignore[override]
+    objects: ItemManager = ItemManager()
 
     class Meta:
         ordering = ("name",)
@@ -78,6 +78,10 @@ class Item(models.Model):
 
     def natural_key(self):
         return (self.name,)
+
+    def quantity(self):
+        inventory = Inventory.objects.filter(item=self).aggregate(quantity=Sum("quantity"))
+        return inventory["quantity"] or 0
 
 
 class Inventory(models.Model):

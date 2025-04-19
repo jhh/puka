@@ -1,0 +1,132 @@
+{% extends "upkeep/base.html" %}
+{% load partials %}
+
+{% block title %}Tasks{% endblock %}
+
+{% partialdef list-partial %}
+{% if htmx %}
+    <title>Tasks - HTMX</title>
+    {% include "sidebar.html#nav-mobile-partial" %}
+    {% include "sidebar.html#nav-desktop-partial" %}
+    {% include "upkeep/base.html#menu-partial" %}
+{% endif %}
+
+<div class="flex justify-end mb-4 mt-0 md:ml-4">
+    <div x-data="{search: false}"
+        x-on:keydown.meta.K.window="search = true"
+        class="mr-4 relative flex items-center" >
+        <label class="hidden" for="search">Search</label>
+        <input hx-get="{% url 'upkeep:task-list' %}"
+            hx-trigger="change"
+            hx-push-url="true"
+            type="text"
+            name="query"
+            id="search"
+            value="{{ request.GET.query }}"
+            hx-target="#id_content"
+            class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
+            x-on:keyup.esc.prevent.stop="$el.blur(); search = false"
+            x-trap="search" />
+        <div class="absolute inset-y-0 right-0 flex py-1.5  pr-1.5">
+            <kbd class="inline-flex items-center border border-gray-200 rounded-sm px-2 text-sm font-sans font-medium text-gray-400">
+            ⌘K </kbd>
+        </div>
+    </div>
+
+    <div class="flex md:mt-0 md:ml-4">
+        <button hx-get="{% url 'upkeep:task-new' %}"
+            type="button"
+            hx-trigger="click"
+            hx-target="#id_content"
+            hx-push-url="true"
+            class="hidden md:inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-xs hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800" >
+            New Task
+        </button>
+        <button hx-get="{% url 'upkeep:task-new' %}"
+            type="button"
+            hx-trigger="click"
+            hx-target="#id_content"
+            hx-push-url="true"
+            class="md:hidden inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-xs hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800" >
+            New
+        </button>
+    </div>
+</div>
+
+<div class="bg-white rounded-sm shadow-sm">
+    <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+        <table class="min-w-full divide-y divide-gray-300 ">
+            <thead>
+                <tr>
+                    <th scope="col" class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">Upcoming Task</th>
+                    <th scope="col" class="hidden sm:table-cell px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Area</th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Due</th>
+                    <th scope="col" class="hidden md:table-cell px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Consumables</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for task in tasks %}
+                <tr>
+                    <td class="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-0">
+                        <a hx-get="{% url 'upkeep:task-detail' task.id %}"
+                            hx-target="#id_content"
+                            hx-push-url="true"
+                            href="#"
+                            class="text-indigo-600 hover:text-indigo-900" >
+                            {{ task.name }}
+                        </a>
+                    </td>
+                    <td class="hidden sm:table-cell px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ task.area.name }}</td>
+                    {# max-w-0 w-full hack from https://stackoverflow.com/questions/5239758/how-can-i-truncate-table-cells-but-fit-as-much-as-content-possible #}
+                    <td class="px-3 py-4 text-sm max-w-0 w-full truncate text-gray-500">
+                        {{ task.earliest_due_date|default:"" }}
+                    </td>
+                    <td class="hidden md:table-cell px-3 py-4 text-sm whitespace-nowrap text-gray-500">
+                        {% if task.are_consumables_stocked %}
+                            in-stock
+                        {% else %}
+                            out-of-stock
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <nav class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6" aria-label="Pagination">
+        <div class="hidden sm:block">
+            <p class="text-sm text-gray-700">
+                Showing
+                <span class="font-medium">{{ page_obj.start_index }}</span>
+                to
+                <span class="font-medium">{{ page_obj.end_index }}</span>
+                of
+                <span class="font-medium">{{ paginator.count }}</span>
+                results
+            </p>
+        </div>
+        <div class="flex flex-1 justify-between sm:justify-end">
+            {% if page_obj.has_previous %}
+                <a href="{% querystring page=page_obj.previous_page_number %}"
+                    hx-get="{% querystring page=page_obj.previous_page_number %}"
+                    hx-target="#id_content"
+                    hx-push-url="true"
+                    class="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:outline-offset-0">Previous</a>
+            {% endif %}
+
+            {% if page_obj.has_next %}
+                <a href="{% querystring page=page_obj.next_page_number %}"
+                    hx-get="{% querystring page=page_obj.next_page_number %}"
+                    hx-target="#id_content"
+                    hx-push-url="true"
+                    class="relative ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:outline-offset-0">Next</a>
+            {% endif %}
+        </div>
+    </nav>
+</div>
+{% endpartialdef list-partial %}
+
+{% block content %}
+{% partial list-partial %}
+{% endblock content %}

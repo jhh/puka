@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from datetime import date, timedelta
 
 import pytest
 from faker import Faker
@@ -8,8 +9,17 @@ from pytest_factoryboy import register
 
 from puka.bookmarks.models import Bookmark
 from puka.stuff.forms import ItemForm
+from puka.upkeep.models import Area, Schedule, Task
 
-from .factories import BookmarkFactory, ItemFactory, ItemWithInventoryFactory, LocationFactory
+from .factories import (
+    AreaFactory,
+    BookmarkFactory,
+    InventoryFactory,
+    ItemFactory,
+    ItemWithInventoryFactory,
+    LocationFactory,
+    TaskFactory,
+)
 
 
 def create_bookmark(
@@ -106,7 +116,11 @@ register(ItemFactory, "filter_item", name="Water Filter", notes="Purifies water"
 register(ItemFactory, "salt_item", name="Water Softener Salt", notes="Yellow bag")
 register(ItemFactory, "container_item", name="Deli Container", notes="Also holds water")
 
+register(InventoryFactory)
 register(ItemWithInventoryFactory)
+
+register(AreaFactory)
+register(TaskFactory)
 
 
 @pytest.fixture
@@ -156,3 +170,27 @@ def flannel_bookmark_item_json(flannel_bookmark, item_factory):
         }}
     ]
     """
+
+
+@pytest.fixture
+def start_date():
+    return date(2024, 1, 1)
+
+
+@pytest.fixture
+def area(db, start_date):
+    area = Area.objects.create(name="Test Area")
+
+    for i in range(3):
+        # create tasks 0, 1, 2
+        task = Task.objects.create(name=f"{i}", area=area)
+        for j in range(3):
+            Schedule.objects.create(
+                task=task,
+                due_date=start_date + timedelta(days=i + j),
+                notes=f"{i}.{j}",
+            )
+    # create task 4
+    Task.objects.create(name="empty", area=area)
+
+    return area

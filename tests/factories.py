@@ -1,13 +1,16 @@
+from datetime import time
+
 from factory.declarations import RelatedFactory, SubFactory
 from factory.django import DjangoModelFactory
 from factory.faker import Faker
 
 from puka.bookmarks.models import Bookmark
 from puka.stuff.models import Inventory, Item, Location
+from puka.upkeep.models import Area, Task
 
 
 class BookmarkFactory(DjangoModelFactory):
-    class Meta:  # type: ignore[override]
+    class Meta:
         model = Bookmark
 
     title = Faker("sentence")
@@ -17,7 +20,7 @@ class BookmarkFactory(DjangoModelFactory):
 
 
 class LocationFactory(DjangoModelFactory):
-    class Meta:  # type: ignore[override]
+    class Meta:
         model = Location
         django_get_or_create = ("code",)
 
@@ -33,7 +36,7 @@ class LocationFactory(DjangoModelFactory):
 
 
 class ItemFactory(DjangoModelFactory):
-    class Meta:  # type: ignore[override]
+    class Meta:
         model = Item
 
     name = "Test Item"
@@ -42,7 +45,7 @@ class ItemFactory(DjangoModelFactory):
 
 
 class InventoryFactory(DjangoModelFactory):
-    class Meta:  # type: ignore[override]
+    class Meta:
         model = Inventory
 
     item = SubFactory(ItemFactory)
@@ -51,7 +54,27 @@ class InventoryFactory(DjangoModelFactory):
 
 
 class ItemWithInventoryFactory(ItemFactory):
-    class Meta:  # type: ignore[override]
+    class Meta:
         skip_postgeneration_save = True
 
     inventory = RelatedFactory(InventoryFactory, factory_related_name="item")
+
+
+class AreaFactory(DjangoModelFactory):
+    class Meta:
+        model = Area
+
+    name = "Test Area"
+    notes = Faker("sentence")
+
+
+class TaskFactory(DjangoModelFactory):
+    class Meta:
+        model = Task
+
+    name = "Test Task"
+    notes = Faker("sentence")
+    duration = time(hour=1, minute=30)
+    interval = 6
+    frequency = "months"
+    area = SubFactory(AreaFactory)
