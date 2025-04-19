@@ -1,7 +1,11 @@
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
-from django.views.generic import DetailView, ListView
+from django.shortcuts import get_object_or_404
+from django.urls import reverse
+from django.views.generic import CreateView, DetailView, ListView, UpdateView, View
+from django_htmx.http import HttpResponseLocation
 
 from puka.core.views import get_template
+from puka.upkeep.forms import TaskForm
 from puka.upkeep.models import Task, TaskItem
 from puka.upkeep.services import get_tasks_with_earliest_due_date
 
@@ -57,3 +61,26 @@ class TaskDetailView(DetailView):
         )
         self.extra_context = {"task_consumables": list(TaskItem.objects.filter(task=task))}
         return task
+
+
+class TaskCreateView(CreateView):
+    model = Task
+    form_class = TaskForm
+
+    def get_template_names(self):
+        return get_template(self.request, "upkeep/form.html", "#form-partial")
+
+
+class TaskUpdateView(UpdateView):
+    model = Task
+    form_class = TaskForm
+
+    def get_template_names(self):
+        return get_template(self.request, "upkeep/form.html", "#form-partial")
+
+
+class TaskDeleteView(View):
+    def post(self, _request, pk):
+        task = get_object_or_404(Task, pk=pk)
+        task.delete()
+        return HttpResponseLocation(reverse("upkeep:task-list"), target="#id_content")

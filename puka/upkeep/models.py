@@ -2,6 +2,7 @@ import datetime
 
 from dateutil.relativedelta import relativedelta
 from django.db import models
+from django.urls import reverse
 
 from puka.stuff.models import Item
 
@@ -48,6 +49,9 @@ class Task(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.id})"
+
+    def get_absolute_url(self):
+        return reverse("upkeep:task-detail", args=[self.id])
 
     def is_recurring(self) -> bool:
         return self.interval is not None

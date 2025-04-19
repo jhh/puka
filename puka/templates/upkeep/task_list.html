@@ -34,7 +34,7 @@
     </div>
 
     <div class="flex md:mt-0 md:ml-4">
-        <button hx-get="{% url 'stuff:item-new' %}"
+        <button hx-get="{% url 'upkeep:task-new' %}"
             type="button"
             hx-trigger="click"
             hx-target="#id_content"
@@ -42,7 +42,7 @@
             class="hidden md:inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-xs hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800" >
             New Task
         </button>
-        <button hx-get="{% url 'stuff:item-new' %}"
+        <button hx-get="{% url 'upkeep:task-new' %}"
             type="button"
             hx-trigger="click"
             hx-target="#id_content"

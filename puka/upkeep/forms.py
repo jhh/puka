@@ -35,7 +35,7 @@ class AreaForm(forms.ModelForm):
                 css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
             ),
             Div(
-                PrimaryButton("submit", "Save item"),
+                PrimaryButton("submit", "Save area"),
                 CancelButton("cancel", "Cancel", onclick="window.history.back();"),
                 delete_button,
                 css_class="mt-4 flex gap-x-4",
@@ -50,48 +50,32 @@ class TaskForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        is_edit = self.instance.id is not None
-        for field in ("interval", "frequency"):
-            self.fields[field].label = None
+
+        if self.instance.id:
+            action = reverse("upkeep:task-edit", args=[self.instance.id])
+            delete_button = DeleteButton("upkeep:task-delete", self.instance.id, "task")
+            autofocus = {}
+        else:
+            action = reverse("upkeep:task-new")
+            delete_button = None
+            autofocus = {"autofocus": ""}
 
         self.helper = FormHelper()
-        self.helper.form_method = "post"
-        self.helper.form_action = (
-            reverse("task_edit", args=[self.instance.id]) if is_edit else reverse("task_new")
-        )
-
+        self.helper.attrs = {"hx-post": action}
         self.helper.layout = Layout(
-            Field("name", css_class="form-control"),
-            Field("area", css_class="form-control"),
             Div(
-                Div(
-                    Field("interval", css_class="form-control", placeholder="interval"),
-                    css_class="col",
-                ),
-                Div(Field("frequency", css_class="form-control"), css_class="col"),
-                css_class="row",
+                Field("name", wrapper_class="sm:col-span-6", autocomplete="off", **autofocus),
+                Field("area", wrapper_class="sm:col-span-6"),
+                Field("interval", wrapper_class="sm:col-span-3"),
+                Field("frequency", wrapper_class="sm:col-span-3"),
+                Field("notes", wrapper_class="sm:col-span-6"),
+                css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
             ),
-            Field("duration", css_class="form-control"),
-            Field("notes", css_class="form-control"),
             Div(
-                Submit(
-                    "submit",
-                    "Update" if is_edit else "Save",
-                    css_class="btn btn-primary",
-                ),
-                StrictButton(
-                    "Cancel",
-                    name="cancel",
-                    css_class="btn-secondary ms-2",
-                    onclick="window.history.back();",
-                ),
-                HTML(f"""<button type="button" class="btn btn-outline-danger ms-auto"
-                hx-delete="{{% url 'task_edit' {self.instance.id} %}}"
-                hx-confirm="Delete this task?"
-                >Delete</button>""")
-                if is_edit
-                else None,
-                css_class="d-flex",
+                PrimaryButton("submit", "Save task"),
+                CancelButton("cancel", "Cancel", onclick="window.history.back();"),
+                delete_button,
+                css_class="mt-4 flex gap-x-4",
             ),
         )
 
