@@ -12,12 +12,15 @@ from puka.upkeep.services import get_areas_tasks_schedules
 class AreaListView(ListView):
     context_object_name = "areas"
     model = Area
+    paginate_by = 10
+    paginate_orphans = 2
 
     def get_template_names(self):
         return get_template(self.request, "upkeep/area_list.html", "#list-partial")
 
     def get_queryset(self):
-        return get_areas_tasks_schedules()
+        query = self.request.GET.get("query", "").strip()
+        return get_areas_tasks_schedules(query) if query else get_areas_tasks_schedules()
 
 
 class AreaCreateView(CreateView):

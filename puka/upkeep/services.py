@@ -17,11 +17,24 @@ def item_quantity_needed(item: Item) -> int:
     return result["total"] or 0
 
 
-def get_areas_tasks_schedules() -> list[dict[str, Any]]:
+def get_areas_tasks_schedules(query=None) -> list[dict[str, Any]]:
     """Return all areas with count of tasks and task with the soonest due_date and id."""
-    area_queryset = (
-        Area.objects.prefetch_related("tasks__schedules").annotate(task_count=Count("tasks")).all()
+    area_queryset = Area.objects.prefetch_related("tasks__schedules").annotate(
+        task_count=Count("tasks"),
     )
+
+    if query:
+        search_query = SearchQuery(query)
+        area_queryset = (
+            area_queryset.annotate(
+                search_vector=SearchVector("name", weight="A") + SearchVector("notes", weight="B"),
+                rank=SearchRank("search_vector", search_query),
+            )
+            .filter(search_vector=search_query)
+            .order_by("-rank")
+        )
+    else:
+        area_queryset = area_queryset.all()
 
     areas = []
     for area in area_queryset:
