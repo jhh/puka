@@ -72,7 +72,17 @@ force-exclude = true
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["ANN", "COM812", "D1", "D203", "D212", "E501", "ISC001"]
+ignore = [
+    "ANN",
+    "COM812",
+    "D1",
+    "D203",
+    "D212",
+    "E501",
+    "FIX002",
+    "ISC001",
+    "TD003",
+]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**.py" = ["ARG001", "PLR2004", "S101"]

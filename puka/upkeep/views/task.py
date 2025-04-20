@@ -19,6 +19,7 @@ class TaskListView(ListView):
         return get_template(self.request, "upkeep/task_list.html", "#list-partial")
 
     def get_queryset(self):
+        # TODO(jhh): make query an optional arg to get_tasks_with_earliest_due_date
         query_text = self.request.GET.get("query", "").strip()
         if query_text:
             search_query = SearchQuery(query_text)
