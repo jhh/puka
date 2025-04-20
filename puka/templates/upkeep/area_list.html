@@ -1,11 +1,11 @@
 {% extends "upkeep/base.html" %}
 {% load partials %}
 
-{% block title %}Tasks{% endblock %}
+{% block title %}Areas{% endblock %}
 
 {% partialdef list-partial %}
 {% if htmx %}
-    <title>Tasks - HTMX</title>
+    <title>Areas - HTMX</title>
     {% include "sidebar.html#nav-mobile-partial" %}
     {% include "sidebar.html#nav-desktop-partial" %}
     {% include "upkeep/base.html#menu-partial" %}
