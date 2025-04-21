@@ -1,11 +1,12 @@
+from django.db.models import OuterRef, Prefetch, Subquery
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
-from django.views.generic import CreateView, ListView, UpdateView, View
+from django.views.generic import CreateView, DetailView, ListView, UpdateView, View
 from django_htmx.http import HttpResponseLocation
 
 from puka.core.views import get_template
 from puka.upkeep.forms import AreaForm
-from puka.upkeep.models import Area
+from puka.upkeep.models import Area, Schedule, Task
 from puka.upkeep.services import get_areas_tasks_schedules
 
 
@@ -21,6 +22,24 @@ class AreaListView(ListView):
     def get_queryset(self):
         query = self.request.GET.get("query", "").strip()
         return get_areas_tasks_schedules(query) if query else get_areas_tasks_schedules()
+
+
+class AreaDetailView(DetailView):
+    model = Area
+    context_object_name = "area"
+
+    def get_template_names(self):
+        return get_template(self.request, "upkeep/area_detail.html", "#detail-partial")
+
+    def get_queryset(self):
+        earliest_due_date_subquery = (
+            Schedule.objects.filter(task=OuterRef("pk"), completion_date__isnull=True)
+            .order_by("due_date")
+            .values("due_date")[:1]
+        )
+        tasks = Task.objects.annotate(earliest_due_date=Subquery(earliest_due_date_subquery))
+
+        return Area.objects.prefetch_related(Prefetch("tasks", queryset=tasks))
 
 
 class AreaCreateView(CreateView):
