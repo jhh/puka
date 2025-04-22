@@ -19,7 +19,7 @@
       {% for bookmark in bookmarks %}
         <li>
           <a href="#"
-              hx-post="{% url 'stuff:bookmark-add' item_id %}"
+              hx-post=""
               hx-vals='{"bookmark_pk": {{ bookmark.id }} }'
               class="block px-4 py-2 hover:bg-gray-100">
             {{ bookmark.title }}

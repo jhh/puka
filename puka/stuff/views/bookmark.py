@@ -15,14 +15,14 @@ from puka.stuff.models import Item
 logger = logging.getLogger(__name__)
 
 
-class BookmarkListView(ListView):
+class BookmarkSelectView(ListView):
     model = Bookmark
     template_name = "bookmarks/list.html"
     context_object_name = "bookmarks"
     paginate_by = 10
 
     def get_template_names(self):
-        return get_template(self.request, "stuff/bookmark_select.html", "#filter-partial")
+        return get_template(self.request, "bookmarks/_select.html", "#filter-partial")
 
     def get_queryset(self):
         self.filter = BookmarkFilter(
@@ -37,14 +37,15 @@ class BookmarkListView(ListView):
         context["item_id"] = self.kwargs.get("pk")
         return context
 
-
-@require_POST
-def bookmark_add_view(request, item_pk):
-    item = Item.objects.get(pk=item_pk)
-    bookmark_pk = request.POST.get("bookmark_pk")
-    bookmark = Bookmark.objects.get(pk=bookmark_pk)
-    item.bookmarks.add(bookmark)
-    return HttpResponseLocation(reverse("stuff:item-detail", args=[item_pk]), target="#id_content")
+    def post(self, request, pk):
+        item = Item.objects.get(pk=pk)
+        bookmark_pk = request.POST.get("bookmark_pk")
+        bookmark = Bookmark.objects.get(pk=bookmark_pk)
+        item.bookmarks.add(bookmark)
+        return HttpResponseLocation(
+            reverse("stuff:item-detail", args=[item.pk]),
+            target="#id_content",
+        )
 
 
 @require_POST

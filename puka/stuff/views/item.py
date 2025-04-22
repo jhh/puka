@@ -1,4 +1,5 @@
 import logging
+from types import MappingProxyType
 
 from django.db import transaction
 from django.db.models import Sum
@@ -41,6 +42,7 @@ class ItemListView(ListView):
 class ItemDetailView(DetailView):
     model = Item
     context_object_name = "item"
+    extra_context = MappingProxyType({"bookmark_delete_url": "stuff:bookmark-delete"})
 
     def get_template_names(self):
         return get_template(self.request, "stuff/item_detail.html", "#detail-partial")

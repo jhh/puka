@@ -31,7 +31,7 @@
                         {% endfor %}
                         </ul>
                         <div class="w-2">
-                            <button hx-post="{% url 'stuff:bookmark-delete' item.id %}"
+                            <button hx-post="{% url bookmark_delete_url item.id %}"
                                 hx-confirm="Are you sure you want to delete this bookmark?"
                                 type="button"
                                 hx-vals='{"bookmark_pk": {{ bookmark.id }}}'

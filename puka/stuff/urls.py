@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from django.urls import URLPattern, URLResolver, path
 
-from puka.stuff.views.bookmark import BookmarkListView, bookmark_add_view, bookmark_delete_view
+from puka.stuff.views.bookmark import BookmarkSelectView, bookmark_delete_view
 from puka.stuff.views.item import (
     InventoryCreateView,
     InventoryDeleteView,
@@ -42,7 +42,6 @@ urlpatterns: list[URLPattern | URLResolver] = [
     path("inventory/<int:pk>/delete/", InventoryDeleteView.as_view(), name="inventory-delete"),
     path("inventory/<int:pk>/adjust/", adjust_inventory, name="inventory-adjust"),
     # Bookmark
-    path("item/<int:pk>/bookmark/", BookmarkListView.as_view(), name="bookmark-list"),
-    path("item/<int:item_pk>/bookmark/add/", bookmark_add_view, name="bookmark-add"),
+    path("item/<int:pk>/bookmark/", BookmarkSelectView.as_view(), name="bookmark-select"),
     path("item/<int:item_pk>/bookmark/delete/", bookmark_delete_view, name="bookmark-delete"),
 ]
