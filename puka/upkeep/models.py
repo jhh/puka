@@ -4,12 +4,14 @@ from dateutil.relativedelta import relativedelta
 from django.db import models
 from django.urls import reverse
 
+from puka.bookmarks.models import Bookmark
 from puka.stuff.models import Item
 
 
 class Area(models.Model):
     name = models.CharField("area name", max_length=200)
     notes = models.TextField(blank=True)
+    bookmarks = models.ManyToManyField(Bookmark, related_name="+")
 
     def __str__(self):
         return self.name

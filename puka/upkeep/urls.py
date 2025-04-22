@@ -9,6 +9,10 @@ from puka.upkeep.views.area import (
     AreaListView,
     AreaUpdateView,
 )
+from puka.upkeep.views.bookmark import (
+    BookmarkSelectView,
+    bookmark_delete_view,
+)
 from puka.upkeep.views.home import HomeListView
 from puka.upkeep.views.item import (
     TaskItemCreateView,
@@ -53,4 +57,7 @@ urlpatterns: list[URLPattern | URLResolver] = [
     path("task/<int:pk>/item/new/", TaskItemCreateView.as_view(), name="task-item-new"),
     path("item/<int:pk>/edit/", TaskItemUpdateView.as_view(), name="task-item-edit"),
     path("item/<int:pk>/delete/", TaskItemDeleteView.as_view(), name="task-item-delete"),
+    # Bookmark
+    path("area/<int:pk>/bookmark/", BookmarkSelectView.as_view(), name="bookmark-select"),
+    path("area/<int:pk>/bookmark/delete/", bookmark_delete_view, name="bookmark-delete"),
 ]

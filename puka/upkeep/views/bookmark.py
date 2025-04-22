@@ -10,7 +10,7 @@ from django_htmx.http import HttpResponseLocation
 from puka.bookmarks.filters import BookmarkFilter
 from puka.bookmarks.models import Bookmark
 from puka.core.views import get_template
-from puka.stuff.models import Item
+from puka.upkeep.models import Area
 
 logger = logging.getLogger(__name__)
 
@@ -33,24 +33,23 @@ class BookmarkSelectView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["filter"] = self.filter
-        context["item_id"] = self.kwargs.get("pk")
         return context
 
     def post(self, request, pk):
-        item = Item.objects.get(pk=pk)
+        area = Area.objects.get(pk=pk)
         bookmark_pk = request.POST.get("bookmark_pk")
         bookmark = Bookmark.objects.get(pk=bookmark_pk)
-        item.bookmarks.add(bookmark)
+        area.bookmarks.add(bookmark)
         return HttpResponseLocation(
-            reverse("stuff:item-detail", args=[item.pk]),
+            reverse("upkeep:area-detail", args=[area.pk]),
             target="#id_content",
         )
 
 
 @require_POST
-def bookmark_delete_view(request, item_pk):
-    item = Item.objects.get(pk=item_pk)
+def bookmark_delete_view(request, pk):
+    area = Area.objects.get(pk=pk)
     bookmark_pk = request.POST.get("bookmark_pk")
     bookmark = Bookmark.objects.get(pk=bookmark_pk)
-    item.bookmarks.remove(bookmark)
-    return HttpResponseLocation(reverse("stuff:item-detail", args=[item_pk]), target="#id_content")
+    area.bookmarks.remove(bookmark)
+    return HttpResponseLocation(reverse("upkeep:area-detail", args=[pk]), target="#id_content")

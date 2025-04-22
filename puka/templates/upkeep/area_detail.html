@@ -47,7 +47,7 @@
                         hx-target="#id_content"
                         class="block p-2 hover:text-indigo-600">Edit area</a>
                     <a href="#"
-                        hx-get="{% url 'stuff:bookmark-list' area.id %}"
+                        hx-get="{% url 'upkeep:bookmark-select' area.id %}"
                         hx-push-url="true"
                         hx-target="#id_content"
                         class="block p-2 hover:text-indigo-600">Add bookmark</a>
@@ -69,7 +69,7 @@
             {% with label="Notes" value=area.notes %}
                 {% partial field-partial %}
             {% endwith %}
-            {# include "bookmarks/_detail_page.html" #}
+            {% include "bookmarks/_detail_page.html" with item=area %}
         </dl>
     </div>
     <div class="border-t border-gray-100">

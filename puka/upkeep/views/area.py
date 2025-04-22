@@ -1,3 +1,5 @@
+from types import MappingProxyType
+
 from django.db.models import OuterRef, Prefetch, Subquery
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
@@ -27,6 +29,7 @@ class AreaListView(ListView):
 class AreaDetailView(DetailView):
     model = Area
     context_object_name = "area"
+    extra_context = MappingProxyType({"bookmark_delete_url": "upkeep:bookmark-delete"})
 
     def get_template_names(self):
         return get_template(self.request, "upkeep/area_detail.html", "#detail-partial")
