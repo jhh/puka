@@ -23,7 +23,12 @@
     {# Header #}
     <div class="flex justify-between px-4 py-6 sm:px-6">
         <div>
-            <h3 class="text-base/7 font-semibold text-gray-900">{{ task.area.name }}: {{ task.name }}</h3>
+            <h3 class="text-base/7 font-semibold text-gray-900">
+                <a href="{% url 'upkeep:area-detail' task.area_id %}"
+                    hx-get="{% url 'upkeep:area-detail' task.area_id %}"
+                    hx-push-url="true"
+                    hx-target="#id_content"
+                    class="text-indigo-600 hover:text-indigo-900">{{ task.area.name }}</a> : {{ task.name }}</h3>
             <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">{{ task.notes }}</p>
             {% if task.interval %}
                 <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">Interval: {{ task.interval }} {{ task.frequency }} </p>
