@@ -47,6 +47,11 @@
                         hx-target="#id_content"
                         class="block p-2 hover:text-indigo-600">Edit area</a>
                     <a href="#"
+                        hx-get="{% url 'upkeep:task-new' %}{% querystring area=area.id %}"
+                        hx-push-url="true"
+                        hx-target="#id_content"
+                        class="block p-2 hover:text-indigo-600">Add task</a>
+                    <a href="#"
                         hx-get="{% url 'upkeep:bookmark-select' area.id %}"
                         hx-push-url="true"
                         hx-target="#id_content"

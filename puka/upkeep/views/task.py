@@ -71,6 +71,9 @@ class TaskCreateView(CreateView):
     def get_template_names(self):
         return get_template(self.request, "upkeep/form.html", "#form-partial")
 
+    def get_initial(self):
+        return {"area": self.request.GET.get("area")}
+
 
 class TaskUpdateView(UpdateView):
     model = Task
