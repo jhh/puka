@@ -1,17 +1,24 @@
 import logging
+from datetime import UTC, datetime, timedelta
 
 from django.core.mail import send_mail
 from django.core.management import BaseCommand
 from django.template.loader import render_to_string
 
-from puka.upkeep.services import get_upcoming_due_tasks
+from puka.upkeep.services import get_tasks_with_earliest_due_date
 
 logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
     def handle(self, *_args, **_options):
-        tasks = get_upcoming_due_tasks(within_days=1)
+        within_days = datetime.now(UTC).date() + timedelta(days=14)
+        tasks = (
+            get_tasks_with_earliest_due_date()
+            .select_related("area")
+            .filter(earliest_due_date__lte=within_days, earliest_due_date__isnull=False)
+            .order_by("earliest_due_date")
+        )
 
         if not tasks:
             logger.info("No upcoming due tasks found")

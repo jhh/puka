@@ -15,6 +15,7 @@ pkgs.mkShell {
     [
       pythonSet.python
       just
+      mailpit
       nil
       nix-output-monitor
       nixfmt-rfc-style

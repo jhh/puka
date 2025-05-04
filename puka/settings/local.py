@@ -21,6 +21,8 @@ MIDDLEWARE += [  # noqa: F405
 
 INTERNAL_IPS = ["127.0.0.1"]
 
+EMAIL_PORT = 1025
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,

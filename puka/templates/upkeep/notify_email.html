@@ -29,7 +29,7 @@
 
   {% for task in tasks %}
     <tr>
-      <td><a href="https://upkeep.j3ff.io{% url 'task' task.id %}">{{ task.name }}</a></td>
+      <td><a href="https://puka.j3ff.io{% url 'upkeep:task-detail' task.id %}">{{ task.name }}</a></td>
       <td>{{ task.due_date }}</td>
       {% if task.is_ready %}<td>in-stock</td>{% else %}<td class="warning">out-of-stock</td>{% endif %}
     </tr>
