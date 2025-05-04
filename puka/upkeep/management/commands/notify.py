@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     def handle(self, *_args, **_options):
-        within_days = datetime.now(UTC).date() + timedelta(days=14)
+        within_days = datetime.now(UTC).date() + timedelta(days=1)
         tasks = (
             get_tasks_with_earliest_due_date()
             .select_related("area")
@@ -26,7 +26,7 @@ class Command(BaseCommand):
 
         context = {
             "tasks": tasks,
-            "period": "within the next two weeks",
+            "period": "within the next day",
         }
         text_content = render_to_string("upkeep/notify_email.txt", context)
         html_content = render_to_string("upkeep/notify_email.html", context)
