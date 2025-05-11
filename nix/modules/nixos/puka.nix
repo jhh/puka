@@ -102,6 +102,18 @@ in
       after = [ "postgresql.service" ];
     };
 
+    systemd.services."puka-notify" = {
+      script = ''
+        ${cfg.venv}/bin/puka-manage notify
+      '';
+      serviceConfig = {
+        EnvironmentFile = cfg.secrets;
+        Type = "oneshot";
+        User = "puka";
+      };
+      startAt = "daily";
+    };
+
     networking.firewall.allowedTCPPorts = [
       443
       80
