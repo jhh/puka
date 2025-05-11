@@ -103,6 +103,11 @@ in
     };
 
     systemd.services."puka-notify" = {
+      environment = {
+        DJANGO_SETTINGS_MODULE = cfg.settings-module;
+        DJANGO_STATIC_ROOT = cfg.static-root;
+      };
+
       script = ''
         ${cfg.venv}/bin/puka-manage notify
       '';
