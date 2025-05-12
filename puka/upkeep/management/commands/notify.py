@@ -1,4 +1,3 @@
-import logging
 from datetime import UTC, datetime, timedelta
 
 from django.core.mail import send_mail
@@ -8,8 +7,6 @@ from environs import Env
 
 from puka.upkeep.services import get_tasks_with_earliest_due_date
 
-logger = logging.getLogger(__name__)
-
 
 class Command(BaseCommand):
     def handle(self, *_args, **_options):
@@ -18,10 +15,16 @@ class Command(BaseCommand):
             "TASK_WITHIN",
             timedelta(days=1),
         )
+        self.stdout.write(f"Checking for tasks due before {task_within_date}.")
+
         supplies_within_date = datetime.now(UTC).date() + env.timedelta(
             "SUPPLIES_WITHIN",
             timedelta(weeks=2),
         )
+        self.stdout.write(
+            f"Checking for tasks with out-of-stock supplies due before {supplies_within_date}.",
+        )
+
         if supplies_within_date < task_within_date:
             msg = "PUKA_SUPPLIES_WITHIN must be greater or equal to PUKA_TASK_WITHIN"
             raise CommandError(msg)
@@ -43,7 +46,7 @@ class Command(BaseCommand):
                 tasks.append(task)
 
         if not tasks:
-            logger.info("No upcoming due tasks found")
+            self.stdout.write("No upcoming due tasks found")
             return
 
         context = {"tasks": tasks}
