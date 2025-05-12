@@ -27,7 +27,7 @@ in
       default = 8000;
     };
 
-    settings-module = mkOption {
+    settingsModule = mkOption {
       type = lib.types.str;
       default = "puka.settings.production";
       description = "Django settings module for Puka";
@@ -39,7 +39,7 @@ in
       description = "Puka virtual environment package";
     };
 
-    static-root = mkOption {
+    staticRoot = mkOption {
       type = lib.types.package;
       default = static;
       description = "Puka static root package";
@@ -75,8 +75,8 @@ in
       description = "Puka server";
 
       environment = {
-        DJANGO_SETTINGS_MODULE = cfg.settings-module;
-        DJANGO_STATIC_ROOT = cfg.static-root;
+        DJANGO_SETTINGS_MODULE = cfg.settingsModule;
+        DJANGO_STATIC_ROOT = cfg.staticRoot;
       };
 
       serviceConfig = {
@@ -117,8 +117,8 @@ in
 
     systemd.services."puka-notify" = {
       environment = {
-        DJANGO_SETTINGS_MODULE = cfg.settings-module;
-        DJANGO_STATIC_ROOT = cfg.static-root;
+        DJANGO_SETTINGS_MODULE = cfg.settingsModule;
+        DJANGO_STATIC_ROOT = cfg.staticRoot;
         PUKA_TASK_WITHIN = cfg.taskWithin;
         PUKA_SUPPLIES_WITHIN = cfg.suppliesWithin;
       };
