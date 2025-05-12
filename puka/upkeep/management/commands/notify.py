@@ -26,7 +26,7 @@ class Command(BaseCommand):
         )
 
         if supplies_within_date < task_within_date:
-            msg = "PUKA_SUPPLIES_WITHIN must be greater or equal to PUKA_TASK_WITHIN"
+            msg = "PUKA_SUPPLIES_WITHIN must be greater or equal to PUKA_TASK_WITHIN."
             raise CommandError(msg)
 
         tasks_qs = (
@@ -46,7 +46,7 @@ class Command(BaseCommand):
                 tasks.append(task)
 
         if not tasks:
-            self.stdout.write("No upcoming due tasks found")
+            self.stdout.write("No upcoming due tasks found.")
             return
 
         context = {"tasks": tasks}
