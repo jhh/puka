@@ -23,7 +23,7 @@ class Command(BaseCommand):
             timedelta(weeks=2),
         )
         if supplies_within_date < task_within_date:
-            msg = "SUPPLIES_WITHIN must be greater or equal to TASK_WITHIN"
+            msg = "PUKA_SUPPLIES_WITHIN must be greater or equal to PUKA_TASK_WITHIN"
             raise CommandError(msg)
 
         tasks_qs = (

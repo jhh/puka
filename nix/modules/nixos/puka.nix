@@ -53,6 +53,19 @@ in
       '';
       default = [ ];
     };
+
+    taskWithin = mkOption {
+      type = lib.types.str;
+      default = "1d";
+      description = "Notification threshold for upcoming tasks";
+    };
+
+    suppliesWithin = mkOption {
+      type = lib.types.str;
+      default = "2w";
+      description = "Notification threshold for out-of-stock task supplies";
+    };
+
   };
 
   config = mkIf cfg.enable {
@@ -106,6 +119,8 @@ in
       environment = {
         DJANGO_SETTINGS_MODULE = cfg.settings-module;
         DJANGO_STATIC_ROOT = cfg.static-root;
+        PUKA_TASK_WITHIN = cfg.taskWithin;
+        PUKA_SUPPLIES_WITHIN = cfg.suppliesWithin;
       };
 
       script = ''
