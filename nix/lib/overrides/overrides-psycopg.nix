@@ -8,7 +8,7 @@ final: prev: {
       });
     postPatch = ''
       substituteInPlace setup.py \
-        --replace-fail 'pg_config = "pg_config"' 'pg_config = "${pkgs.lib.getDev pkgs.postgresql}/bin/pg_config"'
+        --replace-fail 'pg_config = "pg_config"' 'pg_config = "${pkgs.postgresql.pg_config}/bin/pg_config"'
     '';
   });
 }
