@@ -206,7 +206,7 @@
     </li>
 
     <li>
-        <a href="#"
+        <a href="{% url 'upkeep:home' %}"
             class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold {% get_current_class 'upkeep:home' %}" >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="size-6">
@@ -218,12 +218,12 @@
     </li>
 
     <li>
-        <a hx-get="{% url 'bookmarks:filter' %}"
+        <a hx-get="{% url 'stuff:item-list' %}"
             hx-target="#id_content"
             hx-push-url="true"
             @click="sidebarOpen = false"
             href="#"
-            class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold {% get_current_class 'bookmarks:filter' %}" >
+            class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold {% get_current_class 'stuff:item-list' %}" >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="size-6">
                 <path stroke-linecap="round" stroke-linejoin="round"
