@@ -20,7 +20,7 @@ pkgs.mkShell {
       nix-output-monitor
       nixfmt-rfc-style
       nodejs
-      postgresql.dev
+      postgresql.pg_config
       perSystem.uv2nix.uv-bin
       watchman
     ]
