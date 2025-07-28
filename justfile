@@ -3,7 +3,7 @@ _default:
     @just --list
 
 # bootstrap the development environment
-init: pre-commit npm-install
+init: npm-install update-css update-js
     echo DEBUG=true > .env
 
 # run mypy type checks
@@ -39,10 +39,6 @@ shell: (manage "shell")
 startapp appname:
     uv run puka/manage.py startapp {{ appname }}
     mv {{ appname }} puka/
-
-# install pre-commit hooks
-pre-commit:
-    pre-commit install --install-hooks
 
 # install npm deppendencies
 npm-install:

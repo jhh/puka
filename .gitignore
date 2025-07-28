@@ -263,3 +263,4 @@ sketch
 .pre-commit-config.yaml
 full_backup.json
 puka.sql.gz
+.db
