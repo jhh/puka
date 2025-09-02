@@ -311,14 +311,14 @@ wheels = [
 
 [[package]]
 name = "django-upgrade"
-version = "1.25.0"
+version = "1.27.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "tokenize-rt" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/55/a7/5140add1e41a0577355be460640136af0b9f48a40e2abd6c1bcf800ef047/django_upgrade-1.25.0.tar.gz", hash = "sha256:443fcb8e134e5d6455bdce1b41790f3fcf3a84481edd81862565566c17bf1c35", size = 36341, upload-time = "2025-05-13T21:41:39.866Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ef/a9/7b0bfa99ed86082d90ffe686c845d9cc94571b3f9fabf1f222dd776492ed/django_upgrade-1.27.0.tar.gz", hash = "sha256:1a865f772a35fb909acbeae02ed96d009ceb2f7349ebac0772f148e606cd36c3", size = 37144, upload-time = "2025-08-27T14:54:24.465Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a1/25/f68dbdf4911da6a109cc077234cf78cf56a0bd2e472e3dd2b1fd2f7e2146/django_upgrade-1.25.0-py3-none-any.whl", hash = "sha256:da369c52b9fec88a50b0ca493d163a2981b9c8c047e7ff29c4cf7083935586f4", size = 62872, upload-time = "2025-05-13T21:41:38.481Z" },
+    { url = "https://files.pythonhosted.org/packages/4e/41/ede4848396b5ec3568482375d229dc05f6cbc1b9c8d61bfafac39f8c4137/django_upgrade-1.27.0-py3-none-any.whl", hash = "sha256:54a9009905b30dc6943109ad42cdadedd9fdff5d98ac9e0488074b08158d758d", size = 63756, upload-time = "2025-08-27T14:54:22.97Z" },
 ]
 
 [[package]]
