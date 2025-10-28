@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 from warnings import filterwarnings
 
 from .base import *  # noqa: F403
@@ -12,14 +11,3 @@ filterwarnings("ignore", "The FORMS_URLFIELD_ASSUME_HTTPS transitional setting i
 FORMS_URLFIELD_ASSUME_HTTPS = True
 
 STATIC_ROOT = ""
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "USER": os.getenv("PGUSER", "postgres"),
-        "HOST": os.getenv("PGHOST", "127.0.0.1"),
-        "TEST": {
-            "NAME": os.getenv("PGDATABASE", "test_puka"),
-        },
-    },
-}
