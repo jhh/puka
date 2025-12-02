@@ -10,7 +10,7 @@ let
     SECRET_KEY="test-secret-key"
   '';
 in
-pkgs.nixosTest {
+pkgs.testers.nixosTest {
   name = "puka-integration-tests";
 
   nodes.machine =
