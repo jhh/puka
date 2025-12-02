@@ -46,7 +46,7 @@ npm-install:
 
 # update npm deppendencies to latest versions
 npm-update:
-    npm install tailwindcss@latest @tailwindcss/cli@latest @tailwindcss/forms@latest htmx.org@next alpinejs@latest @alpinejs/focus@latest esbuild@latest
+    npm install tailwindcss@latest @tailwindcss/cli@latest @tailwindcss/forms@latest htmx.org@latest alpinejs@latest @alpinejs/focus@latest esbuild@latest
 
 # update CSS
 update-css:
