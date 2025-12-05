@@ -21,7 +21,6 @@ INSTALLED_APPS = [
     "django.contrib.postgres",
     "django.contrib.staticfiles",
     "django_htmx",
-    "template_partials",
     "django_filters",
     "crispy_forms",
     "crispy_tailwind",
