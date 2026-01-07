@@ -2,7 +2,9 @@
   (:require [com.stuartsierra.component :as component]
             [reitit.ring :as ring]
             [ring.adapter.jetty :refer [run-jetty]]
-            [puka.models.core :refer [setup-database]])
+            [ring.util.response :as resp]
+            [puka.models.core :refer [setup-database]]
+            [puka.controllers.core :as controller])
   (:gen-class))
 
 (defrecord Application [config    ; config
@@ -19,17 +21,21 @@
   (component/using (map->Application {:config config})
                    [:database]))
 
-(defn hello [_]
-  {:status 200
-   :headers {"Content-Type" "text/plain"}
-   :body "Hello, Jeff!"})
+(defn render-middleware
+  [handler]
+  (fn [req]
+    (let [resp (handler req)]
+      (if (resp/response? resp)
+        resp
+        (#'controller/render-page resp)))))
 
-(defn my-handler [_application]
+(defn application-handler [_application]
   (ring/ring-handler
    (ring/router
-    ["/" {:get {:handler #'hello}}])
+    ["/"  #'controller/send-message])
    (ring/create-default-handler
-    {:not-found (constantly {:status 404 :body "Not found"})})))
+    {:not-found (constantly {:status 404 :body "Not found"})})
+   {:middleware [[render-middleware]]}))
 
 (defrecord WebServer [handler-fn port         ; parameters
                       application             ; dependencies
@@ -61,7 +67,7 @@
   ([port repl]
    (component/system-map :application (my-application {:repl repl})
                          :database (setup-database)
-                         :web-server (web-server #'my-handler port))))
+                         :web-server (web-server #'application-handler port))))
 (comment
   (def system (new-system 8888))
   (alter-var-root #'system component/start)
