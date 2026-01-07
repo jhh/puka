@@ -29,11 +29,17 @@
         resp
         (#'controller/render-page resp)))))
 
-(defn application-handler [_application]
+(defn application-middleware
+  [handler application]
+  (fn [req]
+    (handler (assoc req :application/component application))))
+
+(defn application-handler [application]
   (ring/ring-handler
    (ring/router
     ["/"  #'controller/send-message]
-    {:data {:middleware [[render-middleware]]}})
+    {:data {:middleware [[render-middleware]
+                         [application-middleware application]]}})
    (ring/create-default-handler
     {:not-found (constantly {:status 404 :body "Not found"})})))
 
