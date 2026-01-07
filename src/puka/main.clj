@@ -32,10 +32,10 @@
 (defn application-handler [_application]
   (ring/ring-handler
    (ring/router
-    ["/"  #'controller/send-message])
+    ["/"  #'controller/send-message]
+    {:data {:middleware [[render-middleware]]}})
    (ring/create-default-handler
-    {:not-found (constantly {:status 404 :body "Not found"})})
-   {:middleware [[render-middleware]]}))
+    {:not-found (constantly {:status 404 :body "Not found"})})))
 
 (defrecord WebServer [handler-fn port         ; parameters
                       application             ; dependencies
