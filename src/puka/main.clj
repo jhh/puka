@@ -77,11 +77,11 @@
   [& [port]]
   (let [port (or port (get (System/getenv) "PORT" 8080))
         port (cond-> port (string? port) Integer/parseInt)]
-    (println "Starting up on port" port)
+    (println (format "Listening on http://localhost:%d" port))
     (-> (component/start (new-system port false))
         :web-server :shutdown deref))) ; wait "forever" on the promise created:
 
 (comment
-  (def db (-> system :application :database :datasource))
+  (def db (-> system :application :database :datasource)) ; system must be started first
   (require '[next.jdbc :as jdbc])
   (jdbc/execute! db ["select * from bookmarks_bookmark limit 3"]))
