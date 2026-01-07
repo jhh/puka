@@ -1,10 +1,13 @@
 (ns puka.main
   (:require [com.stuartsierra.component :as component]
             [reitit.ring :as ring]
-            [ring.adapter.jetty :refer [run-jetty]])
+            [ring.adapter.jetty :refer [run-jetty]]
+            [puka.models.core :refer [setup-database]])
   (:gen-class))
 
-(defrecord Application [config state]
+(defrecord Application [config    ; config
+                        database  ; dependency
+                        state]    ; state
   component/Lifecycle
   (start [this]
     (assoc this :state "Running"))
@@ -13,7 +16,8 @@
 
 (defn my-application
   [config]
-  (map->Application {:config config}))
+  (component/using (map->Application {:config config})
+                   [:database]))
 
 (defn hello [_]
   {:status 200
@@ -56,6 +60,7 @@
   ([port] (new-system port true))
   ([port repl]
    (component/system-map :application (my-application {:repl repl})
+                         :database (setup-database)
                          :web-server (web-server #'my-handler port))))
 (comment
   (def system (new-system 8888))
@@ -69,3 +74,8 @@
     (println "Starting up on port" port)
     (-> (component/start (new-system port false))
         :web-server :shutdown deref))) ; wait "forever" on the promise created:
+
+(comment
+  (def db (-> system :application :database :datasource))
+  (require '[next.jdbc :as jdbc])
+  (jdbc/execute! db ["select * from bookmarks_bookmark limit 3"]))
