@@ -264,3 +264,4 @@ sketch
 full_backup.json
 puka.sql.gz
 .db
+.cpcache
