@@ -87,7 +87,3 @@
     (-> (component/start (new-system port false))
         :web-server :shutdown deref))) ; wait "forever" on the promise created:
 
-(comment
-  (def db (-> system :application :database)) ; system must be started first
-  (require '[next.jdbc :as jdbc])
-  (jdbc/execute! (db) ["select * from bookmarks_bookmark limit 3"]))

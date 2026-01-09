@@ -1,5 +1,6 @@
 (ns puka.models.bookmark
   (:require
+   [next.jdbc :as jdbc]
    [next.jdbc.sql :as sql]
    [next.jdbc.result-set :as result-set]))
 
@@ -17,4 +18,6 @@
 (comment
   (require '[puka.main])
   (def db (-> puka.main/system :application :database)) ; system must be started first
-  (get-bookmarks db 5))
+  (get-bookmarks db 5)
+  (jdbc/execute! (db) ["select * from bookmarks_bookmark limit 3"]))
+
