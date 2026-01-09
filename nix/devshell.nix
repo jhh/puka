@@ -34,8 +34,9 @@ pkgs.mkShell {
 
   shellHook = ''
     unset PYTHONPATH
-    export PGHOST=$(git rev-parse --show-toplevel)/.db
-    export DJANGO_DATABASE_URL=postgres://$(echo $PGHOST | sed -e 's/\//%2f/g')/puka
+    # TODO: make these conditional on system
+    # export PGHOST=$(git rev-parse --show-toplevel)/.db
+    # export DJANGO_DATABASE_URL=postgres://$(echo $PGHOST | sed -e 's/\//%2f/g')/puka
     ${pre-commit.shellHook}
   '';
 }
