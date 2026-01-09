@@ -22,4 +22,4 @@
   clojure.lang.IFn
   (invoke [_] datasource))
 
-(defn setup-database [] (map->Database {:db-spec puka-db}))
+(defn database-component [] (map->Database {:db-spec puka-db}))

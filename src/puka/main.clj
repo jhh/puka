@@ -3,7 +3,7 @@
             [reitit.ring :as ring]
             [ring.adapter.jetty :refer [run-jetty]]
             [ring.util.response :as resp]
-            [puka.models.core :refer [setup-database]]
+            [puka.models.core :refer [database-component]]
             [puka.controllers.core :as controller])
   (:gen-class))
 
@@ -16,7 +16,7 @@
   (stop [this]
     (assoc this :state "Stopped")))
 
-(defn my-application
+(defn application-component
   [config]
   (component/using (map->Application {:config config})
                    [:database]))
@@ -63,7 +63,7 @@
         (assoc this :http-server nil))
       this)))
 
-(defn web-server
+(defn web-server-component
   [handler-fn port]
   (component/using (map->WebServer {:handler-fn handler-fn :port port})
                    [:application]))
@@ -71,9 +71,9 @@
 (defn new-system
   ([port] (new-system port true))
   ([port repl]
-   (component/system-map :application (my-application {:repl repl})
-                         :database (setup-database)
-                         :web-server (web-server #'application-handler port))))
+   (component/system-map :application (application-component {:repl repl})
+                         :database (database-component)
+                         :web-server (web-server-component #'application-handler port))))
 (comment
   (def system (new-system 8888))
   (alter-var-root #'system component/start)
