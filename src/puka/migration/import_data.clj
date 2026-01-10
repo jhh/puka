@@ -11,13 +11,21 @@
   [db-source db-dest]
   (let [tags (sql/query db-source
                         ["SELECT * FROM taggit_tag"]
-                        {:builder-fn rs/as-unqualified-kebab-maps})]
-    (doseq [tag tags]
-      (sql/insert! db-dest :tag tag))))
+                        {:builder-fn rs/as-unqualified-kebab-maps})
+        total (count tags)]
+    (println (format "Importing %d tags..." total))
+    (doseq [[idx tag] (map-indexed vector tags)]
+      (sql/insert! db-dest :tag tag)
+      (when (zero? (mod (inc idx) 100))
+        (println (format "Progress: %d/%d tags" (inc idx) total))))
+    (println "Import of tags complete!")))
 
 (defn delete-tags
   [db-dest]
-  (jdbc/execute! db-dest ["TRUNCATE TABLE tag RESTART IDENTITY CASCADE"]))
+  (let [count (jdbc/execute-one! db-dest ["SELECT count(*) FROM tag"])]
+    (println (format "Deleting %d tags..." (:count count))))
+  (jdbc/execute! db-dest ["TRUNCATE TABLE tag RESTART IDENTITY CASCADE"])
+  (println "Deletion of tags complete!"))
 
 (defn bookmarks-up
   [_]
@@ -32,4 +40,6 @@
 
 (comment
   (bookmarks-up nil)
-  (bookmarks-down nil))
+  (bookmarks-down nil)
+  ;
+  )
