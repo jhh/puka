@@ -1,0 +1,4 @@
+{:ns puka.migration.import-data
+ :up-fn bookmarks-up
+ :down-fn bookmarks-down
+ :transaction? true}
