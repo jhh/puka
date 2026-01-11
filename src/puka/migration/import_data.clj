@@ -1,5 +1,6 @@
 (ns puka.migration.import-data
   (:require
+   [clojure.set :as set]
    [next.jdbc :as jdbc]
    [next.jdbc.sql :as sql]
    [next.jdbc.result-set :as rs]))
@@ -40,16 +41,50 @@
         (println (format "Progress: %d/%d bookmarks" (inc idx) total))))
     (println "Import of bookmarks complete!")))
 
+(defn delete-bookmarks
+  [_ db-dest]
+  (let [count (jdbc/execute-one! db-dest ["SELECT count(*) FROM bookmark"])]
+    (println (format "Deleting %d bookmarks..." (:count count))))
+  (jdbc/execute! db-dest ["TRUNCATE TABLE bookmark RESTART IDENTITY CASCADE"])
+  (println "Deletion of bookmarks complete!"))
+
+(defn import-taggings
+  [db-source db-dest]
+  (let [taggings (sql/query db-source
+                            ["SELECT * FROM taggit_taggeditem"]
+                            {:builder-fn rs/as-unqualified-maps})
+        total (count taggings)]
+    (println (format "Importing %d taggings" total))
+    (doseq [[idx tagging] (map-indexed vector taggings)]
+      (let [tagging (dissoc tagging :content_type_id)
+            tagging (assoc tagging :taggable_type (name :bookmark))
+            tagging (set/rename-keys tagging {:object_id :taggable_id})]
+        (sql/insert! db-dest :tagging tagging))
+      (when (zero? (mod (inc idx) 100))
+        (println (format "Progress: %d/%d taggings" (inc idx) total))))
+    (println "Import of taggings complete!")))
+
+(defn delete-taggings
+  [_ db-dest]
+  (let [count (jdbc/execute-one! db-dest ["SELECT count(*) FROM tagging"])]
+    (println (format "Deleting %d taggings..." (:count count))))
+  (jdbc/execute! db-dest ["TRUNCATE TABLE tagging RESTART IDENTITY CASCADE"])
+  (println "Deletion of taggings complete!"))
+
 (defn bookmarks-up
   [_]
   (let [db-source (jdbc/get-datasource db-source-spec)
         db-dest (jdbc/get-datasource db-dest-spec)]
-    (import-tags db-source db-dest)))
+    (import-tags db-source db-dest)
+    (import-bookmarks db-source db-dest)
+    (import-taggings db-source db-dest)))
 
 (defn bookmarks-down
   [_]
   (let [db-dest (jdbc/get-datasource db-dest-spec)]
-    (delete-tags nil db-dest)))
+    (delete-tags nil db-dest)
+    (delete-bookmarks nil db-dest)
+    (delete-taggings nil db-dest)))
 
 (comment
   (bookmarks-up nil)
@@ -57,6 +92,6 @@
   ;
   (let [db-source (jdbc/get-datasource db-source-spec)
         db-dest (jdbc/get-datasource db-dest-spec)]
-    (import-tags db-source db-dest))
+    (import-taggings db-source db-dest))
   ;
   )
