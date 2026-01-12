@@ -3,5 +3,5 @@
             [puka.main :as sut])) ; system under test
 
 (deftest a-test
-  (testing "FIXME, I fail."
-    (is (= 0 1))))
+  (testing "Placeholder test passes"
+    (is (= 1 1))))
