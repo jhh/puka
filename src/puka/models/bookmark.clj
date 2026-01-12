@@ -52,7 +52,7 @@
 
 (comment
   (defn db [] (jdbc/get-datasource {:dbtype "postgresql" :dbname "puka-test"}))
-  (time (get-bookmarks db :active true :offset 0 :limit 25))
+  (doseq [_ (range 5)] (time (get-bookmarks db :active true :offset 0 :limit 25)))
   (time (jdbc/execute! (db) ["select * from bookmark limit 3"]))
 
   ;; Benchmark: run get-bookmarks 10 times and average (with paging)
@@ -66,6 +66,11 @@
         avg (/ (reduce + times) iterations)]
     (println "Times (ms):" times)
     (println "Average:" avg "ms"))
+  ;
+  ; Use the connection pool in the database component
+  ; N.B. system must be started first
+  (require '[puka.main :as main])
+  (def db (-> main/system :application :database))
   ;
   )
 
