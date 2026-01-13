@@ -28,25 +28,33 @@
   [db & {:keys [active offset limit]
          :or {offset 0
               limit 25}}]
-  (let [base-query {:select [:b.id
-                             :b.title
-                             :b.url
-                             :b.description
-                             :b.created
-                             :b.active
+  (let [base-query {:select [:b/id
+                             :b/title
+                             :b/url
+                             :b/description
+                             :b/created
+                             :b/active
                              [[:coalesce
-                               [:raw "JSON_AGG(JSON_BUILD_OBJECT('id', t.id, 'name', t.name, 'slug', t.slug) ORDER BY t.name) FILTER (WHERE t.id IS NOT NULL)"]
+                               [:filter
+                                [:json_agg
+                                 [:order-by
+                                  [:json_build_object
+                                   [:inline "id"] :t/id
+                                   [:inline "name"] :t/name
+                                   [:inline "slug"] :t/slug]
+                                  :t/name]]
+                                {:where [:is-not :t/id nil]}]
                                [:cast [:inline "[]"] :json]]
                               :tags]]
                     :from [[:bookmark :b]]
-                    :left-join [[:tagging :ti] [:= :ti.taggable_id :b.id]
-                                [:tag :t] [:= :t.id :ti.tag_id]]
-                    :group-by [:b.id :b.title :b.url :b.description :b.created :b.modified]
-                    :order-by [[:b.created :desc]]
+                    :left-join [[:tagging :ti] [:= :ti/taggable_id :b/id]
+                                [:tag :t] [:= :t/id :ti/tag_id]]
+                    :group-by [:b/id :b/title :b/url :b/description :b/created :b/modified]
+                    :order-by [[:b/created :desc]]
                     :offset offset
                     :limit limit}
         query (if (some? active)
-                (assoc base-query :where [:= :b.active active])
+                (assoc base-query :where [:= :b/active active])
                 base-query)]
     (jdbc/execute! (db) (hsql/format query) {:builder-fn rs/as-unqualified-maps})))
 
@@ -73,4 +81,3 @@
   (def db (-> main/system :application :database))
   ;
   )
-
