@@ -62,6 +62,7 @@
   (defn db [] (jdbc/get-datasource {:dbtype "postgresql" :dbname "puka-test"}))
   (doseq [_ (range 5)] (time (get-bookmarks db :active true :offset 0 :limit 25)))
   (time (jdbc/execute! (db) ["select * from bookmark limit 3"]))
+  (tap> (get-bookmarks db :active true :offset 0 :limit 25))
 
   ;; Benchmark: run get-bookmarks 10 times and average (with paging)
   (let [iterations 20
@@ -79,5 +80,11 @@
   ; N.B. system must be started first
   (require '[puka.main :as main])
   (def db (-> main/system :application :database))
+  ;
+  (require '[portal.api :as p])
+  (def p (p/open))
+  (add-tap #'p/submit)
+  (tap> :hello)
+  (p/clear)
   ;
   )
