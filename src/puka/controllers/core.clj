@@ -2,8 +2,8 @@
   (:require [puka.layouts.core :as layout]))
 
 (defn render-page
-  [req]
-  (layout/render-page (-> req :params :message)))
+  [request]
+  (layout/render-page (-> request :params :message)))
 
-(defn send-message [req] (assoc-in req [:params :message] "Hello, Clojure!"))
+(defn default [request] (assoc-in request [:params :message] "Hello, Jeff!"))
 

@@ -23,21 +23,21 @@
 
 (defn render-middleware
   [handler]
-  (fn [req]
-    (let [resp (handler req)]
+  (fn [request]
+    (let [resp (handler request)]
       (if (resp/response? resp)
         resp
         (#'controller/render-page resp)))))
 
 (defn application-middleware
   [handler application]
-  (fn [req]
-    (handler (assoc req :application/component application))))
+  (fn [request]
+    (handler (assoc request :application/component application))))
 
 (defn application-handler [application]
   (ring/ring-handler
    (ring/router
-    ["/"  #'controller/send-message]
+    ["/"  #'controller/default]
     {:data {:middleware [[render-middleware]
                          [application-middleware application]]}})
    (ring/create-default-handler
