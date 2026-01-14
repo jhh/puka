@@ -3,7 +3,7 @@
   (:require [clojure.tools.build.api :as b]))
 
 (def lib 'puka)
-(def version "0.1.0-SNAPSHOT")
+(def version "4.0.0-SNAPSHOT")
 (def main 'puka.main)
 (def class-dir "target/classes")
 
