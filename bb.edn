@@ -3,6 +3,35 @@
  :tasks
  {:require [[clojure.string :as str]]
 
+  :init (do
+          (def assets-dir "assets/")
+          (def puka-dir "resources/public/puka/")
+          (defn tailwind-cli [& [opt]] (str "npx @tailwindcss/cli --input="
+                                            assets-dir
+                                            "base.css --output="
+                                            puka-dir
+                                            "main.css "
+                                            opt))
+
+          (defn esbuild-cli [& [opt]] (str "npx esbuild --bundle --outfile="
+                                           puka-dir
+                                           "main.js "
+                                           assets-dir
+                                           "base.js "
+                                           opt)))
+
+  build {:doc "Build all static assets."
+         :depends [build:css build:js]}
+
+  build:css {:doc "Build CSS static asset."
+             :task (shell (tailwind-cli))}
+
+  build:js {:doc "Build JS static asset."
+            :task (shell (esbuild-cli))}
+
+  watch {:doc "Monitor CSS static resources and rebuild when modified."
+         :task (shell (tailwind-cli "--watch"))}
+
   server {:doc "Run the web application."
           :task (clojure "-M:run")}
 
@@ -10,8 +39,11 @@
         :task (clojure "-M:test" "-m" "cognitect.test-runner")}
 
   ci {:doc "Run the CI pipeline of tests and build the JAR."
-      :depends [test] ; or just test
+      :depends [build test] ; or just test
       :task (clojure "-T:build" "uber")}
+
+  -tt {:doc "test"
+       :task (println (esbuild-cli))}
 
   outdated {:doc "Check for outdated dependencies."
             :task (clojure {:continue true} "-M:outdated")}}}

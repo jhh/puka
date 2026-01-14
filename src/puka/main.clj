@@ -37,11 +37,13 @@
 (defn application-handler [application]
   (ring/ring-handler
    (ring/router
-    ["/"  #'controller/default]
+    [["/"  #'controller/default]
+     ["/assets/*" (ring/create-resource-handler)]]
     {:data {:middleware [[render-middleware]
                          [application-middleware application]]}})
-   (ring/create-default-handler
-    {:not-found (constantly {:status 404 :body "Not found"})})))
+   (ring/routes
+    (ring/create-default-handler
+     {:not-found (constantly {:status 404 :body "Not found"})}))))
 
 (defrecord WebServer [handler-fn port         ; parameters
                       application             ; dependencies

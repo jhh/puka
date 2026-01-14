@@ -3,3 +3,5 @@
 .lsp
 .nrepl-port
 target
+node_modules
+resources/public/puka

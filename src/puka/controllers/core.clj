@@ -13,7 +13,7 @@
 (defn default
   [request]
   #_(assoc-in request [:params :message] "Hello, Jeffrey!")
-  (assoc-in request [:params :content] #html [:p [:strong "Hello, Jeffrey!"]]))
+  (assoc-in request [:params :content] #html [:p [:span {:class "text-red-600"} "Hello, Jeffrey!"]]))
 
 ;; TODO:
 ;; - redirect from default to bookmarks list
