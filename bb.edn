@@ -3,9 +3,15 @@
  :tasks
  {:require [[clojure.string :as str]]
 
+  server {:doc "Run the web application."
+          :task (clojure "-M:run")}
+
   test {:doc "Run the test suite."
         :task (clojure "-M:test" "-m" "cognitect.test-runner")}
 
   ci {:doc "Run the CI pipeline of tests and build the JAR."
       :depends [test] ; or just test
-      :task (clojure "-T:build" "uber")}}}
+      :task (clojure "-T:build" "uber")}
+
+  outdated {:doc "Check for outdated dependencies."
+            :task (clojure {:continue true} "-M:outdated")}}}
