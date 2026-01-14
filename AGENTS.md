@@ -10,6 +10,8 @@ Puka is a home management web application built with:
 - **next.jdbc** - Modern JDBC wrapper for PostgreSQL
 - **borkdude/html** - Hiccup-style HTML templating
 
+When you need to search docs, use `context7` tools.
+
 ## Build/Run Commands
 
 ```bash
@@ -64,12 +66,18 @@ test/puka/
 (ns puka.example
   (:require [com.stuartsierra.component :as component]
             [next.jdbc :as jdbc]
-            [puka.models.core :refer [database-component]]))
+            [next.jdbc.result-set :as rs]
+            [honey.sql :as hsql]
+            [puka.models.core :refer [database-component]])
+  (:import [com.zaxxer.hikari HikariDataSource]
+           [org.postgresql.util PGobject]))
 ```
 
 - Prefer `:as` for aliasing, use `:refer` sparingly
 - Never use `:use`
 - Only add `:gen-class` in main namespace
+- Put `:import` after `:require` for Java classes
+- Align require clauses for readability
 
 ### Naming Conventions
 
@@ -107,26 +115,60 @@ test/puka/
 ### Database Access
 
 ```clojure
+;; Direct SQL queries with next.jdbc
 (defn get-items [db limit]
-  (sql/query (db)
-             ["SELECT * FROM items LIMIT ?" limit]
-             {:builder-fn result-set/as-kebab-maps}))
+  (jdbc/execute! (db)
+                 ["SELECT * FROM items LIMIT ?" limit]
+                 {:builder-fn rs/as-unqualified-maps}))
+
+;; HoneySQL for complex queries
+(defn get-items-complex [db & {:keys [active offset limit]
+                                :or {offset 0 limit 25}}]
+  (let [query {:select [:*]
+               :from [:items]
+               :where [:= :active active]
+               :offset offset
+               :limit limit}]
+    (jdbc/execute! (db) (hsql/format query) {:builder-fn rs/as-unqualified-maps})))
 ```
 
 Note: Database component is callable - use `(db)` to get datasource.
 
+**Builder functions:**
+- `rs/as-unqualified-maps` - column names without table prefix
+- `rs/as-kebab-maps` - converts snake_case to kebab-case keys
+
 ### HTML/Views
 
 ```clojure
+;; Using borkdude/html with hiccup syntax
 (defn render-page [title content]
   (html [:html [:head [:title title]] [:body content]]))
+
+;; Reader literal syntax for inline HTML
+(defn view [request]
+  (assoc-in request [:params :content] 
+            #html [:p [:strong "Hello!"]]))
 ```
 
 ### Error Handling
 
 ```clojure
+;; Use ex-info for structured errors
 (when-not (valid? input)
   (throw (ex-info "Validation failed" {:input input :reason "..."})))
+
+;; Defensive checks in lifecycle methods
+(defn start [this]
+  (if http-server
+    this  ; already started, return as-is
+    (assoc this :http-server (start-server config))))
+
+;; Safe cleanup with when/some->
+(defn stop [this]
+  (when datasource
+    (.close datasource))
+  (assoc this :datasource nil))
 ```
 
 ### REPL Comment Blocks
@@ -162,6 +204,39 @@ Note: Database component is callable - use `(db)` to get datasource.
 
 - Use `sut` alias for system-under-test
 - File naming: `*_test.clj` (underscore in filename, hyphen in namespace)
+- Keep tests simple and focused on one thing
+
+### Common Patterns
+
+**Threading macros:**
+```clojure
+;; Thread-first for data transformation
+(-> request
+    (assoc :key value)
+    layout/render-view
+    str
+    resp/response
+    (resp/content-type "text/html"))
+
+;; Thread-last for collections
+(->> items
+     (filter active?)
+     (map transform)
+     (take 10))
+
+;; Some-> for nil-safe chaining
+(some-> value transform maybe-nil-fn process)
+```
+
+**Keyword arguments:**
+```clojure
+(defn query-items [db & {:keys [active offset limit]
+                          :or {offset 0 limit 25}}]
+  ;; Use keyword args for optional parameters
+  (fetch-data db active offset limit))
+
+;; Call with: (query-items db :active true :limit 50)
+```
 
 ## Key Patterns
 
@@ -178,10 +253,22 @@ Note: Database component is callable - use `(db)` to get datasource.
 ### Middleware Composition
 
 ```clojure
-(defn application-middleware [handler db]
+;; Threading macros for middleware composition
+(defn application-middleware [handler application]
+  (fn [request]
+    (handler (assoc request :application/component application))))
+
+;; Chaining middleware with ->
+(defn wrap-all [handler]
   (-> handler
-      (render-middleware db)
-      (ring-defaults/wrap-defaults ring-defaults/site-defaults)))
+      render-middleware
+      (wrap-middleware-fn arg)))
+
+;; Reitit routing with per-route middleware
+(ring/router
+  ["/" #'controller/default]
+  {:data {:middleware [[render-middleware]
+                       [application-middleware app]]}})
 ```
 
 ## Dependencies (deps.edn aliases)
