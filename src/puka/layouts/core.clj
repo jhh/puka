@@ -2,24 +2,39 @@
   (:require [borkdude.html :refer [html]]))
 
 (defn base-layout
-  [content]
+  [{:keys [title content]
+    :or {title ""
+         content #html [:p [:strong "No content available!"]]}}]
   (html [:<>
          [:$ "<!DOCTYPE html>"]
          [:html {:lang "en"}
           [:head
            [:meta {:charset "utf-8"}]
-           [:title content]]
+           [:title title]]
           [:body
            [:main
-            [:p content]]]]]))
+            (if (string? content)
+              #html [:p content]
+              content)]]]]))
 
-(defn render-page
-  [content]
-  {:status 200
-   :headers {"Content-Type" "text/html; charset=utf-8"}
-   :body (str (base-layout content))})
+(def request->title
+  {"/" "Puka"})
+
+(defmulti render-view :application/view)
+
+(defmethod render-view :default
+  [{:keys [params] :as request}]
+  (let [content (or (:content params)
+                    (:message params))
+        page (merge {:title (request->title (:uri request "TODO: title"))}
+                    (when content {:content content}))]
+    (base-layout page)))
 
 (comment
-  (str (base-layout "HI")))
+  (str (base-layout {:title "Foo" :content "Bar"}))
+  (str (base-layout {:title "Foo" :content #html [:span "Baz"]}))
+  (str #html [:div "Hello"])
+  ;
+  )
 
 

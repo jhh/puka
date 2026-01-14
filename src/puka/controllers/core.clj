@@ -1,9 +1,20 @@
 (ns puka.controllers.core
-  (:require [puka.layouts.core :as layout]))
+  (:require [ring.util.response :as resp]
+            [puka.layouts.core :as layout]))
 
 (defn render-page
   [request]
-  (layout/render-page (-> request :params :message)))
+  (-> request
+      layout/render-view
+      str
+      resp/response
+      (resp/content-type "text/html")))
 
-(defn default [request] (assoc-in request [:params :message] "Hello, Jeff!"))
+(defn default
+  [request]
+  #_(assoc-in request [:params :message] "Hello, Jeffrey!")
+  (assoc-in request [:params :content] #html [:p [:strong "Hello, Jeffrey!"]]))
 
+;; TODO:
+;; - redirect from default to bookmarks list
+;; - create bookmarks list controller and layout
