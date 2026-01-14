@@ -1,0 +1,11 @@
+{:paths ["src"]
+ :deps {org.clojure/clojure {:mvn/version "1.12.4"}}
+ :tasks
+ {:require [[clojure.string :as str]]
+
+  test {:doc "Run the test suite."
+        :task (clojure "-M:test" "-m" "cognitect.test-runner")}
+
+  ci {:doc "Run the CI pipeline of tests and build the JAR."
+      :depends [test] ; or just test
+      :task (clojure "-T:build" "uber")}}}
