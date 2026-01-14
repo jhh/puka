@@ -21,11 +21,12 @@
                               "--interactive"]
                  :ns-default user}
 
+  :run {:extra-deps {org.slf4j/slf4j-nop {:mvn/version "2.0.17"}}
         :main-opts ["-m" "puka.main"]}
 
   :test {:extra-paths ["test"]
-         :extra-deps
-         {io.github.cognitect-labs/test-runner {:git/tag "v0.5.1" :git/sha "dfb30dd"}}}
+         :extra-deps {org.slf4j/slf4j-nop {:mvn/version "2.0.17"}
+                      io.github.cognitect-labs/test-runner {:git/tag "v0.5.1" :git/sha "dfb30dd"}}}
 
   :build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.12"}}
           :ns-default build}
