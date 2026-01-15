@@ -1,10 +1,12 @@
 (ns puka.main
-  (:require [com.stuartsierra.component :as component]
-            [reitit.ring :as ring]
-            [ring.adapter.jetty :refer [run-jetty]]
-            [ring.util.response :as resp]
-            [puka.models.core :refer [database-component]]
-            [puka.controllers.core :as controller])
+  (:require
+   [com.stuartsierra.component :as component]
+   [puka.controllers.core :as controller]
+   [puka.controllers.bookmark :as bookmark]
+   [puka.models.core :refer [database-component]]
+   [reitit.ring :as ring]
+   [ring.adapter.jetty :refer [run-jetty]]
+   [ring.util.response :as resp])
   (:gen-class))
 
 (defrecord Application [config    ; config
@@ -37,8 +39,9 @@
 (defn application-handler [application]
   (ring/ring-handler
    (ring/router
-    [["/"  #'controller/default]
-     ["/assets/*" (ring/create-resource-handler)]]
+    [["/"           #'controller/default]
+     ["/bookmarks/" #'bookmark/default]
+     ["/assets/*"   (ring/create-resource-handler)]]
     {:data {:middleware [[render-middleware]
                          [application-middleware application]]}})
    (ring/routes

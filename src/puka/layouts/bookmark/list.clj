@@ -18,17 +18,17 @@
   [{:keys [name slug]}]
   (let [uri (str "?tags=" slug)
         href {:href uri :hx-get uri}]
-    (html [:li {:class "inline text-sm text-red-700"}
+    (html [:li {:class "inline text-sm text-red-700 mr-1"}
            [:a {:hx-target "#id_content" :& href} name]])))
 
 (defn bookmark->html
   [{:keys [id title description url created active tags]}]
-  (let [href {:href url}
-        edit-hx-get {:hx-get (str "/bookmarks/" id "/edit/")}]
+  (let [link-attr {:href url}
+        button-attr {:hx-get (str "/bookmarks/" id "/edit/")}]
     (html [:li {:class "p-4"}
            [:article
             [:h2 {:class "pb-2 text-base font-medium text-slate-800"}
-             [:a {:target "_blank", :rel "noreferrer" :& href} title]
+             [:a {:target "_blank", :rel "noreferrer" :& link-attr} title]
              (when-not active
                #html [:span {:class "text-sm text-red-700"} "(inactive)"])]
             [:p {:class "text-sm text-slate-600"} description]
@@ -40,7 +40,12 @@
                        :class "ml-3"
                        :hx-target "#id_content"
                        :hx-push-url "true"
-                       :& edit-hx-get} "edit"]]]])))
+                       :& button-attr} "edit"]]]])))
+
+(defn ->html
+  [bookmarks]
+  (html [:ul#id_bookmarks {:role list :class "divide-y divide-gray-200 shadow-sm bg-white"}
+         (map bookmark->html bookmarks)]))
 
 (comment
   (str (tag->html {:id 1 :name "Foo" :slug "foo"}))

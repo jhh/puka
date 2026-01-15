@@ -1,5 +1,6 @@
 (ns puka.layouts.core
-  (:require [puka.layouts.base :as base]))
+  (:require [puka.layouts.base :as base]
+            [puka.layouts.bookmark.list :as bookmark.list]))
 
 (def request->title
   {"/" "Puka"})
@@ -12,6 +13,14 @@
                     (:message params))
         page (merge {:title (request->title (:uri request "TODO: title"))}
                     (when content {:content content}))]
+    (base/layout page)))
+
+(defmethod render-view :bookmark/list
+  [{:keys [params] :as request}]
+  (let [bookmarks (-> params :data)
+        content (bookmark.list/->html bookmarks)
+        page (merge {:title (request->title (:uri request "TODO: bookmark/list"))}
+                    {:content content})]
     (base/layout page)))
 
 (comment
