@@ -60,6 +60,14 @@ test/puka/
 
 ## Code Style Guidelines
 
+### Hiccup-style HTML
+
+```clojure
+[:p {:class "text-sm text-slate-600"} "This is the paragraph content."]
+```
+
+- HTML views should have Tailwind CSS classes sorted in the recommended [order](https://tailwindcss.com/blog/automatic-class-sorting-with-prettier#how-classes-are-sorted).
+
 ### Namespace Declarations
 
 ```clojure
@@ -135,6 +143,7 @@ test/puka/
 Note: Database component is callable - use `(db)` to get datasource.
 
 **Builder functions:**
+
 - `rs/as-unqualified-maps` - column names without table prefix
 - `rs/as-kebab-maps` - converts snake_case to kebab-case keys
 
@@ -209,6 +218,7 @@ Note: Database component is callable - use `(db)` to get datasource.
 ### Common Patterns
 
 **Threading macros:**
+
 ```clojure
 ;; Thread-first for data transformation
 (-> request
@@ -229,6 +239,7 @@ Note: Database component is callable - use `(db)` to get datasource.
 ```
 
 **Keyword arguments:**
+
 ```clojure
 (defn query-items [db & {:keys [active offset limit]
                           :or {offset 0 limit 25}}]

@@ -18,7 +18,7 @@
   [{:keys [name slug]}]
   (let [uri (str "?tags=" slug)
         href {:href uri :hx-get uri}]
-    (html [:li {:class "inline text-sm text-red-700 mr-1"}
+    (html [:li {:class "inline mr-1 text-sm text-red-700"}
            [:a {:hx-target "#id_content" :& href} name]])))
 
 (defn bookmark->html
@@ -44,7 +44,7 @@
 
 (defn ->html
   [bookmarks]
-  (html [:ul#id_bookmarks {:role list :class "divide-y divide-gray-200 shadow-sm bg-white"}
+  (html [:ul#id_bookmarks {:role list :class "bg-white divide-y divide-gray-200 shadow-sm"}
          (map bookmark->html bookmarks)]))
 
 (comment
