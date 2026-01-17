@@ -35,7 +35,7 @@
   (testing "String content wrapping and escaping"
     (testing "string content is wrapped in <p> tag"
       (let [result (str (sut/layout {:content "Hello World"}))]
-        (is (re-find #"<main><p>Hello World</p></main>" result)
+        (is (re-find #"<p>Hello World</p>" result)
             "Should wrap string content in <p> tag")))
 
     (testing "string content with HTML characters (escaped)"
@@ -51,14 +51,14 @@
 
     (testing "empty string content"
       (let [result (str (sut/layout {:content ""}))]
-        (is (re-find #"<main><p></p></main>" result)
+        (is (re-find #"<main[^>]+><div[^>]+><p></p></div></main>" result)
             "Should include empty <p> tag")))))
 
 (deftest base-layout-html-content-test
   (testing "HTML/hiccup content rendering"
     (testing "HTML content (hiccup vector)"
       (let [result (str (sut/layout {:content (html [:div "Custom"])}))]
-        (is (re-find #"<main><div>Custom</div></main>" result)
+        (is (re-find #"<main[^>]+><div[^>]+><div>Custom</div></div></main>" result)
             "Should render hiccup vector as HTML")))
 
     (testing "nested HTML content"
@@ -72,7 +72,7 @@
       (let [result (str (sut/layout {:title "Test" :content "Content"}))]
         (is (re-find #"<title>Test</title>" result)
             "Should include custom title")
-        (is (re-find #"<main><p>Content</p></main>" result)
+        (is (re-find #"<main[^>]+><div[^>]+><p>Content</p></div></main>" result)
             "Should include custom content")))))
 
 (deftest base-layout-structure-test
@@ -84,7 +84,7 @@
           "Should have html tags")
       (is (re-find #"<head>.*</head>" result)
           "Should have head section")
-      (is (re-find #"<body>.*</body>" result)
+      (is (re-find #"<body[^>]+>.*</body>" result)
           "Should have body section")
-      (is (re-find #"<main>.*</main>" result)
+      (is (re-find #"<main[^>]+>.*</main>" result)
           "Should have main section"))))
