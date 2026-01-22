@@ -249,39 +249,6 @@ Note: Database component is callable - use `(db)` to get datasource.
 ;; Call with: (query-items db :active true :limit 50)
 ```
 
-## Key Patterns
-
-### System Assembly
-
-```clojure
-(defn new-system [port & [repl?]]
-  (component/system-map
-    :database (database-component)
-    :application (application-component {:port port})
-    :web-server (web-server-component {:port port :join? (not repl?)})))
-```
-
-### Middleware Composition
-
-```clojure
-;; Threading macros for middleware composition
-(defn application-middleware [handler application]
-  (fn [request]
-    (handler (assoc request :application/component application))))
-
-;; Chaining middleware with ->
-(defn wrap-all [handler]
-  (-> handler
-      render-middleware
-      (wrap-middleware-fn arg)))
-
-;; Reitit routing with per-route middleware
-(ring/router
-  ["/" #'controller/default]
-  {:data {:middleware [[render-middleware]
-                       [application-middleware app]]}})
-```
-
 ## Dependencies (deps.edn aliases)
 
 - `:test` - Test paths and cognitect test-runner

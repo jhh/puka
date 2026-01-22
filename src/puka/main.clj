@@ -23,7 +23,7 @@
   (component/using (map->Application {:config config})
                    [:database]))
 
-(defn render-middleware
+(defn wrap-render-page
   [handler]
   (fn [request]
     (let [resp (handler request)]
@@ -31,7 +31,7 @@
         resp
         (#'controller/render-page resp)))))
 
-(defn application-middleware
+(defn wrap-application
   [handler application]
   (fn [request]
     (handler (assoc request :application/component application))))
@@ -42,8 +42,8 @@
     [["/"           #'controller/default]
      ["/bookmarks/" #'bookmark/default]
      ["/assets/*"   (ring/create-resource-handler)]]
-    {:data {:middleware [[render-middleware]
-                         [application-middleware application]]}})
+    {:data {:middleware [[wrap-render-page]
+                         [wrap-application application]]}})
    (ring/routes
     (ring/create-default-handler
      {:not-found (constantly {:status 404 :body "Not found"})}))))
