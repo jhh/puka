@@ -5,6 +5,9 @@
    [puka.controllers.bookmark :as bookmark]
    [puka.models.core :refer [database-component]]
    [reitit.ring :as ring]
+   [reitit.ring.middleware.parameters :as parameters]
+   [reitit.ring.coercion :as coercion]
+   [reitit.coercion.malli :as malli]
    [ring.adapter.jetty :refer [run-jetty]]
    [ring.util.response :as resp])
   (:gen-class))
@@ -40,9 +43,16 @@
   (ring/ring-handler
    (ring/router
     [["/"           #'controller/default]
-     ["/bookmarks/" #'bookmark/default]
+     ["/bookmarks/" {:get {:parameters {:query [:map
+                                                [:tag {:optional true} :string]
+                                                [:page {:optional true} :int]]}}
+                     :handler #'bookmark/default}]
+     ["/foo/" {:get {:handler #'bookmark/default}}]
      ["/assets/*"   (ring/create-resource-handler)]]
-    {:data {:middleware [[wrap-render-page]
+    {:data {:coercion malli/coercion
+            :middleware [parameters/parameters-middleware
+                         coercion/coerce-request-middleware
+                         [wrap-render-page]
                          [wrap-application application]]}})
    (ring/routes
     (ring/create-default-handler
@@ -79,10 +89,6 @@
    (component/system-map :application (application-component {:repl repl})
                          :database (database-component)
                          :web-server (web-server-component #'application-handler port))))
-(comment
-  (def system (new-system 8888))
-  (alter-var-root #'system component/start)
-  (alter-var-root #'system component/stop))
 
 (defn -main
   [& [port]]
@@ -91,4 +97,23 @@
     (println (format "Listening on http://localhost:%d" port))
     (-> (component/start (new-system port false))
         :web-server :shutdown deref))) ; wait "forever" on the promise created:
+
+(comment
+  ;; run the server in the REPL
+  (def system (new-system 8888))
+  (alter-var-root #'system component/start)
+  (alter-var-root #'system component/stop)
+  ;;
+  ;; use Portal
+  (require '[portal.api :as p])
+  (def p (p/open))
+  (add-tap #'p/submit)
+  ;;
+  (require '[reitit.core :as r])
+  (def app (application-handler (-> system :application)))
+  (tap> (r/match-by-path (-> app (ring/get-router)) "/bookmarks/"))
+  (app {:request-method :get, :uri "/bookmarks/" :query-string "tag=clojure&page=3"})
+  (app {:request-method :get, :uri "/foo/"})
+  ;;
+  )
 

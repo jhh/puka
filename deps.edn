@@ -7,6 +7,9 @@
         com.zaxxer/HikariCP {:mvn/version "7.0.2"}
         io.github.borkdude/html {:mvn/version "0.2.2"}
         metosin/reitit-ring {:mvn/version "0.10.0"}
+        metosin/reitit-middleware {:mvn/version "0.10.0"}
+        metosin/reitit-malli {:mvn/version "0.10.0"}
+        metosin/malli {:mvn/version "0.17.0"}
         migratus/migratus {:mvn/version "1.6.4"}
         org.postgresql/postgresql {:mvn/version "42.7.9"}
         ring/ring {:mvn/version "1.15.3"}

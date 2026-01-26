@@ -16,9 +16,8 @@
     (base/layout page)))
 
 (defmethod render-view :bookmark/list
-  [{:keys [params] :as request}]
-  (let [bookmarks (-> params :data)
-        content (bookmark.list/->html bookmarks)
+  [{:application/keys [data] :as request}]
+  (let [content (bookmark.list/->html data)
         page (merge {:title (request->title (:uri request "TODO: bookmark/list"))}
                     {:content content})]
     (base/layout page)))

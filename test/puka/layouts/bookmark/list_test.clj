@@ -6,8 +6,8 @@
   (testing "renders a tag list item with correct links and name"
     (let [sample-tag {:name "Clojure" :slug "clojure"}
           result (str (sut/tag->html sample-tag))]
-      (is (re-find #"href=\"\?tags=clojure\"" result))
-      (is (re-find #"hx-get=\"\?tags=clojure\"" result))
+      (is (re-find #"href=\"\?tag=clojure\"" result))
+      (is (re-find #"hx-get=\"\?tag=clojure\"" result))
       (is (re-find #">Clojure</a>" result)))))
 
 (deftest bookmark->html-test

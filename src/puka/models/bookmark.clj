@@ -51,11 +51,16 @@
    :order-by [[:b/created :desc]]})
 
 (defn get-bookmarks
-  [db & {:keys [offset limit active] :or {offset 0 limit 25}}]
+  [db & {:keys [offset limit active tag] :or {offset 0 limit 25}}]
   (let [query (-> bookmark-list-query
                   (h/offset offset)
                   (h/limit limit)
-                  (cond-> (some? active) (h/where [:= :b/active active])))]
+                  (cond-> (some? active) (h/where [:= :b/active active]))
+                  (cond-> tag (h/where [:in :b/id
+                                        {:select-distinct [:ti2/taggable_id]
+                                         :from [[:tagging :ti2]]
+                                         :join [[:tag :t2] [:= :t2/id :ti2/tag_id]]
+                                         :where [:= :t2/slug tag]}])))]
     (jdbc/execute! (db) (hsql/format query) {:builder-fn rs/as-unqualified-maps})))
 
 (comment
@@ -79,11 +84,6 @@
   (require '[puka.main :as main])
   (def db (-> main/system :application :database))
   ;
-  (require '[portal.api :as p])
-  (def p (p/open))
-  (add-tap #'p/submit)
-  (tap> :hello)
-  (p/clear)
   ;
   )
 

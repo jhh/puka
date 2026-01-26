@@ -16,7 +16,7 @@
 
 (defn tag->html
   [{:keys [name slug]}]
-  (let [uri (str "?tags=" slug)
+  (let [uri (str "?tag=" slug)
         href {:href uri :hx-get uri}]
     (html [:li {:class "inline mr-1 text-sm text-red-700"}
            [:a {:hx-target "#id_content" :& href} name]])))
