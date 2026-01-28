@@ -19,33 +19,45 @@
   (let [uri (str "?tag=" slug)
         href {:href uri :hx-get uri}]
     (html [:li {:class "inline mr-1 text-sm text-red-700"}
-           [:a {:hx-target "#id_content" :& href} name]])))
+           [:a {:hx-target "#id_content" :hx-push-url "true" :& href} name]])))
 
 (defn bookmark->html
-  [{:keys [id title description url created active tags]}]
-  (let [link-attr {:href url}
-        button-attr {:hx-get (str "/bookmarks/" id "/edit/")}]
-    (html [:li {:class "p-4"}
-           [:article
-            [:h2 {:class "pb-2 text-base font-medium text-slate-800"}
-             [:a {:target "_blank", :rel "noreferrer" :& link-attr} title]
-             (when-not active
-               #html [:span {:class "text-sm text-red-700"} "(inactive)"])]
-            [:p {:class "text-sm text-slate-600"} description]
-            [:ul {:role "list", :class "mt-4"}
-             (html (map tag->html tags))]
-            [:div {:class "text-xs text-slate-400"}
-             (format-inst created)
-             [:button {:type "button"
-                       :class "ml-3"
-                       :hx-target "#id_content"
-                       :hx-push-url "true"
-                       :& button-attr} "edit"]]]])))
+  ([bm] (bookmark->html bm nil))
+  ([{:keys [id title description url created active tags]} htmx-attrs]
+   (let [link-attr {:href url}
+         button-attr {:hx-get (str "/bookmarks/" id "/edit/")}]
+     (html [:li {:class "p-4" :& htmx-attrs}
+            [:article
+             [:h2 {:class "pb-2 text-base font-medium text-slate-800"}
+              [:a {:target "_blank", :rel "noreferrer" :& link-attr} title]
+              (when-not active
+                #html [:span {:class "text-sm text-red-700"} "(inactive)"])]
+             [:p {:class "text-sm text-slate-600"} description]
+             [:ul {:role "list", :class "mt-4"}
+              (html (map tag->html tags))]
+             [:div {:class "text-xs text-slate-400"}
+              (format-inst created)
+              [:button {:type "button"
+                        :class "ml-3"
+                        :hx-target "#id_content"
+                        :hx-push-url "true"
+                        :& button-attr} "edit"]]]]))))
 
-(defn ->html
-  [bookmarks]
-  (html [:ul#id_bookmarks {:role list :class "bg-white divide-y divide-gray-200 shadow-sm"}
-         (map bookmark->html bookmarks)]))
+(defn ->partial
+  [{:keys [bookmarks page tag has-more?]}]
+  (html [:<>
+         (map bookmark->html bookmarks)
+         (when has-more?
+           (let [htmx-attrs {:hx-get (str "?page=" (inc page)
+                                          (when tag (str "&tag=" tag)))
+                             :hx-trigger "revealed"
+                             :hx-swap "outerHTML"}]
+             (html [:li {:& htmx-attrs}])))]))
+
+(defn partial->html
+  [partial]
+  (html [:ul#id_bookmarks {:role "list" :class "bg-white divide-y divide-gray-200 shadow-sm"}
+         partial]))
 
 (comment
   (str (tag->html {:id 1 :name "Foo" :slug "foo"}))

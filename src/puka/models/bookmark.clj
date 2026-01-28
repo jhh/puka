@@ -54,25 +54,30 @@
   [db & {:keys [offset limit active tag] :or {offset 0 limit 25}}]
   (let [query (-> bookmark-list-query
                   (h/offset offset)
-                  (h/limit limit)
+                  (h/limit (inc limit))
                   (cond-> (some? active) (h/where [:= :b/active active]))
                   (cond-> tag (h/where [:in :b/id
                                         {:select-distinct [:ti2/taggable_id]
                                          :from [[:tagging :ti2]]
                                          :join [[:tag :t2] [:= :t2/id :ti2/tag_id]]
-                                         :where [:= :t2/slug tag]}])))]
-    (jdbc/execute! (db) (hsql/format query) {:builder-fn rs/as-unqualified-maps})))
+                                         :where [:= :t2/slug tag]}])))
+        results (jdbc/execute! (db) (hsql/format query) {:builder-fn rs/as-unqualified-maps})
+        has-more? (> (count results) limit)
+        bookmarks (take limit results)]
+    {:bookmarks bookmarks
+     :has-more? has-more?}))
 
 (comment
   (defn db [] (jdbc/get-datasource {:dbtype "postgresql" :dbname "puka-test"}))
-  (get-bookmarks db {:active true :offset 15 :limit 25})
+  (get-bookmarks db :active true :offset 15 :limit 25)
+  ;; => {:bookmarks [{...} {...}], :has-more? true}
 
   ;; Benchmark: run get-bookmarks 10 times and average (with paging)
   (let [iterations 20
         times (doall
                (for [i (range iterations)]
                  (let [start (System/nanoTime)
-                       _ (doall (get-bookmarks db {:active true :offset (* i 25) :limit 25}))
+                       _ (doall (:bookmarks (get-bookmarks db :active true :offset (* i 25) :limit 25)))
                        end (System/nanoTime)]
                    (/ (- end start) 1000000.0))))
         avg (/ (reduce + times) iterations)]

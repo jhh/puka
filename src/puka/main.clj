@@ -34,6 +34,12 @@
         resp
         (#'controller/render-page resp)))))
 
+(defn wrap-htmx
+  [handler]
+  (fn [request]
+    (let [htmx? (contains? (:headers request) "hx-request")]
+      (handler (assoc request :htmx? htmx?)))))
+
 (defn wrap-application
   [handler application]
   (fn [request]
@@ -52,6 +58,7 @@
     {:data {:coercion malli/coercion
             :middleware [parameters/parameters-middleware
                          coercion/coerce-request-middleware
+                         [wrap-htmx]
                          [wrap-render-page]
                          [wrap-application application]]}})
    (ring/routes

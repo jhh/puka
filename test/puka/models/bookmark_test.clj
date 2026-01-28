@@ -44,8 +44,8 @@
           (reset! execute-calls [])
           (sut/get-bookmarks db :offset 50 :limit 10)
           (let [sql-vec (-> @execute-calls first :sql)]
-            (is (= 10 (second sql-vec))
-                "Should use custom limit")
+            (is (= 11 (second sql-vec))
+                "Should use custom limit + 1")
             (is (= 50 (nth sql-vec 2))
                 "Should use custom offset")))
 
@@ -53,8 +53,8 @@
           (reset! execute-calls [])
           (sut/get-bookmarks db)
           (let [sql-vec (-> @execute-calls first :sql)]
-            (is (= 25 (second sql-vec))
-                "Should default to limit 25")
+            (is (= 26 (second sql-vec))
+                "Should default to limit 25 + 1")
             (is (= 0 (nth sql-vec 2))
                 "Should default to offset 0")))
 
@@ -97,29 +97,68 @@
       (with-redefs [jdbc/execute! (fn [_ _ _] [])]
 
         (testing "no parameters (all defaults)"
-          (is (= [] (sut/get-bookmarks db))
-              "Should return empty result with defaults"))
+          (is (= {:bookmarks [] :has-more? false} (sut/get-bookmarks db))
+              "Should return map with empty bookmarks and has-more false"))
 
         (testing "only :active"
-          (is (= [] (sut/get-bookmarks db :active true))
+          (is (= {:bookmarks [] :has-more? false} (sut/get-bookmarks db :active true))
               "Should work with only active param"))
 
         (testing "only :offset"
-          (is (= [] (sut/get-bookmarks db :offset 10))
+          (is (= {:bookmarks [] :has-more? false} (sut/get-bookmarks db :offset 10))
               "Should work with only offset param"))
 
         (testing "only :limit"
-          (is (= [] (sut/get-bookmarks db :limit 5))
+          (is (= {:bookmarks [] :has-more? false} (sut/get-bookmarks db :limit 5))
               "Should work with only limit param"))
 
         (testing ":active and :offset"
-          (is (= [] (sut/get-bookmarks db :active true :offset 20))
+          (is (= {:bookmarks [] :has-more? false} (sut/get-bookmarks db :active true :offset 20))
               "Should work with active and offset"))
 
         (testing ":active and :limit"
-          (is (= [] (sut/get-bookmarks db :active false :limit 50))
+          (is (= {:bookmarks [] :has-more? false} (sut/get-bookmarks db :active false :limit 50))
               "Should work with active and limit"))
 
         (testing "all parameters"
-          (is (= [] (sut/get-bookmarks db :active true :offset 100 :limit 15))
+          (is (= {:bookmarks [] :has-more? false} (sut/get-bookmarks db :active true :offset 100 :limit 15))
               "Should work with all params specified"))))))
+
+(deftest get-bookmarks-has-more-test
+  (testing ":has-more? flag is set correctly based on result count"
+    (let [db (mock-db)]
+
+      (testing "when results count equals limit, has-more? is false"
+        (with-redefs [jdbc/execute! (fn [_ _ _]
+                                      [{:id 1} {:id 2} {:id 3}])]
+          (let [result (sut/get-bookmarks db :limit 3)]
+            (is (= 3 (count (:bookmarks result)))
+                "Should return 3 bookmarks")
+            (is (false? (:has-more? result))
+                "has-more? should be false when result count equals limit"))))
+
+      (testing "when results count is less than limit, has-more? is false"
+        (with-redefs [jdbc/execute! (fn [_ _ _]
+                                      [{:id 1} {:id 2}])]
+          (let [result (sut/get-bookmarks db :limit 5)]
+            (is (= 2 (count (:bookmarks result)))
+                "Should return 2 bookmarks")
+            (is (false? (:has-more? result))
+                "has-more? should be false when results < limit"))))
+
+      (testing "when results count is limit + 1, has-more? is true"
+        (with-redefs [jdbc/execute! (fn [_ _ _]
+                                      [{:id 1} {:id 2} {:id 3} {:id 4} {:id 5} {:id 6}])]
+          (let [result (sut/get-bookmarks db :limit 5)]
+            (is (= 5 (count (:bookmarks result)))
+                "Should return only 5 bookmarks (trimmed)")
+            (is (true? (:has-more? result))
+                "has-more? should be true when results > limit"))))
+
+      (testing "with empty results, has-more? is false"
+        (with-redefs [jdbc/execute! (fn [_ _ _] [])]
+          (let [result (sut/get-bookmarks db :limit 10)]
+            (is (= 0 (count (:bookmarks result)))
+                "Should return 0 bookmarks")
+            (is (false? (:has-more? result))
+                "has-more? should be false for empty results")))))))

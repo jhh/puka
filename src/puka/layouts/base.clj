@@ -14,7 +14,7 @@
          [:link {:rel "preconnect" :href "https://rsms.me/"}]
          [:link {:rel "stylesheet" :href "https://rsms.me/inter/inter.css"}]
          [:link {:rel "stylesheet" :href "/assets/puka/main.css"}]
-         #_[:script {:defer true :src "/assets/puka/main.js"}]])
+         [:script {:defer true :src "/assets/puka/main.js"}]])
 
 (defn layout
   [{:keys [title content]

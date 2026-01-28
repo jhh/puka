@@ -3,7 +3,8 @@
             [puka.layouts.bookmark.list :as bookmark.list]))
 
 (def request->title
-  {"/" "Puka"})
+  {"/" "Puka"
+   "/bookmarks/" "Bookmarks"})
 
 (defmulti render-view :application/view)
 
@@ -11,16 +12,19 @@
   [{:keys [params] :as request}]
   (let [content (or (:content params)
                     (:message params))
-        page (merge {:title (request->title (:uri request "TODO: title"))}
+        page (merge {:title (request->title (:uri request))}
                     (when content {:content content}))]
     (base/layout page)))
 
 (defmethod render-view :bookmark/list
   [{:application/keys [data] :as request}]
-  (let [content (bookmark.list/->html data)
-        page (merge {:title (request->title (:uri request "TODO: bookmark/list"))}
-                    {:content content})]
-    (base/layout page)))
+  (let [paging? (> (:page data) 0)
+        content (bookmark.list/->partial data)
+        content (if paging? content (bookmark.list/partial->html content))]
+    (if (:htmx? request)
+      content
+      (base/layout (merge {:title (request->title (:uri request))
+                           :content (bookmark.list/partial->html content)})))))
 
 (comment
   (str (base/layout {:title "Foo" :content "Bar"}))
@@ -28,5 +32,4 @@
   (str #html [:div "Hello"])
   ;
   )
-
 
