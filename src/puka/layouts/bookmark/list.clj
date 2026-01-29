@@ -19,7 +19,10 @@
   (let [uri (str "?tag=" slug)
         href {:href uri :hx-get uri}]
     (html [:li {:class "inline mr-1 text-sm text-red-700"}
-           [:a {:hx-target "#id_content" :hx-push-url "true" :& href} name]])))
+           [:a {:hx-target "#id_content"
+                :hx-push-url "true"
+                :hx-on:click "window.scrollTo(0,0)"
+                :& href} name]])))
 
 (defn bookmark->html
   ([bm] (bookmark->html bm nil))
