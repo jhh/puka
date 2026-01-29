@@ -2,6 +2,9 @@
   (:require [clojure.test :refer [deftest is testing]]
             [puka.layouts.bookmark.list :as sut]))
 
+(defn- ->html [data]
+  (sut/partial->html (sut/->partial data)))
+
 (deftest tag-test
   (testing "renders a tag list item with correct links and name"
     (let [sample-tag {:name "Clojure" :slug "clojure"}
@@ -60,7 +63,7 @@
                              :tags []}]
                 :has-more? false
                 :page 0}
-          result (str (sut/->html data))]
+          result (str (->html data))]
       (is (re-find #"<ul" result))
       (is (re-find #"Title 1" result))
       (is (re-find #"Title 2" result))
@@ -84,7 +87,7 @@
                              :tags []}]
                 :has-more? true
                 :page 0}
-          result (str (sut/->html data))]
+          result (str (->html data))]
       (is (re-find #"Title 1" result))
       (is (re-find #"Title 2" result))
       (is (re-find #"hx-get=\"\?page=1\"" result)
@@ -104,7 +107,7 @@
                              :tags []}]
                 :has-more? true
                 :page 3}
-          result (str (sut/->html data))]
+          result (str (->html data))]
       (is (re-find #"hx-get=\"\?page=4\"" result)
           "Should increment page number correctly")))
 
@@ -112,7 +115,7 @@
     (let [data {:bookmarks []
                 :has-more? false
                 :page 0}
-          result (str (sut/->html data))]
+          result (str (->html data))]
       (is (re-find #"<ul" result))
       (is (not (re-find #"hx-trigger" result))))))
 
