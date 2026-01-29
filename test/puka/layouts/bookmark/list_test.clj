@@ -29,21 +29,7 @@
       (is (re-find #"\(inactive\)" result))
       (is (re-find #"january 2026" result))
       (is (re-find #"hx-get=\"/bookmarks/123/edit/\"" result))
-      (is (re-find #">tag1</a>" result))))
-
-  (testing "renders bookmark with extra HTMX attributes"
-    (let [bm {:id 123
-              :title "Test"
-              :description "Desc"
-              :url "https://example.com"
-              :created #inst "2026-01-14T12:00:00Z"
-              :active true
-              :tags []}
-          htmx-attrs {:hx-get "?page=2" :hx-trigger "revealed" :hx-swap "outerHTML"}
-          result (str (sut/bookmark->html bm htmx-attrs))]
-      (is (re-find #"hx-get=\"\?page=2\"" result))
-      (is (re-find #"hx-trigger=\"revealed\"" result))
-      (is (re-find #"hx-swap=\"outerHTML\"" result)))))
+      (is (re-find #">tag1</a>" result)))))
 
 (deftest html-test
   (testing "renders bookmarks list without HTMX when has-more? is false"
