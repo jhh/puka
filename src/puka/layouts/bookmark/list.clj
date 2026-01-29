@@ -15,7 +15,9 @@
             (.atZone (.toInstant inst) (ZoneId/systemDefault)))))
 
 (defn tag->html
-  [{:keys [name slug]}]
+  "Returns an HTML string for a single tag list item.
+  Expects a tag map with :name and :slug keys."
+  [{:keys [:name :slug]}]
   (let [uri (str "?tag=" slug)
         href {:href uri :hx-get uri}]
     (html [:li {:class "inline mr-1 text-sm text-red-700"}
@@ -25,11 +27,12 @@
                 :& href} name]])))
 
 (defn bookmark->html
-  ([bm] (bookmark->html bm nil))
-  ([{:keys [id title description url created active tags]} htmx-attrs]
+  "Returns an HTML string for a single bookmark list item.
+  Takes a bookmark map as returned from puka.models.bookmark/get-bookmarks."
+  ([{:keys [id title description url created active tags]}]
    (let [link-attr {:href url}
          button-attr {:hx-get (str "/bookmarks/" id "/edit/")}]
-     (html [:li {:class "p-4" :& htmx-attrs}
+     (html [:li {:class "p-4"}
             [:article
              [:h2 {:class "pb-2 text-base font-medium text-slate-800"}
               [:a {:target "_blank", :rel "noreferrer" :& link-attr} title]
@@ -47,6 +50,8 @@
                         :& button-attr} "edit"]]]]))))
 
 (defn ->partial
+  "Returns an HTML partial of LI's for a list of bookmarks, including a
+  'load more' trigger if needed."
   [{:keys [bookmarks page tag has-more?]}]
   (html [:<>
          (map bookmark->html bookmarks)
@@ -58,6 +63,7 @@
              (html [:li {:& htmx-attrs}])))]))
 
 (defn partial->html
+  "Wraps an HTML partial of bookmark LI's in a UL element with standard styling."
   [partial]
   (html [:ul#id_bookmarks {:role "list" :class "bg-white divide-y divide-gray-200 shadow-sm"}
          partial]))
