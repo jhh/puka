@@ -53,7 +53,7 @@
     </div>
 </div>
 
-<ul id="id_bookmarks" class="list bg-base-100 shadow-sm">
+<ul id="id_bookmarks" class="list bg-base-100 border-base-300 rounded-box">
     {% partial list-items-partial %}
 </ul>
 {% endpartialdef list-partial %}
@@ -67,31 +67,29 @@
             hx-swap="afterend"
         {% endif %}>
         <article>
-            <h2 class="pb-2 text-base font-medium">
+            <h2 class="text-primary font-medium text-base mb-2">
                 <a href="{{ bookmark.url }}" target="_blank" rel="noreferrer" class="link link-hover">{{ bookmark.title }}</a>
                 {% if not bookmark.active %}
                     <span class="badge badge-error badge-sm">(inactive)</span>
                 {% endif %}
             </h2>
-            <p class="text-sm opacity-70">
+            <p class="text-sm text-base-content mb-3">
                 {{ bookmark.description }}
             </p>
-            <ul class="mt-4 flex flex-wrap gap-1">
+            <ul class="flex flex-wrap gap-2 mb-1">
                 {% for tag in bookmark.tags.all %}
                     <li class="inline">
-                        <a href="?tags={{ tag }}" hx-get="?tags={{ tag }}" hx-target="#id_content" class="link link-secondary text-sm">{{ tag }}</a>
+                        <a href="?tags={{ tag }}" hx-get="?tags={{ tag }}" hx-target="#id_content" class="link-hover text-secondary text-sm">{{ tag }}</a>
                     </li>
                 {% endfor %}
             </ul>
-            <div class="text-xs opacity-50 mt-2">
+            <div class="text-xs text-base-content/50">
                 {{ bookmark.created|date:'F Y'|lower }}
-                <button hx-get="{% url 'bookmarks:edit' bookmark.id %}"
-                    type="button"
-                    class="btn btn-ghost btn-xs ml-3"
-                    hx-target="#id_content"
-                    hx-push-url="true">
+                <a hx-get="{% url 'bookmarks:edit' bookmark.id %}"
+                    href="{% url 'bookmarks:edit' bookmark.id %}"
+                    class="link-hover text-base-content/50 ml-2">
                     edit
-                </button>
+                </a>
             </div>
         </article>
     </li>
