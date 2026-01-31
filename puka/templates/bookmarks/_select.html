@@ -15,23 +15,22 @@
     {% include "stuff/base.html#menu-partial" %}
   {% endif %}
   {% crispy filter.form %}
-  <ul id="id_bookmarks" role="list" class="divide-y divide-gray-200 shadow-sm bg-white">
+  <ul id="id_bookmarks" class="menu bg-base-100 shadow-sm">
       {% for bookmark in bookmarks %}
         <li>
           <a href="#"
               hx-post=""
-              hx-vals='{"bookmark_pk": {{ bookmark.id }} }'
-              class="block px-4 py-2 hover:bg-gray-100">
+              hx-vals='{"bookmark_pk": {{ bookmark.id }} }'>
             {{ bookmark.title }}
           </a>
         </li>
       {% empty %}
-        <li class="px-4 py-2 text-gray-500">No bookmarks found.</li>
+        <li class="menu-disabled"><span>No bookmarks found.</span></li>
       {% endfor %}
   </ul>
-  <nav class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6" aria-label="Pagination">
+  <nav class="flex items-center justify-between border-t border-base-300 bg-base-100 px-4 py-3 sm:px-6" aria-label="Pagination">
       <div class="hidden sm:block">
-          <p class="text-sm text-gray-700">
+          <p class="text-sm">
               Showing
               <span class="font-medium">{{ page_obj.start_index }}</span>
               to
@@ -47,7 +46,7 @@
                   hx-get="{% querystring page=page_obj.previous_page_number query=query %}"
                   hx-target="#id_content"
                   hx-push-url="true"
-                  class="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:outline-offset-0">Previous</a>
+                  class="btn btn-outline btn-sm">Previous</a>
           {% endif %}
 
           {% if page_obj.has_next %}
@@ -55,7 +54,7 @@
                   hx-get="{% querystring page=page_obj.next_page_number query=query %}"
                   hx-target="#id_content"
                   hx-push-url="true"
-                  class="relative ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:outline-offset-0">Next</a>
+                  class="btn btn-outline btn-sm ml-3">Next</a>
           {% endif %}
       </div>
   </nav>
