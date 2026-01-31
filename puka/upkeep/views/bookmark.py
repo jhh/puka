@@ -26,7 +26,7 @@ class BookmarkSelectView(ListView):
     def get_queryset(self):
         self.filter = BookmarkFilter(
             self.request.GET,
-            queryset=Bookmark.objects.prefetch_related("tags"),
+            queryset=Bookmark.objects.prefetch_related("tags"),  # type: ignore[misc]
         )
         return self.filter.qs
 

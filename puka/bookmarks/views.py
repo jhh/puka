@@ -55,7 +55,7 @@ def bookmarks(request):
 
 @require_GET
 def bookmarks_filter(request):
-    f = BookmarkFilter(request.GET, queryset=Bookmark.objects.prefetch_related("tags"))
+    f = BookmarkFilter(request.GET, queryset=Bookmark.objects.prefetch_related("tags"))  # type: ignore[misc]
     paginator = Paginator(f.qs, 25)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
