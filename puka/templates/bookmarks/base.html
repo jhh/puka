@@ -4,7 +4,7 @@
 {% block title %}Bookmarks{% endblock %}
 
 {% block menu %}
-<div class="menu-title">Tasks</div>
+<div class="font-semibold text-neutral-content/60">Tasks</div>
 {% partial menu-partial %}
 {% endblock menu %}
 
@@ -16,9 +16,10 @@
         <a hx-get="{% url 'bookmarks:filter' %}"
             hx-target="#id_content"
             hx-push-url="true"
+            @click="$refs.sidebarDrawer.checked = false"
             href="#"
             class="{% get_current_class 'bookmarks:filter' %}">
-            <span class="badge badge-neutral badge-sm">F</span>
+            <span class="puka-task-menu">F</span>
             <span class="truncate">Filter Bookmarks</span>
         </a>
     </li>
@@ -27,9 +28,10 @@
         <a hx-get="{% url 'bookmarks:tags' %}"
             hx-target="#id_content"
             hx-push-url="true"
+            @click="$refs.sidebarDrawer.checked = false"
             href="#"
             class="{% get_current_class 'bookmarks:tags' %}">
-            <span class="badge badge-neutral badge-sm">B</span>
+            <span class="puka-task-menu">B</span>
             <span class="truncate">Bookmark Tags</span>
         </a>
     </li>

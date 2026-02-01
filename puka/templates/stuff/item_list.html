@@ -23,12 +23,11 @@
             id="search"
             value="{{ query }}"
             hx-target="#id_content"
-            class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
+            class="input input-sm w-full pr-12"
             x-on:keyup.esc.prevent.stop="$el.blur(); search = false"
             x-trap="search" />
-        <div class="absolute inset-y-0 right-0 flex py-1.5  pr-1.5">
-            <kbd class="inline-flex items-center border border-gray-200 rounded-sm px-2 text-sm font-sans font-medium text-gray-400">
-            ⌘K </kbd>
+        <div class="absolute inset-y-0 right-0 flex py-1.5 pr-1.5">
+            <kbd class="kbd kbd-sm">⌘K</kbd>
         </div>
     </div>
 
@@ -38,7 +37,7 @@
             hx-trigger="click"
             hx-target="#id_content"
             hx-push-url="true"
-            class="hidden md:inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-xs hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800" >
+            class="btn btn-primary hidden md:inline-flex" >
             New Item
         </button>
         <button hx-get="{% url 'stuff:item-new' %}"
@@ -46,54 +45,55 @@
             hx-trigger="click"
             hx-target="#id_content"
             hx-push-url="true"
-            class="md:hidden inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-xs hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800" >
+            class="btn btn-primary md:hidden" >
             New
         </button>
     </div>
 </div>
 
-<div class="bg-white rounded-sm shadow-sm">
-    <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-        <table class="min-w-full divide-y divide-gray-300 ">
+<div class="border border-base-300 rounded-box bg-base-100">
+    <div class="overflow-x-auto">
+        <table class="table table-sm w-full">
             <thead>
                 <tr>
-                    <th scope="col" class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">Item</th>
-                    <th scope="col" class="hidden sm:table-cell px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Quantity</th>
-                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Location</th>
-                    <th scope="col" class="hidden md:table-cell px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Tags</th>
+                    <th scope="col" class="text-sm font-semibold text-base-content">Item</th>
+                    <th scope="col" class="hidden sm:table-cell text-sm font-semibold text-base-content">Quantity</th>
+                    <th scope="col" class="text-sm font-semibold text-base-content">Location</th>
+                    <th scope="col" class="hidden md:table-cell text-sm font-semibold text-base-content">Tags</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200">
+            <tbody>
                 {% for item in items %}
                 <tr>
-                    <td class="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-0">
+                    <td class="text-sm font-medium text-base-content">
                         <a hx-get="{% url 'stuff:item-detail' item.pk %}"
                             hx-target="#id_content"
                             hx-push-url="true"
                             href="#"
-                            class="text-indigo-600 hover:text-indigo-900" >
+                            class="link link-hover link-primary" >
                             {{ item.name }}
                         </a>
                     </td>
-                    <td class="hidden sm:table-cell px-3 py-4 text-sm whitespace-nowrap text-gray-500">{{ item.quantity }}</td>
+                    <td class="hidden sm:table-cell text-sm text-base-content/70">{{ item.quantity }}</td>
                     {# max-w-0 w-full hack from https://stackoverflow.com/questions/5239758/how-can-i-truncate-table-cells-but-fit-as-much-as-content-possible #}
-                    <td class="px-3 py-4 text-sm max-w-0 w-full truncate text-gray-500">
+                    <td class="text-sm text-base-content/70 max-w-0 w-full truncate">
                     {% for inv in item.inventories.all %}
                         <a href="{% url 'stuff:location-detail' pk=inv.location.id %}"
                             hx-get="{% url 'stuff:location-detail' pk=inv.location.id %}"
                             hx-target="#id_content"
                             hx-push-url="true"
-                            class="text-indigo-600 hover:text-indigo-900 ">
+                            class="link link-hover link-primary">
                             {{ inv.location.name }}</a>{% if not forloop.last %}, {% endif %}
                     {% endfor %}
                     </td>
-                    <td class="hidden md:table-cell px-3 py-4 text-sm whitespace-nowrap text-gray-500">
+                    <td class="hidden md:table-cell text-sm text-base-content/70">
                     {% for tag in item.tags.all %}
-                        <li class="inline text-red-700">
+                        <li class="inline">
                             <a href="{% url 'stuff:item-list' %}?query=%23{{ tag }}"
                                 hx-get="{% url 'stuff:item-list' %}?query=%23{{ tag }}"
                                 hx-push-url="true"
-                                hx-target="#id_content" >{{ tag }}</a>
+                                hx-target="#id_content"
+                                class="link-hover text-error">{{ tag }}</a>
                         </li>
                     {% endfor %}
                     </td>
@@ -103,9 +103,9 @@
         </table>
     </div>
 
-    <nav class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6" aria-label="Pagination">
+    <nav class="flex items-center justify-between border-t border-base-300 bg-base-100 px-4 py-3 sm:px-6" aria-label="Pagination">
         <div class="hidden sm:block">
-            <p class="text-sm text-gray-700">
+            <p class="text-sm text-base-content/70">
                 Showing
                 <span class="font-medium">{{ page_obj.start_index }}</span>
                 to
@@ -121,7 +121,7 @@
                     hx-get="{% querystring page=page_obj.previous_page_number query=query %}"
                     hx-target="#id_content"
                     hx-push-url="true"
-                    class="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:outline-offset-0">Previous</a>
+                    class="btn btn-sm btn-outline">Previous</a>
             {% endif %}
 
             {% if page_obj.has_next %}
@@ -129,7 +129,7 @@
                     hx-get="{% querystring page=page_obj.next_page_number query=query %}"
                     hx-target="#id_content"
                     hx-push-url="true"
-                    class="relative ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:outline-offset-0">Next</a>
+                    class="btn btn-sm btn-outline ml-3">Next</a>
             {% endif %}
         </div>
     </nav>

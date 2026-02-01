@@ -4,7 +4,7 @@
 {% block title %}Stuff{% endblock %}
 
 {% block menu %}
-<div class="text-xs/6 font-semibold text-gray-400">Tasks</div>
+<div class="font-semibold text-neutral-content/60">Tasks</div>
 {% partial menu-partial %}
 {% endblock menu %}
 
@@ -13,17 +13,16 @@
     hx-swap-oob="true"
     id="id_extra_menu"
     role="list"
-    class="-mx-2 mt-2 space-y-1" >
+    class="menu -mx-2 mt-2" >
     <li>
         <a
             hx-get="{% url 'stuff:location-list' pk=0 %}"
             hx-target="#id_content"
             hx-push-url="true"
+            @click="$refs.sidebarDrawer.checked = false"
             href="#"
-            class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold {% get_current_class 'stuff:location' %}" >
-            <span
-                class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-[0.625rem] font-medium text-gray-400 group-hover:text-white"
-                >L</span>
+            class="flex items-center gap-3 {% get_current_class 'stuff:location' %}" >
+            <span class="puka-task-menu">L</span>
             <span class="truncate">Locations</span>
         </a>
     </li>

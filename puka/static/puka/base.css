@@ -16,33 +16,21 @@
         "Noto Color Emoji";
 }
 
-/*
-  The default border color has changed to `currentColor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
+.puka-logo-mask {
+    width: 8rem;
+    height: 2rem;
+    display: inline-block;
+    background-color: var(--color-primary);
+    mask-image: url("/static/logo.svg");
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+    -webkit-mask-image: url("/static/logo.svg");
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    -webkit-mask-size: contain;
+}
 
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
-/* @layer base { */
-/*     *, */
-/*     ::after, */
-/*     ::before, */
-/*     ::backdrop, */
-/*     ::file-selector-button { */
-/*         border-color: var(--color-gray-200, currentColor); */
-/*     } */
-/* } */
-/**/
-/* .dj-input-text, */
-/* .dj-input-url { */
-/*     @apply block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6; */
-/* } */
-/**/
-/* .dj-input-textarea { */
-/*     @apply block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-xs ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6; */
-/* } */
-/**/
-/* .tagwidget { */
-/*     @apply bg-white px-4 block w-full leading-normal text-gray-700 rounded-lg border-gray-300 appearance-none border py-2 focus:outline-none; */
-/* } */
+.puka-task-menu {
+  @apply badge badge-secondary glass;
+}
