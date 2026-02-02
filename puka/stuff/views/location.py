@@ -29,8 +29,8 @@ class LocationListView(ListView):
 
         parent = get_object_or_404(Location, pk=pk)
         if hasattr(parent, "get_ancestors"):
-            self.ancestors = [(node.id, node.name) for node in parent.get_ancestors()]
-        self.ancestors.append((parent.id, parent.name))
+            self.ancestors = [(node.pk, node.name) for node in parent.get_ancestors()]
+        self.ancestors.append((parent.pk, parent.name))
         return parent.get_children()
 
     def get_context_data(self, **kwargs):

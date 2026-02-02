@@ -38,6 +38,7 @@ test = [
     "pytest-cov>=6.0.0",
     "pytest-django>=4.9.0",
     "pytest-factoryboy>=2.7.0",
+    "ty>=0.0.14",
 ]
 pre-commit = [
     "add-trailing-comma>=3.1.0",
@@ -103,3 +104,26 @@ venv = ".venv"
 pythonVersion = "3.12"
 typeCheckingMode = "basic"
 reportAttributeAccessIssue = "none"
+
+[tool.ty]
+
+[tool.ty.src]
+include = ["**/*.py"]
+exclude = [
+    "**/migrations/",
+    ".venv/",
+]
+
+# Rule configuration for Django compatibility
+[tool.ty.rules]
+# Be more lenient with Django's dynamic nature
+possibly-unresolved-reference = "warn"
+unresolved-import = "warn"
+
+
+# # Allow unresolved imports for Django modules that might be dynamically loaded
+# allowed-unresolved-imports = [
+#     "django.**",
+#     "*.migrations.**",
+# ]
+# respect-type-ignore-comments = true

@@ -33,7 +33,7 @@ class ItemListView(ListView):
             query_set = Item.objects.all().order_by("name")
 
         return (
-            query_set.annotate(quantity=Sum("inventories__quantity"))  # type: ignore[no-redef, misc]
+            query_set.annotate(quantity=Sum("inventories__quantity"))
             .prefetch_related("locations")
             .prefetch_related("tags")
         )
@@ -49,7 +49,7 @@ class ItemDetailView(DetailView):
 
     def get_queryset(self):
         return (
-            Item.objects.annotate(quantity=Sum("inventories__quantity"))  # type: ignore[no-redef, misc]
+            Item.objects.annotate(quantity=Sum("inventories__quantity"))
             .prefetch_related("bookmarks")
             .prefetch_related("locations")
             .prefetch_related("tags")

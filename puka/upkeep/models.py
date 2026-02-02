@@ -12,6 +12,7 @@ class Area(models.Model):
     name = models.CharField("area name", max_length=200)
     notes = models.TextField(blank=True)
     bookmarks = models.ManyToManyField(Bookmark, related_name="+")
+    tasks: models.Manager["Task"]
 
     def __str__(self):
         return self.name
@@ -48,12 +49,13 @@ class Task(models.Model):
     )
     area = models.ForeignKey(Area, on_delete=models.CASCADE, related_name="tasks")
     objects = TaskManager()
+    schedules: models.Manager["Schedule"]
 
     def __str__(self):
-        return f"{self.name} ({self.id})"
+        return f"{self.name} ({self.pk})"
 
     def get_absolute_url(self):
-        return reverse("upkeep:task-detail", args=[self.id])
+        return reverse("upkeep:task-detail", args=[self.pk])
 
     def is_recurring(self) -> bool:
         return self.interval is not None
@@ -92,6 +94,7 @@ class TaskItem(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField("quantity required", default=1)
+    task_id: int
 
     class Meta:
         unique_together = ("task", "item")
@@ -108,6 +111,7 @@ class Schedule(models.Model):
     due_date = models.DateField()
     completion_date = models.DateField(blank=True, null=True)
     notes = models.TextField(blank=True)
+    task_id: int
 
     class Meta:
         ordering = ("due_date",)

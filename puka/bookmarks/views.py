@@ -4,10 +4,10 @@ import logging
 
 from django.core.paginator import Paginator
 from django.db.models import Case, Count, Value, When
-from django.http import HttpResponse
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.views.decorators.http import require_GET, require_http_methods, require_POST
+from django.views.decorators.http import require_http_methods
 from django_htmx.http import HttpResponseLocation, trigger_client_event
 
 from puka.core.views import get_template
@@ -19,8 +19,8 @@ from .models import Bookmark
 logger = logging.getLogger(__name__)
 
 
-@require_GET
-def bookmarks(request):
+@require_http_methods(["GET"])
+def bookmarks(request: HttpRequest) -> HttpResponse:
     clear_search = False
 
     match request.GET:
@@ -53,9 +53,9 @@ def bookmarks(request):
     return trigger_client_event(response, "clearSearch", {}) if clear_search else response
 
 
-@require_GET
+@require_http_methods(["GET"])
 def bookmarks_filter(request):
-    f = BookmarkFilter(request.GET, queryset=Bookmark.objects.prefetch_related("tags"))  # type: ignore[misc]
+    f = BookmarkFilter(request.GET, queryset=Bookmark.objects.prefetch_related("tags"))
     paginator = Paginator(f.qs, 25)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
@@ -115,7 +115,7 @@ def bookmark_edit(request, pk):
     return HttpResponse()
 
 
-@require_POST
+@require_http_methods(["POST"])
 def bookmark_delete(_request, pk):
     bookmark = get_object_or_404(Bookmark, pk=pk)
     logger.debug("delete: Bookmark %s", bookmark)
@@ -123,7 +123,7 @@ def bookmark_delete(_request, pk):
     return HttpResponseLocation(reverse("bookmarks:list"), target="#id_content")
 
 
-@require_GET
+@require_http_methods(["GET"])
 def tags_list(request):
     tags = Bookmark.tags.annotate(
         num_times=Count(Bookmark.tags.through.tag_relname()),

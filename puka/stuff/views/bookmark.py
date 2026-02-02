@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 
 from django.urls import reverse
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_http_methods
 from django.views.generic import ListView
 from django_htmx.http import HttpResponseLocation
 
@@ -26,7 +26,7 @@ class BookmarkSelectView(ListView):
     def get_queryset(self):
         self.filter = BookmarkFilter(
             self.request.GET,
-            queryset=Bookmark.objects.prefetch_related("tags"),  # type: ignore[misc]
+            queryset=Bookmark.objects.prefetch_related("tags"),
         )
         return self.filter.qs
 
@@ -47,7 +47,7 @@ class BookmarkSelectView(ListView):
         )
 
 
-@require_POST
+@require_http_methods(["POST"])
 def bookmark_delete_view(request, item_pk):
     item = Item.objects.get(pk=item_pk)
     bookmark_pk = request.POST.get("bookmark_pk")
