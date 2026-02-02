@@ -12,28 +12,40 @@
     {% include "bookmarks/base.html#menu-partial" %}
 {% endif %}
 
-<div class="flex justify-end mb-4 mt-0 md:ml-4">
+<div class="flex justify-end mb-4 mt-0 gap-4">
     <div x-data="{search: false}"
-        x-on:keydown.meta.K.window="search = true"
-        class="mr-4 relative flex items-center">
-        <label class="hidden" for="search">Search</label>
-        <input type="text"
+        x-on:keydown.meta.K.window="search = true">
+        <label class="input w-64">
+            <svg class="h-[2em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <g
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                  stroke-width="2.5"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.3-4.3"></path>
+                </g>
+            </svg>
+        <input type="search"
             name="q"
             id="search"
+            placeholder="Search"
             {# fake pagination to force list-items-partial to be returned #}
             hx-get="{% url 'bookmarks:list' %}?page=x"
             hx-trigger="keyup changed delay:0.5s"
             hx-target="#id_bookmarks"
-            class="input input-sm w-full pr-12"
+            class="grow"
             x-on:keyup.esc.prevent.stop="$el.blur(); search = false"
             x-on:blur="$el.value = ''; search = false"
             x-trap="search" />
-        <div class="absolute inset-y-0 right-0 flex py-1.5 pr-1.5">
-            <kbd class="kbd kbd-sm">⌘K</kbd>
-        </div>
+            <kbd class="hidden md:inline kbd kbd-sm">⌘</kbd>
+            <kbd class="hidden md:inline kbd kbd-sm">K</kbd>
+        </label>
     </div>
 
-    <div class="flex md:mt-0 md:ml-4">
+    <div class="flex md:mt-0">
         <button hx-get="{% url 'bookmarks:new' %}"
             type="button"
             hx-trigger="click"
