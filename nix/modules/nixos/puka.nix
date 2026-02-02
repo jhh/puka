@@ -7,7 +7,7 @@
 }:
 let
   cfg = config.services.puka;
-  inherit (pkgs) system;
+  inherit (pkgs.stdenv.hostPlatform) system;
   inherit (flake.packages.${system}) manage static venv;
 
   inherit (lib.options) mkOption;

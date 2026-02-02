@@ -34,7 +34,6 @@ dev = [
 ]
 test = [
     "django-stubs[compatible-mypy]>=5.1.1",
-    "mypy>=1.13.0",
     "pytest-cov>=6.0.0",
     "pytest-django>=4.9.0",
     "pytest-factoryboy>=2.7.0",
@@ -58,9 +57,6 @@ testpaths = ["puka"]
 python_files = "*_test.py"
 DJANGO_SETTINGS_MODULE = "puka.settings.test"
 
-[tool.mypy]
-plugins = ["mypy_django_plugin.main"]
-ignore_missing_imports = true
 
 [tool.django-stubs]
 django_settings_module = "puka.settings.test"
@@ -119,11 +115,3 @@ exclude = [
 # Be more lenient with Django's dynamic nature
 possibly-unresolved-reference = "warn"
 unresolved-import = "warn"
-
-
-# # Allow unresolved imports for Django modules that might be dynamically loaded
-# allowed-unresolved-imports = [
-#     "django.**",
-#     "*.migrations.**",
-# ]
-# respect-type-ignore-comments = true

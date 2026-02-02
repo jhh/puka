@@ -6,9 +6,9 @@ _default:
 init: npm-install update-css update-js
     echo DEBUG=true > .env
 
-# run mypy type checks
-mypy:
-    uv run mypy --check-untyped-defs .
+# run ty type checks
+ty:
+    uv run ty check
 
 # run tests
 test $DJANGO_SETTINGS_MODULE="puka.settings.test":
