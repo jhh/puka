@@ -14,7 +14,7 @@
 
 <div class="flex justify-end mb-4 mt-0 gap-4">
     <div x-data="{search: false}"
-        x-on:keydown.meta.K.window="search = true">
+        x-on:keydown.meta.k.window="$focus.focus($refs.searchInput)">
         <label class="input w-64">
             <svg class="h-[2em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <g
@@ -29,6 +29,7 @@
                 </g>
             </svg>
         <input type="search"
+            x-ref="searchInput"
             name="q"
             id="search"
             placeholder="Search"
@@ -37,9 +38,7 @@
             hx-trigger="keyup changed delay:0.5s"
             hx-target="#id_bookmarks"
             class="grow"
-            x-on:keyup.esc.prevent.stop="$el.blur(); search = false"
-            x-on:blur="$el.value = ''; search = false"
-            x-trap="search" />
+            x-on:keyup.esc.prevent.stop="$el.value = ''; $el.blur(); htmx.trigger($el, 'change')" />
             <kbd class="hidden md:inline kbd kbd-sm">⌘</kbd>
             <kbd class="hidden md:inline kbd kbd-sm">K</kbd>
         </label>
