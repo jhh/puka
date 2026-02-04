@@ -14,7 +14,7 @@ let
   pukaCssJs = pkgs.buildNpmPackage {
     name = "django-static-deps";
     src = ../../.;
-    npmDepsHash = "sha256-7x0XR5v/T/E6IsU0mM5hwNrRjnfdhRdhSt8IjHmb46k=";
+    npmDepsHash = "sha256-bRsh+5yFGcqmTDuWia3nNPIq9ekXMHjtqdzsxtQlG7o=";
     dontNpmBuild = true;
 
     patchPhase = ''

@@ -8,7 +8,7 @@ register = template.Library()
 def get_current_class(context, url_name):
     request = context["request"]
     return (
-        "bg-gray-800 text-white"
+        "active text-neutral-content"
         if request.path.startswith(reverse(url_name))
-        else "text-gray-400 hover:text-white hover:bg-gray-800"
+        else "text-neutral-content/70 hover:text-neutral-content hover:bg-neutral-focus"
     )

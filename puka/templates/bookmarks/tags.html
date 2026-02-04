@@ -11,29 +11,25 @@
   {% endif %}
   <div class="md:flex md:items-center md:justify-between">
   <div class="min-w-0 flex-1">
-    <h1 class="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">Tags</h1>
+    <h1 class="text-2xl/7 font-bold sm:truncate sm:text-3xl sm:tracking-tight">Tags</h1>
   </div>
   </div>
   {% for tag in tags %}
     {% ifchanged tag.bucket %}
       {% if not forloop.first %}</ul>{% endif %}
-      <div class="border-b border-gray-200 py-5">
-        <h2 class="text-base font-semibold text-gray-900">{{ tag.bucket }}</h2>
-      </div>
+      <div class="divider"></div>
+      <h2 class="text-base font-semibold">{{ tag.bucket }}</h2>
 
-      <ul class="flex flex-wrap space-x-2">
+      <ul class="flex flex-wrap gap-2 mt-2">
     {% endifchanged %}
   <li class="inline">
-
     <a
         href="{% url 'bookmarks:list' %}?tags={{ tag.name }}"
         hx-get="{% url 'bookmarks:list' %}?tags={{ tag.name }}"
         hx-push-url="true"
         hx-target="#id_content"
     >
-    <span
-        class="inline-flex items-center rounded-full bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700 ring-1 ring-indigo-700/10 ring-inset"
-    >{{ tag.name }} {{ tag.num_times }}</span>
+    <span class="badge badge-primary badge-soft">{{ tag.name }} {{ tag.num_times }}</span>
     </a>
   </li>
   {% if forloop.last %}</ul>{% endif %}

@@ -65,6 +65,7 @@ class Item(models.Model):
     name_notes_search = SearchVectorField(null=True, editable=False)
 
     objects: ItemManager = ItemManager()
+    inventories: models.Manager["Inventory"]
 
     class Meta:
         ordering = ("name",)

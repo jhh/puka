@@ -1,16 +1,14 @@
 {% extends "bookmarks/base.html" %}
 
 {% block content %}
-  <h1 class="text-xl font-medium text-gray-900">{{ bookmark.title }}</h1>
+  <h1 class="text-xl font-medium">{{ bookmark.title }}</h1>
   <p class="mt-4 max-w-prose">{{ bookmark.description }}</p>
-  <ul role="list" class="flex flex-wrap items-center justify-start space-x-1.5">
+  <ul class="flex flex-wrap items-center justify-start gap-1.5 mt-2">
   {% for tag in bookmark.tags.all %}
-    <li><span
-        class="inline-flex items-center rounded-full bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700 ring-1 ring-indigo-700/10 ring-inset">{{ tag }}</span>
-    </li>
+    <li><span class="badge badge-primary badge-soft">{{ tag }}</span></li>
   {% endfor %}
   </ul>
-  <p class="mt-2"><a class="font-medium text-blue-600 dark:text-blue-500 hover:underline" href="{{ bookmark.url }}" target="_blank" rel="noopener noreferrer">{{ bookmark.url }}</a></p>
+  <p class="mt-2"><a class="link link-primary" href="{{ bookmark.url }}" target="_blank" rel="noopener noreferrer">{{ bookmark.url }}</a></p>
   <p>Created: {{ bookmark.created }}</p>
   <p>Updated: {{ bookmark.updated }}</p>
   <p>Active: {{ bookmark.active }}</p>

@@ -20,8 +20,8 @@ pythonSet.mkVirtualEnv "puka-env" workspace.deps.default
     {
       # pytests are not included in checks due to requiring postgres
 
-      mypy = mkDerivation {
-        name = "puka-mypy";
+      ty-check = mkDerivation {
+        name = "puka-ty";
         inherit (pythonSet.puka) src;
 
         nativeBuildInputs = [ venv ];
@@ -30,8 +30,8 @@ pythonSet.mkVirtualEnv "puka-env" workspace.deps.default
         dontInstall = true;
         buildPhase = ''
           runHook preBuild
-          export MYPYPATH=apps
-          mypy . --junit-xml $out/junit.xml
+          mkdir -p $out
+          ty check --output-format=concise > $out/out.txt 2>&1
           runHook postBuild
         '';
       };
@@ -58,6 +58,8 @@ pythonSet.mkVirtualEnv "puka-env" workspace.deps.default
           pytest tests --junit-xml=$out/junit.xml
           runHook postCheck
         '';
+
+        meta.platforms = pkgs.lib.platforms.linux;
       };
     };
 }

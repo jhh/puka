@@ -10,35 +10,45 @@
     {% include "upkeep/base.html#menu-partial" %}
 {% endif %}
 
-<div class="flex justify-end mb-4 mt-0 md:ml-4">
+<div class="flex justify-end mb-4 mt-0 gap-4">
     <div x-data="{search: false}"
-        x-on:keydown.meta.K.window="search = true"
-        class="mr-4 relative flex items-center" >
-        <label class="hidden" for="search">Search</label>
-        <input hx-get="{% url 'upkeep:area-list' %}"
-            hx-trigger="change"
-            hx-push-url="true"
-            type="text"
+        x-on:keydown.meta.k.window="$focus.focus($refs.searchInput)">
+        <label class="input w-64">
+            <svg class="h-[2em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <g
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                  stroke-width="2.5"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.3-4.3"></path>
+                </g>
+            </svg>
+        <input type="search"
+            x-ref="searchInput"
             name="query"
             id="search"
+            placeholder="Search"
             value="{{ request.GET.query }}"
+            hx-get="{% url 'upkeep:area-list' %}"
+            hx-trigger="change"
             hx-target="#id_content"
-            class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
-            x-on:keyup.esc.prevent.stop="$el.blur(); search = false"
-            x-trap="search" />
-        <div class="absolute inset-y-0 right-0 flex py-1.5  pr-1.5">
-            <kbd class="inline-flex items-center border border-gray-200 rounded-sm px-2 text-sm font-sans font-medium text-gray-400">
-            ⌘K </kbd>
-        </div>
+            class="grow"
+            x-on:keyup.esc.prevent.stop="$el.value = ''; $el.blur(); htmx.trigger($el, 'change')" />
+            <kbd class="hidden md:inline kbd kbd-sm">⌘</kbd>
+            <kbd class="hidden md:inline kbd kbd-sm">K</kbd>
+        </label>
     </div>
 
-    <div class="flex md:mt-0 md:ml-4">
+    <div class="flex md:mt-0">
         <button hx-get="{% url 'upkeep:area-new' %}"
             type="button"
             hx-trigger="click"
             hx-target="#id_content"
             hx-push-url="true"
-            class="hidden md:inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-xs hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800" >
+            class="btn btn-primary hidden md:inline-flex" >
             New Area
         </button>
         <button hx-get="{% url 'upkeep:area-new' %}"
@@ -46,51 +56,51 @@
             hx-trigger="click"
             hx-target="#id_content"
             hx-push-url="true"
-            class="md:hidden inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-xs hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800" >
+            class="btn btn-primary md:hidden" >
             New
         </button>
     </div>
 </div>
 
-<div class="bg-white rounded-sm shadow-sm">
-    <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-        <table class="min-w-full divide-y divide-gray-300">
+<div class="border border-base-300 rounded-box bg-base-100">
+    <div class="overflow-x-auto">
+        <table class="table table-sm w-full">
             <thead>
                 <tr>
-                    <th scope="col" class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">Area</th>
-                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Tasks</th>
-                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Next Due</th>
-                    <th scope="col" class="relative py-3.5 pr-4 pl-3 sm:pr-0">
+                    <th scope="col" class="text-sm font-semibold text-base-content">Area</th>
+                    <th scope="col" class="text-sm font-semibold text-base-content">Tasks</th>
+                    <th scope="col" class="text-sm font-semibold text-base-content">Next Due</th>
+                    <th scope="col" class="relative">
                         <span class="sr-only">Edit</span>
                     </th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200">
+            <tbody>
                 {% for area in areas %}
                 <tr>
-                    <td class="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-0">
+                    <td class="text-sm font-medium text-base-content">
                         <a hx-get="{% url 'upkeep:area-detail' area.id %}"
                            href="{% url 'upkeep:area-detail' area.id %}"
                            hx-target="#id_content"
                            hx-push-url="true"
-                           class="text-indigo-600 hover:text-indigo-900" >
+                           class="link link-hover link-primary" >
                             {{ area.name }}
                         </a>
                     </td>
-                    <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500">
+                    <td class="text-sm text-base-content/70">
                         {{ area.task_count }}
                     </td>
-                    <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500">
+                    <td class="text-sm text-base-content/70">
                        {% if area.due_task_id %}
                             {{ area.due_date }}
                        {% endif %}
                     </td>
-                    <td class="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-0">
+                    <td class="text-right text-sm font-medium">
                         <a href="#"
                            hx-get="{% url 'upkeep:area-edit' area.id %}"
                            hx-target="#id_content"
                            hx-push-url="true"
-                           class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                           class="link link-hover link-primary">Edit</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -98,9 +108,9 @@
         </table>
     </div>
 
-    <nav class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6" aria-label="Pagination">
+    <nav class="flex items-center justify-between border-t border-base-300 bg-base-100 px-4 py-3 sm:px-6" aria-label="Pagination">
         <div class="hidden sm:block">
-            <p class="text-sm text-gray-700">
+            <p class="text-sm text-base-content/70">
                 Showing
                 <span class="font-medium">{{ page_obj.start_index }}</span>
                 to
@@ -116,7 +126,7 @@
                     hx-get="{% querystring page=page_obj.previous_page_number %}"
                     hx-target="#id_content"
                     hx-push-url="true"
-                    class="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:outline-offset-0">Previous</a>
+                    class="btn btn-sm btn-outline">Previous</a>
             {% endif %}
 
             {% if page_obj.has_next %}
@@ -124,7 +134,7 @@
                     hx-get="{% querystring page=page_obj.next_page_number %}"
                     hx-target="#id_content"
                     hx-push-url="true"
-                    class="relative ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:outline-offset-0">Next</a>
+                    class="btn btn-sm btn-outline ml-3">Next</a>
             {% endif %}
         </div>
     </nav>

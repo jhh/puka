@@ -12,35 +12,45 @@
     {% include "bookmarks/base.html#menu-partial" %}
 {% endif %}
 
-<div class="flex justify-end mb-4 mt-0 md:ml-4">
+<div class="flex justify-end mb-4 mt-0 gap-4">
     <div x-data="{search: false}"
-        x-on:keydown.meta.K.window="search = true"
-        class="mr-4 relative flex items-center" >
-        <label class="hidden" for="search">Search</label>
-        <input type="text"
+        x-on:keydown.meta.k.window="$focus.focus($refs.searchInput)">
+        <label class="input w-64">
+            <svg class="h-[2em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <g
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                  stroke-width="2.5"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.3-4.3"></path>
+                </g>
+            </svg>
+        <input type="search"
+            x-ref="searchInput"
             name="q"
             id="search"
+            placeholder="Search"
             {# fake pagination to force list-items-partial to be returned #}
             hx-get="{% url 'bookmarks:list' %}?page=x"
             hx-trigger="keyup changed delay:0.5s"
             hx-target="#id_bookmarks"
-            class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
-            x-on:keyup.esc.prevent.stop="$el.blur(); search = false"
-            x-on:blur="$el.value = ''; search = false"
-            x-trap="search" />
-        <div class="absolute inset-y-0 right-0 flex py-1.5  pr-1.5">
-            <kbd class="inline-flex items-center border border-gray-200 rounded-sm px-2 text-sm font-sans font-medium text-gray-400">
-            ⌘K </kbd>
-        </div>
+            class="grow"
+            x-on:keyup.esc.prevent.stop="$el.value = ''; $el.blur(); htmx.trigger($el, 'change')" />
+            <kbd class="hidden md:inline kbd kbd-sm">⌘</kbd>
+            <kbd class="hidden md:inline kbd kbd-sm">K</kbd>
+        </label>
     </div>
 
-    <div class="flex md:mt-0 md:ml-4">
+    <div class="flex md:mt-0">
         <button hx-get="{% url 'bookmarks:new' %}"
             type="button"
             hx-trigger="click"
             hx-target="#id_content"
             hx-push-url="true"
-            class="hidden md:inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-xs hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800" >
+            class="btn btn-primary hidden md:inline-flex">
             New Bookmark
         </button>
         <button hx-get="{% url 'bookmarks:new' %}"
@@ -48,51 +58,49 @@
             hx-trigger="click"
             hx-target="#id_content"
             hx-push-url="true"
-            class="md:hidden inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-xs hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800" >
+            class="btn btn-primary md:hidden">
             New
         </button>
     </div>
 </div>
 
-<ul id="id_bookmarks" role="list" class="divide-y divide-gray-200 shadow-sm bg-white">
+<ul id="id_bookmarks" class="list bg-base-100 border-base-300 rounded-box">
     {% partial list-items-partial %}
 </ul>
 {% endpartialdef list-partial %}
 
 {% partialdef list-items-partial %}
 {% for bookmark in page_obj %}
-    <li class="p-4"
+    <li class="list-row"
         {% if forloop.last and page_obj.has_next %}
             hx-get="{% querystring page=page_obj.next_page_number %}"
             hx-trigger="revealed"
             hx-swap="afterend"
-        {% endif %} >
+        {% endif %}>
         <article>
-            <h2 class="pb-2 text-base font-medium text-slate-800">
-                <a href="{{ bookmark.url }}" target="_blank" rel="noreferrer">{{ bookmark.title }}</a>
+            <h2 class="text-primary font-medium text-base mb-2">
+                <a href="{{ bookmark.url }}" target="_blank" rel="noreferrer" class="link link-hover">{{ bookmark.title }}</a>
                 {% if not bookmark.active %}
-                    <span class="text-sm text-red-700">(inactive)</span>
+                    <span class="badge badge-error badge-sm">(inactive)</span>
                 {% endif %}
             </h2>
-            <p class="text-sm text-slate-600">
+            <p class="text-sm text-base-content mb-3">
                 {{ bookmark.description }}
             </p>
-            <ul role="list" class="mt-4">
+            <ul class="flex flex-wrap gap-2 mb-1">
                 {% for tag in bookmark.tags.all %}
-                    <li class="inline text-sm text-red-700">
-                        <a href="?tags={{ tag }}" hx-get="?tags={{ tag }}" hx-target="#id_content" >{{ tag }}</a>
+                    <li class="inline">
+                        <a href="?tags={{ tag }}" hx-get="?tags={{ tag }}" hx-target="#id_content" class="link-hover text-secondary text-sm">{{ tag }}</a>
                     </li>
                 {% endfor %}
             </ul>
-            <div class="text-xs text-slate-400">
+            <div class="text-xs text-base-content/50">
                 {{ bookmark.created|date:'F Y'|lower }}
-                <button hx-get="{% url 'bookmarks:edit' bookmark.id %}"
-                    type="button"
-                    class="ml-3"
-                    hx-target="#id_content"
-                    hx-push-url="true" >
+                <a hx-get="{% url 'bookmarks:edit' bookmark.id %}"
+                    href="{% url 'bookmarks:edit' bookmark.id %}"
+                    class="link-hover text-base-content/50 ml-2">
                     edit
-                </button>
+                </a>
             </div>
         </article>
     </li>

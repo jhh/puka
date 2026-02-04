@@ -4,8 +4,8 @@
 
 {% partialdef field-partial %}
 <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-    <dt class="text-sm font-medium text-gray-900">{{ label }}</dt>
-    <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ value }}</dd>
+    <dt class="text-sm font-medium text-base-content">{{ label }}</dt>
+    <dd class="mt-1 text-sm text-base-content/70 sm:col-span-2 sm:mt-0">{{ value }}</dd>
 </div>
 {% endpartialdef field-partial %}
 
@@ -17,13 +17,13 @@
     {% include "sidebar.html#nav-desktop-partial" %}
     {% include "stuff/base.html#menu-partial" %}
 {% endif %}
-<div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-    <div class="px-4 py-6 sm:px-6">
-        <h3 class="text-base/7 font-semibold text-gray-900">Location Detail</h3>
-        <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">Location details for {{ location.name }}.</p>
+<div class="card bg-base-100 border border-base-300 rounded-box">
+    <div class="card-body">
+        <h3 class="text-base font-semibold text-base-content">Location Detail</h3>
+        <p class="mt-1 max-w-2xl text-sm text-base-content/70">Location details for {{ location.name }}.</p>
     </div>
-    <div class="border-t border-gray-100">
-        <dl class="divide-y divide-gray-100">
+    <div class="border-t border-base-300">
+        <dl class="divide-y divide-base-200">
             {% with label="Name" value=location.name %}
                 {% partial field-partial %}
             {% endwith %}
@@ -31,17 +31,17 @@
                 {% partial field-partial %}
             {% endwith %}
             <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm/6 font-medium text-gray-900">Inventory</dt>
-                <dd class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                    <ul role="list" class="divide-y divide-gray-100 rounded-md border border-gray-200">
+                <dt class="text-sm font-medium text-base-content">Inventory</dt>
+                <dd class="mt-2 text-sm text-base-content sm:col-span-2 sm:mt-0">
+                    <ul role="list" class="list list-sm border border-base-300 rounded-box bg-base-100">
                     {% for inv in location.inventories.all %}
-                        <li class="flex items-center justify-between py-4 pr-5 pl-4 text-sm/6" >
+                        <li class="list-row">
                             <div>
                                 <a href="{% url 'stuff:item-detail' pk=inv.item.id %}"
                                     hx-get="{% url 'stuff:item-detail' pk=inv.item.id %}"
                                     hx-target="#id_content"
                                     hx-push-url="true"
-                                    class="text-indigo-600 hover:text-indigo-900">
+                                    class="link link-hover link-primary">
                                         {{ inv.item.name }}
                                 </a>
                             </div>
@@ -50,7 +50,7 @@
                                     hx-target="#id_quantity_{{ inv.id }}"
                                     hx-vals='{"quantity": -1}'
                                     type="button"
-                                    class="mr-2 rounded-full bg-indigo-600 p-1 text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                                    class="btn btn-primary btn-circle btn-xs mr-2">
                                     <svg class="size-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" >
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
                                     </svg>
@@ -60,7 +60,7 @@
                                     hx-target="#id_quantity_{{ inv.id }}"
                                     hx-vals='{"quantity": 1}'
                                     type="button"
-                                    class="ml-2 rounded-full bg-indigo-600 p-1 text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                                    class="btn btn-primary btn-circle btn-xs ml-2">
                                     <svg class="size-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
                                         <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
                                     </svg>
