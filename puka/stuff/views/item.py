@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 class ItemListView(ListView):
     context_object_name = "items"
-    paginate_by = 10
+    paginate_by = 20
 
     def get_template_names(self):
         return get_template(self.request, "stuff/item_list.html", "#list-partial")
