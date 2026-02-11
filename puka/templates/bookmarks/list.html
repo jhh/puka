@@ -98,6 +98,8 @@
                 {{ bookmark.created|date:'F Y'|lower }}
                 <a hx-get="{% url 'bookmarks:edit' bookmark.id %}"
                     href="{% url 'bookmarks:edit' bookmark.id %}"
+                    hx-target="#id_content"
+                    hx-push-url="true"
                     class="link-hover text-base-content/50 ml-2">
                     edit
                 </a>
