@@ -36,7 +36,7 @@ class AreaForm(forms.ModelForm):
             ),
             Div(
                 PrimaryButton("submit", "Save area"),
-                CancelButton("cancel", "Cancel", onclick="window.history.back();"),
+                CancelButton("upkeep:area-list"),
                 delete_button,
                 css_class="mt-4 flex gap-x-4",
             ),
@@ -73,7 +73,7 @@ class TaskForm(forms.ModelForm):
             ),
             Div(
                 PrimaryButton("submit", "Save task"),
-                CancelButton("cancel", "Cancel", onclick="window.history.back();"),
+                CancelButton("upkeep:task-list"),
                 delete_button,
                 css_class="mt-4 flex gap-x-4",
             ),
@@ -110,7 +110,7 @@ class ScheduleForm(forms.ModelForm):
             ),
             Div(
                 PrimaryButton("submit", "Save schedule"),
-                CancelButton("cancel", "Cancel", onclick="window.history.back();"),
+                CancelButton("upkeep:home"),
                 delete_button,
                 css_class="mt-4 flex gap-x-4",
             ),
@@ -152,7 +152,7 @@ class TaskItemForm(forms.ModelForm):
             ),
             Div(
                 PrimaryButton("submit", "Save item"),
-                CancelButton("cancel", "Cancel", onclick="window.history.back();"),
+                CancelButton("upkeep:home"),
                 delete_button,
                 css_class="mt-4 flex gap-x-4",
             ),

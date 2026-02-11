@@ -1,10 +1,10 @@
 import django_filters
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Div, Field, Layout
+from crispy_forms.layout import Button, Div, Field, Layout
 from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.db.models import F
 
-from puka.bookmarks.forms import CancelButton, PrimaryButton
+from puka.bookmarks.forms import PrimaryButton
 from puka.bookmarks.models import Bookmark
 from puka.core.filters import TagFilter
 
@@ -55,7 +55,12 @@ class BookmarkFilter(django_filters.FilterSet):
                 css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
             ),
             Div(
-                CancelButton("clear", "Clear Search", onclick="clearSearch();", hx_get=""),
+                Button(
+                    "clear",
+                    "Clear Search",
+                    onclick="clearSearch();",
+                    css_class="text-sm/6 font-semibold text-gray-900",
+                ),
                 PrimaryButton("submit", "Search"),
                 css_class="mt-0 mb-4 flex items-center justify-end gap-x-6",
             ),

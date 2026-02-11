@@ -37,7 +37,7 @@ class BookmarkForm(ModelForm):
             ),
             Div(
                 PrimaryButton("submit", "Save Bookmark"),
-                CancelButton("cancel", "Cancel", onclick="window.history.back();"),
+                CancelButton("bookmarks:list"),
                 delete_button,
                 css_class="mt-4 flex gap-x-4",
             ),

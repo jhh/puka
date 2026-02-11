@@ -1,5 +1,5 @@
 from crispy_forms.layout import HTML
-from crispy_tailwind.layout import Button, Submit
+from crispy_tailwind.layout import Submit
 
 
 class PrimaryButton(Submit):
@@ -13,10 +13,15 @@ class PrimaryButton(Submit):
         super().__init__(*args, **kwargs)
 
 
-class CancelButton(Button):
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault("css_class", "text-sm/6 font-semibold text-gray-900")
-        super().__init__(*args, **kwargs)
+class CancelButton(HTML):
+    def __init__(self, url_name, label="Cancel"):
+        super().__init__(
+            f"""<a href="{{% url '{url_name}' %}}"
+            hx-get="{{% url '{url_name}' %}}"
+            hx-target="#id_content"
+            hx-push-url="true"
+            class="text-sm/6 font-semibold text-gray-900">{label}</a>""",
+        )
 
 
 class DeleteButton(HTML):

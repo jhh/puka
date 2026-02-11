@@ -44,7 +44,7 @@ class LocationForm(MoveNodeForm):
             ),
             Div(
                 PrimaryButton("submit", "Save location"),
-                CancelButton("cancel", "Cancel", onclick="window.history.back();"),
+                CancelButton("stuff:location-list", "Cancel"),
                 delete_button,
                 css_class="mt-4 flex gap-x-4",
             ),
@@ -91,7 +91,7 @@ class ItemForm(ModelForm):
             ),
             Div(
                 PrimaryButton("submit", "Save item"),
-                CancelButton("cancel", "Cancel", onclick="window.history.back();"),
+                CancelButton("stuff:item-list", "Cancel"),
                 delete_button,
                 css_class="mt-4 flex gap-x-4",
             ),
@@ -166,7 +166,7 @@ class InventoryForm(ModelForm):
             ),
             Div(
                 PrimaryButton("submit", "Save item"),
-                CancelButton("cancel", "Cancel", onclick="window.history.back();"),
+                CancelButton("stuff:item-list", "Cancel"),
                 delete_button,
                 css_class="mt-4 flex gap-x-4",
             ),
