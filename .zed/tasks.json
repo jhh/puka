@@ -1,0 +1,7 @@
+// Project tasks configuration. See https://zed.dev/docs/tasks for documentation.
+[
+  {
+    "label": "Run Phoenix Server",
+    "command": "mix phx.server",
+  },
+]
