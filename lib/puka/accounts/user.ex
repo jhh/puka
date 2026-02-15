@@ -1,7 +1,11 @@
 defmodule Puka.Accounts.User do
+  @moduledoc """
+  User schema for authentication.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Inspect, except: [:password, :hashed_password]}
   schema "users" do
     field :email, :string
     field :password, :string, virtual: true, redact: true

@@ -4,7 +4,7 @@ defmodule Puka.Bookmarks do
   """
 
   import Ecto.Query, warn: false
-  alias Puka.Repo
+  alias Puka.{Paginator, Repo}
 
   alias Puka.Bookmarks.Bookmark
 
@@ -19,6 +19,15 @@ defmodule Puka.Bookmarks do
   """
   def list_bookmarks do
     Bookmark |> order_by(desc: :inserted_at) |> Repo.all() |> Repo.preload(:tags)
+  end
+
+  def list_bookmarks(a, page \\ 1, per_page \\ 10)
+
+  def list_bookmarks(:paged, page, per_page) do
+    Bookmark
+    |> order_by(desc: :inserted_at)
+    |> preload(:tags)
+    |> Paginator.page(page, per_page: per_page)
   end
 
   @doc """
@@ -104,3 +113,8 @@ defmodule Puka.Bookmarks do
     Bookmark.changeset(bookmark, attrs)
   end
 end
+
+# iex(11)> query = from b in Bookmark,
+# ...(11)>   join: t in assoc(b, :tags),
+# ...(11)>   where: t.name == "elixir",
+# ...(11)>   preload: [:tags]
