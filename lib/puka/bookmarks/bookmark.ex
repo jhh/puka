@@ -1,4 +1,7 @@
 defmodule Puka.Bookmarks.Bookmark do
+  @moduledoc """
+  Bookmark schema.
+  """
   use Ecto.Schema
   import Ecto.Changeset
   alias Puka.Tags.Tag

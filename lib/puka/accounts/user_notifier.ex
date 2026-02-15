@@ -1,4 +1,7 @@
 defmodule Puka.Accounts.UserNotifier do
+  @moduledoc """
+  Deliver notifications to users via email.
+  """
   import Swoosh.Email
 
   alias Puka.Mailer

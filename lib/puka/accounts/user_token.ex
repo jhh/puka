@@ -1,4 +1,7 @@
 defmodule Puka.Accounts.UserToken do
+  @moduledoc """
+  Manage tokens for user authentication.
+  """
   use Ecto.Schema
   import Ecto.Query
   alias Puka.Accounts.UserToken

@@ -1,4 +1,7 @@
 defmodule PukaWeb.UserAuth do
+  @moduledoc """
+  Utility methods for user authentication.
+  """
   use PukaWeb, :verified_routes
 
   import Plug.Conn
