@@ -4,8 +4,8 @@ defmodule Puka.Accounts.UserNotifier do
   """
   import Swoosh.Email
 
-  alias Puka.Mailer
   alias Puka.Accounts.User
+  alias Puka.Mailer
 
   # Delivers the email using the application mailer.
   defp deliver(recipient, subject, body) do

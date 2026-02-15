@@ -6,7 +6,7 @@ defmodule Puka.Accounts do
   import Ecto.Query, warn: false
   alias Puka.Repo
 
-  alias Puka.Accounts.{User, UserToken, UserNotifier}
+  alias Puka.Accounts.{User, UserNotifier, UserToken}
 
   ## Database getters
 

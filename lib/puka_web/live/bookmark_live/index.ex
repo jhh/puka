@@ -61,7 +61,7 @@ defmodule PukaWeb.BookmarkLive.Index do
     {:noreply, stream_delete(socket, :bookmarks, bookmark)}
   end
 
-  defp list_bookmarks() do
+  defp list_bookmarks do
     Bookmarks.list_bookmarks()
   end
 end

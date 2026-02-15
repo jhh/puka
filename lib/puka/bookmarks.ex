@@ -8,6 +8,8 @@ defmodule Puka.Bookmarks do
 
   alias Puka.Bookmarks.Bookmark
 
+  @page_size 10
+
   @doc """
   Returns the list of bookmarks with tags preloaded.
 
@@ -21,7 +23,7 @@ defmodule Puka.Bookmarks do
     Bookmark |> order_by(desc: :inserted_at) |> Repo.all() |> Repo.preload(:tags)
   end
 
-  def list_bookmarks(a, page \\ 1, per_page \\ 10)
+  def list_bookmarks(a, page \\ 1, per_page \\ @page_size)
 
   def list_bookmarks(:paged, page, per_page) do
     Bookmark

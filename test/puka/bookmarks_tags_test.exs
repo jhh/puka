@@ -2,8 +2,8 @@ defmodule Tagger.BookmarkTest do
   use ExUnit.Case
 
   alias Puka.Bookmarks.Bookmark
-  alias Puka.Tags.Tag
   alias Puka.Repo
+  alias Puka.Tags.Tag
   import Ecto.Query
 
   setup do

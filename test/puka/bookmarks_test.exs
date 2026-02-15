@@ -158,7 +158,7 @@ defmodule Puka.BookmarksTest do
       assert result.count == 1
       assert result.has_next == false
       assert result.has_prev == true
-      assert length(result.list) == 0
+      assert result.list == []
     end
 
     test "preloads tags for each bookmark" do
