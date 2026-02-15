@@ -4,6 +4,7 @@ defmodule PukaWeb.Layouts do
   used by your application.
   """
   use PukaWeb, :html
+  alias Puka.Accounts.Scope
 
   # Embed all files in layouts/* within this module.
   # The default root.html.heex file contains the HTML
@@ -35,41 +36,182 @@ defmodule PukaWeb.Layouts do
 
   def app(assigns) do
     ~H"""
-    <header class="navbar px-4 sm:px-6 lg:px-8">
-      <div class="flex-1">
-        <a href="/" class="flex-1 flex w-fit items-center gap-2">
-          <img src={~p"/images/puka-logo.svg"} width="180" />
-        </a>
+    <div class="drawer lg:drawer-open">
+      <input id="app-drawer" type="checkbox" class="drawer-toggle" />
+
+      <div class="drawer-content bg-base-100">
+        <header class="navbar sticky top-0 z-20 border-b border-base-200 bg-base-100/90 px-4 backdrop-blur sm:px-6 lg:px-8">
+          <div class="navbar-start gap-2">
+            <label
+              for="app-drawer"
+              aria-label="open sidebar"
+              class="btn btn-square btn-ghost lg:hidden"
+            >
+              <.icon name="hero-bars-3" class="size-5" />
+            </label>
+          </div>
+
+          <div class="navbar-end gap-2">
+            <details class="dropdown dropdown-end">
+              <summary class="btn btn-ghost gap-2 px-2">
+                <%= if user_email(@current_scope) do %>
+                  <div class="hidden text-sm font-medium text-base-content/80 sm:block">
+                    {user_email(@current_scope)}
+                  </div>
+                <% end %>
+
+                <.icon name="hero-chevron-down" class="size-4 text-base-content/60" />
+              </summary>
+
+              <ul class="menu dropdown-content z-30 mt-2 w-56 rounded-box border border-base-200 bg-base-100 p-2 shadow">
+                <%= if @current_scope do %>
+                  <li class="menu-title">
+                    <span>Account</span>
+                  </li>
+                  <li>
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs text-base-content/60">Theme</span>
+                      <.theme_toggle />
+                    </div>
+                  </li>
+                  <li>
+                    <.link href={~p"/users/settings"}>
+                      <.icon name="hero-cog-6-tooth" class="size-4" /> Settings
+                    </.link>
+                  </li>
+                  <li>
+                    <.link href={~p"/users/log-out"} method="delete">
+                      <.icon name="hero-arrow-left-on-rectangle" class="size-4" /> Log out
+                    </.link>
+                  </li>
+                <% else %>
+                  <li>
+                    <.link href={~p"/users/register"}>
+                      <.icon name="hero-user-plus" class="size-4" /> Register
+                    </.link>
+                  </li>
+                  <li>
+                    <.link href={~p"/users/log-in"}>
+                      <.icon name="hero-arrow-right-on-rectangle" class="size-4" /> Log in
+                    </.link>
+                  </li>
+                <% end %>
+              </ul>
+            </details>
+          </div>
+        </header>
+
+        <main class="min-h-[calc(100vh-4rem)] bg-base-100 px-4 py-6 sm:px-6 lg:px-8">
+          <div class="mx-auto w-full max-w-screen-2xl">
+            {render_slot(@inner_block)}
+          </div>
+        </main>
+
+        <.flash_group flash={@flash} />
       </div>
-      <div class="flex-none">
-        <ul class="flex flex-column px-1 space-x-4 items-center">
-          <li>
-            <a href="https://phoenixframework.org/" class="btn btn-ghost">Website</a>
-          </li>
-          <li>
-            <a href="https://github.com/phoenixframework/phoenix" class="btn btn-ghost">GitHub</a>
-          </li>
-          <li>
-            <.theme_toggle />
-          </li>
-          <li>
-            <a href="https://hexdocs.pm/phoenix/overview.html" class="btn btn-primary">
-              Get Started <span aria-hidden="true">&rarr;</span>
+
+      <div class="drawer-side is-drawer-close:overflow-visible">
+        <label for="app-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+
+        <aside class="flex min-h-full flex-col border-r border-base-200 bg-base-200 is-drawer-close:w-14 is-drawer-open:w-72">
+          <div class="flex h-16 items-center border-b border-base-200/60 px-4">
+            <a href={~p"/"} class="is-drawer-close:hidden">
+              <img src={~p"/images/puka-logo.svg"} class="w-[180px] max-w-full h-auto" alt="Puka" />
             </a>
-          </li>
-        </ul>
-      </div>
-    </header>
+          </div>
 
-    <main class="px-4 py-20 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-2xl space-y-4">
-        {render_slot(@inner_block)}
-      </div>
-    </main>
+          <ul class="menu menu-md w-full grow px-2">
+            <li class="menu-title is-drawer-close:hidden"><span>Manage</span></li>
+            <li>
+              <.link
+                href={~p"/"}
+                class="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+                data-tip="Overview"
+              >
+                <.icon name="hero-home" class="size-4" />
+                <span class="is-drawer-close:hidden">Overview</span>
+              </.link>
+            </li>
 
-    <.flash_group flash={@flash} />
+            <%= if @current_scope do %>
+              <li>
+                <.link
+                  href={~p"/bookmarks"}
+                  class="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+                  data-tip="Bookmarks"
+                >
+                  <.icon name="hero-bookmark" class="size-4" />
+                  <span class="is-drawer-close:hidden">Bookmarks</span>
+                </.link>
+              </li>
+              <li>
+                <.link
+                  href={~p"/tags"}
+                  class="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+                  data-tip="Tags"
+                >
+                  <.icon name="hero-tag" class="size-4" />
+                  <span class="is-drawer-close:hidden">Tags</span>
+                </.link>
+              </li>
+            <% else %>
+              <li class="disabled">
+                <a
+                  class="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+                  data-tip="Log in to use"
+                >
+                  <.icon name="hero-bookmark" class="size-4" />
+                  <span class="is-drawer-close:hidden">Bookmarks</span>
+                </a>
+              </li>
+              <li class="disabled">
+                <a
+                  class="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+                  data-tip="Log in to use"
+                >
+                  <.icon name="hero-tag" class="size-4" />
+                  <span class="is-drawer-close:hidden">Tags</span>
+                </a>
+              </li>
+            <% end %>
+
+            <li class="menu-title is-drawer-close:hidden"><span>Account</span></li>
+            <%= if @current_scope do %>
+              <li>
+                <.link
+                  href={~p"/users/settings"}
+                  class="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+                  data-tip="Settings"
+                >
+                  <.icon name="hero-cog-6-tooth" class="size-4" />
+                  <span class="is-drawer-close:hidden">Settings</span>
+                </.link>
+              </li>
+            <% else %>
+              <li>
+                <.link
+                  href={~p"/users/log-in"}
+                  class="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+                  data-tip="Log in"
+                >
+                  <.icon name="hero-arrow-right-on-rectangle" class="size-4" />
+                  <span class="is-drawer-close:hidden">Log in</span>
+                </.link>
+              </li>
+            <% end %>
+          </ul>
+        </aside>
+      </div>
+    </div>
     """
   end
+
+  defp user_email(nil), do: nil
+
+  defp user_email(%Scope{user: %{email: email}}) when is_binary(email) and byte_size(email) > 0,
+    do: email
+
+  defp user_email(_), do: nil
 
   @doc """
   Shows the flash group with standard titles and content.

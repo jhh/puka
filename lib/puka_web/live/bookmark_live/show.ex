@@ -6,7 +6,7 @@ defmodule PukaWeb.BookmarkLive.Show do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash}>
+    <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
         Bookmark {@bookmark.id}
         <:subtitle>This is a bookmark record from your database.</:subtitle>

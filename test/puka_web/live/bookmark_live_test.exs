@@ -4,6 +4,8 @@ defmodule PukaWeb.BookmarkLiveTest do
   import Phoenix.LiveViewTest
   import Puka.BookmarksFixtures
 
+  setup :register_and_log_in_user
+
   @create_attrs %{
     active: true,
     description: "some description",

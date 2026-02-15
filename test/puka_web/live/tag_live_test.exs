@@ -4,6 +4,8 @@ defmodule PukaWeb.TagLiveTest do
   import Phoenix.LiveViewTest
   import Puka.TagsFixtures
 
+  setup :register_and_log_in_user
+
   @create_attrs %{name: "some name"}
   @update_attrs %{name: "some updated name"}
   @invalid_attrs %{name: nil}

@@ -9,7 +9,7 @@ defmodule Puka.Bookmarks do
   alias Puka.Bookmarks.Bookmark
 
   @doc """
-  Returns the list of bookmarks.
+  Returns the list of bookmarks with tags preloaded.
 
   ## Examples
 
@@ -18,11 +18,11 @@ defmodule Puka.Bookmarks do
 
   """
   def list_bookmarks do
-    Repo.all(Bookmark) |> Repo.preload(:tags)
+    Bookmark |> order_by(desc: :inserted_at) |> Repo.all() |> Repo.preload(:tags)
   end
 
   @doc """
-  Gets a single bookmark.
+  Gets a single bookmark with its tags preloaded.
 
   Raises `Ecto.NoResultsError` if the Bookmark does not exist.
 
@@ -38,7 +38,9 @@ defmodule Puka.Bookmarks do
   def get_bookmark!(id), do: Repo.get!(Bookmark, id) |> Repo.preload(:tags)
 
   @doc """
-  Creates a bookmark.
+  Creates a bookmark. In addition to `Bookmark` schema fields, `attrs` can
+  contain a field for related tags: `"tags" => "tag1, tag2, tag2"`. Tags in this
+  list are created as neccessary.
 
   ## Examples
 

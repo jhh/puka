@@ -6,7 +6,7 @@ defmodule PukaWeb.BookmarkLive.Index do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash}>
+    <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
         Listing Bookmarks
         <:actions>
@@ -19,9 +19,10 @@ defmodule PukaWeb.BookmarkLive.Index do
       <.table
         id="bookmarks"
         rows={@streams.bookmarks}
-        row_click={fn {_id, bookmark} -> JS.navigate(~p"/bookmarks/#{bookmark}") end}
       >
-        <:col :let={{_id, bookmark}} label="Title">{bookmark.title}</:col>
+        <:col :let={{_id, bookmark}} label="Title">
+          <.link href={bookmark.url} target="_blank" rel="noreferrer">{bookmark.title}</.link>
+        </:col>
         <:col :let={{_id, bookmark}} label="Description">{bookmark.description}</:col>
         <:col :let={{_id, bookmark}} label="Url">{bookmark.url}</:col>
         <:col :let={{_id, bookmark}} label="Active">{bookmark.active}</:col>
