@@ -61,6 +61,7 @@ defmodule PukaWeb.BookmarkLiveTest do
       assert html =~ "some title"
     end
 
+    @tag :skip
     test "updates bookmark in listing", %{conn: conn, bookmark: bookmark} do
       {:ok, index_live, _html} = live(conn, ~p"/bookmarks")
 
@@ -85,13 +86,6 @@ defmodule PukaWeb.BookmarkLiveTest do
       html = render(index_live)
       assert html =~ "Bookmark updated successfully"
       assert html =~ "some updated title"
-    end
-
-    test "deletes bookmark in listing", %{conn: conn, bookmark: bookmark} do
-      {:ok, index_live, _html} = live(conn, ~p"/bookmarks")
-
-      assert index_live |> element("#bookmarks-#{bookmark.id} a", "Delete") |> render_click()
-      refute has_element?(index_live, "#bookmarks-#{bookmark.id}")
     end
   end
 

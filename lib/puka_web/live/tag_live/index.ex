@@ -70,8 +70,4 @@ defmodule PukaWeb.TagLive.Index do
 
     {:noreply, stream_delete(socket, :tags, tag)}
   end
-
-  defp list_tags do
-    Tags.list_tags()
-  end
 end
