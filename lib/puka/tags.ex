@@ -4,9 +4,11 @@ defmodule Puka.Tags do
   """
 
   import Ecto.Query, warn: false
-  alias Puka.Repo
+  alias Puka.{Paginator, Repo}
 
   alias Puka.Tags.Tag
+
+  @page_size 10
 
   @doc """
   Returns the list of tags.
@@ -18,7 +20,19 @@ defmodule Puka.Tags do
 
   """
   def list_tags do
-    Repo.all(Tag)
+    Tag |> order_by(:name) |> Repo.all()
+  end
+
+  def list_tags(a, page \\ 1, per_page \\ @page_size)
+
+  def list_tags(:paged, page, _per_page) when page in [nil, ""] do
+    list_tags(:paged, 1, @page_size)
+  end
+
+  def list_tags(:paged, page, per_page) do
+    Tag
+    |> order_by(:name)
+    |> Paginator.page(page, per_page: per_page)
   end
 
   @doc """

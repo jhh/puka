@@ -1,7 +1,28 @@
 defmodule PukaWeb.TagLive.Index do
   use PukaWeb, :live_view
 
+  import PukaWeb.CustomComponents
+
   alias Puka.Tags
+
+  @impl true
+  def mount(_params, _session, socket) do
+    {:ok, socket}
+  end
+
+  @impl true
+  def handle_params(params, _uri, socket) do
+    page = params["page"]
+    pagination = Tags.list_tags(:paged, page)
+
+    socket =
+      socket
+      |> assign(:page_title, "Listing Tags")
+      |> assign(:pagination, pagination)
+      |> stream(:tags, pagination.list, reset: true)
+
+    {:noreply, socket}
+  end
 
   @impl true
   def render(assigns) do
@@ -37,16 +58,9 @@ defmodule PukaWeb.TagLive.Index do
           </.link>
         </:action>
       </.table>
+      <.pagination_controls path="/tags" pagination={@pagination} />
     </Layouts.app>
     """
-  end
-
-  @impl true
-  def mount(_params, _session, socket) do
-    {:ok,
-     socket
-     |> assign(:page_title, "Listing Tags")
-     |> stream(:tags, list_tags())}
   end
 
   @impl true
