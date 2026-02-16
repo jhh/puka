@@ -48,7 +48,7 @@ defmodule PukaWeb.BookmarkLive.Index do
       <li :for={{_id, bookmark} <- @bookmarks} class="list-row">
         <div class="list-col-grow">
           <div class="text-base font-semibold">{bookmark.title}</div>
-          <div class="text-sm opacity-60">{bookmark.description}</div>
+          <div class="text-sm opacity-60 w-full md:max-w-3xl">{bookmark.description}</div>
           <div><.tag_list tags={bookmark.tags} /></div>
           <div class="text-xs opacity-60">
             <.icon name="hero-cloud-mini" class="size-3 opacity-40" />
