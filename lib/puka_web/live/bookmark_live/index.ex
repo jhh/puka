@@ -1,6 +1,8 @@
 defmodule PukaWeb.BookmarkLive.Index do
   use PukaWeb, :live_view
 
+  import PukaWeb.CustomComponents
+
   alias Puka.Bookmarks
 
   @impl true
@@ -10,10 +12,14 @@ defmodule PukaWeb.BookmarkLive.Index do
 
   @impl true
   def handle_params(params, _uri, socket) do
+    page = params["page"]
+    pagination = Bookmarks.list_bookmarks(:paged, page, 10)
+
     socket =
       socket
       |> assign(:page_title, "Listing Bookmarks")
-      |> stream(:bookmarks, Bookmarks.list_bookmarks(:paged, params["page"], 10).list)
+      |> assign(:pagination, pagination)
+      |> stream(:bookmarks, pagination.list, reset: true)
 
     {:noreply, socket}
   end
@@ -56,6 +62,8 @@ defmodule PukaWeb.BookmarkLive.Index do
           </.link>
         </:action>
       </.table>
+
+      <.pagination_controls path="/bookmarks" pagination={@pagination} />
     </Layouts.app>
     """
   end

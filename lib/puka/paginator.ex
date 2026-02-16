@@ -11,6 +11,8 @@ defmodule Puka.Paginator do
   the items for each page.
   """
 
+  defstruct [:has_next, :has_prev, :prev_page, :page, :next_page, :first, :last, :count, :list]
+
   def query(query, page, per_page: per_page) when is_binary(page) do
     query(query, String.to_integer(page), per_page: per_page)
   end
@@ -35,7 +37,7 @@ defmodule Puka.Paginator do
     has_next = page * per_page < count
     has_prev = page > 1
 
-    %{
+    %__MODULE__{
       has_next: has_next,
       has_prev: has_prev,
       prev_page: if(has_prev, do: page - 1, else: nil),
