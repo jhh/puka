@@ -25,6 +25,9 @@ defmodule Puka.Bookmarks do
 
   def list_bookmarks(a, page \\ 1, per_page \\ @page_size)
 
+  def list_bookmarks(:paged, page, _per_page) when page in [nil, ""],
+    do: list_bookmarks(:paged, 1, @page_size)
+
   def list_bookmarks(:paged, page, per_page) do
     Bookmark
     |> order_by(desc: :inserted_at)

@@ -4,6 +4,21 @@ defmodule PukaWeb.BookmarkLive.Index do
   alias Puka.Bookmarks
 
   @impl true
+  def mount(_params, _session, socket) do
+    {:ok, socket}
+  end
+
+  @impl true
+  def handle_params(params, _uri, socket) do
+    socket =
+      socket
+      |> assign(:page_title, "Listing Bookmarks")
+      |> stream(:bookmarks, Bookmarks.list_bookmarks(:paged, params["page"], 10).list)
+
+    {:noreply, socket}
+  end
+
+  @impl true
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
@@ -46,22 +61,10 @@ defmodule PukaWeb.BookmarkLive.Index do
   end
 
   @impl true
-  def mount(_params, _session, socket) do
-    {:ok,
-     socket
-     |> assign(:page_title, "Listing Bookmarks")
-     |> stream(:bookmarks, list_bookmarks())}
-  end
-
-  @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     bookmark = Bookmarks.get_bookmark!(id)
     {:ok, _} = Bookmarks.delete_bookmark(bookmark)
 
     {:noreply, stream_delete(socket, :bookmarks, bookmark)}
-  end
-
-  defp list_bookmarks do
-    Bookmarks.list_bookmarks()
   end
 end
