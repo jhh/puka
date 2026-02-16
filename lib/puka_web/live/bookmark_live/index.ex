@@ -44,8 +44,8 @@ defmodule PukaWeb.BookmarkLive.Index do
 
   def bookmark_list(assigns) do
     ~H"""
-    <ul class="list">
-      <li :for={{_id, bookmark} <- @bookmarks} class="list-row">
+    <ul id="bookmarks" class="list" phx-update="stream">
+      <li :for={{id, bookmark} <- @bookmarks} id={id} class="list-row">
         <div class="list-col-grow">
           <div class="text-base font-semibold">{bookmark.title}</div>
           <div class="text-sm opacity-60 w-full md:max-w-3xl">{bookmark.description}</div>
