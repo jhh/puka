@@ -36,35 +36,38 @@ defmodule PukaWeb.BookmarkLive.Index do
           </.button>
         </:actions>
       </.header>
-
-      <.table
-        id="bookmarks"
-        rows={@streams.bookmarks}
-      >
-        <:col :let={{_id, bookmark}} label="Title">
-          <.link href={bookmark.url} target="_blank" rel="noreferrer">{bookmark.title}</.link>
-        </:col>
-        <:col :let={{_id, bookmark}} label="Description">{bookmark.description}</:col>
-        <:col :let={{_id, bookmark}} label="Url">{bookmark.url}</:col>
-        <:col :let={{_id, bookmark}} label="Active">{bookmark.active}</:col>
-        <:action :let={{_id, bookmark}}>
-          <div class="sr-only">
-            <.link navigate={~p"/bookmarks/#{bookmark}"}>Show</.link>
-          </div>
-          <.link navigate={~p"/bookmarks/#{bookmark}/edit"}>Edit</.link>
-        </:action>
-        <:action :let={{id, bookmark}}>
-          <.link
-            phx-click={JS.push("delete", value: %{id: bookmark.id}) |> hide("##{id}")}
-            data-confirm="Are you sure?"
-          >
-            Delete
-          </.link>
-        </:action>
-      </.table>
-
+      <.bookmark_list bookmarks={@streams.bookmarks} />
       <.pagination_controls path="/bookmarks" pagination={@pagination} />
     </Layouts.app>
+    """
+  end
+
+  def bookmark_list(assigns) do
+    ~H"""
+    <ul class="list">
+      <li :for={{_id, bookmark} <- @bookmarks} class="list-row">
+        <div class="list-col-grow">
+          <div class="text-base font-semibold">{bookmark.title}</div>
+          <div class="text-sm opacity-60">{bookmark.description}</div>
+          <div><.tag_list tags={bookmark.tags} /></div>
+          <div class="text-xs opacity-60">
+            <.icon name="hero-cloud-mini" class="size-3 opacity-40" />
+            {get_domain(bookmark.url)}
+            <span class="text-lg mx-1">·</span> {format_month_year(bookmark.inserted_at)}
+          </div>
+        </div>
+      </li>
+    </ul>
+    """
+  end
+
+  def tag_list(assigns) do
+    ~H"""
+    <span>
+      <a :for={tag <- @tags} href="#" class="mr-1 text-sm link-info" tabindex="-1">
+        <.icon name="hero-hashtag-mini" class="size-2.25" />{tag.name}
+      </a>
+    </span>
     """
   end
 
@@ -74,5 +77,18 @@ defmodule PukaWeb.BookmarkLive.Index do
     {:ok, _} = Bookmarks.delete_bookmark(bookmark)
 
     {:noreply, stream_delete(socket, :bookmarks, bookmark)}
+  end
+
+  defp get_domain(url) do
+    case URI.parse(url) do
+      %URI{host: nil} -> nil
+      %URI{host: host} -> host
+    end
+  end
+
+  def format_month_year(%DateTime{} = dt) do
+    month = Calendar.strftime(dt, "%b") |> String.downcase()
+    year = Integer.to_string(dt.year)
+    "#{month} #{year}"
   end
 end
