@@ -47,13 +47,17 @@ defmodule PukaWeb.BookmarkLive.Index do
     <ul id="bookmarks" class="list" phx-update="stream">
       <li :for={{id, bookmark} <- @bookmarks} id={id} class="list-row">
         <div class="list-col-grow">
-          <div class="text-base font-semibold">{bookmark.title}</div>
-          <div class="text-sm opacity-60 w-full md:max-w-3xl">{bookmark.description}</div>
+          <div class="text-base font-semibold">
+            <.link href={bookmark.url} target="_blank" rel="nofollow">{bookmark.title}</.link>
+          </div>
+          <div class="text-sm opacity-60 w-full md:max-w-3xl">
+            <.link href={bookmark.url} target="_blank" rel="nofollow">{bookmark.description}</.link>
+          </div>
           <div><.tag_list tags={bookmark.tags} /></div>
-          <div class="text-xs opacity-60">
+          <div class="text-xs opacity-60 mt-1">
             <.icon name="hero-cloud-mini" class="size-3 opacity-40" />
             {get_domain(bookmark.url)}
-            <span class="text-lg mx-1">·</span> {format_month_year(bookmark.inserted_at)}
+            <span class="font-black mx-1">·</span> {format_month_year(bookmark.inserted_at)}
           </div>
         </div>
       </li>
