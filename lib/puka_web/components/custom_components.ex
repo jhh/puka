@@ -3,8 +3,17 @@ defmodule PukaWeb.CustomComponents do
 
   attr :pagination, Puka.Paginator, required: true
   attr :path, :string, required: true
+  attr :params, :map, required: true
 
   def pagination_controls(assigns) do
+    filter =
+      assigns.params
+      |> Map.take(~w(tag))
+      |> Map.reject(fn {_, v} -> v in ["", nil] end)
+      |> Enum.reduce("", fn {k, v}, acc -> acc <> "&#{k}=#{v}" end)
+
+    assigns = assign(assigns, :filter, filter)
+
     ~H"""
     <div class="flex items-center justify-between mt-4">
       <div class="text-sm text-zinc-500">
@@ -13,7 +22,7 @@ defmodule PukaWeb.CustomComponents do
       <div class="flex items-center gap-2">
         <%= if @pagination.has_prev do %>
           <.link
-            patch={"#{@path}?page=#{@pagination.prev_page}"}
+            patch={"#{@path}?page=#{@pagination.prev_page}#{@filter}"}
             class="px-3 py-2 rounded-lg text-sm font-medium bg-zinc-100 hover:bg-zinc-200 text-zinc-700 transition-colors"
           >
             <.icon name="hero-chevron-left" /> Previous
@@ -28,7 +37,7 @@ defmodule PukaWeb.CustomComponents do
         </span>
         <%= if @pagination.has_next do %>
           <.link
-            patch={"#{@path}?page=#{@pagination.next_page}"}
+            patch={"#{@path}?page=#{@pagination.next_page}#{@filter}"}
             class="px-3 py-2 rounded-lg text-sm font-medium bg-zinc-100 hover:bg-zinc-200 text-zinc-700 transition-colors"
           >
             Next <.icon name="hero-chevron-right" />
@@ -40,6 +49,8 @@ defmodule PukaWeb.CustomComponents do
         <% end %>
       </div>
     </div>
+    <%!-- <div class="pre">{inspect(@params, pretty: true)}</div>
+    <div class="pre">{inspect(@filter, pretty: true)}</div> --%>
     """
   end
 end

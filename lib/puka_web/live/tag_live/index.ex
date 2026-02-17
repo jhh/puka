@@ -19,6 +19,7 @@ defmodule PukaWeb.TagLive.Index do
       socket
       |> assign(:page_title, "Listing Tags")
       |> assign(:pagination, pagination)
+      |> assign(:current_params, params)
       |> stream(:tags, pagination.list, reset: true)
 
     {:noreply, socket}
@@ -58,7 +59,7 @@ defmodule PukaWeb.TagLive.Index do
           </.link>
         </:action>
       </.table>
-      <.pagination_controls path="/tags" pagination={@pagination} />
+      <.pagination_controls path="/tags" pagination={@pagination} params={@current_params} />
     </Layouts.app>
     """
   end

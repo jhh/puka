@@ -12,13 +12,13 @@ defmodule PukaWeb.BookmarkLive.Index do
 
   @impl true
   def handle_params(params, _uri, socket) do
-    page = params["page"]
-    pagination = Bookmarks.list_bookmarks(:paged, page, 10)
+    pagination = Bookmarks.filter_bookmarks(params)
 
     socket =
       socket
       |> assign(:page_title, "Listing Bookmarks")
       |> assign(:pagination, pagination)
+      |> assign(:current_params, params)
       |> stream(:bookmarks, pagination.list, reset: true)
 
     {:noreply, socket}
@@ -37,7 +37,7 @@ defmodule PukaWeb.BookmarkLive.Index do
         </:actions>
       </.header>
       <.bookmark_list bookmarks={@streams.bookmarks} />
-      <.pagination_controls path="/bookmarks" pagination={@pagination} />
+      <.pagination_controls path="/bookmarks" pagination={@pagination} params={@current_params} />
     </Layouts.app>
     """
   end
@@ -68,9 +68,14 @@ defmodule PukaWeb.BookmarkLive.Index do
   def tag_list(assigns) do
     ~H"""
     <span>
-      <a :for={tag <- @tags} href="#" class="mr-1 text-sm link-info" tabindex="-1">
+      <.link
+        :for={tag <- @tags}
+        patch={"/bookmarks?tag=#{tag.name}"}
+        class="mr-1 text-sm link-info"
+        tabindex="-1"
+      >
         <.icon name="hero-hashtag-mini" class="size-2.25" />{tag.name}
-      </a>
+      </.link>
     </span>
     """
   end

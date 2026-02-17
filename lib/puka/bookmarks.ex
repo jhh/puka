@@ -36,6 +36,24 @@ defmodule Puka.Bookmarks do
     |> Paginator.page(page, per_page: per_page)
   end
 
+  def filter_bookmarks(params) do
+    page = params["page"] || 1
+
+    Bookmark
+    |> with_tag(params["tag"])
+    |> order_by(desc: :inserted_at)
+    |> preload(:tags)
+    |> Paginator.page(page, per_page: @page_size)
+  end
+
+  defp with_tag(query, tag) when tag in ["", nil], do: query
+
+  defp with_tag(query, tag) do
+    from b in query,
+      join: t in assoc(b, :tags),
+      where: t.name == ^tag
+  end
+
   @doc """
   Gets a single bookmark with its tags preloaded.
 
