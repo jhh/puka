@@ -45,8 +45,8 @@ defmodule PukaWeb.BookmarkLive.Index do
   def bookmark_list(assigns) do
     ~H"""
     <ul id="bookmarks" class="list" phx-update="stream">
-      <li :for={{id, bookmark} <- @bookmarks} id={id} class="list-row">
-        <div class="list-col-grow">
+      <li :for={{id, bookmark} <- @bookmarks} id={id} class="list-row group relative">
+        <div class="list-col-grow pr-12">
           <div class="text-base font-semibold">
             <.link href={bookmark.url} target="_blank" rel="nofollow">{bookmark.title}</.link>
           </div>
@@ -60,6 +60,12 @@ defmodule PukaWeb.BookmarkLive.Index do
             <span class="font-black mx-1">·</span> {format_month_year(bookmark.inserted_at)}
           </div>
         </div>
+        <.link
+          navigate={~p"/bookmarks/#{bookmark}/edit?return_to=index"}
+          class="btn btn-sm absolute right-3 top-3 opacity-0 transition-opacity pointer-events-none group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100"
+        >
+          Edit
+        </.link>
       </li>
     </ul>
     """
