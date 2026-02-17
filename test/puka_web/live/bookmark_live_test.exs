@@ -61,7 +61,6 @@ defmodule PukaWeb.BookmarkLiveTest do
       assert html =~ "some title"
     end
 
-    @tag :skip
     test "updates bookmark in listing", %{conn: conn, bookmark: bookmark} do
       {:ok, index_live, _html} = live(conn, ~p"/bookmarks")
 

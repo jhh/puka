@@ -50,6 +50,15 @@ defmodule PukaWeb.BookmarkLive.Index do
         id={id}
         class="list-row group relative transition-colors hover:bg-base-200"
       >
+        <.link
+          href={bookmark.url}
+          target="_blank"
+          rel="nofollow"
+          tabindex="-1"
+          class="absolute inset-0 z-10"
+        >
+          <span class="sr-only">Open bookmark</span>
+        </.link>
         <div class="list-col-grow pr-12">
           <div class="text-base font-semibold">
             <.link href={bookmark.url} target="_blank" rel="nofollow">{bookmark.title}</.link>
@@ -57,7 +66,7 @@ defmodule PukaWeb.BookmarkLive.Index do
           <div class="text-sm opacity-60 w-full md:max-w-3xl">
             <.link href={bookmark.url} target="_blank" rel="nofollow">{bookmark.description}</.link>
           </div>
-          <div><.tag_list tags={bookmark.tags} /></div>
+          <div class="relative z-20"><.tag_list tags={bookmark.tags} /></div>
           <div class="text-xs opacity-60 mt-1">
             <.icon name="hero-cloud-mini" class="size-3 opacity-40" />
             {get_domain(bookmark.url)}
@@ -65,8 +74,8 @@ defmodule PukaWeb.BookmarkLive.Index do
           </div>
         </div>
         <.link
-          navigate={~p"/bookmarks/#{bookmark}/edit?return_to=index"}
-          class="btn btn-sm absolute right-3 top-3 opacity-0 transition-opacity pointer-events-none group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100"
+          navigate={~p"/bookmarks/#{bookmark}/edit"}
+          class="btn absolute right-3 top-3 z-20 opacity-0 transition-opacity pointer-events-none group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100"
         >
           Edit
         </.link>
