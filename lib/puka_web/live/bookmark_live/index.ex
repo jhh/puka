@@ -45,7 +45,11 @@ defmodule PukaWeb.BookmarkLive.Index do
   def bookmark_list(assigns) do
     ~H"""
     <ul id="bookmarks" class="list" phx-update="stream">
-      <li :for={{id, bookmark} <- @bookmarks} id={id} class="list-row group relative">
+      <li
+        :for={{id, bookmark} <- @bookmarks}
+        id={id}
+        class="list-row group relative transition-colors hover:bg-base-200"
+      >
         <div class="list-col-grow pr-12">
           <div class="text-base font-semibold">
             <.link href={bookmark.url} target="_blank" rel="nofollow">{bookmark.title}</.link>
