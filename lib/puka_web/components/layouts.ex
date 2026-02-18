@@ -110,7 +110,7 @@ defmodule PukaWeb.Layouts do
         <.flash_group flash={@flash} />
       </div>
 
-      <div class="drawer-side is-drawer-close:overflow-visible">
+      <div class="drawer-side z-30 is-drawer-close:overflow-visible">
         <label for="app-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
 
         <aside class="flex min-h-full flex-col border-r border-base-200 bg-base-200 is-drawer-close:w-14 is-drawer-open:w-72">
