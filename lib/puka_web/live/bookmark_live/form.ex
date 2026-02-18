@@ -17,6 +17,14 @@ defmodule PukaWeb.BookmarkLive.Form do
         <.input field={@form[:title]} type="text" label="Title" />
         <.input field={@form[:description]} type="textarea" label="Description" />
         <.input field={@form[:url]} type="text" label="Url" />
+        <.input
+          id="bookmark-tags"
+          name="bookmark[tags]"
+          type="text"
+          label="Tags"
+          value={Map.get(@form.params || %{}, "tags", "")}
+          placeholder="elixir, phoenix"
+        />
         <.input field={@form[:active]} type="checkbox" label="Active" />
         <footer>
           <.button phx-disable-with="Saving..." variant="primary">Save Bookmark</.button>
@@ -44,7 +52,7 @@ defmodule PukaWeb.BookmarkLive.Form do
     socket
     |> assign(:page_title, "Edit Bookmark")
     |> assign(:bookmark, bookmark)
-    |> assign(:form, to_form(Bookmarks.change_bookmark(bookmark)))
+    |> assign(:form, to_form(Bookmarks.change_bookmark(bookmark, %{}, skip_tag_parse: true)))
   end
 
   defp apply_action(socket, :new, _params) do
@@ -53,12 +61,14 @@ defmodule PukaWeb.BookmarkLive.Form do
     socket
     |> assign(:page_title, "New Bookmark")
     |> assign(:bookmark, bookmark)
-    |> assign(:form, to_form(Bookmarks.change_bookmark(bookmark)))
+    |> assign(:form, to_form(Bookmarks.change_bookmark(bookmark, %{}, skip_tag_parse: true)))
   end
 
   @impl true
   def handle_event("validate", %{"bookmark" => bookmark_params}, socket) do
-    changeset = Bookmarks.change_bookmark(socket.assigns.bookmark, bookmark_params)
+    changeset =
+      Bookmarks.change_bookmark(socket.assigns.bookmark, bookmark_params, skip_tag_parse: true)
+
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
 

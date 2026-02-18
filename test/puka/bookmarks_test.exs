@@ -2,6 +2,7 @@ defmodule Puka.BookmarksTest do
   use Puka.DataCase
 
   alias Puka.Bookmarks
+  alias Puka.Repo
 
   describe "bookmarks" do
     alias Puka.Bookmarks.Bookmark
@@ -71,6 +72,50 @@ defmodule Puka.BookmarksTest do
     test "change_bookmark/1 returns a bookmark changeset" do
       bookmark = bookmark_fixture()
       assert %Ecto.Changeset{} = Bookmarks.change_bookmark(bookmark)
+    end
+
+    test "create_bookmark/1 normalizes and dedupes tags" do
+      valid_attrs = %{
+        active: true,
+        description: "some description",
+        title: "some title",
+        url: "https://tags.example",
+        tags: "Elixir, phoenix, ELIXIR"
+      }
+
+      assert {:ok, %Bookmark{} = bookmark} = Bookmarks.create_bookmark(valid_attrs)
+
+      bookmark = Bookmarks.get_bookmark!(bookmark.id)
+      tag_names = bookmark.tags |> Enum.map(& &1.name) |> Enum.sort()
+      assert tag_names == ["elixir", "phoenix"]
+    end
+
+    test "change_bookmark/3 populates tags param from preloaded tags" do
+      bookmark = bookmark_fixture(%{tags: "one, two"})
+      bookmark = Bookmarks.get_bookmark!(bookmark.id)
+
+      changeset = Bookmarks.change_bookmark(bookmark, %{}, skip_tag_parse: true)
+      tags_param = changeset.params["tags"]
+
+      assert String.contains?(tags_param, "one")
+      assert String.contains?(tags_param, "two")
+    end
+
+    test "change_bookmark/3 respects provided tags param" do
+      bookmark = bookmark_fixture()
+
+      changeset = Bookmarks.change_bookmark(bookmark, %{"tags" => "custom"}, skip_tag_parse: true)
+
+      assert changeset.params["tags"] == "custom"
+    end
+
+    test "change_bookmark/3 sets empty tags param when tags not loaded" do
+      bookmark = bookmark_fixture()
+      bookmark = Repo.get!(Bookmark, bookmark.id)
+
+      changeset = Bookmarks.change_bookmark(bookmark, %{}, skip_tag_parse: true)
+
+      assert changeset.params["tags"] == ""
     end
   end
 

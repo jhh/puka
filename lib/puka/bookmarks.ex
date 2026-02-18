@@ -146,9 +146,28 @@ defmodule Puka.Bookmarks do
       %Ecto.Changeset{data: %Bookmark{}}
 
   """
-  def change_bookmark(%Bookmark{} = bookmark, attrs \\ %{}) do
-    Bookmark.changeset(bookmark, attrs)
+  def change_bookmark(%Bookmark{} = bookmark, attrs \\ %{}, opts \\ []) do
+    attrs = put_tags_param(bookmark, attrs)
+    Bookmark.changeset(bookmark, attrs, opts)
   end
+
+  defp put_tags_param(bookmark, attrs) do
+    if Map.has_key?(attrs, "tags") or Map.has_key?(attrs, :tags) do
+      attrs
+    else
+      Map.put(attrs, "tags", tags_to_string(bookmark))
+    end
+  end
+
+  defp tags_to_string(%Bookmark{tags: %Ecto.Association.NotLoaded{}}), do: ""
+
+  defp tags_to_string(%Bookmark{tags: tags}) when is_list(tags) do
+    tags
+    |> Enum.map(& &1.name)
+    |> Enum.join(", ")
+  end
+
+  defp tags_to_string(_bookmark), do: ""
 end
 
 # iex(11)> query = from b in Bookmark,

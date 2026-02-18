@@ -20,11 +20,19 @@ defmodule Puka.Bookmarks.Bookmark do
   end
 
   @doc false
-  def changeset(bookmark, attrs) do
+  def changeset(bookmark, attrs, opts \\ []) do
     bookmark
     |> cast(attrs, [:title, :description, :url, :active])
     |> validate_required([:title, :url])
     |> unique_constraint(:url)
-    |> Ecto.Changeset.put_assoc(:tags, Tag.parse_tags(attrs))
+    |> maybe_put_tags_assoc(attrs, opts)
+  end
+
+  defp maybe_put_tags_assoc(changeset, attrs, opts) do
+    if Keyword.get(opts, :skip_tag_parse, false) do
+      changeset
+    else
+      Ecto.Changeset.put_assoc(changeset, :tags, Tag.parse_tags(attrs))
+    end
   end
 end
