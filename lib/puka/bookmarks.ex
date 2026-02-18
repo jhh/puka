@@ -11,6 +11,19 @@ defmodule Puka.Bookmarks do
   @page_size 10
 
   @doc """
+  Returns the number of active bookmarks.
+
+  ## Examples
+
+      iex> count_bookmarks()
+      2340
+
+  """
+  def count_bookmarks do
+    Bookmark |> where([b], b.active) |> Repo.aggregate(:count, :id)
+  end
+
+  @doc """
   Returns the list of bookmarks with tags preloaded.
 
   ## Examples

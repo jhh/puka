@@ -9,6 +9,18 @@ defmodule Puka.Tags do
   alias Puka.Tags.Tag
 
   @page_size 10
+  @doc """
+  Returns the number of active tags.
+
+  ## Examples
+
+      iex> count_tags()
+      340
+
+  """
+  def count_tags do
+    Tag |> Repo.aggregate(:count, :id)
+  end
 
   @doc """
   Returns the list of tags.

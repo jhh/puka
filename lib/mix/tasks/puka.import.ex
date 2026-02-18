@@ -17,6 +17,7 @@ defmodule Mix.Tasks.Puka.Import do
   alias Puka.Repo
 
   def run(args) do
+    Logger.configure(level: :info)
     IO.puts("Importing Bookmarks CSV file...")
 
     File.stream!(hd(args))

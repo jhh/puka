@@ -20,52 +20,56 @@
     </div>
 
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
-      <div class="card bg-base-100 shadow-sm ring-1 ring-base-200">
+      <div class="card bg-base-100 shadow-sm ring-1 ring-base-300">
         <div class="card-body">
           <div class="flex items-start justify-between gap-3">
             <div>
               <div class="text-sm font-medium">Bookmarks</div>
-              <div class="mt-1 text-sm text-base-content/60">Your saved links</div>
+              <div class="mt-2 text-sm text-base-content/60">
+                Saved {@bookmark_count} active bookmarks.
+              </div>
             </div>
             <div class="grid size-10 place-items-center rounded-xl bg-base-200">
               <.icon name="hero-bookmark" class="size-5" />
             </div>
           </div>
-          <div class="card-actions mt-4 justify-end">
+          <div class="card-actions mt-2 justify-end">
             <.link href={~p"/bookmarks"} class="btn btn-sm btn-ghost">View</.link>
           </div>
         </div>
       </div>
 
-      <div class="card bg-base-100 shadow-sm ring-1 ring-base-200">
+      <div class="card bg-base-100 shadow-sm ring-1 ring-base-300">
         <div class="card-body">
           <div class="flex items-start justify-between gap-3">
             <div>
               <div class="text-sm font-medium">Tags</div>
-              <div class="mt-1 text-sm text-base-content/60">Group by topic</div>
+              <div class="mt-2 text-sm text-base-content/60">
+                Organized with {@tag_count} tags.
+              </div>
             </div>
             <div class="grid size-10 place-items-center rounded-xl bg-base-200">
               <.icon name="hero-tag" class="size-5" />
             </div>
           </div>
-          <div class="card-actions mt-4 justify-end">
+          <div class="card-actions mt-2 justify-end">
             <.link href={~p"/tags"} class="btn btn-sm btn-ghost">View</.link>
           </div>
         </div>
       </div>
 
-      <div class="card bg-base-100 shadow-sm ring-1 ring-base-200">
+      <div class="card bg-base-100 shadow-sm ring-1 ring-base-300">
         <div class="card-body">
           <div class="flex items-start justify-between gap-3">
             <div>
               <div class="text-sm font-medium">Account</div>
-              <div class="mt-1 text-sm text-base-content/60">Settings and preferences</div>
+              <div class="mt-2 text-sm text-base-content/60">Settings and preferences</div>
             </div>
             <div class="grid size-10 place-items-center rounded-xl bg-base-200">
               <.icon name="hero-cog-6-tooth" class="size-5" />
             </div>
           </div>
-          <div class="card-actions mt-4 justify-end">
+          <div class="card-actions mt-2 justify-end">
             <.link href={~p"/users/settings"} class="btn btn-sm btn-ghost">Open</.link>
           </div>
         </div>
