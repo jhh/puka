@@ -66,7 +66,7 @@ defmodule PukaWeb.BookmarkLive.Index do
           <div class="text-sm opacity-60 w-full md:max-w-3xl">
             <.link href={bookmark.url} target="_blank" rel="nofollow">{bookmark.description}</.link>
           </div>
-          <div class="relative z-20"><.tag_list tags={bookmark.tags} /></div>
+          <div class="relative max-w-fit z-20"><.tag_list tags={bookmark.tags} /></div>
           <div class="text-xs opacity-60 mt-1">
             <.icon name="hero-cloud-mini" class="size-3 opacity-40" />
             {get_domain(bookmark.url)}
