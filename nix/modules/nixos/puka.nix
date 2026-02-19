@@ -83,7 +83,7 @@ in
         EnvironmentFile = cfg.secrets;
         ExecStartPre = "${cfg.venv}/bin/puka-manage migrate --no-input";
         ExecStart = ''
-          ${cfg.venv}/bin/gunicorn --bind 127.0.0.1:${toString cfg.port} puka.wsgi:application
+          ${cfg.venv}/bin/gunicorn --bind 127.0.0.1:${toString cfg.port} --no-control-socket puka.wsgi:application
         '';
         Restart = "on-failure";
 
