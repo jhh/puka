@@ -134,14 +134,22 @@ defmodule PukaWeb.Layouts do
             </li>
 
             <%= if @current_scope do %>
-              <li>
-                <.link
-                  href={~p"/bookmarks"}
-                  class="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-                  data-tip="Bookmarks"
-                >
+              <li class="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Bookmarks">
+                <details open>
+                  <summary class="is-drawer-close:hidden">
+                    <.icon name="hero-bookmark" class="size-4" /> Bookmarks
+                  </summary>
+                  <ul class="is-drawer-close:hidden">
+                    <li>
+                      <.link href={~p"/bookmarks"}>Browse</.link>
+                    </li>
+                    <li>
+                      <.link href={~p"/bookmarks"}>Filter</.link>
+                    </li>
+                  </ul>
+                </details>
+                <.link href={~p"/bookmarks"} class="hidden is-drawer-close:flex">
                   <.icon name="hero-bookmark" class="size-4" />
-                  <span class="is-drawer-close:hidden">Bookmarks</span>
                 </.link>
               </li>
               <li>
@@ -155,13 +163,21 @@ defmodule PukaWeb.Layouts do
                 </.link>
               </li>
             <% else %>
-              <li class="disabled">
-                <a
-                  class="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-                  data-tip="Log in to use"
-                >
+              <li
+                class="disabled is-drawer-close:tooltip is-drawer-close:tooltip-right"
+                data-tip="Log in to use"
+              >
+                <details>
+                  <summary class="is-drawer-close:hidden">
+                    <.icon name="hero-bookmark" class="size-4" /> Bookmarks
+                  </summary>
+                  <ul class="is-drawer-close:hidden">
+                    <li><a>Browse</a></li>
+                    <li><a>Filter</a></li>
+                  </ul>
+                </details>
+                <a class="hidden is-drawer-close:flex">
                   <.icon name="hero-bookmark" class="size-4" />
-                  <span class="is-drawer-close:hidden">Bookmarks</span>
                 </a>
               </li>
               <li class="disabled">

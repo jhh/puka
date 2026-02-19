@@ -90,32 +90,31 @@ defmodule Puka.BookmarksTest do
       assert tag_names == ["elixir", "phoenix"]
     end
 
-    test "change_bookmark/3 populates tags param from preloaded tags" do
+    test "change_bookmark/2 populates tags from preloaded tags" do
       bookmark = bookmark_fixture(%{tags: "one, two"})
       bookmark = Bookmarks.get_bookmark!(bookmark.id)
 
-      changeset = Bookmarks.change_bookmark(bookmark, %{}, skip_tag_parse: true)
-      tags_param = changeset.params["tags"]
+      changeset = Bookmarks.change_bookmark(bookmark, %{})
+      tag_names = Ecto.Changeset.get_field(changeset, :tags) |> Enum.map(& &1.name) |> Enum.sort()
 
-      assert String.contains?(tags_param, "one")
-      assert String.contains?(tags_param, "two")
+      assert tag_names == ["one", "two"]
     end
 
-    test "change_bookmark/3 respects provided tags param" do
+    test "change_bookmark/2 does not create tags (validation only)" do
       bookmark = bookmark_fixture()
+      tag_count = Repo.aggregate(Puka.Tags.Tag, :count, :id)
 
-      changeset = Bookmarks.change_bookmark(bookmark, %{"tags" => "custom"}, skip_tag_parse: true)
+      Bookmarks.change_bookmark(bookmark, %{"tags" => "custom"})
 
-      assert changeset.params["tags"] == "custom"
+      assert Repo.aggregate(Puka.Tags.Tag, :count, :id) == tag_count
     end
 
-    test "change_bookmark/3 sets empty tags param when tags not loaded" do
+    test "change_bookmark/2 skips tags association when tags not loaded" do
       bookmark = bookmark_fixture()
       bookmark = Repo.get!(Bookmark, bookmark.id)
 
-      changeset = Bookmarks.change_bookmark(bookmark, %{}, skip_tag_parse: true)
-
-      assert changeset.params["tags"] == ""
+      # Should not raise even though tags are not preloaded
+      assert %Ecto.Changeset{} = Bookmarks.change_bookmark(bookmark, %{})
     end
   end
 

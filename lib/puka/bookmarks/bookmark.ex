@@ -4,7 +4,6 @@ defmodule Puka.Bookmarks.Bookmark do
   """
   use Ecto.Schema
   import Ecto.Changeset
-  alias Puka.Tags.Tag
 
   schema "bookmarks" do
     field :title, :string
@@ -12,7 +11,7 @@ defmodule Puka.Bookmarks.Bookmark do
     field :url, :string
     field :active, :boolean, default: true
 
-    many_to_many :tags, Tag,
+    many_to_many :tags, Puka.Tags.Tag,
       join_through: "bookmarks_tags",
       on_replace: :delete
 
@@ -20,19 +19,17 @@ defmodule Puka.Bookmarks.Bookmark do
   end
 
   @doc false
-  def changeset(bookmark, attrs, opts \\ []) do
-    bookmark
-    |> cast(attrs, [:title, :description, :url, :active])
-    |> validate_required([:title, :url])
-    |> unique_constraint(:url)
-    |> maybe_put_tags_assoc(attrs, opts)
-  end
+  def changeset(bookmark, attrs, tags \\ :skip) do
+    changeset =
+      bookmark
+      |> cast(attrs, [:title, :description, :url, :active])
+      |> validate_required([:title, :url])
+      |> unique_constraint(:url)
 
-  defp maybe_put_tags_assoc(changeset, attrs, opts) do
-    if Keyword.get(opts, :skip_tag_parse, false) do
+    if tags == :skip do
       changeset
     else
-      Ecto.Changeset.put_assoc(changeset, :tags, Tag.parse_tags(attrs))
+      put_assoc(changeset, :tags, tags)
     end
   end
 end

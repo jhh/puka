@@ -13,7 +13,7 @@ defmodule Mix.Tasks.Puka.Import do
 
   import Ecto.Changeset
   alias Puka.Bookmarks.Bookmark
-  alias Puka.Tags.Tag
+  alias Puka.Tags
   alias Puka.Repo
 
   def run(args) do
@@ -48,6 +48,6 @@ defmodule Mix.Tasks.Puka.Import do
     |> unique_constraint(:url)
     |> put_change(:inserted_at, attrs["inserted_at"])
     |> put_change(:updated_at, attrs["updated_at"])
-    |> Ecto.Changeset.put_assoc(:tags, Tag.parse_tags(attrs))
+    |> Ecto.Changeset.put_assoc(:tags, Tags.parse_tags(attrs))
   end
 end

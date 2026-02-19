@@ -4,7 +4,7 @@ defmodule Puka.Bookmarks do
   """
 
   import Ecto.Query, warn: false
-  alias Puka.{Paginator, Repo}
+  alias Puka.{Paginator, Repo, Tags}
 
   alias Puka.Bookmarks.Bookmark
 
@@ -98,8 +98,10 @@ defmodule Puka.Bookmarks do
 
   """
   def create_bookmark(attrs) do
+    tags = Tags.parse_tags(attrs)
+
     %Bookmark{}
-    |> Bookmark.changeset(attrs)
+    |> Bookmark.changeset(attrs, tags)
     |> Repo.insert()
   end
 
@@ -116,8 +118,10 @@ defmodule Puka.Bookmarks do
 
   """
   def update_bookmark(%Bookmark{} = bookmark, attrs) do
+    tags = Tags.parse_tags(attrs)
+
     bookmark
-    |> Bookmark.changeset(attrs)
+    |> Bookmark.changeset(attrs, tags)
     |> Repo.update()
   end
 
@@ -146,11 +150,16 @@ defmodule Puka.Bookmarks do
       %Ecto.Changeset{data: %Bookmark{}}
 
   """
-  def change_bookmark(%Bookmark{} = bookmark, attrs \\ %{}, opts \\ []) do
+  def change_bookmark(%Bookmark{} = bookmark, attrs \\ %{}) do
+    # Ensure the "tags" string param is present so the tags input field
+    # displays the current tags on mount (before the user has typed anything).
     attrs = put_tags_param(bookmark, attrs)
-    Bookmark.changeset(bookmark, attrs, opts)
+    Bookmark.changeset(bookmark, attrs, loaded_tags(bookmark))
   end
 
+  # Inject a "tags" string only when the caller hasn't provided one —
+  # i.e. on initial mount.  On subsequent validate events the form
+  # submits its own "tags" string which we leave untouched.
   defp put_tags_param(bookmark, attrs) do
     if Map.has_key?(attrs, "tags") or Map.has_key?(attrs, :tags) do
       attrs
@@ -159,15 +168,15 @@ defmodule Puka.Bookmarks do
     end
   end
 
-  defp tags_to_string(%Bookmark{tags: %Ecto.Association.NotLoaded{}}), do: ""
-
   defp tags_to_string(%Bookmark{tags: tags}) when is_list(tags) do
-    tags
-    |> Enum.map(& &1.name)
-    |> Enum.join(", ")
+    tags |> Enum.map(& &1.name) |> Enum.join(", ")
   end
 
-  defp tags_to_string(_bookmark), do: ""
+  defp tags_to_string(_), do: ""
+
+  defp loaded_tags(%Bookmark{tags: %Ecto.Association.NotLoaded{}}), do: :skip
+  defp loaded_tags(%Bookmark{tags: tags}) when is_list(tags), do: tags
+  defp loaded_tags(_bookmark), do: :skip
 end
 
 # iex(11)> query = from b in Bookmark,

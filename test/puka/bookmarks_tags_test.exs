@@ -1,6 +1,7 @@
 defmodule Tagger.BookmarkTest do
   use ExUnit.Case
 
+  alias Puka.Bookmarks
   alias Puka.Bookmarks.Bookmark
   alias Puka.Repo
   alias Puka.Tags.Tag
@@ -17,11 +18,8 @@ defmodule Tagger.BookmarkTest do
       "tags" => "elixir, ecto"
     }
 
-    bookmark =
-      %Bookmark{}
-      |> Bookmark.changeset(params)
-      |> Repo.insert!()
-      |> Repo.preload(:tags)
+    {:ok, bookmark} = Bookmarks.create_bookmark(params)
+    bookmark = Repo.preload(bookmark, :tags)
 
     assert tag_names(bookmark) == ["ecto", "elixir"]
     assert Repo.aggregate(Tag, :count, :id) == 2
@@ -42,11 +40,8 @@ defmodule Tagger.BookmarkTest do
       "tags" => " , ,   "
     }
 
-    bookmark =
-      %Bookmark{}
-      |> Bookmark.changeset(params)
-      |> Repo.insert!()
-      |> Repo.preload(:tags)
+    {:ok, bookmark} = Bookmarks.create_bookmark(params)
+    bookmark = Repo.preload(bookmark, :tags)
 
     assert bookmark.tags == []
     assert Repo.aggregate(Tag, :count, :id) == 0
@@ -61,33 +56,27 @@ defmodule Tagger.BookmarkTest do
       "tags" => "elixir, elixir,  elixir"
     }
 
-    bookmark =
-      %Bookmark{}
-      |> Bookmark.changeset(params)
-      |> Repo.insert!()
-      |> Repo.preload(:tags)
+    {:ok, bookmark} = Bookmarks.create_bookmark(params)
+    bookmark = Repo.preload(bookmark, :tags)
 
     assert tag_names(bookmark) == ["elixir"]
     assert Repo.aggregate(Tag, :count, :id) == 1
   end
 
   test "replaces tags on update" do
-    bookmark =
-      %Bookmark{}
-      |> Bookmark.changeset(%{
+    {:ok, bookmark} =
+      Bookmarks.create_bookmark(%{
         "title" => "Replace",
         "url" => "https://example.com/replace",
         "tags" => "elixir, ecto"
       })
-      |> Repo.insert!()
 
     bookmark = Repo.preload(bookmark, :tags)
 
-    bookmark =
-      bookmark
-      |> Bookmark.changeset(%{"tags" => "phoenix"})
-      |> Repo.update!()
-      |> Repo.preload(:tags)
+    {:ok, bookmark} =
+      Bookmarks.update_bookmark(bookmark, %{"tags" => "phoenix"})
+
+    bookmark = Repo.preload(bookmark, :tags)
 
     assert tag_names(bookmark) == ["phoenix"]
 

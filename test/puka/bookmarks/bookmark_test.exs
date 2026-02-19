@@ -1,7 +1,7 @@
 defmodule Puka.Bookmarks.BookmarkTest do
   use Puka.DataCase
 
-  alias Puka.Bookmarks.Bookmark
+  alias Puka.Bookmarks
   alias Puka.Repo
   alias Puka.Tags.Tag
 
@@ -10,35 +10,42 @@ defmodule Puka.Bookmarks.BookmarkTest do
     "url" => "https://example.com"
   }
 
-  test "changeset/3 parses tags and normalizes case" do
-    changeset =
-      Bookmark.changeset(%Bookmark{}, Map.put(@valid_attrs, "tags", " Elixir, phoenix, ELIXIR "))
+  test "create_bookmark/1 parses tags and normalizes case" do
+    {:ok, bookmark} =
+      Bookmarks.create_bookmark(Map.put(@valid_attrs, "tags", " Elixir, phoenix, ELIXIR "))
 
-    tag_names =
-      changeset.changes[:tags]
-      |> Enum.map(&Ecto.Changeset.get_field(&1, :name))
-      |> Enum.sort()
+    bookmark = Bookmarks.get_bookmark!(bookmark.id)
+    tag_names = bookmark.tags |> Enum.map(& &1.name) |> Enum.sort()
 
     assert tag_names == ["elixir", "phoenix"]
     assert Repo.aggregate(Tag, :count, :id) == 2
   end
 
-  test "changeset/3 ignores blank tags" do
-    changeset = Bookmark.changeset(%Bookmark{}, Map.put(@valid_attrs, "tags", " , ,   "))
+  test "create_bookmark/1 ignores blank tags" do
+    {:ok, bookmark} =
+      Bookmarks.create_bookmark(Map.put(@valid_attrs, "tags", " , ,   "))
 
-    assert changeset.changes[:tags] == []
+    bookmark = Bookmarks.get_bookmark!(bookmark.id)
+    assert bookmark.tags == []
     assert Repo.aggregate(Tag, :count, :id) == 0
   end
 
-  test "changeset/3 with skip_tag_parse avoids tag inserts" do
+  test "change_bookmark/2 preserves preloaded tags without inserting" do
+    {:ok, bookmark} =
+      Bookmarks.create_bookmark(Map.put(@valid_attrs, "tags", "elixir"))
+
+    bookmark = Bookmarks.get_bookmark!(bookmark.id)
     tag_count = Repo.aggregate(Tag, :count, :id)
 
-    changeset =
-      Bookmark.changeset(%Bookmark{}, Map.put(@valid_attrs, "tags", "elixir"),
-        skip_tag_parse: true
-      )
+    changeset = Bookmarks.change_bookmark(bookmark, %{})
 
+    # No additional tags inserted during change_bookmark
     assert Repo.aggregate(Tag, :count, :id) == tag_count
-    refute Map.has_key?(changeset.changes, :tags)
+
+    tag_names =
+      Ecto.Changeset.get_field(changeset, :tags)
+      |> Enum.map(& &1.name)
+
+    assert tag_names == ["elixir"]
   end
 end

@@ -9,6 +9,47 @@ defmodule Puka.Tags do
   alias Puka.Tags.Tag
 
   @page_size 10
+
+  @doc """
+  Parses a comma-separated tag string from params and upserts the tags,
+  returning a list of `%Tag{}` structs.
+  """
+  def parse_tags(params) do
+    (params["tags"] || params[:tags] || "")
+    |> String.split(",")
+    |> Enum.map(&String.trim/1)
+    |> Enum.map(&String.downcase/1)
+    |> Enum.reject(&(&1 == ""))
+    |> insert_and_get_all()
+  end
+
+  defp insert_and_get_all([]), do: []
+
+  defp insert_and_get_all(names) do
+    timestamp =
+      DateTime.utc_now()
+      |> DateTime.truncate(:second)
+
+    placeholders = %{timestamp: timestamp}
+
+    maps =
+      Enum.map(
+        names,
+        &%{
+          name: &1,
+          inserted_at: {:placeholder, :timestamp},
+          updated_at: {:placeholder, :timestamp}
+        }
+      )
+
+    Repo.insert_all(Tag, maps,
+      placeholders: placeholders,
+      on_conflict: :nothing
+    )
+
+    Repo.all(from t in Tag, where: t.name in ^names)
+  end
+
   @doc """
   Returns the number of active tags.
 

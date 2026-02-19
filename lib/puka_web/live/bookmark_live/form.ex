@@ -52,7 +52,7 @@ defmodule PukaWeb.BookmarkLive.Form do
     socket
     |> assign(:page_title, "Edit Bookmark")
     |> assign(:bookmark, bookmark)
-    |> assign(:form, to_form(Bookmarks.change_bookmark(bookmark, %{}, skip_tag_parse: true)))
+    |> assign(:form, to_form(Bookmarks.change_bookmark(bookmark)))
   end
 
   defp apply_action(socket, :new, _params) do
@@ -61,13 +61,13 @@ defmodule PukaWeb.BookmarkLive.Form do
     socket
     |> assign(:page_title, "New Bookmark")
     |> assign(:bookmark, bookmark)
-    |> assign(:form, to_form(Bookmarks.change_bookmark(bookmark, %{}, skip_tag_parse: true)))
+    |> assign(:form, to_form(Bookmarks.change_bookmark(bookmark)))
   end
 
   @impl true
   def handle_event("validate", %{"bookmark" => bookmark_params}, socket) do
     changeset =
-      Bookmarks.change_bookmark(socket.assigns.bookmark, bookmark_params, skip_tag_parse: true)
+      Bookmarks.change_bookmark(socket.assigns.bookmark, bookmark_params)
 
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
