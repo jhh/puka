@@ -91,6 +91,7 @@ in
         DynamicUser = true;
         StateDirectory = "puka";
         RuntimeDirectory = "puka";
+        WorkingDirectory = "/var/run/puka";
 
         BindReadOnlyPaths = [
           "${
