@@ -4,7 +4,7 @@ from operator import attrgetter
 from typing import Any
 
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
-from django.db.models import CharField, Count, OuterRef, Subquery, Sum, Value
+from django.db.models import CharField, OuterRef, Subquery, Sum, Value
 
 from puka.stuff.models import Item
 from puka.upkeep.models import Area, Schedule, Task, TaskItem
@@ -19,9 +19,7 @@ def item_quantity_needed(item: Item) -> int:
 
 def get_areas_tasks_schedules(query=None) -> list[dict[str, Any]]:
     """Return all areas with count of tasks and task with the soonest due_date and id."""
-    area_queryset = Area.objects.prefetch_related("tasks__schedules").annotate(
-        task_count=Count("tasks"),
-    )
+    area_queryset = Area.objects.prefetch_related("tasks__schedules")
 
     if query:
         search_query = SearchQuery(query)
@@ -38,10 +36,11 @@ def get_areas_tasks_schedules(query=None) -> list[dict[str, Any]]:
 
     areas = []
     for area in area_queryset:
-        row = {"id": area.id, "name": area.name, "task_count": area.task_count}
+        row = {"id": area.pk, "name": area.name, "task_count": area.tasks.count()}
 
         schedules: list[Schedule] = []
         for task in area.tasks.all():
+            # TODO(jhh): this is a N+1 query, schedules are prefetched so use python to filter
             schedules += task.schedules.filter(completion_date__isnull=True).all()
 
         if schedules:
