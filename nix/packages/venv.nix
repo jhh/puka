@@ -30,7 +30,7 @@ pythonSet.mkVirtualEnv "puka-env" workspace.deps.default
         dontInstall = true;
         buildPhase = ''
           runHook preBuild
-          ty check  --output-format=github --exit-zero | tee $out 2>&1
+          ty check  --output-format=concise --error-on-warning | tee $out 2>&1
           runHook postBuild
         '';
       };
