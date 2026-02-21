@@ -3,12 +3,12 @@ from __future__ import annotations
 from django.conf import settings
 from django.contrib import admin
 from django.urls import URLPattern, URLResolver, include, path
-from django.views.generic import RedirectView
+from django.views.generic import TemplateView
 
 from puka.core.views import view_404
 
 urlpatterns: list[URLPattern | URLResolver] = [
-    path("", RedirectView.as_view(url="/bookmarks/", permanent=False), name="home"),
+    path("", TemplateView.as_view(template_name="overview.html"), name="home"),
     path("bookmarks/", include("puka.bookmarks.urls", namespace="bookmarks")),
     path("stuff/", include("puka.stuff.urls", namespace="stuff")),
     path("upkeep/", include("puka.upkeep.urls", namespace="upkeep")),
