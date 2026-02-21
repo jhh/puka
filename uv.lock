@@ -731,6 +731,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "djade" },
     { name = "django-debug-toolbar" },
     { name = "django-stubs", extra = ["compatible-mypy"] },
     { name = "ipython" },
@@ -744,7 +745,6 @@ dev = [
 ]
 pre-commit = [
     { name = "add-trailing-comma" },
-    { name = "djade" },
     { name = "django-upgrade" },
 ]
 test = [
@@ -774,6 +774,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "djade", specifier = ">=1.3.2" },
     { name = "django-debug-toolbar", specifier = ">=4.4.6" },
     { name = "django-stubs", extras = ["compatible-mypy"], specifier = ">=5.1.1" },
     { name = "ipython", specifier = ">=8.30.0" },
@@ -787,7 +788,6 @@ dev = [
 ]
 pre-commit = [
     { name = "add-trailing-comma", specifier = ">=3.1.0" },
-    { name = "djade", specifier = ">=1.3.2" },
     { name = "django-upgrade", specifier = ">=1.23.1" },
 ]
 test = [
