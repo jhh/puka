@@ -1,15 +1,168 @@
 {% load django_htmx static utils %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{% block title %}Puka{% endblock %}</title>
-    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
-    <link rel="stylesheet" href="{% static 'puka/main.css' %}" />
-    <script defer src="{% static 'puka/main.js' %}"></script>
-  </head>
-  <body class="min-h-screen bg-base-100 text-base-content">
-    {% block content %}{% endblock %}
-  </body>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>{% block title %}Puka{% endblock %}</title>
+        <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+        <link rel="stylesheet" href="{% static 'puka/main.css' %}" />
+        <script defer src="{% static 'puka/main.js' %}"></script>
+    </head>
+    <body class="min-h-screen bg-base-100 text-base-content">
+        <div class="drawer lg:drawer-open">
+            <input id="app-drawer" type="checkbox" class="drawer-toggle" />
+
+            <div class="drawer-content flex min-h-screen flex-col">
+                <header class="navbar sticky top-0 z-20 h-16 border-b border-base-300 bg-base-200 px-4 backdrop-blur sm:px-6 lg:px-8">
+                    <div class="navbar-start gap-2">
+                        <label
+                            for="app-drawer"
+                            aria-label="open sidebar"
+                            class="btn btn-square btn-ghost lg:hidden"
+                        >
+                            <span class="hero-bars-3 size-5"></span>
+                        </label>
+                        <span class="text-base font-semibold text-base-content/90">Overview</span>
+                    </div>
+
+                    <div class="navbar-end gap-2">
+                        <details class="dropdown dropdown-end">
+                            <summary class="btn btn-ghost gap-2 px-2">
+                                <!--<%= if user_email(@current_scope) do %>-->
+                                <div class="hidden text-sm font-medium text-base-content/80 sm:block">
+                                    jeff@j3ff.io
+                                    <!--{user_email(@current_scope)}-->
+                                </div>
+                                <!--<% end %>-->
+
+                                <span class="hero-chevron-down size-4 text-base-content/60"></span>
+                            </summary>
+
+                            <ul class="menu dropdown-content z-30 mt-2 w-56 rounded-box border border-base-200 bg-base-100 p-2 shadow">
+                                <!--<%= if @current_scope do %>-->
+                                <li class="menu-title">
+                                    <span>Account</span>
+                                </li>
+                                <li>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs text-base-content/60">Theme</span>
+                                        <!--<.theme_toggle />-->
+                                    </div>
+                                </li>
+                                <li>
+                                    <!--<.link href={~p"/users/settings"}>-->
+                                    <a href="#">
+                                        <span class="hero-cog-6-tooth size-4"></span> Settings
+                                    </a>
+                                    <!--</.link>-->
+                                </li>
+                                <li>
+                                    <!--<.link href={~p"/users/log-out"} method="delete">-->
+                                    <a href="#">
+                                        <span class="hero-arrow-left-on-rectangle size-4"></span> Log out
+                                    </a>
+                                    <!--</.link>-->
+                                </li>
+                                <!--<% else %>-->
+                                <li>
+                                    <!--<.link href={~p"/users/register"}>-->
+                                    <a href="#">
+                                        <span class="hero-user-plus size-4"></span> Register
+                                    </a>
+                                    <!--</.link>-->
+                                </li>
+                                <li>
+                                    <!--<.link href={~p"/users/log-in"}>-->
+                                    <a href="#">
+                                        <span class="hero-arrow-right-on-rectangle size-4"></span> Log in
+                                    </a>
+                                    <!--</.link>-->
+                                </li>
+                                <!--<% end %>-->
+                            </ul>
+                        </details>
+                    </div>
+                </header>
+
+                <main class="min-h-[calc(100vh-4rem)] bg-base-200 px-4 py-6 sm:px-6 lg:px-8">
+                    <div class="mx-auto w-full max-w-screen-2xl">
+                        <!--{render_slot(@inner_block)}-->
+                        {% block content %}{% endblock %}
+                    </div>
+                </main>
+
+                <!--<.flash_group flash={@flash} />-->
+            </div>
+
+            <aside class="drawer-side">
+                <label for="app-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+                <div class="min-h-full w-64 border-r border-base-300 bg-base-200 pt-16 backdrop-blur lg:pt-0">
+                    <div class="hidden h-16 items-center px-5 lg:flex">
+                        <a href="#" class="flex h-full items-center gap-3">
+                            <img
+                                src="{% static 'puka-logo.svg' %}"
+                                alt="Puka"
+                                class="h-auto w-[180px] max-w-full"
+                            />
+                        </a>
+                    </div>
+
+                    <ul class="menu px-4 py-4 text-base-content">
+                        <li class="lg:hidden">
+                            <a href="#" class="gap-3">
+                                <img
+                                    src="{% static 'puka-logo.svg' %}"
+                                    alt="Puka"
+                                    class="h-auto w-[180px] max-w-full"
+                                />
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="gap-3">
+                                <span class="hero-home size-5"></span>
+                                <span>Overview</span>
+                            </a>
+                        </li>
+                        <li>
+                            <details open>
+                                <summary class="menu-dropdown-toggle flex w-full items-center gap-3 after:ml-auto">
+                                    <span class="hero-bookmark size-5"></span>
+                                    <span>Bookmarks</span>
+                                </summary>
+                                <ul>
+                                    <li><a href="{% url 'bookmarks:list' %}">Browse</a></li>
+                                    <li><a href="#">Filter</a></li>
+                                </ul>
+                            </details>
+                        </li>
+                        <li>
+                            <a href="#" class="gap-3">
+                                <span class="hero-archive-box size-5"></span>
+                                <span>Inventory</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="gap-3">
+                                <span class="hero-clipboard-document-check size-5"></span>
+                                <span>Tasks</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="gap-3">
+                                <span class="hero-tag size-5"></span>
+                                <span>Tags</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="gap-3">
+                                <span class="hero-shield-check size-5"></span>
+                                <span>Admin</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
+    </body>
 </html>
