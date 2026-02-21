@@ -25,6 +25,7 @@ let
 
     buildPhase = ''
       runHook preBuild
+      export HEROICONS_DIR="${perSystem.self.heroicons}/share/heroicons/optimized/"
       npx @tailwindcss/cli --minify --input=${baseCss} --output=$out/puka/main.css
       npx esbuild --bundle --minify --outfile=$out/puka/main.js puka/static/puka/base.js
       runHook postBuild
