@@ -96,7 +96,7 @@ pkgs.testers.nixosTest {
 
       with subtest("create a bookmark"):
         # test that main bookmarks list is available
-        assert "New Bookmark" in machine.succeed(f"{curl} --location {base_url}"), "T001"
+        assert "New Bookmark" in machine.succeed(f"{curl} --location {base_url}/bookmarks/"), "T001"
 
         # create a new bookmark
 
@@ -115,7 +115,7 @@ pkgs.testers.nixosTest {
         )
 
         # check for this new bookmark in main bookmark list
-        output = machine.succeed(f"{curl} --location {base_url}")
+        output = machine.succeed(f"{curl} --location {base_url}/bookmarks/")
         assert title in output, "T002"
         assert "http://example.com" in output, "T003"
         assert "foobar" in output, "T004"
