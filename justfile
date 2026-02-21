@@ -10,6 +10,9 @@ init: npm-install update-css update-js
 ty:
     uv run ty check
 
+djade:
+    uv run djade puka/templates/**/*.html
+
 # run tests
 test $DJANGO_SETTINGS_MODULE="puka.settings.test":
     uv run pytest tests
