@@ -5,7 +5,7 @@ import logging
 from django.core.paginator import Paginator
 from django.db.models import Case, Count, Value, When
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 from django_htmx.http import HttpResponseLocation, trigger_client_event
@@ -73,39 +73,32 @@ def bookmark_detail(request, pk):
 
 
 @require_http_methods(["GET", "POST"])
-def bookmark_new(request):
+def bookmark_create(request):
     if request.method == "GET":
         form = BookmarkForm()
-        template = get_template(request, "bookmarks/form.html", "#form-partial")
-        return render(request, template, {"form": form, "title": "New Bookmark"})
-
-    if request.method == "POST":
-        form = BookmarkForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return HttpResponseLocation(reverse("bookmarks:list"), target="#id_content")
         return render(request, "bookmarks/form.html", {"form": form, "title": "New Bookmark"})
 
-    return HttpResponse()
+    form = BookmarkForm(request.POST)
+    if form.is_valid():
+        form.save()
+        return redirect(reverse("bookmarks:list"))
+    return render(request, "bookmarks/form.html", {"form": form, "title": "New Bookmark"})
 
 
 @require_http_methods(["GET", "POST"])
-def bookmark_edit(request, pk):
+def bookmark_update(request, pk):
     bookmark = get_object_or_404(Bookmark, pk=pk)
 
     if request.method == "GET":
         form = BookmarkForm(instance=bookmark)
-        template = get_template(request, "bookmarks/form.html", "#form-partial")
+        template = "bookmarks/form.html"
         return render(request, template, {"form": form, "title": "Edit Bookmark"})
 
-    if request.method == "POST":
-        form = BookmarkForm(request.POST, instance=bookmark)
-        if form.is_valid():
-            form.save()
-            return HttpResponseLocation(reverse("bookmarks:list"), target="#id_content")
-        return render(request, "bookmarks/form.html", {"form": form, "title": "Edit Bookmark"})
-
-    return HttpResponse()
+    form = BookmarkForm(request.POST, instance=bookmark)
+    if form.is_valid():
+        form.save()
+        return redirect(reverse("bookmarks:list"))
+    return render(request, "bookmarks/form.html", {"form": form, "title": "Edit Bookmark"})
 
 
 @require_http_methods(["POST"])

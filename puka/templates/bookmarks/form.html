@@ -1,12 +1,49 @@
-{% extends "bookmarks/base.html" %}
-{% load crispy_forms_tags %}
-
-{% partialdef form-partial %}
-  {% crispy form %}
-{% endpartialdef form-partial %}
-
-{% block title %}{{ title }}{% endblock %}
+{% extends "root.html" %}
 
 {% block content %}
-  {% partial form-partial %}
+<form method="post">
+    {% csrf_token %}
+    <div class="fieldset mb-2">
+        {{ form.title.errors }}
+        <label>
+            <span class="label mb-1">Title</span>
+            {{ form.title }}
+        </label>
+    </div>
+
+    <div class="fieldset mb-2">
+        {{ form.description.errors }}
+        <label>
+            <span class="label mb-1">Description</span>
+            {{ form.description }}
+        </label>
+    </div>
+
+    <div class="fieldset mb-2">
+        {{ form.url.errors }}
+        <label>
+            <span class="label mb-1">URL</span>
+            {{ form.url }}
+        </label>
+    </div>
+
+    <div class="fieldset mb-2">
+        {{ form.tags.errors }}
+        <label>
+            <span class="label mb-1">Tags</span>
+            {{ form.tags }}
+        </label>
+    </div>
+
+    <div class="fieldset mb-2">
+        {{ form.active.errors }}
+        <label>
+            <span class="label">{{ form.active }} Active</span>
+        </label>
+    </div>
+    <footer>
+        <button class="btn btn-primary"> Save Bookmark </button>
+        <a href="{% url 'bookmarks:list' %}" class="btn btn-primary btn-soft"> Cancel </a>
+    </footer>
+</form>
 {% endblock content %}
