@@ -1,6 +1,8 @@
 {% extends "root.html" %}
 {% load utils %}
 
+{% block title %}Bookmarks{% endblock title %}
+
 {% block content %}
     <div class="flex justify-end mb-4 mt-0">
         <div
@@ -38,24 +40,14 @@
         </div>
 
         <div class="flex md:mt-0">
-            <button
-                hx-get="{% url 'bookmarks:new' %}"
-                type="button"
-                hx-trigger="click"
-                hx-target="#id_content"
-                hx-push-url="true"
-                class="btn btn-primary hidden md:inline-flex">
-                New Bookmark
-            </button>
-            <button
-                hx-get="{% url 'bookmarks:new' %}"
-                type="button"
-                hx-trigger="click"
-                hx-target="#id_content"
-                hx-push-url="true"
-                class="btn btn-primary md:hidden">
-                New
-            </button>
+            <a
+                href="{% url 'bookmarks:new' %}"
+                class="btn btn-primary hidden md:inline-flex"
+            > New Bookmark </a>
+            <a
+                href="{% url 'bookmarks:new' %}"
+                class="btn btn-primary md:hidden"
+            > New </a>
         </div>
     </div>
 
