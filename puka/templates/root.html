@@ -2,16 +2,16 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{% block title %}Puka{% endblock %}</title>
-        <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
-        <link rel="stylesheet" href="{% static 'puka/main.css' %}" />
+        <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+        <link rel="stylesheet" href="{% static 'puka/main.css' %}">
         <script defer src="{% static 'puka/main.js' %}"></script>
     </head>
     <body class="min-h-screen bg-base-100 text-base-content">
         <div class="drawer lg:drawer-open">
-            <input id="app-drawer" type="checkbox" class="drawer-toggle" />
+            <input id="app-drawer" type="checkbox" class="drawer-toggle">
 
             <div class="drawer-content flex min-h-screen flex-col">
                 <header class="navbar sticky top-0 z-20 h-16 border-b border-base-300 bg-base-200 px-4 backdrop-blur sm:px-6 lg:px-8">
@@ -30,10 +30,9 @@
                         <details class="dropdown dropdown-end">
                             <summary class="btn btn-ghost gap-2 px-2">
                                 <!--<%= if user_email(@current_scope) do %>-->
-                                <div class="hidden text-sm font-medium text-base-content/80 sm:block">
+                                <span class="hidden text-sm font-medium text-base-content/80 sm:block">
                                     jeff@j3ff.io
-                                    <!--{user_email(@current_scope)}-->
-                                </div>
+                                </span>
                                 <!--<% end %>-->
 
                                 <span class="hero-chevron-down size-4 text-base-content/60"></span>
@@ -104,7 +103,7 @@
                                 src="{% static 'puka-logo.svg' %}"
                                 alt="Puka"
                                 class="h-auto w-[180px] max-w-full"
-                            />
+                            >
                         </a>
                     </div>
 
@@ -115,11 +114,11 @@
                                     src="{% static 'puka-logo.svg' %}"
                                     alt="Puka"
                                     class="h-auto w-[180px] max-w-full"
-                                />
+                                >
                             </a>
                         </li>
                         <li>
-                            <a href="#" class="gap-3">
+                            <a href="/" class="gap-3">
                                 <span class="hero-home size-5"></span>
                                 <span>Overview</span>
                             </a>
