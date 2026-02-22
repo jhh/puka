@@ -1,0 +1,114 @@
+{% extends "root.html" %}
+{% load utils %}
+
+{% block content %}
+    <div class="flex justify-end mb-4 mt-0 gap-4">
+        <div
+            x-data="{search: false}"
+            x-on:keydown.meta.k.window="$focus.focus($refs.searchInput)">
+            <label class="input w-64">
+                <svg
+                    class="h-[2em] opacity-50"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24">
+                    <g
+                        stroke-linejoin="round"
+                        stroke-linecap="round"
+                        stroke-width="2.5"
+                        fill="none"
+                        stroke="currentColor">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.3-4.3"></path>
+                    </g>
+                </svg>
+                <input
+                    type="search"
+                    x-ref="searchInput"
+                    name="q"
+                    id="search"
+                    placeholder="Search"
+                    {# fake pagination to force list-items-partial to be returned #}
+                    hx-get="{% url 'bookmarks:list' %}?page=x"
+                    hx-trigger="keyup changed delay:0.5s"
+                    hx-target="#id_bookmarks"
+                    class="grow"
+                    x-on:keyup.esc.prevent.stop="$el.value = ''; $el.blur(); htmx.trigger($el, 'change')">
+                <kbd class="hidden md:inline kbd kbd-sm">⌘</kbd>
+                <kbd class="hidden md:inline kbd kbd-sm">K</kbd>
+            </label>
+        </div>
+
+        <div class="flex md:mt-0">
+            <button
+                hx-get="{% url 'bookmarks:new' %}"
+                type="button"
+                hx-trigger="click"
+                hx-target="#id_content"
+                hx-push-url="true"
+                class="btn btn-primary hidden md:inline-flex">
+                New Bookmark
+            </button>
+            <button
+                hx-get="{% url 'bookmarks:new' %}"
+                type="button"
+                hx-trigger="click"
+                hx-target="#id_content"
+                hx-push-url="true"
+                class="btn btn-primary md:hidden">
+                New
+            </button>
+        </div>
+    </div>
+
+    <ul
+        id="id_bookmarks"
+        class="list rounded-box border border-base-300 shadow-sm bg-base-100">
+        {% partial list-items-partial %}
+    </ul>
+{% endblock content %}
+
+{% partialdef list-items-partial %}
+{% for bookmark in page_obj %}
+    <li class="list-row group relative transition-colors hover:bg-base-200"
+        {% if forloop.last and page_obj.has_next %}
+            hx-get="{% querystring page=page_obj.next_page_number %}"
+            hx-trigger="revealed"
+            hx-swap="afterend"
+        {% endif %}>
+        <a
+            href="{{ bookmark.url }}"
+            class="absolute inset-0 z-10"
+            target="_blank"
+            rel="nofollow"
+            tabindex="-1">
+        </a>
+        <div class="list-col-grow pr-12">
+            <div class="text-base font-semibold">{{ bookmark.title }}</div>
+            <div class="text-sm opacity-60 w-full lg:max-w-3xl">{{ bookmark.description }}</div>
+            <div class="relative max-w-fit z-20">
+                <span>
+                    {% for tag in bookmark.tags.all %}
+                        <a
+                            href="?tags={{ tag }}"
+                            hx-get="?tags={{ tag }}"
+                            hx-target="#id_bookmarks"
+                            class="mr-1 text-sm link-primary"
+                            tabindex="-1">
+                            <span class="hero-hashtag-mini size-2.25"></span>{{ tag }}
+                        </a>
+                    {% endfor %}
+                </span>
+                <div class="text-xs opacity-60 mt-1">
+                    <span class="hero-cloud-mini size-3 opacity-40"></span> {{ bookmark.url|domain }}
+                    <span class="font-black mx-1">·</span> {{ bookmark.created|date:'F Y'|lower }}
+                </div>
+            </div>
+        </div>
+        <a
+            href="{% url 'bookmarks:edit' bookmark.pk %}"
+            class="btn btn-soft btn-accent absolute right-3 top-3 z-20 opacity-0 transition-opacity pointer-events-none group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100">
+            Edit
+        </a>
+    </li>
+{% endfor %}
+{% endpartialdef list-items-partial %}

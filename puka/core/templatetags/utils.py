@@ -1,3 +1,5 @@
+from urllib.parse import urlparse
+
 from django import template
 from django.urls import reverse
 
@@ -12,3 +14,10 @@ def get_current_class(context, url_name):
         if request.path.startswith(reverse(url_name))
         else "text-neutral-content/70 hover:text-neutral-content hover:bg-neutral-focus"
     )
+
+
+@register.filter
+def domain(url):
+    """Extract domain from URL."""
+    parsed_url = urlparse(url)
+    return parsed_url.netloc
