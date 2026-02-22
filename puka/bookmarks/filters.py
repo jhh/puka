@@ -4,7 +4,6 @@ from crispy_forms.layout import Button, Div, Field, Layout
 from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.db.models import F
 
-from puka.bookmarks.forms import PrimaryButton
 from puka.bookmarks.models import Bookmark
 from puka.core.filters import TagFilter
 
@@ -61,7 +60,7 @@ class BookmarkFilter(django_filters.FilterSet):
                     onclick="clearSearch();",
                     css_class="text-sm/6 font-semibold text-gray-900",
                 ),
-                PrimaryButton("submit", "Search"),
+                Button("submit", "Search"),
                 css_class="mt-0 mb-4 flex items-center justify-end gap-x-6",
             ),
         )

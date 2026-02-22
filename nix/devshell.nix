@@ -28,6 +28,7 @@ pkgs.mkShell {
     ++ pre-commit.enabledPackages;
 
   env = {
+    HEROICONS_DIR = "${flake.packages.${system}.heroicons}/share/heroicons/optimized/";
     UV_PYTHON_DOWNLOADS = "never";
     PGPORT = 5432;
   };
