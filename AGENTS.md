@@ -42,7 +42,15 @@
 ## Django Template Formatting
 - Use 4-space indentation for HTML elements and align Django template tags
   with their corresponding HTML structure.
-- Tags with many attributes can have one indented attribute per line.
+- Tags with more than one attributes can have one indented attribute per line.
+  example:
+
+      <a
+          href="?tags={{ tag }}"
+          hx-get="?tags={{ tag }}"
+      >
+
+
 - `just djade`: lint Django templates
 
 ## Tests
