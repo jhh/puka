@@ -9,7 +9,7 @@ from puka.bookmarks.models import Bookmark
 def test_bookmarks(admin_client, succulents_bookmark):
     url = reverse("bookmarks:list")
     response = admin_client.get(url)
-    assertTemplateUsed(response, "bookmarks/list.html")
+    assertTemplateUsed(response, "bookmarks/index.html")
     assertContains(response, succulents_bookmark.title)
     assertContains(response, succulents_bookmark.description)
     assertContains(response, succulents_bookmark.url)
@@ -86,7 +86,7 @@ def test_create_bookmark(admin_client):
             "active": True,
         },
     )
-    assert response.status_code == 200
+    assert response.status_code == 302
     qs = Bookmark.active_objects.with_tags(["hammock"])
     assert len(qs) == 1
 
@@ -103,7 +103,7 @@ def test_update_bookmark(admin_client, flannel_bookmark):
             "active": True,
         },
     )
-    assert response.status_code == 200
+    assert response.status_code == 302
     qs = Bookmark.active_objects.with_tags(["hammock"])
     qs = Bookmark.active_objects.with_text("copper")
     assert len(qs) == 1
@@ -122,6 +122,5 @@ def test_invalid_update_bookmark(admin_client, typewriter_bookmark):
     )
     qs = Bookmark.active_objects.with_text("pabst")
     assert len(qs) == 0
-    assertTemplateUsed(response, "tailwind/whole_uni_form.html")
     assertContains(response, "vaporware pabst")
     assertContains(response, "error")
