@@ -85,7 +85,7 @@
                 </header>
 
                 <main class="min-h-[calc(100vh-4rem)] bg-base-200 px-4 py-6 sm:px-6 lg:px-8">
-                    <div class="mx-auto w-full max-w-screen-2xl">
+                    <div id="id_content" class="mx-auto w-full max-w-screen-2xl">
                         <!--{render_slot(@inner_block)}-->
                         {% block content %}{% endblock %}
                     </div>
@@ -136,13 +136,13 @@
                             </details>
                         </li>
                         <li>
-                            <a href="#" class="gap-3">
+                            <a href="{% url 'stuff:item-list' %}" class="gap-3">
                                 <span class="hero-archive-box size-5"></span>
                                 <span>Inventory</span>
                             </a>
                         </li>
                         <li>
-                            <a href="#" class="gap-3">
+                            <a href="{% url 'upkeep:task-list' %}" class="gap-3">
                                 <span class="hero-clipboard-document-check size-5"></span>
                                 <span>Tasks</span>
                             </a>
@@ -154,7 +154,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#" class="gap-3">
+                            <a href="/admin/" class="gap-3">
                                 <span class="hero-shield-check size-5"></span>
                                 <span>Admin</span>
                             </a>
