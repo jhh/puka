@@ -9,7 +9,10 @@
         <link rel="stylesheet" href="{% static 'puka/main.css' %}">
         <script defer src="{% static 'puka/main.js' %}"></script>
     </head>
-    <body class="min-h-screen bg-base-100 text-base-content">
+    <body
+        hx-headers:inherited='{"X-CSRFToken": "{{ csrf_token }}"}'
+        class="min-h-screen bg-base-100 text-base-content"
+    >
         <div class="drawer lg:drawer-open">
             <input id="app-drawer" type="checkbox" class="drawer-toggle">
 
