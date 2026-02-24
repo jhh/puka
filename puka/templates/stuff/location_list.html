@@ -17,7 +17,7 @@
                 {% if ancestors %}
                     <a href="{% url 'stuff:location-list' 0 %}"
                         hx-get="{% url 'stuff:location-list' 0 %}"
-                        hx-target="#id_content"
+                        hx-target="#content"
                         hx-push-url="true"
                         class="link link-hover link-primary">Locations</a>
                 {% else %}
@@ -28,7 +28,7 @@
                     {% if not forloop.last %}
                         <a href="{% url 'stuff:location-list' id %}"
                             hx-get="{% url 'stuff:location-list' id %}"
-                            hx-target="#id_content"
+                            hx-target="#content"
                             hx-push-url="true"
                             class="link link-hover link-primary">{{ name }}</a>
                     {% else %}
@@ -39,7 +39,7 @@
         </div>
         <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
             <button hx-get="{% url 'stuff:location-new' %}{% querystring parent=parent_id %}"
-                hx-target="#id_content"
+                hx-target="#content"
                 hx-push-url="true"
                 type="button"
                 class="btn btn-primary hidden sm:inline-flex">
@@ -69,7 +69,7 @@
                             <td class="text-sm font-medium text-base-content">
                                 {% if location.is_leaf %}
                                 <a hx-get="{% url 'stuff:location-detail' location.pk %}"
-                                   hx-target="#id_content"
+                                   hx-target="#content"
                                    hx-push-url="true"
                                    href="#"
                                     class="link link-hover link-primary" >
@@ -77,7 +77,7 @@
                                 </a>
                                 {% else %}
                                 <a hx-get="{% url 'stuff:location-list' location.pk %}"
-                                   hx-target="#id_content"
+                                   hx-target="#content"
                                    hx-push-url="true"
                                    href="#"
                                     class="link link-hover link-primary" >
@@ -101,7 +101,7 @@
                             <td class="text-right text-sm font-medium">
                                 <a href="#"
                                    hx-get="{% url 'stuff:location-edit' location.pk %}"
-                                   hx-target="#id_content"
+                                   hx-target="#content"
                                    hx-push-url="true"
                                     class="link link-hover link-primary">Edit</a>
                             </td>

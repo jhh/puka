@@ -105,7 +105,7 @@ def bookmark_delete(_request, pk):
     bookmark = get_object_or_404(Bookmark, pk=pk)
     logger.debug("delete: Bookmark %s", bookmark)
     bookmark.delete()
-    return HttpResponseLocation(reverse("bookmarks:list"), target="#id_content")
+    return HttpResponseLocation(reverse("bookmarks:list"), target="#content")
 
 
 @require_http_methods(["GET"])

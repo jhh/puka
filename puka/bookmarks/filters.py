@@ -43,7 +43,7 @@ class BookmarkFilter(django_filters.FilterSet):
         form = super().form
         form.helper = FormHelper()
         form.helper.form_method = "GET"
-        form.helper.attrs = {"hx-get": "", "hx-target": "#id_content"}
+        form.helper.attrs = {"hx-get": "", "hx-target": "#content"}
         form.helper.layout = Layout(
             Div(
                 Field("text", wrapper_class="sm:col-span-3"),

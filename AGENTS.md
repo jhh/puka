@@ -111,7 +111,7 @@
 - htmx partials use `#fragment` syntax and `{% partialdef %}`.
 - Preserve existing layout structure (root -> sidebar -> app).
 - Use Tailwind + daisyUI classes; keep class names inline.
-- Use `hx-target="#id_content"` for main content swaps.
+- Use `hx-target="#content"` for main content swaps.
 
 ## Frontend JS/CSS
 - Edit `puka/static/puka/base.css` and `base.js` only.

@@ -18,7 +18,7 @@ class CancelButton(HTML):
         super().__init__(
             f"""<a href="{{% url '{url_name}' %}}"
             hx-get="{{% url '{url_name}' %}}"
-            hx-target="#id_content"
+            hx-target="#content"
             hx-push-url="true"
             class="text-sm/6 font-semibold text-gray-900">{label}</a>""",
         )

@@ -39,7 +39,7 @@
                             <div>
                                 <a href="{% url 'stuff:item-detail' pk=inv.item.id %}"
                                     hx-get="{% url 'stuff:item-detail' pk=inv.item.id %}"
-                                    hx-target="#id_content"
+                                    hx-target="#content"
                                     hx-push-url="true"
                                     class="link link-hover link-primary">
                                         {{ inv.item.name }}

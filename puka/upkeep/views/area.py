@@ -67,4 +67,4 @@ class AreaDeleteView(View):
     def post(self, _request, pk):
         area = get_object_or_404(Area, pk=pk)
         area.delete()
-        return HttpResponseLocation(reverse("upkeep:area-list"), target="#id_content")
+        return HttpResponseLocation(reverse("upkeep:area-list"), target="#content")

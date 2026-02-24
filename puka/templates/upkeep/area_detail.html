@@ -31,26 +31,26 @@
                         <a href="{% url 'upkeep:area-edit' area.id %}"
                             hx-get="{% url 'upkeep:area-edit' area.id %}"
                             hx-push-url="true"
-                            hx-target="#id_content">Edit area</a>
+                            hx-target="#content">Edit area</a>
                     </li>
                     <li>
                         <a href="#"
                             hx-get="{% url 'upkeep:task-new' %}{% querystring area=area.id %}"
                             hx-push-url="true"
-                            hx-target="#id_content">Add task</a>
+                            hx-target="#content">Add task</a>
                     </li>
                     <li>
                         <a href="#"
                             hx-get="{% url 'upkeep:bookmark-select' area.id %}"
                             hx-push-url="true"
-                            hx-target="#id_content">Add bookmark</a>
+                            hx-target="#content">Add bookmark</a>
                     </li>
                     <li>
                         <a href="#"
                             hx-post="{% url 'upkeep:area-delete' area.id %}"
                             hx-confirm="Are you sure you want to delete this area?"
                             hx-params="none"
-                            hx-target="#id_content">Delete area</a>
+                            hx-target="#content">Delete area</a>
                     </li>
                 </ul>
             </details>
@@ -82,7 +82,7 @@
                     <tr>
                         <td class="text-sm font-medium text-base-content">
                             <a hx-get="{% url 'upkeep:task-detail' task.id %}"
-                                hx-target="#id_content"
+                                hx-target="#content"
                                 hx-push-url="true"
                                 href="#"
                                 class="link link-hover link-primary" >

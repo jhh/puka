@@ -33,5 +33,5 @@ class TaskItemDeleteView(View):
         task_item.delete()
         return HttpResponseLocation(
             reverse("upkeep:task-detail", args=[task_item.task_id]),
-            target="#id_content",
+            target="#content",
         )

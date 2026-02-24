@@ -37,7 +37,7 @@ class ScheduleDeleteView(View):
         schedule.delete()
         return HttpResponseLocation(
             reverse("upkeep:task-detail", args=[task_id]),
-            target="#id_content",
+            target="#content",
         )
 
 
@@ -53,5 +53,5 @@ class ScheduleToggleView(View):
         schedule.save()
         return HttpResponseLocation(
             reverse("upkeep:task-detail", args=[schedule.task_id]),
-            target="#id_content",
+            target="#content",
         )
