@@ -9,3 +9,4 @@ class TagFilter(django_filters.CharFilter):
         kwargs.setdefault("lookup_expr", "in")
         kwargs.setdefault("distinct", True)
         super().__init__(*args, **kwargs)
+        self.field.widget.attrs["class"] = "input w-full"

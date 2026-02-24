@@ -116,6 +116,7 @@
                     <div class="text-xs opacity-60 mt-1">
                         <span class="hero-cloud-mini size-3 opacity-40"></span> {{ bookmark.url|domain }}
                         <span class="font-black mx-1">·</span> {{ bookmark.created|date:'F Y'|lower }}
+                        {% if not bookmark.active %}<span class="font-black mx-1">·</span> inactive{% endif %}
                     </div>
                 </div>
             </div>
