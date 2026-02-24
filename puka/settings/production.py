@@ -13,6 +13,8 @@ DEBUG = False
 
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["puka.j3ff.io"])
 
+DATABASES["default"]["CONN_HEALTH_CHECKS"] = True  # noqa: F405
+
 if env.path("DJANGO_STATICFILES_DIR", None):
     STATICFILES_DIRS.append(str(env.path("DJANGO_STATICFILES_DIR")))  # noqa: F405
 
