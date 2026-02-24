@@ -127,7 +127,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="/" class="gap-3">
+                            <a  hx-boost="true" href="/" class="gap-3">
                                 <span class="hero-home size-5"></span>
                                 <span>Overview</span>
                             </a>
@@ -139,7 +139,7 @@
                                     <span>Bookmarks</span>
                                 </summary>
                                 <ul>
-                                    <li><a href="{% url 'bookmarks:list' %}">Browse</a></li>
+                                    <li><a hx-boost="true" href="{% url 'bookmarks:list' %}">Browse</a></li>
                                     <li><a href="#">Filter</a></li>
                                 </ul>
                             </details>
