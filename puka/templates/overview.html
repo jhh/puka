@@ -1,0 +1,55 @@
+{% extends "root.html" %}
+{% load static %}
+
+{% block title %}Overview{% endblock %}
+
+{% block content %}
+    <h1 class="text-2xl font-semibold text-base-content">Welcome to Puka</h1>
+    <div class="mt-6 grid gap-4 lg:grid-cols-3">
+        <a
+            href="{% url 'bookmarks:list' %}"
+            class="card border border-base-200 bg-base-100 shadow-sm transition hover:shadow"
+        >
+            <div class="card-body relative">
+                <span
+                    class="hero-bookmark absolute right-4 top-4 size-5 text-base-content/40"
+                    aria-hidden="true"
+                ></span>
+                <h2 class="card-title text-base">Bookmarks</h2>
+                <p class="text-sm text-base-content/70">
+                    There are XXX active bookmarks.
+                </p>
+            </div>
+        </a>
+        <a href="#" class="card border border-base-200 bg-base-100 shadow-sm transition hover:shadow">
+            <div class="card-body relative">
+                <span
+                    class="hero-archive-box absolute right-4 top-4 size-5 text-base-content/40"
+                    aria-hidden="true"
+                ></span>
+                <h2 class="card-title text-base">Inventory</h2>
+                <p class="text-sm text-base-content/70">There are XXX active items.</p>
+            </div>
+        </a>
+        <a href="#" class="card border border-base-200 bg-base-100 shadow-sm transition hover:shadow">
+            <div class="card-body relative">
+                <span
+                    class="hero-clipboard-document-check absolute right-4 top-4 size-5 text-base-content/40"
+                    aria-hidden="true"
+                ></span>
+                <h2 class="card-title text-base">Tasks</h2>
+                <p class="text-sm text-base-content/70">There are XXX active tasks.</p>
+            </div>
+        </a>
+        <a href="#" class="card border border-base-200 bg-base-100 shadow-sm transition hover:shadow">
+            <div class="card-body relative">
+                <span
+                    class="hero-tag absolute right-4 top-4 size-5 text-base-content/40"
+                    aria-hidden="true"
+                ></span>
+                <h2 class="card-title text-base">Tags</h2>
+                <p class="text-sm text-base-content/70">There are XXX active tags.</p>
+            </div>
+        </a>
+    </div>
+{% endblock content %}

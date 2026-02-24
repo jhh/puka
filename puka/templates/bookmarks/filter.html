@@ -1,22 +1,57 @@
-{% extends "bookmarks/base.html" %}
-{% load crispy_forms_tags %}
+{% extends "root.html" %}
 
 {% block title %}Filter{% endblock %}
+
+{% block breadcrumbs %}
+<ul>
+    <li><a href="{% url 'home' %}">Overview</a></li>
+    <li><a href="{% url 'bookmarks:list' %}">Bookmarks</a></li>
+    <li><a href="{% url 'bookmarks:list' %}">Filter</a></li>
+</ul>
+{% endblock breadcrumbs %}
 
 {% block content %}
   {% partial filter-partial %}
 {% endblock content %}
 
 {% partialdef filter-partial %}
-  {% if htmx %}
-    <title>Filter - HTMX</title>
-    {% include "sidebar.html#nav-mobile-partial" %}
-    {% include "sidebar.html#nav-desktop-partial" %}
-    {% include "bookmarks/base.html#menu-partial" %}
-  {% endif %}
-  {% crispy filter.form %}
-  <ul id="id_bookmarks" class="list bg-base-100 shadow-sm">
-    {% include "bookmarks/list.html#list-items-partial" %}
+<form method="get" class="mb-4">
+    <div class="fieldset mb-2">
+        <label>
+            <span class="label mb-1">Title or description contains words</span>
+            {{ filter.form.text }}
+        </label>
+    </div>
+    <div class="fieldset mb-2">
+        <label>
+            <span class="label mb-1">Tag name is in</span>
+            {{ filter.form.tags }}
+        </label>
+    </div>
+    <div class="fieldset grid-cols-2 mb-2">
+        <label>
+            <div class="label mb-1 block">Year created</div>
+            {{ filter.form.created }}
+        </label>
+        <label>
+            <div class="label mb-1 block">Active</div>
+            {{ filter.form.active }}
+        </label>
+    </div>
+    <footer>
+        <button class="btn btn-primary">  Search </button>
+        <a
+            href="{% url 'bookmarks:filter' %}"
+            class="btn btn-primary btn-soft"
+        > Clear </a>
+    </footer>
+</form>
+</form>
+  <ul
+      id="id_bookmarks"
+      class="list rounded-box border border-base-300 shadow-sm bg-base-100"
+  >
+    {% include "bookmarks/index.html#list-items-partial" %}
   </ul>
 
   <script>

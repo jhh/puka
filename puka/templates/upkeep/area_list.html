@@ -34,7 +34,7 @@
             value="{{ request.GET.query }}"
             hx-get="{% url 'upkeep:area-list' %}"
             hx-trigger="change"
-            hx-target="#id_content"
+            hx-target="#content"
             class="grow"
             x-on:keyup.esc.prevent.stop="$el.value = ''; $el.blur(); htmx.trigger($el, 'change')" />
             <kbd class="hidden md:inline kbd kbd-sm">⌘</kbd>
@@ -46,7 +46,7 @@
         <button hx-get="{% url 'upkeep:area-new' %}"
             type="button"
             hx-trigger="click"
-            hx-target="#id_content"
+            hx-target="#content"
             hx-push-url="true"
             class="btn btn-primary hidden md:inline-flex" >
             New Area
@@ -54,7 +54,7 @@
         <button hx-get="{% url 'upkeep:area-new' %}"
             type="button"
             hx-trigger="click"
-            hx-target="#id_content"
+            hx-target="#content"
             hx-push-url="true"
             class="btn btn-primary md:hidden" >
             New
@@ -81,7 +81,7 @@
                     <td class="text-sm font-medium text-base-content">
                         <a hx-get="{% url 'upkeep:area-detail' area.id %}"
                            href="{% url 'upkeep:area-detail' area.id %}"
-                           hx-target="#id_content"
+                           hx-target="#content"
                            hx-push-url="true"
                            class="link link-hover link-primary" >
                             {{ area.name }}
@@ -98,7 +98,7 @@
                     <td class="text-right text-sm font-medium">
                         <a href="#"
                            hx-get="{% url 'upkeep:area-edit' area.id %}"
-                           hx-target="#id_content"
+                           hx-target="#content"
                            hx-push-url="true"
                            class="link link-hover link-primary">Edit</a>
                     </td>
@@ -124,7 +124,7 @@
             {% if page_obj.has_previous %}
                 <a href="{% querystring page=page_obj.previous_page_number %}"
                     hx-get="{% querystring page=page_obj.previous_page_number %}"
-                    hx-target="#id_content"
+                    hx-target="#content"
                     hx-push-url="true"
                     class="btn btn-sm btn-outline">Previous</a>
             {% endif %}
@@ -132,7 +132,7 @@
             {% if page_obj.has_next %}
                 <a href="{% querystring page=page_obj.next_page_number %}"
                     hx-get="{% querystring page=page_obj.next_page_number %}"
-                    hx-target="#id_content"
+                    hx-target="#content"
                     hx-push-url="true"
                     class="btn btn-sm btn-outline ml-3">Next</a>
             {% endif %}

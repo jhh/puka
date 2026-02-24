@@ -43,7 +43,7 @@ class BookmarkSelectView(ListView):
         item.bookmarks.add(bookmark)
         return HttpResponseLocation(
             reverse("stuff:item-detail", args=[item.pk]),
-            target="#id_content",
+            target="#content",
         )
 
 
@@ -53,4 +53,4 @@ def bookmark_delete_view(request, item_pk):
     bookmark_pk = request.POST.get("bookmark_pk")
     bookmark = Bookmark.objects.get(pk=bookmark_pk)
     item.bookmarks.remove(bookmark)
-    return HttpResponseLocation(reverse("stuff:item-detail", args=[item_pk]), target="#id_content")
+    return HttpResponseLocation(reverse("stuff:item-detail", args=[item_pk]), target="#content")

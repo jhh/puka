@@ -1,4 +1,4 @@
-{% extends "sidebar.html" %}
+{% extends "root.html" %}
 {% load utils %}
 
 {% block title %}Stuff{% endblock %}
@@ -17,7 +17,7 @@
     <li>
         <a
             hx-get="{% url 'stuff:location-list' pk=0 %}"
-            hx-target="#id_content"
+            hx-target="#content"
             hx-push-url="true"
             @click="$refs.sidebarDrawer.checked = false"
             href="#"

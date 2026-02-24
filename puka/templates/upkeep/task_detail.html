@@ -26,7 +26,7 @@
                 <a href="{% url 'upkeep:area-detail' task.area_id %}"
                     hx-get="{% url 'upkeep:area-detail' task.area_id %}"
                     hx-push-url="true"
-                    hx-target="#id_content"
+                    hx-target="#content"
                     class="link link-hover link-primary">{{ task.area.name }}</a> : {{ task.name }}</h3>
             <p class="mt-1 max-w-2xl text-sm text-base-content/70">{{ task.notes }}</p>
             {% if task.interval %}
@@ -44,26 +44,26 @@
                     <a href="{% url 'upkeep:task-edit' task.id %}"
                         hx-get="{% url 'upkeep:task-edit' task.id %}"
                         hx-push-url="true"
-                        hx-target="#id_content">Edit task</a>
+                        hx-target="#content">Edit task</a>
                 </li>
                 <li>
                     <a href="#"
                         hx-post="{% url 'upkeep:task-delete' task.id %}"
                         hx-confirm="Are you sure you want to delete this item?"
                         hx-params="none"
-                        hx-target="#id_content">Delete task</a>
+                        hx-target="#content">Delete task</a>
                 </li>
                 <li>
                     <a href="{% url 'upkeep:schedule-new' task.id %}"
                         hx-get="{% url 'upkeep:schedule-new' task.id %}"
                         hx-push-url="true"
-                        hx-target="#id_content">Create schedule</a>
+                        hx-target="#content">Create schedule</a>
                 </li>
                 <li>
                     <a href="{% url 'upkeep:task-item-new' task.id %}"
                         hx-get="{% url 'upkeep:task-item-new' task.id %}"
                         hx-push-url="true"
-                        hx-target="#id_content">Add item</a>
+                        hx-target="#content">Add item</a>
                 </li>
             </ul>
         </details>
@@ -96,7 +96,7 @@
                     <td class="hidden md:table-cell text-sm text-base-content/70">{{ schedule.notes }}</td>
                     <td class="hidden md:table-cell text-right">
                         <button hx-get="{% url 'upkeep:schedule-edit' schedule.id %}"
-                            hx-target="#id_content"
+                            hx-target="#content"
                             hx-push-url="true"
                             type="button"
                             class="btn btn-ghost btn-xs">edit</button>
@@ -129,7 +129,7 @@
                 <tr class="group">
                     <td class="text-sm text-base-content">
                         <a hx-get="{% url 'stuff:item-detail' tc.item.pk %}"
-                            hx-target="#id_content"
+                            hx-target="#content"
                             hx-push-url="true"
                             href="#"
                             class="link link-hover link-primary" >
@@ -141,7 +141,7 @@
                     <td class="hidden md:table-cell text-sm text-base-content/70">{{ tc.item.notes }}</td>
                     <td class="hidden md:table-cell text-right">
                         <button hx-get="{% url 'upkeep:task-item-edit' tc.id %}"
-                            hx-target="#id_content"
+                            hx-target="#content"
                             hx-push-url="true"
                             type="button"
                             class="btn btn-ghost btn-xs">edit</button>

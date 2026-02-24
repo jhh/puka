@@ -35,7 +35,7 @@
                 value="{{ query }}"
                 hx-get="{% url 'stuff:item-list' %}"
                 hx-trigger="change"
-                hx-target="#id_content"
+                hx-target="#content"
                 class="grow"
                 x-on:keyup.esc.prevent.stop="$el.value = ''; $el.blur(); htmx.trigger($el, 'change')" />
                 <kbd class="hidden md:inline kbd kbd-sm">⌘</kbd>
@@ -47,7 +47,7 @@
         <button hx-get="{% url 'stuff:item-new' %}"
             type="button"
             hx-trigger="click"
-            hx-target="#id_content"
+            hx-target="#content"
             hx-push-url="true"
             class="btn btn-primary hidden md:inline-flex" >
             New Item
@@ -55,7 +55,7 @@
         <button hx-get="{% url 'stuff:item-new' %}"
             type="button"
             hx-trigger="click"
-            hx-target="#id_content"
+            hx-target="#content"
             hx-push-url="true"
             class="btn btn-primary md:hidden" >
             New
@@ -79,7 +79,7 @@
                 <tr>
                     <td class="w-3/4 whitespace-normal sm:whitespace-nowrap">
                         <a hx-get="{% url 'stuff:item-detail' item.pk %}"
-                            hx-target="#id_content"
+                            hx-target="#content"
                             hx-push-url="true"
                             href="#"
                             class="link link-hover link-primary" >
@@ -92,7 +92,7 @@
                     {% for inv in item.inventories.all %}
                         <a href="{% url 'stuff:location-detail' pk=inv.location.id %}"
                             hx-get="{% url 'stuff:location-detail' pk=inv.location.id %}"
-                            hx-target="#id_content"
+                            hx-target="#content"
                             hx-push-url="true"
                             class="link link-hover link-secondary">
                             {{ inv.location.name }}</a>{% if not forloop.last %}, {% endif %}
@@ -104,7 +104,7 @@
                             <a href="{% url 'stuff:item-list' %}?query=%23{{ tag }}"
                                 hx-get="{% url 'stuff:item-list' %}?query=%23{{ tag }}"
                                 hx-push-url="true"
-                                hx-target="#id_content"
+                                hx-target="#content"
                                 class="link-hover text-error">{{ tag }}</a>
                         </li>
                     {% endfor %}
@@ -131,7 +131,7 @@
             {% if page_obj.has_previous %}
                 <a href="{% querystring page=page_obj.previous_page_number query=query %}"
                     hx-get="{% querystring page=page_obj.previous_page_number query=query %}"
-                    hx-target="#id_content"
+                    hx-target="#content"
                     hx-push-url="true"
                     class="btn btn-sm btn-outline">Previous</a>
             {% endif %}
@@ -139,7 +139,7 @@
             {% if page_obj.has_next %}
                 <a href="{% querystring page=page_obj.next_page_number query=query %}"
                     hx-get="{% querystring page=page_obj.next_page_number query=query %}"
-                    hx-target="#id_content"
+                    hx-target="#content"
                     hx-push-url="true"
                     class="btn btn-sm btn-outline ml-3">Next</a>
             {% endif %}

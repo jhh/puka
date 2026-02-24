@@ -26,6 +26,7 @@ puka-manage = "puka.manage:main"
 [dependency-groups]
 dev = [
     { include-group = "test" },
+    { include-group = "pre-commit" },
     "django-debug-toolbar>=4.4.6",
     "ipython>=8.30.0",
     "rich>=13.9.4",

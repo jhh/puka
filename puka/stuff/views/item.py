@@ -100,7 +100,7 @@ class ItemDeleteView(View):
     def post(self, _request, pk):
         item = get_object_or_404(Item, pk=pk)
         item.delete()
-        return HttpResponseLocation(reverse("stuff:item-list"), target="#id_content")
+        return HttpResponseLocation(reverse("stuff:item-list"), target="#content")
 
 
 def adjust_inventory(request, pk):
@@ -136,5 +136,5 @@ class InventoryDeleteView(View):
         inventory.delete()
         return HttpResponseLocation(
             reverse("stuff:item-detail", kwargs={"pk": item_id}),
-            target="#id_content",
+            target="#content",
         )

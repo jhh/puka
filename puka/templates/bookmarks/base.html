@@ -14,7 +14,7 @@
     class="menu -mx-2 mt-2">
     <li>
         <a hx-get="{% url 'bookmarks:filter' %}"
-            hx-target="#id_content"
+            hx-target="#content"
             hx-push-url="true"
             @click="$refs.sidebarDrawer.checked = false"
             href="#"
@@ -26,7 +26,7 @@
 
     <li>
         <a hx-get="{% url 'bookmarks:tags' %}"
-            hx-target="#id_content"
+            hx-target="#content"
             hx-push-url="true"
             @click="$refs.sidebarDrawer.checked = false"
             href="#"
