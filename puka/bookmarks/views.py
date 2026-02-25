@@ -40,9 +40,9 @@ def bookmarks(request):
     page_obj = paginator.get_page(page_number)
 
     if request.htmx and not request.htmx.boosted:
-        template = "bookmarks/index.html#list-items-partial"
+        template = "bookmarks/bookmark_list.html#list-items-partial"
     else:
-        template = "bookmarks/index.html"
+        template = "bookmarks/bookmark_list.html"
 
     response = render(request, template, {"page_obj": page_obj})
     return trigger_client_event(response, "clearSearch", {}) if clear_search else response
@@ -58,7 +58,7 @@ def bookmarks_filter(request):
     # if paging, just render the list items, otherwise this is a navigation to the filter page contents
     if request.htmx and not request.htmx.boosted:
         template = (
-            "bookmarks/index.html#list-items-partial"
+            "bookmarks/bookmark_list.html#list-items-partial"
             if page_number
             else "bookmarks/filter.html#filter-partial"
         )
