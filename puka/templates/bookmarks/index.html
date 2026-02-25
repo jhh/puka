@@ -20,8 +20,9 @@
 {% endblock breadcrumbs %}
 
 {% block content %}
-<div class="flex justify-end mb-4 mt-0">
+<div class="flex justify-end gap-4 mb-4 mt-0">
     <div
+        class="w-80"
         x-data="{search: false}"
         x-on:keydown.meta.k.window="$focus.focus($refs.searchInput)">
         <label class="input">
