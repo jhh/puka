@@ -18,7 +18,7 @@ class LocationListView(ListView):
     context_object_name = "locations"
 
     def get_template_names(self):
-        return get_template(self.request, "stuff/location_list.html", "#list-partial")
+        return "stuff/location_list.html"
 
     def get_queryset(self):
         pk = self.kwargs.get("pk")
