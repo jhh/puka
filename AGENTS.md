@@ -6,6 +6,7 @@
 - Frontend uses Tailwind + daisyUI + htmx + Alpine + esbuild.
 - Python commands are run via `uv run ...`; tasks via `just`.
 - Nix is used for deployment; local dev uses just + uv.
+- GitButler cli is used
 
 ## Key Paths
 - `puka/`: Django project, apps, settings, templates.

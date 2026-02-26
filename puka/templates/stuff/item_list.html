@@ -13,7 +13,7 @@
 <div class="flex justify-end gap-2 mb-4 mt-0">
     <div
         class="w-80"
-        x-data="{search: false}"
+        x-data="{}"
         x-on:keydown.meta.k.window="$focus.focus($refs.searchInput)">
         <label class="input">
             <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -36,10 +36,10 @@
                 placeholder="Search"
                 value="{{ query }}"
                 hx-get="{% url 'stuff:item-list' %}"
-                hx-trigger="keyup changed delay:0.5s"
+                hx-trigger="input changed delay:0.5s"
                 hx-target="#content"
                 class="grow"
-                x-on:keyup.esc.prevent.stop="$el.value = ''; $el.blur(); htmx.trigger($el, 'change')"
+                x-on:keyup.esc.prevent.stop="$el.value = ''; $el.blur(); $el.dispatchEvent(new Event('input', { bubbles: true }))"
             >
             <kbd class="kbd kbd-sm">⌘</kbd>
             <kbd class="kbd kbd-sm">K</kbd>
