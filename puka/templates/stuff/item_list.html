@@ -1,15 +1,16 @@
-{% extends "stuff/base.html" %}
+{% extends "root.html" %}
 
-{% block title %}Items{% endblock %}
+{% block title %}Inventory{% endblock %}
 
-{% partialdef list-partial %}
-{% if htmx %}
-    <title>Items - HTMX</title>
-    {% include "sidebar.html#nav-mobile-partial" %}
-    {% include "sidebar.html#nav-desktop-partial" %}
-    {% include "stuff/base.html#menu-partial" %}
-{% endif %}
+{% block breadcrumbs %}
+<ul>
+    <li><a href="{% url 'home' %}">Overview</a></li>
+    <li><a href="{% url 'stuff:item-list' %}">Inventory</a></li>
+</ul>
+{% endblock breadcrumbs %}
 
+{% block content %}
+{% partialdef list-partial inline %}
 <div class="flex justify-end gap-2 mb-4 mt-0">
     <div
         class="w-80"
@@ -64,7 +65,7 @@
     </div>
 </div>
 
-<div class="rounded-box border border-base-300 bg-base-100">
+<div class="overflow-x-auto rounded-box border border-base-300 bg-base-100">
     <div class="h-[calc(100vh-14rem)] overflow-x-auto">
         <table class="table table-pin-rows table-zebra">
             <thead>
@@ -156,7 +157,4 @@
     </div>
 </div>
 {% endpartialdef list-partial %}
-
-{% block content %}
-{% partial list-partial %}
 {% endblock content %}

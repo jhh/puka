@@ -9,7 +9,7 @@ from puka.bookmarks.models import Bookmark
 def test_bookmarks(admin_client, succulents_bookmark):
     url = reverse("bookmarks:list")
     response = admin_client.get(url)
-    assertTemplateUsed(response, "bookmarks/index.html")
+    assertTemplateUsed(response, "bookmarks/bookmark_list.html")
     assertContains(response, succulents_bookmark.title)
     assertContains(response, succulents_bookmark.description)
     assertContains(response, succulents_bookmark.url)
