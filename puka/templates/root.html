@@ -138,8 +138,8 @@
                                     <span class="hero-bookmark size-5"></span>
                                     <span>Bookmarks</span>
                                 </summary>
-                                <ul>
-                                    <li><a hx-boost="true" href="{% url 'bookmarks:list' %}">Browse</a></li>
+                                <ul hx-boost:inherited="true">
+                                    <li><a  href="{% url 'bookmarks:list' %}">Browse</a></li>
                                     <li><a href="{% url 'bookmarks:filter' %}">Filter</a></li>
                                 </ul>
                             </details>

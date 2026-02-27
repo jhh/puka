@@ -80,10 +80,8 @@
                 <tr>
                     <td class="w-3/4 whitespace-nowrap">
                         <a
-                            hx-get="{% url 'stuff:item-detail' item.pk %}"
-                            hx-target="#content"
-                            hx-push-url="true"
-                            href="#"
+                            href="{% url 'stuff:item-detail' item.pk %}"
+                            hx-boost="true"
                             class="link link-hover font-semibold"
                         >
                             {{ item.name }}

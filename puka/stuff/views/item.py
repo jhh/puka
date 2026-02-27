@@ -3,11 +3,13 @@ from types import MappingProxyType
 
 from django.db import transaction
 from django.db.models import Sum
+from django.http import HttpRequest as HttpRequestBase
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView, View
 from django_htmx.http import HttpResponseLocation
+from django_htmx.middleware import HtmxDetails
 
 from puka.core.views import get_template
 from puka.stuff.forms import InventoryForm, ItemForm
@@ -15,6 +17,10 @@ from puka.stuff.models import Bookmark, Inventory, Item
 from puka.stuff.services import adjust_inventory_quantity, get_or_create_location
 
 logger = logging.getLogger(__name__)
+
+
+class HttpRequest(HttpRequestBase):
+    htmx: HtmxDetails
 
 
 class ItemListView(ListView):
@@ -43,9 +49,14 @@ class ItemDetailView(DetailView):
     model = Item
     context_object_name = "item"
     extra_context = MappingProxyType({"bookmark_delete_url": "stuff:bookmark-delete"})
+    request: HttpRequest
 
     def get_template_names(self):
-        return get_template(self.request, "stuff/item_detail.html", "#detail-partial")
+        if self.request.htmx and not self.request.htmx.boosted:
+            template = "stuff/item_detail.html#detail-partial"
+        else:
+            template = "stuff/item_detail.html"
+        return template
 
     def get_queryset(self):
         return (
