@@ -85,4 +85,4 @@ class TaskDeleteView(View):
     def post(self, _request, pk):
         task = get_object_or_404(Task, pk=pk)
         task.delete()
-        return HttpResponseLocation(reverse("upkeep:task-list"), target="#id_content")
+        return HttpResponseLocation(reverse("upkeep:task-list"), target="#content")

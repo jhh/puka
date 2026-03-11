@@ -1,143 +1,198 @@
-{% extends "stuff/base.html" %}
+{% extends "root.html" %}
 
 {% block title %}{{ item.name }}{% endblock %}
 
-{% partialdef field-partial %}
-<div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-    <dt class="text-sm font-medium text-base-content">{{ label }}</dt>
-    <dd class="mt-1 text-sm text-base-content/70 sm:col-span-2 sm:mt-0">{{ value }}</dd>
-</div>
-{% endpartialdef field-partial %}
+{% block breadcrumbs %}
+<ul>
+    <li><a href="{% url 'home' %}">Overview</a></li>
+    <li><a href="{% url 'stuff:item-list' %}">Inventory</a></li>
+    <li><a href="{% url 'stuff:item-detail' item.pk %}">{{ item.name }}</a></li>
+</ul>
+{% endblock breadcrumbs %}
 
-{% partialdef detail-partial %}
-{% if htmx %}
-    <title>{{ item.name }} - HTMX</title>
-    {% include "sidebar.html#nav-mobile-partial" %}
-    {% include "sidebar.html#nav-desktop-partial" %}
-    {% include "stuff/base.html#menu-partial" %}
-{% endif %}
-
+{% block content %}
+{% partialdef detail-partial inline %}
 <div class="card bg-base-100 border border-base-300 rounded-box">
     <div class="card-body gap-6">
         <div class="flex justify-between">
             <div>
-            <h3 class="text-base font-semibold text-base-content">Item Detail</h3>
-            <p class="mt-1 max-w-2xl text-sm text-base-content/70">Item details for {{ item.name }}.</p>
+                <h3 class="text-base font-semibold text-base-content">{{ item.name }}</h3>
             </div>
             <details class="dropdown dropdown-end">
                 <summary class="btn btn-ghost btn-sm">Manage</summary>
                 <ul class="menu dropdown-content z-10 mt-2 w-56 rounded-box bg-base-100 p-2 shadow">
                     <li>
-                        <a href="{% url 'stuff:item-edit' item.id %}"
-                            hx-get="{% url 'stuff:item-edit' item.id %}"
+                        <a href="{% url 'stuff:item-edit' item.pk %}"
+                            hx-get="{% url 'stuff:item-edit' item.pk %}"
                             hx-push-url="true"
-                            hx-target="#id_content">Edit item</a>
+                            hx-target="#content">Edit item</a>
                     </li>
                     <li>
                         <a href="#"
-                            hx-get="{% url 'stuff:inventory-new' item.id %}"
+                            hx-get="{% url 'stuff:inventory-new' item.pk %}"
                             hx-push-url="true"
-                            hx-target="#id_content">Create inventory</a>
+                            hx-target="#content">Create inventory</a>
                     </li>
                     <li>
                         <a href="#"
-                            hx-get="{% url 'stuff:bookmark-select' item.id %}"
+                            hx-get="{% url 'stuff:bookmark-select' item.pk %}"
                             hx-push-url="true"
-                            hx-target="#id_content">Add bookmark</a>
+                            hx-target="#content">Add bookmark</a>
                     </li>
                     <li>
                         <a href="#"
-                            hx-post="{% url 'stuff:item-delete' item.id %}"
+                            hx-post="{% url 'stuff:item-delete' item.pk %}"
                             hx-confirm="Are you sure you want to delete this item?"
                             hx-params="none"
-                            hx-target="#id_content">Delete item</a>
+                            hx-target="#content">Delete item</a>
                     </li>
                 </ul>
             </details>
         </div>
     </div>
-    <div class="border-t border-base-300">
-        <dl class="divide-y divide-base-200">
-            {% with label="Name" value=item.name %}
-                {% partial field-partial %}
-            {% endwith %}
-            {% with label="Notes" value=item.notes %}
-                {% partial field-partial %}
-            {% endwith %}
-            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-base-content">Inventory</dt>
-                <dd class="mt-2 text-sm text-base-content sm:col-span-2 sm:mt-0">
-                    <ul role="list" class="list list-sm border border-base-300 rounded-box bg-base-100">
-                    {% for inv in item.inventories.all %}
-                        <li class="list-row">
-                            <div >
-                                <a href="{% url 'stuff:location-detail' pk=inv.location.id %}"
-                                    hx-get="{% url 'stuff:location-detail' pk=inv.location.id %}"
-                                    hx-target="#id_content"
-                                    hx-push-url="true"
-                                    class="link link-hover link-primary">
-                                    {{ inv.location }}
-                                </a>
-                                <button hx-get="{% url 'stuff:inventory-edit' inv.id %}"
-                                    hx-target="#id_content"
-                                    hx-push-url="true"
-                                    type="button"
-                                    class="btn btn-ghost btn-xs ml-2">edit</button>
-
-                            </div>
-                            <div >
-                                <button hx-post="{% url 'stuff:inventory-adjust' pk=inv.id %}"
-                                    hx-target="#id_quantity_{{ inv.id }}"
-                                    hx-vals='{"quantity": -1}'
-                                    type="button"
-                                    class="btn btn-primary btn-circle btn-xs mr-2">
-                                    <svg class="size-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" >
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
-                                    </svg>
-                                </button>
-                                <span class="inline-block text-center w-6 font-medium" id="id_quantity_{{ inv.id }}">{{ inv.quantity }}</span>
-                                <button hx-post="{% url 'stuff:inventory-adjust' pk=inv.id %}"
-                                    hx-target="#id_quantity_{{ inv.id }}"
-                                    hx-vals='{"quantity": 1}'
-                                    type="button"
-                                    class="btn btn-primary btn-circle btn-xs ml-2">
-                                    <svg class="size-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
-                                        <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </li>
-                    {% endfor %}
-                    </ul>
-                </dd>
+    <div class="border-t border-base-300 px-4 py-6 sm:px-6">
+        {% partialdef field-partial %}
+        <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
+            <dt class="text-sm font-medium text-base-content">{{ label }}</dt>
+            <dd class="mt-1 text-sm text-base-content/70 sm:col-span-2 sm:mt-0">{{ value }}</dd>
+        </div>
+        {% endpartialdef field-partial %}
+        <div x-data="{ activeTab: 'details' }">
+            <div class="grid grid-cols-1 sm:hidden">
+                <label for="item-detail-tab-select" class="sr-only">Select a tab</label>
+                <select
+                    id="item-detail-tab-select"
+                    aria-label="Select a tab"
+                    class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-base-100 py-2 pr-8 pl-3 text-base text-base-content outline-1 -outline-offset-1 outline-base-300 focus:outline-2 focus:-outline-offset-2 focus:outline-primary"
+                    x-model="activeTab"
+                >
+                    <option value="details">Details</option>
+                    <option value="inventory">Inventory</option>
+                    <option value="bookmarks">Bookmarks</option>
+                </select>
+                <svg
+                    viewBox="0 0 16 16"
+                    fill="currentColor"
+                    data-slot="icon"
+                    aria-hidden="true"
+                    class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-base-content/60"
+                >
+                    <path d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
+                </svg>
             </div>
-            {% with label="Reorder Level" value=item.reorder_level %}
-                {% partial field-partial %}
-            {% endwith %}
-            {% if item.tags.all %}
-                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-base-content">Item Tags</dt>
-                    <dd class="mt-1 text-sm text-base-content/70 sm:col-span-2 sm:mt-0">
-                        <ul role="list" class="shrink-0">
-                        {% for tag in item.tags.all %}
-                            <li class="inline">
-                                <a href="{% url 'stuff:item-list' %}?query=%23{{ tag }}"
-                                    hx-get="{% url 'stuff:item-list' %}?query=%23{{ tag }}"
-                                    hx-push-url="true"
-                                    hx-target="#id_content"
-                                    class="link-hover text-error">{{ tag }}</a>
-                            </li>
-                        {% endfor %}
-                        </ul>
-                    </dd>
-                </div>
-            {% endif %}
-            {% include "bookmarks/_detail_page.html" %}
-        </dl>
+            <div class="hidden sm:block">
+                <nav aria-label="Tabs" class="flex space-x-2">
+                    <button
+                        type="button"
+                        @click="activeTab = 'details'"
+                        :aria-current="activeTab === 'details' ? 'page' : undefined"
+                        :class="activeTab === 'details' ? 'bg-base-200 text-base-content' : 'text-base-content/70 hover:text-base-content'"
+                        class="rounded-md px-3 py-2 text-sm font-medium"
+                    >
+                        Details
+                    </button>
+                    <button
+                        type="button"
+                        @click="activeTab = 'inventory'"
+                        :aria-current="activeTab === 'inventory' ? 'page' : undefined"
+                        :class="activeTab === 'inventory' ? 'bg-base-200 text-base-content' : 'text-base-content/70 hover:text-base-content'"
+                        class="rounded-md px-3 py-2 text-sm font-medium"
+                    >
+                        Inventory
+                    </button>
+                    <button
+                        type="button"
+                        @click="activeTab = 'bookmarks'"
+                        :aria-current="activeTab === 'bookmarks' ? 'page' : undefined"
+                        :class="activeTab === 'bookmarks' ? 'bg-base-200 text-base-content' : 'text-base-content/70 hover:text-base-content'"
+                        class="rounded-md px-3 py-2 text-sm font-medium"
+                    >
+                        Bookmarks
+                    </button>
+                </nav>
+            </div>
+
+            <div class="mt-4 rounded-box border border-base-300 bg-base-100 p-4 sm:p-6" x-show="activeTab === 'details'" x-cloak>
+                <dl class="divide-y divide-base-200">
+                    {% with label="Name" value=item.name %}
+                        {% partial field-partial %}
+                    {% endwith %}
+                    {% with label="Notes" value=item.notes %}
+                        {% partial field-partial %}
+                    {% endwith %}
+                    {% with label="Reorder Level" value=item.reorder_level %}
+                        {% partial field-partial %}
+                    {% endwith %}
+                    {% if item.tags.all %}
+                        <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
+                            <dt class="text-sm font-medium text-base-content">Item Tags</dt>
+                            <dd class="mt-1 text-sm text-base-content/70 sm:col-span-2 sm:mt-0">
+                                <ul role="list" class="shrink-0">
+                                {% for tag in item.tags.all %}
+                                    <li class="inline">
+                                        <a href="{% url 'stuff:item-list' %}?query=%23{{ tag }}"
+                                            hx-get="{% url 'stuff:item-list' %}?query=%23{{ tag }}"
+                                            hx-push-url="true"
+                                            hx-target="#content"
+                                            class="link-hover text-error">{{ tag }}</a>
+                                    </li>
+                                {% endfor %}
+                                </ul>
+                            </dd>
+                        </div>
+                    {% endif %}
+                </dl>
+            </div>
+
+            <div class="mt-4 rounded-box border border-base-300 bg-base-100 p-4 sm:p-6" x-show="activeTab === 'inventory'" x-cloak>
+                <ul role="list" class="list list-sm border border-base-300 rounded-box bg-base-100">
+                {% for inv in item.inventories.all %}
+                    <li class="list-row group">
+                        <div>
+                            <a href="{% url 'stuff:location-detail' pk=inv.location.id %}"
+                                hx-get="{% url 'stuff:location-detail' pk=inv.location.id %}"
+                                hx-target="#content"
+                                hx-push-url="true"
+                                class="link link-hover link-primary">
+                                {{ inv.location }}
+                            </a>
+                        </div>
+                        <div class="flex items-center justify-end">
+                            <button hx-post="{% url 'stuff:inventory-adjust' pk=inv.id %}"
+                                hx-target="#id_quantity_{{ inv.id }}"
+                                hx-vals='{"quantity": -1}'
+                                type="button"
+                                class="btn btn-primary btn-circle btn-xs mr-2">
+                                <svg class="size-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
+                                </svg>
+                            </button>
+                            <span class="inline-block w-6 text-center font-medium" id="id_quantity_{{ inv.id }}">{{ inv.quantity }}</span>
+                            <button hx-post="{% url 'stuff:inventory-adjust' pk=inv.id %}"
+                                hx-target="#id_quantity_{{ inv.id }}"
+                                hx-vals='{"quantity": 1}'
+                                type="button"
+                                class="btn btn-primary btn-circle btn-xs ml-2">
+                                <svg class="size-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+                                    <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
+                                </svg>
+                            </button>
+                            <button hx-get="{% url 'stuff:inventory-edit' inv.id %}"
+                                hx-target="#content"
+                                hx-push-url="true"
+                                type="button"
+                                class="btn btn-ghost btn-xs ml-3">edit</button>
+                        </div>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+
+            <div class="mt-4 rounded-box border border-base-300 bg-base-100 p-4 sm:p-6" x-show="activeTab === 'bookmarks'" x-cloak>
+                {% include "bookmarks/_detail_page.html" %}
+            </div>
+        </div>
     </div>
 </div>
 {% endpartialdef detail-partial %}
-
-{% block content %}
-  {% partial detail-partial %}
 {% endblock content %}

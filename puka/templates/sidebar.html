@@ -90,7 +90,7 @@
     class="menu text-neutral-content">
     <li>
         <a hx-get="{% url 'bookmarks:list' %}"
-            hx-target="#id_content"
+            hx-target="#content"
             hx-push-url="true"
             @click="$refs.sidebarDrawer.checked = false"
             href="#"
@@ -106,7 +106,7 @@
 
     <li>
         <a hx-get="{% url 'upkeep:home' %}"
-            hx-target="#id_content"
+            hx-target="#content"
             hx-push-url="true"
             @click="$refs.sidebarDrawer.checked = false"
             href="#"
@@ -122,7 +122,7 @@
 
     <li>
         <a hx-get="{% url 'stuff:item-list' %}"
-            hx-target="#id_content"
+            hx-target="#content"
             hx-push-url="true"
             @click="$refs.sidebarDrawer.checked = false"
             href="#"

@@ -18,7 +18,7 @@ class LocationListView(ListView):
     context_object_name = "locations"
 
     def get_template_names(self):
-        return get_template(self.request, "stuff/location_list.html", "#list-partial")
+        return "stuff/location_list.html"
 
     def get_queryset(self):
         pk = self.kwargs.get("pk")
@@ -83,4 +83,4 @@ class LocationDeleteView(View):
     def post(self, _request, pk):
         location = get_object_or_404(Location, pk=pk)
         location.delete()
-        return HttpResponseLocation(reverse("stuff:location-list", args=[0]), target="#id_content")
+        return HttpResponseLocation(reverse("stuff:location-list", args=[0]), target="#content")

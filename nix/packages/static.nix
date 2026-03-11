@@ -9,22 +9,16 @@ let
   inherit (perSystem.self) venv;
 
   baseCss = "puka/static/puka/base.css";
-  templates = "${pythonSet.python.sitePackages}/crispy_tailwind";
 
   pukaCssJs = pkgs.buildNpmPackage {
     name = "django-static-deps";
     src = ../../.;
-    npmDepsHash = "sha256-bRsh+5yFGcqmTDuWia3nNPIq9ekXMHjtqdzsxtQlG7o=";
+    npmDepsHash = "sha256-i3/Hm7rfT7e8xaO/gOC7sP2vx2sm8ugbajmfzTxsAYY=";
     dontNpmBuild = true;
-
-    patchPhase = ''
-      runHook prePatch
-      substituteInPlace ${baseCss} --replace-fail "../../../.venv/${templates}" "${venv}/${templates}"
-      runHook postPatch
-    '';
 
     buildPhase = ''
       runHook preBuild
+      export HEROICONS_DIR="${perSystem.self.heroicons}/share/heroicons/optimized/"
       npx @tailwindcss/cli --minify --input=${baseCss} --output=$out/puka/main.css
       npx esbuild --bundle --minify --outfile=$out/puka/main.js puka/static/puka/base.js
       runHook postBuild

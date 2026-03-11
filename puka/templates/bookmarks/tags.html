@@ -27,7 +27,7 @@
         href="{% url 'bookmarks:list' %}?tags={{ tag.name }}"
         hx-get="{% url 'bookmarks:list' %}?tags={{ tag.name }}"
         hx-push-url="true"
-        hx-target="#id_content"
+        hx-target="#content"
     >
     <span class="badge badge-primary badge-soft">{{ tag.name }} {{ tag.num_times }}</span>
     </a>

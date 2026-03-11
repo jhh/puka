@@ -34,7 +34,7 @@
             value="{{ request.GET.query }}"
             hx-get="{% url 'upkeep:task-list' %}"
             hx-trigger="change"
-            hx-target="#id_content"
+            hx-target="#content"
             class="grow"
             x-on:keyup.esc.prevent.stop="$el.value = ''; $el.blur(); htmx.trigger($el, 'change')" />
             <kbd class="hidden md:inline kbd kbd-sm">⌘</kbd>
@@ -46,7 +46,7 @@
         <button hx-get="{% url 'upkeep:task-new' %}"
             type="button"
             hx-trigger="click"
-            hx-target="#id_content"
+            hx-target="#content"
             hx-push-url="true"
             class="btn btn-primary hidden md:inline-flex" >
             New Task
@@ -54,7 +54,7 @@
         <button hx-get="{% url 'upkeep:task-new' %}"
             type="button"
             hx-trigger="click"
-            hx-target="#id_content"
+            hx-target="#content"
             hx-push-url="true"
             class="btn btn-primary md:hidden" >
             New
@@ -78,7 +78,7 @@
                 <tr>
                     <td class="text-sm font-medium text-base-content">
                         <a hx-get="{% url 'upkeep:task-detail' task.id %}"
-                            hx-target="#id_content"
+                            hx-target="#content"
                             hx-push-url="true"
                             href="#"
                             class="link link-hover link-primary" >
@@ -119,7 +119,7 @@
             {% if page_obj.has_previous %}
                 <a href="{% querystring page=page_obj.previous_page_number %}"
                     hx-get="{% querystring page=page_obj.previous_page_number %}"
-                    hx-target="#id_content"
+                    hx-target="#content"
                     hx-push-url="true"
                     class="btn btn-sm btn-outline">Previous</a>
             {% endif %}
@@ -127,7 +127,7 @@
             {% if page_obj.has_next %}
                 <a href="{% querystring page=page_obj.next_page_number %}"
                     hx-get="{% querystring page=page_obj.next_page_number %}"
-                    hx-target="#id_content"
+                    hx-target="#content"
                     hx-push-url="true"
                     class="btn btn-sm btn-outline ml-3">Next</a>
             {% endif %}
