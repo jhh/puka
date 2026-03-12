@@ -4,11 +4,17 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import URLPattern, URLResolver, include, path
 from django.views.generic import TemplateView
+from django.views.static import serve
 
 from puka.core.views import view_404
 
 urlpatterns: list[URLPattern | URLResolver] = [
     path("", TemplateView.as_view(template_name="overview.html"), name="home"),
+    path(
+        "favicon.ico",
+        serve,
+        {"document_root": settings.STATICFILES_DIRS[0], "path": "favicon.ico"},
+    ),
     path("bookmarks/", include("puka.bookmarks.urls", namespace="bookmarks")),
     path("stuff/", include("puka.stuff.urls", namespace="stuff")),
     path("upkeep/", include("puka.upkeep.urls", namespace="upkeep")),
