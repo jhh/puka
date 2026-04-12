@@ -122,28 +122,33 @@
                     </a>
                 </li>
                 <li>
-                    <details open>
-                        <summary class="menu-dropdown-toggle flex w-full items-center gap-3 after:ml-auto">
-                            <span class="hero-bookmark size-5"></span>
-                            <span>Bookmarks</span>
-                        </summary>
-                        <ul hx-boost:inherited="true">
-                            <li><a  href="{% url 'bookmarks:list' %}">Browse</a></li>
-                            <li><a href="{% url 'bookmarks:filter' %}">Filter</a></li>
-                        </ul>
-                    </details>
+                    <a href="{% url 'bookmarks:list' %}" class="gap-3">
+                        <span class="hero-bookmark size-5"></span>
+                        <span>Bookmarks</span>
+                    </a>
+                    <ul hx-boost:inherited="true">
+                        <li><a href="{% url 'bookmarks:filter' %}">Filter</a></li>
+                    </ul>
                 </li>
                 <li>
                     <a href="{% url 'stuff:item-list' %}" class="gap-3">
                         <span class="hero-archive-box size-5"></span>
                         <span>Inventory</span>
                     </a>
+                    <!-- TODO: re-enable hx-boost:inherited -->
+                    <ul>
+                        <li><a href="{% url 'stuff:location-list' pk=0 %}">Locations</a></li>
+                    </ul>
                 </li>
                 <li>
                     <a href="{% url 'upkeep:task-list' %}" class="gap-3">
                         <span class="hero-clipboard-document-check size-5"></span>
                         <span>Tasks</span>
                     </a>
+                    <!-- TODO: re-enable hx-boost:inherited -->
+                    <ul>
+                        <li><a href="{% url 'upkeep:area-list' %}">Areas</a></li>
+                    </ul>
                 </li>
                 <li>
                     <a href="#" class="gap-3">
