@@ -3,12 +3,6 @@
 {% block title %}Locations{% endblock %}
 
 {% partialdef list-partial %}
-{% if htmx %}
-    <title>Locations - HTMX</title>
-    {% include "sidebar.html#nav-mobile-partial" %}
-    {% include "sidebar.html#nav-desktop-partial" %}
-    {% include "stuff/base.html#menu-partial" %}
-{% endif %}
 
 <div class="flex items-center justify-between mb-4 mt-0">
     <h1 class="text-lg font-semibold text-base-content">

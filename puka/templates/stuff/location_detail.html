@@ -11,12 +11,6 @@
 
 
 {% partialdef detail-partial %}
-{% if htmx %}
-    <title>{{ location.name }} - HTMX</title>
-    {% include "sidebar.html#nav-mobile-partial" %}
-    {% include "sidebar.html#nav-desktop-partial" %}
-    {% include "stuff/base.html#menu-partial" %}
-{% endif %}
 <div class="card bg-base-100 border border-base-300 rounded-box">
     <div class="card-body">
         <h3 class="text-base font-semibold text-base-content">Location Detail</h3>

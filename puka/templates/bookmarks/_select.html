@@ -8,12 +8,6 @@
 {% endblock content %}
 
 {% partialdef filter-partial %}
-  {% if htmx %}
-    <title>Select Bookmark - HTMX</title>
-    {% include "sidebar.html#nav-mobile-partial" %}
-    {% include "sidebar.html#nav-desktop-partial" %}
-    {% include "stuff/base.html#menu-partial" %}
-  {% endif %}
   {% crispy filter.form %}
   <ul id="id_bookmarks" class="menu bg-base-100 shadow-sm">
       {% for bookmark in bookmarks %}

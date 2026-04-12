@@ -10,13 +10,6 @@
 {% endpartialdef field-partial %}
 
 {% partialdef detail-partial %}
-{% if htmx %}
-    <title>{{ area.name }} - HTMX</title>
-    {% include "sidebar.html#nav-mobile-partial" %}
-    {% include "sidebar.html#nav-desktop-partial" %}
-    {% include "upkeep/base.html#menu-partial" %}
-{% endif %}
-
 <div class="card bg-base-100 border border-base-300 rounded-box">
     <div class="card-body gap-6">
         <div class="flex justify-between">
