@@ -98,7 +98,7 @@ class ScheduleForm(forms.ModelForm):
         self.helper.attrs = {"hx-post": action}
 
         tasks = Task.objects.select_related().values_list("id", "area__name", "name")
-        self.fields["task"].choices = [(t[0], f"{t[1]}: {t[2]}") for t in tasks]  # type:ignore[attr-defined]
+        self.fields["task"].choices = [(t[0], f"{t[1]}: {t[2]}") for t in tasks]  # ty: ignore[unresolved-attribute]
 
         self.helper.layout = Layout(
             Div(
@@ -135,13 +135,13 @@ class TaskItemForm(forms.ModelForm):
         self.helper.attrs = {"hx-post": action}
 
         tasks = Task.objects.select_related().values_list("id", "area__name", "name")
-        self.fields["task"].choices = [(t[0], f"{t[1]}: {t[2]}") for t in tasks]  # type:ignore[attr-defined]
+        self.fields["task"].choices = [(t[0], f"{t[1]}: {t[2]}") for t in tasks]  # ty: ignore[unresolved-attribute]
         items = (
             Item.objects.filter(tags__name__in=["upkeep"])
             .order_by("name")
             .values_list("id", "name")
         )
-        self.fields["item"].choices = [(None, "---")] + [(i[0], i[1]) for i in items]  # type:ignore[attr-defined]
+        self.fields["item"].choices = [(None, "---")] + [(i[0], i[1]) for i in items]  # ty: ignore[unresolved-attribute]
 
         self.helper.layout = Layout(
             Div(
