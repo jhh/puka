@@ -20,5 +20,6 @@ jobs:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Check Nix flake Nixpkgs inputs
         uses: DeterminateSystems/flake-checker-action@main
-      - name: Run `nix flake check`
-        run: nix flake check -L
+      - uses: spotdemo4/nix-flake-check-action@v1
+        with:
+          args: -L --keep-going
