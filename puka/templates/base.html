@@ -54,11 +54,12 @@
                             <!--</.link>-->
                         </li>
                         <li>
-                            <!--<.link href={~p"/users/log-out"} method="delete">-->
-                            <a href="#">
-                                <span class="hero-arrow-left-on-rectangle size-4"></span> Log out
-                            </a>
-                            <!--</.link>-->
+                            <form action="{% url 'logout' %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="flex items-center gap-2">
+                                    <span class="hero-arrow-left-on-rectangle size-4"></span> Log out
+                                </button>
+                            </form>
                         </li>
                         <!--<% else %>-->
                         <li>
