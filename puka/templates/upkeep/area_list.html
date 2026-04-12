@@ -3,13 +3,6 @@
 {% block title %}Areas{% endblock %}
 
 {% partialdef list-partial %}
-{% if htmx %}
-    <title>Areas - HTMX</title>
-    {% include "sidebar.html#nav-mobile-partial" %}
-    {% include "sidebar.html#nav-desktop-partial" %}
-    {% include "upkeep/base.html#menu-partial" %}
-{% endif %}
-
 <div class="flex justify-end mb-4 mt-0 gap-4">
     <div x-data="{search: false}"
         x-on:keydown.meta.k.window="$focus.focus($refs.searchInput)">

@@ -3,12 +3,6 @@
 {% block title %}Tags{% endblock %}
 
 {% partialdef tags-partial %}
-  {% if htmx %}
-    <title>Tags - HTMX</title>
-    {% include "sidebar.html#nav-mobile-partial" %}
-    {% include "sidebar.html#nav-desktop-partial" %}
-    {% include "bookmarks/base.html#menu-partial" %}
-  {% endif %}
   <div class="md:flex md:items-center md:justify-between">
   <div class="min-w-0 flex-1">
     <h1 class="text-2xl/7 font-bold sm:truncate sm:text-3xl sm:tracking-tight">Tags</h1>
