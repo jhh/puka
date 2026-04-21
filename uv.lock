@@ -775,7 +775,7 @@ requires-dist = [
     { name = "django-htmx", specifier = ">=1.21.0" },
     { name = "django-taggit", specifier = ">=6.1.0" },
     { name = "django-treebeard", specifier = ">=4.7.1" },
-    { name = "environs", extras = ["django"], specifier = ">=11.2.1" },
+    { name = "environs", extras = ["django"], specifier = ">=15.0.1" },
     { name = "gunicorn", specifier = ">=23.0.0" },
     { name = "psycopg", extras = ["c", "pool"], specifier = ">=3.2.3" },
     { name = "python-dateutil", specifier = ">=2.9.0.post0" },
