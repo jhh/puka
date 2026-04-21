@@ -34,7 +34,7 @@ dev = [
   "pywatchman>=2.0.0",
 ]
 test = [
-  "django-stubs[compatible-mypy]>=5.1.1",
+  "django-stubs[compatible-mypy]>=6.0.3",
   "pytest-cov>=6.0.0",
   "pytest-django>=4.9.0",
   "pytest-factoryboy>=2.7.0",
