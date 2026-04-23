@@ -719,7 +719,7 @@ wheels = [
 
 [[package]]
 name = "puka"
-version = "3.6.3"
+version = "3.6.4"
 source = { editable = "." }
 dependencies = [
     { name = "crispy-tailwind" },

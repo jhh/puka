@@ -10,10 +10,12 @@ pkgs.writeShellApplication {
         echo "error: run this command as root."
         exit 1
     fi
-    sudo -u puka env \
-      DJANGO_SETTINGS_MODULE=puka.settings.production \
-      DJANGO_DATABASE_URL=postgres:///puka \
-      SECRET_KEY=not-secret \
-      ${perSystem.self.venv}/bin/puka-manage "$@"
+
+    export DJANGO_SETTINGS_MODULE=''${DJANGO_SETTINGS_MODULE:-puka.settings.production}
+    export DJANGO_DATABASE_URL=''${DJANGO_DATABASE_URL:-postgres:///puka}
+    export SECRET_KEY=not-secret
+    runuser -u puka \
+      -w DJANGO_SETTINGS_MODULE,DJANGO_DATABASE_URL,SECRET_KEY,DJANGO_SUPERUSER_PASSWORD \
+      -- ${perSystem.self.venv}/bin/puka-manage "$@"
   '';
 }

@@ -29,6 +29,8 @@ pkgs.mkShell {
 
   env = {
     HEROICONS_DIR = "${flake.packages.${system}.heroicons}/share/heroicons/optimized/";
+    UV_NO_SYNC = "1";
+    UV_PYTHON = pythonSet.python.interpreter;
     UV_PYTHON_DOWNLOADS = "never";
     PGPORT = 5432;
   };

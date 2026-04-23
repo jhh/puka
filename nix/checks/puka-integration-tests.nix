@@ -14,20 +14,19 @@ pkgs.testers.nixosTest {
   name = "puka-integration-tests";
 
   nodes.machine =
-    { pkgs, ... }:
+    { config, pkgs, ... }:
+    let
+      port = 8001;
+    in
     {
       imports = [
         flake.modules.nixos.puka
       ];
 
-      environment.systemPackages = with pkgs; [
-        wget
-      ];
-
       services.puka = {
         enable = true;
         secrets = [ secrets ];
-        port = 8001;
+        inherit port;
       };
 
       services.postgresql = {
@@ -41,25 +40,46 @@ pkgs.testers.nixosTest {
           }
         ];
       };
+      networking.firewall.allowedTCPPorts = [ port ];
+      virtualisation.forwardPorts = [
+        {
+          host.port = port;
+          guest.port = port;
+        }
+      ];
 
       system.stateVersion = "24.11";
     };
 
+  extraPythonPackages = p: [ p.beautifulsoup4 ];
   skipTypeCheck = true;
 
   testScript =
     { nodes, ... }:
     let
       inherit (nodes.machine.services.puka) port venv;
+      username = "alice";
+      password = "sekret";
+      createSuperUser = pkgs.writeShellScript "create-puka-superuser" ''
+        set -euo pipefail
+        export DJANGO_SUPERUSER_PASSWORD="sekret"
+        puka-manage createsuperuser --no-input --username="${username}" --email=alice@example.com
+      '';
     in
     builtins.replaceStrings
       [
         "\${port}"
         "\${venv}"
+        "\${createSuperUser}"
+        "\${username}"
+        "\${password}"
       ]
       [
         "${toString port}"
         "${venv}"
+        "${createSuperUser}"
+        "${username}"
+        "${password}"
       ]
       (pkgs.lib.readFile ./tests.py);
 }
