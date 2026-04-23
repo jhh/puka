@@ -777,7 +777,7 @@ requires-dist = [
     { name = "django-treebeard", specifier = ">=4.7.1" },
     { name = "environs", extras = ["django"], specifier = ">=11.2.1" },
     { name = "gunicorn", specifier = ">=23.0.0" },
-    { name = "psycopg", extras = ["c", "pool"], specifier = ">=3.2.3" },
+    { name = "psycopg", extras = ["c", "pool"], specifier = ">=3.3.3" },
     { name = "python-dateutil", specifier = ">=2.9.0.post0" },
     { name = "types-python-dateutil", specifier = ">=2.9.0.20241206" },
     { name = "whitenoise", specifier = ">=6.8.2" },
