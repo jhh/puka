@@ -203,3 +203,25 @@ with subtest("create upkeep task"):
     assert task_name in page_text, "create upkeep task: name does not match"
     assert task_notes in page_text, "create upkeep task: notes do not match"
     assert str(interval) in page_text, "create upkeep task: interval does not match"
+
+
+with subtest("create schedule"):
+    due_date = "2026-06-01"
+    schedule_notes = generate_random_string(150)
+    task_pk = 1
+
+    csrf_token = get_csrf_token(f"{BASE_URL}/upkeep/task/{task_pk}/schedule/new/")
+
+    html = machine.succeed(f"""
+        {CURL} -v -L \
+        --data 'csrfmiddlewaretoken={csrf_token}' \
+        --data 'task={task_pk}' \
+        --data 'due_date={due_date}' \
+        --data 'notes={schedule_notes}' \
+        {BASE_URL}/upkeep/task/{task_pk}/schedule/new/
+        """)
+
+    soup = BeautifulSoup(html, "html.parser")
+    page_text = soup.get_text()
+    assert "June 1, 2026" in page_text, "create schedule: due_date does not match"
+    assert schedule_notes in page_text, "create schedule: notes do not match"
