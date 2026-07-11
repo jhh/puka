@@ -15,11 +15,9 @@ let
 
   pg-start = pkgs.writeShellScriptBin "pg-start" ''
     if ! pg_ctl status > /dev/null 2>&1; then
-      echo "Starting PostgreSQL..."
-      pg_ctl start -w \
-        --log="$PGDATA/postgres.log" \
-        --options="-k $PGHOST -p $PGPORT" \
-        > /dev/null 2>&1
+      echo "starting PostgreSQL..."
+      : > "$PGDATA/postgres.log"
+      pg_ctl start --wait --log="$PGDATA/postgres.log" --options="-k $PGHOST -p $PGPORT"
     fi
   '';
 
@@ -27,7 +25,7 @@ let
     if pg_isready -h "$PGHOST" -p "$PGPORT" -q; then
       echo "PostgreSQL is ready."
     else
-      echo "PostgreSQL is not ready yet."
+      echo "PostgreSQL is not ready."
     fi
   '';
 in
@@ -43,6 +41,7 @@ pkgs.mkShell {
       nixfmt-rfc-style
       nodejs
       postgresql_17
+      postgresql_17.pg_config
       perSystem.uv2nix.uv-bin
       watchman
       pg-stop
