@@ -28,6 +28,17 @@ let
       echo "PostgreSQL is not ready."
     fi
   '';
+
+  puka-db-init = pkgs.writeShellScriptBin "puka-db-init" ''
+    if ! psql -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='puka'" | grep -q 1; then
+      psql -d postgres -tA << END_INPUT
+      CREATE DATABASE puka;
+      ALTER DATABASE puka SET client_encoding TO 'UTF8';
+      ALTER DATABASE puka SET default_transaction_isolation TO 'read committed';
+      ALTER DATABASE puka SET timezone TO 'UTC';
+    END_INPUT
+    fi
+  '';
 in
 pkgs.mkShell {
   packages =
@@ -47,6 +58,7 @@ pkgs.mkShell {
       pg-stop
       pg-start
       pg-status
+      puka-db-init
     ]
     ++ pre-commit.enabledPackages;
 
@@ -68,20 +80,21 @@ pkgs.mkShell {
 
     # Initialize if needed
     if [ ! -d "$PGDATA" ]; then
-      echo "Initializing PostgreSQL database..."
+      echo "initializing puka database..."
       initdb \
         --auth-host=trust \
         --auth-local=trust \
         --encoding=UTF8 \
         --locale=C \
         --username=postgres
+
     fi
 
     if ! pg_isready -h "$PGHOST" -p "$PGPORT" -q 2>/dev/null; then
       echo ""
       echo "╔══════════════════════════════════════════════╗"
       echo "║  WARNING: PostgreSQL is not running.         ║"
-      echo "║  Run 'pg-start' to start the database.       ║"
+      echo "║  Run 'just start' to start the database.     ║"
       echo "╚══════════════════════════════════════════════╝"
       echo ""
     fi

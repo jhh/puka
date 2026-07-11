@@ -2,6 +2,16 @@
 _default:
     @just --list
 
+# initialize and start the development database
+start:
+  pg-start
+  puka-db-init
+  @just manage migrate
+
+# stop the development database
+stop:
+  pg-stop
+
 # bootstrap the development environment
 init: npm-install update-css update-js
     echo DEBUG=true > .env
