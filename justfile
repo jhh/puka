@@ -12,9 +12,17 @@ start:
 stop:
   pg-stop
 
+# load data into the development database
+load:
+  #!/usr/bin/env bash
+  tmpfile=$(mktemp).json
+  ssh eris puka-manage dumpdata --natural-foreign --natural-primary > $tmpfile
+  echo Loading data from $tmpfile...
+  uv run puka/manage.py loaddata $tmpfile
+
 # bootstrap the development environment
 init: npm-install update-css update-js
-    echo DEBUG=true > .env
+  echo DEBUG=true > .env
 
 # run ty type checks
 ty:
