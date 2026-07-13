@@ -9,6 +9,7 @@ from django.views.static import serve
 from puka.core.views import view_404
 
 urlpatterns: list[URLPattern | URLResolver] = [
+    path("next/", TemplateView.as_view(template_name="next/index.html"), name="next"),
     path("", TemplateView.as_view(template_name="overview.html"), name="home"),
     path(
         "favicon.ico",
