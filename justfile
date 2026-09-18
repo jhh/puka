@@ -16,7 +16,7 @@ stop:
 load:
   #!/usr/bin/env bash
   tmpfile=$(mktemp).json
-  ssh eris puka-manage dumpdata --natural-foreign --natural-primary > $tmpfile
+  ssh eris puka-manage dumpdata --natural-foreign -e contenttypes -e auth.permission > $tmpfile
   echo Loading data from $tmpfile...
   uv run puka/manage.py loaddata $tmpfile
 
