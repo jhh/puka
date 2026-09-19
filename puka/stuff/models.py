@@ -64,7 +64,7 @@ class Item(models.Model):
     notes = models.TextField(blank=True)
     name_notes_search = SearchVectorField(null=True, editable=False)
 
-    objects: ItemManager = ItemManager()
+    objects = ItemManager()
     inventories: models.Manager["Inventory"]
 
     class Meta:
