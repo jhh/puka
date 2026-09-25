@@ -32,6 +32,7 @@ dev = [
   "rich>=13.9.4",
   "ruff>=0.15.12",
   "pywatchman>=2.0.0",
+  "djangofmt>=0.2.11",
 ]
 test = [
   "django-stubs[compatible-mypy]>=6.0.3",
