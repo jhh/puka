@@ -21,7 +21,17 @@ MIDDLEWARE += [  # noqa: F405
 
 INTERNAL_IPS = ["127.0.0.1"]
 
-EMAIL_PORT = 1025
+MAILERS = {
+    "default": {
+        "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+        "OPTIONS": {
+            "host": "localhost",
+            "port": 1025,
+            "use_tls": False,
+            "use_ssl": False,
+        },
+    },
+}
 
 LOGGING = {
     "version": 1,

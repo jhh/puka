@@ -139,9 +139,16 @@ TAGGIT_CASE_INSENSITIVE = True
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 CRISPY_TEMPLATE_PACK = "tailwind"
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "localhost"
-EMAIL_USE_TLS = False
-EMAIL_USE_SSL = False
+MAILERS = {
+    "default": {
+        "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+        "OPTIONS": {
+            "host": "localhost",
+            "port": 25,
+            "use_tls": False,
+            "use_ssl": False,
+        },
+    },
+}
 
 ADMINS = [("Jeff", "jeff@j3ff.io")]

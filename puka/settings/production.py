@@ -24,8 +24,6 @@ STORAGES = {
     },
 }
 
-EMAIL_PORT = 25
-
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
