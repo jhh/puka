@@ -1,58 +1,78 @@
 # AGENTS.md
 
-Django app (Python 3.12+, Tailwind/daisyUI/htmx/Alpine), Nix devshell,
-`just` task runner. Run every command inside the Nix devshell.
+Django 6 app (Python 3.13 via Nix; Tailwind 4/daisyUI 5/htmx 4/Alpine),
+Nix devshell, `just` task runner. Run every command inside the devshell.
+
+## VCS: Jujutsu
+
+- Use the `jj` skill for all VCS work (status, diff, describe, new, squash,
+  bookmarks, push). Never run raw `git` even though `.git/` exists
+  (colocated repo). Trunk bookmark is `main`; CI runs on PRs and `main`.
 
 ## Environment
 
-- The devshell comes from `flake.nix` via direnv (`use flake`). `uv`, `just`,
-  `node`, and Postgres are only on `PATH` inside it; `uv run` outside the
-  devshell will not use the pinned interpreter.
-- `.env` only sets `DEBUG=true`. `DJANGO_DATABASE_URL` and `PG*` come from the
-  devshell `shellHook` (local Postgres data dir is `.db/`).
+- Devshell comes from `flake.nix` via direnv (`use flake`). `uv`, `just`,
+  `node`, and Postgres are only on `PATH` inside it.
+- `UV_NO_SYNC=1` is set: `uv run` never installs deps. After editing
+  `pyproject.toml` run `uv lock` then `uv sync`. Nix builds resolve from
+  `uv.lock` (uv2nix), so `nix flake check` fails if the lock is stale.
+- `.env` only sets `DEBUG=true`. `DJANGO_DATABASE_URL` and `PG*` come from
+  the devshell `shellHook`; local Postgres data dir is `.db/`.
 - `just init`: npm install + build CSS/JS + write `.env`.
-- `just start`: start local Postgres, create DB, migrate. `just stop` stops it.
+- `just start` / `just stop`: local Postgres (+ create DB + migrate).
+- `just load` pulls production data over `ssh eris`; needs prod access.
 
 ## Commands
 
 - Dev server: `just run` (`puka.settings.local`).
-- manage.py: `just manage "cmd"` (e.g. `just migrate`, `just makemigrations`),
+- manage.py: `just manage "cmd"`, `just migrate`, `just makemigrations`,
   or `uv run puka/manage.py ...`.
-- Tests: `just test` or `uv run pytest tests`.
+- Tests: `just test` or `uv run pytest tests`. Postgres must be running
+  (`just start`); pytest-django creates `test_puka`.
   - Bare `uv run pytest` collects nothing: `testpaths = ["puka"]` in
-    `pyproject.toml`, but all tests live in `tests/`.
+    `pyproject.toml`, but tests live in `tests/` (`*_test.py`).
   - Single: `uv run pytest tests/stuff/item_model_test.py::test_name`.
   - Coverage: `just coverage`.
 - Lint/format: `uv run ruff format .` then `uv run ruff check .`.
-- Types: `just ty` (`uv run ty check`). `ty` is preferred over pyright/mypy.
+- Types: `just ty`. CI runs `ty check --error-on-warning`, so use
+  `uv run ty check --error-on-warning` to match; `ty` over pyright/mypy.
 - Templates: `just djade`.
-- Assets: `just update-css`, `just update-js`, `just watch`.
-- `pre-commit run --all-files`; the config is a Nix-store symlink, do not edit.
+- Assets: `just update-css`, `just update-js`, `just watch`. Rebuild after
+  editing `base.css`/`base.js` or Tailwind classes in templates.
+- `pre-commit run --all-files`. The config is a Nix-store symlink generated
+  from `nix/checks/pre-commit.nix`; edit that, not the yaml. Hooks rewrite
+  code: ruff, pyupgrade `--py312-plus`, django-upgrade `--target-version=5.2`,
+  add-trailing-comma, djade, nixfmt; files >25 KB are rejected.
 
 ## Verification / CI
 
-- CI runs `nix flake check` (`spotdemo4/nix-flake-check-action`). Reproduce with
-  `nix flake check -L` before pushing; it is broader than ruff/pytest.
-- NixOS integration tests (separate from pytest):
-  `nix build .#checks.aarch64-darwin.puka-integration-tests -L`.
+- CI is only `nix flake check -L --keep-going`. Reproduce locally before
+  pushing. Checks: pre-commit, `ty` (warnings fatal), NixOS integration
+  tests, and pytest (Linux-only, so skipped on macOS — run `just test`).
+- NixOS integration tests (`nix/checks/tests.py`):
+  `nix build .#checks.aarch64-darwin.puka-integration-tests -L`
 
 ## Layout
 
-- `puka/` Django project; apps: `bookmarks`, `core`, `stuff`, `upkeep`,
+- `puka/` Django project; apps `bookmarks`, `core`, `stuff`, `upkeep`,
   `users`. Settings in `puka/settings/{base,local,test,production}.py`.
 - `tests/` mirrors the apps; `tests/conftest.py` fixtures and
   `tests/factories.py` (factory_boy, registered via pytest-factoryboy).
-- `puka/static/puka/base.{css,js}` are the sources; `main.{css,js}` are
-  generated (gitignored) and also built by Nix in production — never edit them.
-- `nix/` holds the devshell, deployment module, and static build; `justfile`
-  is the canonical task list.
+  DB tests need `@pytest.mark.django_db` or the `db` fixture.
+- `puka/static/puka/base.{css,js}` are sources; `main.{css,js}` are
+  generated (gitignored) and built by Nix in production. Never edit them.
+- `nix/` holds devshell, checks, packages, and the NixOS module
+  (`nix/modules/nixos/puka.nix`); `justfile` is the canonical task list.
+- Ruff and `ty` both exclude `*/migrations/`.
 
 ## Conventions
 
 - Ruff: `line-length = 99`, `select = ["ALL"]` with repo ignores.
-- Use `from __future__ import annotations`; PEP 604 unions and built-in
-  generics; trailing commas in multi-line literals/calls.
-- htmx: get templates with `get_template(request, "path", "#partial")` from
-  `puka/core/views.py`; partials use `{% partialdef %}` and `#fragment`.
-  Keep the root -> sidebar -> app template layout.
-- VCS is Jujutsu (`jj`), colocated with git; use `jj`, not raw `git`.
+- `from __future__ import annotations`; PEP 604 unions; built-in generics;
+  trailing commas in multi-line literals/calls.
+- htmx: views return `get_template(request, "path.html", "#partial")` from
+  `puka/core/views.py`; templates define `{% partialdef name %}` (Django 6
+  built-in partials). Keep the root -> sidebar -> app template layout.
+- `htmx.org` is pinned to `4.0.0` in `just npm-update`; use htmx 4 APIs.
+- Crispy forms use `crispy-tailwind`; overrides live in
+  `puka/templates/tailwind/layout/`.
