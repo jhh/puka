@@ -58,6 +58,10 @@ exclude = ["/.*", "/docs", "/tests"]
 testpaths = ["puka"]
 python_files = "*_test.py"
 DJANGO_SETTINGS_MODULE = "puka.settings.test"
+filterwarnings = [
+  # django-taggit 6.1.0 (latest) uses the deprecated SQLCompiler.quote_name_unless_alias
+  "ignore:.*quote_name_unless_alias.*:PendingDeprecationWarning",
+]
 
 
 [tool.django-stubs]

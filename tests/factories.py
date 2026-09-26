@@ -31,8 +31,9 @@ class LocationFactory(DjangoModelFactory):
     def _create(cls, model_class, *_args, **kwargs):
         qs = model_class.objects.filter(code="A01")
         if not qs:
-            model_class.add_root(name="A01", code="A01")
-        return model_class.objects.get(pk=qs.get().pk).add_child(**kwargs)
+            model_class.objects.add_root({"name": "A01", "code": "A01"})
+        parent = model_class.objects.get(pk=qs.get().pk)
+        return model_class.objects.add_child(parent, kwargs)
 
 
 class ItemFactory(DjangoModelFactory):

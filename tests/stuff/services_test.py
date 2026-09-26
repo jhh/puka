@@ -104,4 +104,4 @@ def test_get_or_create_location(test_input, parent_code, expected_created):
     assert location.name == test_input
     assert location.code == test_input
     assert expected_created == created
-    assert Location.objects.get(code=parent_code) == location.get_parent()
+    assert Location.objects.get(code=parent_code) == Location.objects.get_parent(location)

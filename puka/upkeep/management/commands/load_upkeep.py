@@ -45,7 +45,7 @@ class Command(BaseCommand):
         try:
             location = Location.objects.get(name="Unknown")
         except ObjectDoesNotExist:
-            location = Location.add_root(name="Unknown", code="UNK")
+            location = Location.objects.add_root({"name": "Unknown", "code": "UNK"})
 
         with Path(options["file_name"]).open() as f:
             data = json.load(f)

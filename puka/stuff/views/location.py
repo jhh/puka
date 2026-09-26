@@ -25,13 +25,12 @@ class LocationListView(ListView):
 
         if pk == 0:
             self.ancestors = []
-            return Location.get_root_nodes()
+            return Location.objects.get_root_nodes()
 
         parent = get_object_or_404(Location, pk=pk)
-        if hasattr(parent, "get_ancestors"):
-            self.ancestors = [(node.pk, node.name) for node in parent.get_ancestors()]
+        self.ancestors = [(node.pk, node.name) for node in Location.objects.get_ancestors(parent)]
         self.ancestors.append((parent.pk, parent.name))
-        return parent.get_children()
+        return Location.objects.get_children(parent)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -50,7 +49,7 @@ class LocationDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["ancestors"] = self.object.get_ancestors()
+        context["ancestors"] = Location.objects.get_ancestors(self.object)
         return context
 
 

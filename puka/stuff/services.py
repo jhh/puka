@@ -101,5 +101,5 @@ def get_or_create_location(code: str) -> tuple[Location, bool]:
     except Location.DoesNotExist:
         parent_code, _ = parse_location_code(code)
         parent = Location.objects.get(code=parent_code)
-        child = parent.add_child(name=code, code=code)
+        child = Location.objects.add_child(parent, {"name": code, "code": code})
         return Location.objects.get(pk=child.pk), True
