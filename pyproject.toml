@@ -118,3 +118,5 @@ exclude = ["**/migrations/", ".venv/"]
 # Be more lenient with Django's dynamic nature
 possibly-unresolved-reference = "warn"
 unresolved-import = "warn"
+# django-stubs types BaseManager.__get__ with a mypy-only `Options` workaround
+invalid-attribute-access = "ignore"
