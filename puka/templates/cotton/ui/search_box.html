@@ -1,0 +1,29 @@
+{% comment %}
+Search input, backed by Alpine.data("searchBox"): Cmd/Ctrl-K focuses it, Esc clears it and
+re-runs the search, and the server's `clearSearch` event (HX-Trigger) clears it.
+htmx attributes (hx-get, hx-target, hx-trigger) pass through to the <input>.
+{% endcomment %}
+<c-vars name="q" value="" placeholder="Search" id="search" class="w-80" />
+
+<div x-data="searchBox" class="{{ class }}">
+    <label class="input w-full">
+        <c-ui.icon name="hero-magnifying-glass" class="size-4 opacity-50" />
+        <input
+            type="search"
+            name="{{ name }}"
+            id="{{ id }}"
+            value="{{ value }}"
+            placeholder="{{ placeholder }}"
+            aria-label="{{ placeholder }}"
+            class="grow"
+            x-ref="input"
+            x-on:keydown.meta.k.window.prevent="focus()"
+            x-on:keydown.ctrl.k.window.prevent="focus()"
+            x-on:keyup.esc.prevent.stop="reset()"
+            x-on:clear-search.camel.window="clear()"
+            {{ attrs }}
+        >
+        <kbd class="kbd kbd-sm hidden md:inline-flex">⌘</kbd>
+        <kbd class="kbd kbd-sm hidden md:inline-flex">K</kbd>
+    </label>
+</div>

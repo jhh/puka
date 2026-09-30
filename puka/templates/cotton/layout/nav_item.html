@@ -1,0 +1,22 @@
+{% comment %}
+Sidebar menu item for a named URL; the only component that reads the request.
+url_name, arg: reversed with {% url url_name arg %} (arg is optional).
+match: also active when the current path contains this prefix, e.g. "/stuff/location/";
+otherwise active only on an exact match.
+icon: a full heroicons class. target: when set, navigate with hx-get into that element.
+{% endcomment %}
+<c-vars url_name arg="" match="" icon="" target="" class />
+
+{% if arg != "" %}{% url url_name arg as href %}{% else %}{% url url_name as href %}{% endif %}
+<li>
+    <a
+        href="{{ href }}"
+        {% if target %}hx-get="{{ href }}" hx-target="{{ target }}" hx-push-url="true"{% endif %}
+        class="gap-3 {% if request.path == href or match and match in request.path %}menu-active{% endif %} {{ class }}"
+        {% if request.path == href %}aria-current="page"{% endif %}
+        {{ attrs }}
+    >
+        {% if icon %}<c-ui.icon name="{{ icon }}" class="size-5" />{% endif %}
+        <span>{{ slot }}</span>
+    </a>
+</li>

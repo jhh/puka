@@ -53,12 +53,18 @@ Decisions already made:
    - Components only get data passed in. They never query the database or
      read the request, except for a nav-item component that needs the
      current path.
+     `COTTON_ENABLE_CONTEXT_ISOLATION` enforces this: a component sees its
+     attributes plus the context processors, not the parent context.
 2. **Component layout** under `puka/templates/cotton/`:
    - `ui/`: button, icon, card, badge, alert, table, pagination,
      breadcrumbs, tabs, empty state, search box → `<c-ui.button>`
    - `form/`: form, field, errors, actions →
      `<c-form.field :field="form.name" />`
    - `layout/`: page header, nav item, drawer, navbar
+   - Files are snake_case: `<c-ui.search-box>` is `ui/search_box.html`.
+   - Declare `class` in `<c-vars>` (bare, `class`, since djangofmt rejects
+     `class=""`) and merge it into the root element, or a caller's `class`
+     becomes a second `class` attribute via `{{ attrs }}`.
 3. **htmx and Alpine attributes pass through** `{{ attrs }}`, so
    `<c-ui.button hx-post="…" hx-confirm="…">` works.
    - Anything that isn't meant to become an HTML attribute (for example

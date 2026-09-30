@@ -1,0 +1,43 @@
+{% comment %}
+Previous/next pager for a Django Page. Links keep the current query string (via
+{% querystring %}) and swap into `target`.
+{% endcomment %}
+<c-vars page_obj target="#content" class />
+
+{% if page_obj.has_other_pages %}
+    <nav class="flex items-center justify-between gap-4 {{ class }}" aria-label="Pagination" {{ attrs }}>
+        <p class="hidden text-sm text-base-content/70 sm:block">
+            Showing
+            <span class="font-medium">{{ page_obj.start_index }}</span>
+            to
+            <span class="font-medium">{{ page_obj.end_index }}</span>
+            of
+            <span class="font-medium">{{ page_obj.paginator.count }}</span>
+            results
+        </p>
+        <div class="join ml-auto">
+            {% if page_obj.has_previous %}
+                <a
+                    href="{% querystring page=page_obj.previous_page_number %}"
+                    hx-get="{% querystring page=page_obj.previous_page_number %}"
+                    hx-target="{{ target }}"
+                    hx-push-url="true"
+                    class="join-item btn btn-sm"
+                >Previous</a>
+            {% else %}
+                <button type="button" class="join-item btn btn-sm" disabled>Previous</button>
+            {% endif %}
+            {% if page_obj.has_next %}
+                <a
+                    href="{% querystring page=page_obj.next_page_number %}"
+                    hx-get="{% querystring page=page_obj.next_page_number %}"
+                    hx-target="{{ target }}"
+                    hx-push-url="true"
+                    class="join-item btn btn-sm"
+                >Next</a>
+            {% else %}
+                <button type="button" class="join-item btn btn-sm" disabled>Next</button>
+            {% endif %}
+        </div>
+    </nav>
+{% endif %}

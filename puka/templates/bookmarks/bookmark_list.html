@@ -23,40 +23,11 @@
 
 {% block content %}
     <div class="flex justify-end gap-4 mb-4 mt-0">
-        <div
-            class="w-80"
-            x-data="{}"
-            x-on:keydown.meta.k.window="$focus.focus($refs.searchInput)"
-        >
-            <label class="input">
-                <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <g
-                        stroke-linejoin="round"
-                        stroke-linecap="round"
-                        stroke-width="2.5"
-                        fill="none"
-                        stroke="currentColor"
-                    >
-                        <circle cx="11" cy="11" r="8" />
-                        <path d="m21 21-4.3-4.3" />
-                    </g>
-                </svg>
-                <input
-                    type="search"
-                    class="grow"
-                    placeholder="Search"
-                    x-ref="searchInput"
-                    name="q"
-                    id="search"
-                    hx-get="{% url 'bookmarks:list' %}"
-                    hx-trigger="input changed delay:0.5s"
-                    hx-target="#id_bookmarks"
-                    x-on:keyup.esc.prevent.stop="$el.value = ''; $el.blur(); $el.dispatchEvent(new Event('input', { bubbles: true }))"
-                >
-                <kbd class="kbd kbd-sm">⌘</kbd>
-                <kbd class="kbd kbd-sm">K</kbd>
-            </label>
-        </div>
+        <c-ui.search-box
+            hx-get="{% url 'bookmarks:list' %}"
+            hx-trigger="input changed delay:0.5s"
+            hx-target="#id_bookmarks"
+        />
 
         <div class="flex md:mt-0">
             <a

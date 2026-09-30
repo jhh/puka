@@ -1,0 +1,19 @@
+{% comment %}
+Sticky top bar with a drawer toggle (hidden on lg). drawer: the drawer checkbox id.
+start and end are named slots; the default slot follows `start`.
+{% endcomment %}
+<c-vars drawer="app-drawer" start="" end="" class />
+
+<header
+    class="navbar sticky top-0 z-40 h-16 border-b border-base-300 bg-base-200/90 px-4 backdrop-blur sm:px-6 lg:px-8 {{ class }}"
+    {{ attrs }}
+>
+    <div class="navbar-start gap-2">
+        <label for="{{ drawer }}" aria-label="open sidebar" class="btn btn-square btn-ghost lg:hidden">
+            <c-ui.icon name="hero-bars-3" />
+        </label>
+        {{ start }}
+        {{ slot }}
+    </div>
+    {% if end %}<div class="navbar-end gap-2">{{ end }}</div>{% endif %}
+</header>

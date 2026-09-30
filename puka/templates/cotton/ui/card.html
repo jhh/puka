@@ -1,0 +1,13 @@
+{% comment %}
+Bordered card. title: plain text or a named <c-slot name="title">.
+actions: optional named slot, right-aligned below the body.
+{% endcomment %}
+<c-vars title="" actions="" class body_class="" />
+
+<div class="card card-border border-base-300 bg-base-100 {{ class }}" {{ attrs }}>
+    <div class="card-body {{ body_class }}">
+        {% if title %}<h2 class="card-title text-base">{{ title }}</h2>{% endif %}
+        {{ slot }}
+        {% if actions %}<div class="card-actions justify-end">{{ actions }}</div>{% endif %}
+    </div>
+</div>

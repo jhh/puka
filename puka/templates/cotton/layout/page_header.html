@@ -1,0 +1,10 @@
+{% comment %}
+Page title with optional actions on the right.
+title: plain text or a named <c-slot name="title">; actions: optional named slot.
+{% endcomment %}
+<c-vars title actions="" class />
+
+<div class="mb-4 flex flex-wrap items-center justify-between gap-4 {{ class }}" {{ attrs }}>
+    <h1 class="text-lg font-semibold text-base-content">{{ title }}</h1>
+    {% if actions %}<div class="flex items-center gap-2">{{ actions }}</div>{% endif %}
+</div>

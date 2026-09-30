@@ -1,0 +1,8 @@
+{% comment %}
+Heroicon from the Tailwind heroicons plugin.
+name: the full class, e.g. "hero-home" or "hero-hashtag-mini", so Tailwind finds it in the
+calling template. class: size and colour classes (default "size-5").
+{% endcomment %}
+<c-vars name class="size-5" />
+
+<span class="{{ name }} {{ class }}" aria-hidden="true" {{ attrs }}></span>

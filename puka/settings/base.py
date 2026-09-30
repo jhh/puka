@@ -150,6 +150,10 @@ LOGIN_REDIRECT_URL = "/"
 
 TAGGIT_CASE_INSENSITIVE = True
 
+# Components get a fresh RequestContext (context processors only) plus the attributes
+# passed to them, not the whole parent context.
+COTTON_ENABLE_CONTEXT_ISOLATION = True
+
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 CRISPY_TEMPLATE_PACK = "tailwind"
 

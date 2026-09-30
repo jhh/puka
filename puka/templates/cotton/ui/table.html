@@ -1,0 +1,11 @@
+{% comment %}
+Scrollable, bordered table. The slot holds <thead>/<tbody>.
+size: xs | sm | md | lg; zebra and pin_rows are flags.
+{% endcomment %}
+<c-vars size="md" zebra="" pin_rows="" class />
+
+<div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 {{ class }}" {{ attrs }}>
+    <table class="table {% if size == 'xs' %}table-xs{% elif size == 'sm' %}table-sm{% elif size == 'lg' %}table-lg{% endif %} {% if zebra %}table-zebra{% endif %} {% if pin_rows %}table-pin-rows{% endif %}">
+        {{ slot }}
+    </table>
+</div>

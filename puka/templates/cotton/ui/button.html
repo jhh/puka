@@ -1,0 +1,27 @@
+{% comment %}
+Button, or a link styled as one when `href` is set.
+variant: primary | secondary | accent | neutral | error | ghost | link
+style: soft | outline | dash (optional); size: xs | sm | md | lg
+icon: a full heroicons class, e.g. "hero-plus" (rendered before the label).
+{% endcomment %}
+<c-vars variant="" style="" size="md" icon="" href="" type="button" square="" class />
+
+{% if href %}
+    <a
+        href="{{ href }}"
+        class="btn {% if variant == 'primary' %}btn-primary{% elif variant == 'secondary' %}btn-secondary{% elif variant == 'accent' %}btn-accent{% elif variant == 'neutral' %}btn-neutral{% elif variant == 'error' %}btn-error{% elif variant == 'ghost' %}btn-ghost{% elif variant == 'link' %}btn-link{% endif %} {% if style == 'soft' %}btn-soft{% elif style == 'outline' %}btn-outline{% elif style == 'dash' %}btn-dash{% endif %} {% if size == 'xs' %}btn-xs{% elif size == 'sm' %}btn-sm{% elif size == 'lg' %}btn-lg{% endif %} {% if square %}btn-square{% endif %} {{ class }}"
+        {{ attrs }}
+    >
+        {% if icon %}<c-ui.icon name="{{ icon }}" class="size-4" />{% endif %}
+        {{ slot }}
+    </a>
+{% else %}
+    <button
+        type="{{ type }}"
+        class="btn {% if variant == 'primary' %}btn-primary{% elif variant == 'secondary' %}btn-secondary{% elif variant == 'accent' %}btn-accent{% elif variant == 'neutral' %}btn-neutral{% elif variant == 'error' %}btn-error{% elif variant == 'ghost' %}btn-ghost{% elif variant == 'link' %}btn-link{% endif %} {% if style == 'soft' %}btn-soft{% elif style == 'outline' %}btn-outline{% elif style == 'dash' %}btn-dash{% endif %} {% if size == 'xs' %}btn-xs{% elif size == 'sm' %}btn-sm{% elif size == 'lg' %}btn-lg{% endif %} {% if square %}btn-square{% endif %} {{ class }}"
+        {{ attrs }}
+    >
+        {% if icon %}<c-ui.icon name="{{ icon }}" class="size-4" />{% endif %}
+        {{ slot }}
+    </button>
+{% endif %}

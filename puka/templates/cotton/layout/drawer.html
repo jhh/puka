@@ -1,0 +1,15 @@
+{% comment %}
+Responsive daisyUI drawer: the sidebar is open on lg screens and toggles below that.
+id: the checkbox id that navbar and overlay labels point at. The default slot is the page;
+the `side` named slot is the sidebar content.
+{% endcomment %}
+<c-vars id="app-drawer" side="" class />
+
+<div class="drawer lg:drawer-open {{ class }}" {{ attrs }}>
+    <input id="{{ id }}" type="checkbox" class="drawer-toggle" x-ref="drawer">
+    <div class="drawer-content flex min-h-screen flex-col">{{ slot }}</div>
+    <aside class="drawer-side z-30">
+        <label for="{{ id }}" aria-label="close sidebar" class="drawer-overlay"></label>
+        {{ side }}
+    </aside>
+</div>

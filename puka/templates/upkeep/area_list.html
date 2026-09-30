@@ -4,37 +4,14 @@
 
 {% partialdef list-partial %}
     <div class="flex justify-end mb-4 mt-0 gap-4">
-        <div x-data="{search: false}" x-on:keydown.meta.k.window="$focus.focus($refs.searchInput)">
-            <label class="input w-64">
-                <svg class="h-[2em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <g
-                        stroke-linejoin="round"
-                        stroke-linecap="round"
-                        stroke-width="2.5"
-                        fill="none"
-                        stroke="currentColor"
-                    >
-                        <circle cx="11" cy="11" r="8" />
-                        <path d="m21 21-4.3-4.3" />
-                    </g>
-                </svg>
-                <input
-                    type="search"
-                    x-ref="searchInput"
-                    name="query"
-                    id="search"
-                    placeholder="Search"
-                    value="{{ request.GET.query }}"
-                    hx-get="{% url 'upkeep:area-list' %}"
-                    hx-trigger="change"
-                    hx-target="#content"
-                    class="grow"
-                    x-on:keyup.esc.prevent.stop="$el.value = ''; $el.blur(); htmx.trigger($el, 'change')"
-                >
-                <kbd class="hidden md:inline kbd kbd-sm">⌘</kbd>
-                <kbd class="hidden md:inline kbd kbd-sm">K</kbd>
-            </label>
-        </div>
+        <c-ui.search-box
+            name="query"
+            value="{{ request.GET.query }}"
+            class="w-64"
+            hx-get="{% url 'upkeep:area-list' %}"
+            hx-trigger="change"
+            hx-target="#content"
+        />
 
         <div class="flex md:mt-0">
             <button

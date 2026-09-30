@@ -1,0 +1,8 @@
+{% comment %}Placeholder for an empty list. The slot holds optional detail or actions.{% endcomment %}
+<c-vars title icon="hero-inbox" class />
+
+<div class="flex flex-col items-center gap-2 py-10 text-center text-base-content/60 {{ class }}" {{ attrs }}>
+    {% if icon %}<c-ui.icon name="{{ icon }}" class="size-8 opacity-60" />{% endif %}
+    <p class="font-medium text-base-content/80">{{ title }}</p>
+    {{ slot }}
+</div>

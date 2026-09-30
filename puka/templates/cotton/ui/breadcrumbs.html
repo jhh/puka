@@ -1,0 +1,11 @@
+{% comment %}
+Breadcrumb trail; the slot holds <li> items. Pass id="breadcrumbs" hx-swap-oob="true" to
+replace the navbar breadcrumbs from an htmx fragment.
+{% endcomment %}
+<c-vars class />
+
+<div class="breadcrumbs text-sm font-semibold {{ class }}" {{ attrs }}>
+    <ul>
+        {{ slot }}
+    </ul>
+</div>

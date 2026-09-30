@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load utils %}
 
 {% block title %}Stuff{% endblock %}
 
@@ -15,18 +14,12 @@
         role="list"
         class="menu -mx-2 mt-2"
     >
-        <li>
-            <a
-                hx-get="{% url 'stuff:location-list' pk=0 %}"
-                hx-target="#content"
-                hx-push-url="true"
-                @click="$refs.sidebarDrawer.checked = false"
-                href="#"
-                class="flex items-center gap-3 {% get_current_class 'stuff:location' %}"
-            >
-                <span class="puka-task-menu">L</span>
-                <span class="truncate">Locations</span>
-            </a>
-        </li>
+        <c-layout.nav-item
+            url_name="stuff:location-list"
+            :arg="0"
+            match="/stuff/location/"
+            target="#content"
+            x-on:click="$refs.sidebarDrawer.checked = false"
+        >Locations</c-layout.nav-item>
     </ul>
 {% endpartialdef menu-partial %}

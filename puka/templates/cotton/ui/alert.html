@@ -1,0 +1,26 @@
+{% comment %}
+variant: info | success | warning | error; style: soft | outline | dash (optional).
+Shows the matching icon unless icon="" is passed.
+{% endcomment %}
+<c-vars variant="info" style="" icon="default" class />
+
+<div
+    role="alert"
+    class="alert {% if variant == 'info' %}alert-info{% elif variant == 'success' %}alert-success{% elif variant == 'warning' %}alert-warning{% elif variant == 'error' %}alert-error{% endif %} {% if style == 'soft' %}alert-soft{% elif style == 'outline' %}alert-outline{% elif style == 'dash' %}alert-dash{% endif %} {{ class }}"
+    {{ attrs }}
+>
+    {% if icon == 'default' %}
+        {% if variant == 'success' %}
+            <c-ui.icon name="hero-check-circle" />
+        {% elif variant == 'warning' %}
+            <c-ui.icon name="hero-exclamation-triangle" />
+        {% elif variant == 'error' %}
+            <c-ui.icon name="hero-x-circle" />
+        {% else %}
+            <c-ui.icon name="hero-information-circle" />
+        {% endif %}
+    {% elif icon %}
+        <c-ui.icon name="{{ icon }}" />
+    {% endif %}
+    <div>{{ slot }}</div>
+</div>
