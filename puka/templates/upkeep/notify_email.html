@@ -1,40 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
-<!--suppress HtmlRequiredTitleElement -->
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-      td {
-          padding: 0.1rem 1rem;
-      }
+    <head>
+        <meta charset="UTF-8">
+        <title>Upkeep Task Notification</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            td {
+                padding: 0.1rem 1rem;
+            }
 
-      p {
-          font-size: large;
-      }
+            p {
+                font-size: large;
+            }
 
-      .warning {
-          color: red;
-      }
-  </style>
-</head>
-<body>
-<p>The following tasks are due.</p>
-<table>
-  <tr>
-    <th>Task</th>
-    <th>Due</th>
-    <th>Consumables</th>
-  </tr>
+            .warning {
+                color: red;
+            }
+        </style>
+    </head>
+    <body>
+        <p>The following tasks are due.</p>
+        <table>
+            <tr>
+                <th>Task</th>
+                <th>Due</th>
+                <th>Consumables</th>
+            </tr>
 
-  {% for task in tasks %}
-    <tr>
-      <td><a href="https://puka.j3ff.io{% url 'upkeep:task-detail' task.id %}">{{ task.name }}</a></td>
-      <td>{{ task.earliest_due_date }}</td>
-      {% if task.are_consumables_stocked %}<td>in-stock</td>{% else %}<td class="warning">out-of-stock</td>{% endif %}
-    </tr>
-  {% endfor %}
-
-</table>
-</body>
+            {% for task in tasks %}
+                <tr>
+                    <td><a href="https://puka.j3ff.io{% url 'upkeep:task-detail' task.id %}">{{ task.name }}</a></td>
+                    <td>{{ task.earliest_due_date }}</td>
+                    {% if task.are_consumables_stocked %}<td>in-stock</td>{% else %}<td class="warning">
+                            out-of-stock
+                        </td>{% endif %}
+                </tr>
+            {% endfor %}
+        </table>
+    </body>
 </html>

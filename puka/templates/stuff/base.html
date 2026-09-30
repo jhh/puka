@@ -4,27 +4,29 @@
 {% block title %}Stuff{% endblock %}
 
 {% block menu %}
-<div class="font-semibold text-neutral-content/60">Tasks</div>
-{% partial menu-partial %}
+    <div class="font-semibold text-neutral-content/60">Tasks</div>
+    {% partial menu-partial %}
 {% endblock menu %}
 
 {% partialdef menu-partial %}
-<ul
-    hx-swap-oob="true"
-    id="id_extra_menu"
-    role="list"
-    class="menu -mx-2 mt-2" >
-    <li>
-        <a
-            hx-get="{% url 'stuff:location-list' pk=0 %}"
-            hx-target="#content"
-            hx-push-url="true"
-            @click="$refs.sidebarDrawer.checked = false"
-            href="#"
-            class="flex items-center gap-3 {% get_current_class 'stuff:location' %}" >
-            <span class="puka-task-menu">L</span>
-            <span class="truncate">Locations</span>
-        </a>
-    </li>
-</ul>
+    <ul
+        hx-swap-oob="true"
+        id="id_extra_menu"
+        role="list"
+        class="menu -mx-2 mt-2"
+    >
+        <li>
+            <a
+                hx-get="{% url 'stuff:location-list' pk=0 %}"
+                hx-target="#content"
+                hx-push-url="true"
+                @click="$refs.sidebarDrawer.checked = false"
+                href="#"
+                class="flex items-center gap-3 {% get_current_class 'stuff:location' %}"
+            >
+                <span class="puka-task-menu">L</span>
+                <span class="truncate">Locations</span>
+            </a>
+        </li>
+    </ul>
 {% endpartialdef menu-partial %}

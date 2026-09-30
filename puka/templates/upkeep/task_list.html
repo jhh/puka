@@ -3,132 +3,148 @@
 {% block title %}Tasks{% endblock %}
 
 {% partialdef list-partial %}
-<div class="flex justify-end mb-4 mt-0 gap-4">
-    <div x-data="{search: false}"
-        x-on:keydown.meta.k.window="$focus.focus($refs.searchInput)">
-        <label class="input w-64">
-            <svg class="h-[2em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <g
-                  stroke-linejoin="round"
-                  stroke-linecap="round"
-                  stroke-width="2.5"
-                  fill="none"
-                  stroke="currentColor"
+    <div class="flex justify-end mb-4 mt-0 gap-4">
+        <div x-data="{search: false}" x-on:keydown.meta.k.window="$focus.focus($refs.searchInput)">
+            <label class="input w-64">
+                <svg class="h-[2em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <g
+                        stroke-linejoin="round"
+                        stroke-linecap="round"
+                        stroke-width="2.5"
+                        fill="none"
+                        stroke="currentColor"
+                    >
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.3-4.3" />
+                    </g>
+                </svg>
+                <input
+                    type="search"
+                    x-ref="searchInput"
+                    name="query"
+                    id="search"
+                    placeholder="Search"
+                    value="{{ request.GET.query }}"
+                    hx-get="{% url 'upkeep:task-list' %}"
+                    hx-trigger="change"
+                    hx-target="#content"
+                    class="grow"
+                    x-on:keyup.esc.prevent.stop="$el.value = ''; $el.blur(); htmx.trigger($el, 'change')"
                 >
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <path d="m21 21-4.3-4.3"></path>
-                </g>
-            </svg>
-        <input type="search"
-            x-ref="searchInput"
-            name="query"
-            id="search"
-            placeholder="Search"
-            value="{{ request.GET.query }}"
-            hx-get="{% url 'upkeep:task-list' %}"
-            hx-trigger="change"
-            hx-target="#content"
-            class="grow"
-            x-on:keyup.esc.prevent.stop="$el.value = ''; $el.blur(); htmx.trigger($el, 'change')" />
-            <kbd class="hidden md:inline kbd kbd-sm">⌘</kbd>
-            <kbd class="hidden md:inline kbd kbd-sm">K</kbd>
-        </label>
-    </div>
-
-    <div class="flex md:mt-0">
-        <button hx-get="{% url 'upkeep:task-new' %}"
-            type="button"
-            hx-trigger="click"
-            hx-target="#content"
-            hx-push-url="true"
-            class="btn btn-primary hidden md:inline-flex" >
-            New Task
-        </button>
-        <button hx-get="{% url 'upkeep:task-new' %}"
-            type="button"
-            hx-trigger="click"
-            hx-target="#content"
-            hx-push-url="true"
-            class="btn btn-primary md:hidden" >
-            New
-        </button>
-    </div>
-</div>
-
-<div class="border border-base-300 rounded-box bg-base-100">
-    <div class="overflow-x-auto">
-        <table class="table table-sm w-full">
-            <thead>
-                <tr>
-                    <th scope="col" class="text-sm font-semibold text-base-content">Upcoming Task</th>
-                    <th scope="col" class="hidden sm:table-cell text-sm font-semibold text-base-content">Area</th>
-                    <th scope="col" class="text-sm font-semibold text-base-content">Due</th>
-                    <th scope="col" class="hidden md:table-cell text-sm font-semibold text-base-content">Consumables</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for task in tasks %}
-                <tr>
-                    <td class="text-sm font-medium text-base-content">
-                        <a hx-get="{% url 'upkeep:task-detail' task.id %}"
-                            hx-target="#content"
-                            hx-push-url="true"
-                            href="#"
-                            class="link link-hover link-primary" >
-                            {{ task.name }}
-                        </a>
-                    </td>
-                    <td class="hidden sm:table-cell text-sm text-base-content/70">{{ task.area.name }}</td>
-                    {# max-w-0 w-full hack from https://stackoverflow.com/questions/5239758/how-can-i-truncate-table-cells-but-fit-as-much-as-content-possible #}
-                    <td class="text-sm text-base-content/70 max-w-0 w-full truncate">
-                        {{ task.earliest_due_date|default:"" }}
-                    </td>
-                    <td class="hidden md:table-cell text-sm text-base-content/70">
-                        {% if task.are_consumables_stocked %}
-                            in-stock
-                        {% else %}
-                            out-of-stock
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <nav class="flex items-center justify-between border-t border-base-300 bg-base-100 px-4 py-3 sm:px-6" aria-label="Pagination">
-        <div class="hidden sm:block">
-            <p class="text-sm text-base-content/70">
-                Showing
-                <span class="font-medium">{{ page_obj.start_index }}</span>
-                to
-                <span class="font-medium">{{ page_obj.end_index }}</span>
-                of
-                <span class="font-medium">{{ paginator.count }}</span>
-                results
-            </p>
+                <kbd class="hidden md:inline kbd kbd-sm">⌘</kbd>
+                <kbd class="hidden md:inline kbd kbd-sm">K</kbd>
+            </label>
         </div>
-        <div class="flex flex-1 justify-between sm:justify-end">
-            {% if page_obj.has_previous %}
-                <a href="{% querystring page=page_obj.previous_page_number %}"
-                    hx-get="{% querystring page=page_obj.previous_page_number %}"
-                    hx-target="#content"
-                    hx-push-url="true"
-                    class="btn btn-sm btn-outline">Previous</a>
-            {% endif %}
 
-            {% if page_obj.has_next %}
-                <a href="{% querystring page=page_obj.next_page_number %}"
-                    hx-get="{% querystring page=page_obj.next_page_number %}"
-                    hx-target="#content"
-                    hx-push-url="true"
-                    class="btn btn-sm btn-outline ml-3">Next</a>
-            {% endif %}
+        <div class="flex md:mt-0">
+            <button
+                hx-get="{% url 'upkeep:task-new' %}"
+                type="button"
+                hx-trigger="click"
+                hx-target="#content"
+                hx-push-url="true"
+                class="btn btn-primary hidden md:inline-flex"
+            >
+                New Task
+            </button>
+            <button
+                hx-get="{% url 'upkeep:task-new' %}"
+                type="button"
+                hx-trigger="click"
+                hx-target="#content"
+                hx-push-url="true"
+                class="btn btn-primary md:hidden"
+            >
+                New
+            </button>
         </div>
-    </nav>
-</div>
+    </div>
+
+    <div class="border border-base-300 rounded-box bg-base-100">
+        <div class="overflow-x-auto">
+            <table class="table table-sm w-full">
+                <thead>
+                    <tr>
+                        <th scope="col" class="text-sm font-semibold text-base-content">Upcoming Task</th>
+                        <th scope="col" class="hidden sm:table-cell text-sm font-semibold text-base-content">Area</th>
+                        <th scope="col" class="text-sm font-semibold text-base-content">Due</th>
+                        <th scope="col" class="hidden md:table-cell text-sm font-semibold text-base-content">
+                            Consumables
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in tasks %}
+                        <tr>
+                            <td class="text-sm font-medium text-base-content">
+                                <a
+                                    hx-get="{% url 'upkeep:task-detail' task.id %}"
+                                    hx-target="#content"
+                                    hx-push-url="true"
+                                    href="#"
+                                    class="link link-hover link-primary"
+                                >
+                                    {{ task.name }}
+                                </a>
+                            </td>
+                            <td class="hidden sm:table-cell text-sm text-base-content/70">{{ task.area.name }}</td>
+                            {# max-w-0 w-full hack from https://stackoverflow.com/questions/5239758/how-can-i-truncate-table-cells-but-fit-as-much-as-content-possible #}
+                            <td class="text-sm text-base-content/70 max-w-0 w-full truncate">
+                                {{ task.earliest_due_date|default:"" }}
+                            </td>
+                            <td class="hidden md:table-cell text-sm text-base-content/70">
+                                {% if task.are_consumables_stocked %}
+                                    in-stock
+                                {% else %}
+                                    out-of-stock
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <nav
+            class="flex items-center justify-between border-t border-base-300 bg-base-100 px-4 py-3 sm:px-6"
+            aria-label="Pagination"
+        >
+            <div class="hidden sm:block">
+                <p class="text-sm text-base-content/70">
+                    Showing
+                    <span class="font-medium">{{ page_obj.start_index }}</span>
+                    to
+                    <span class="font-medium">{{ page_obj.end_index }}</span>
+                    of
+                    <span class="font-medium">{{ paginator.count }}</span>
+                    results
+                </p>
+            </div>
+            <div class="flex flex-1 justify-between sm:justify-end">
+                {% if page_obj.has_previous %}
+                    <a
+                        href="{% querystring page=page_obj.previous_page_number %}"
+                        hx-get="{% querystring page=page_obj.previous_page_number %}"
+                        hx-target="#content"
+                        hx-push-url="true"
+                        class="btn btn-sm btn-outline"
+                    >Previous</a>
+                {% endif %}
+
+                {% if page_obj.has_next %}
+                    <a
+                        href="{% querystring page=page_obj.next_page_number %}"
+                        hx-get="{% querystring page=page_obj.next_page_number %}"
+                        hx-target="#content"
+                        hx-push-url="true"
+                        class="btn btn-sm btn-outline ml-3"
+                    >Next</a>
+                {% endif %}
+            </div>
+        </nav>
+    </div>
 {% endpartialdef list-partial %}
 
 {% block content %}
-{% partial list-partial %}
+    {% partial list-partial %}
 {% endblock content %}

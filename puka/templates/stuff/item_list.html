@@ -3,156 +3,157 @@
 {% block title %}Inventory{% endblock %}
 
 {% block breadcrumbs %}
-<ul>
-    <li><a href="{% url 'home' %}">Overview</a></li>
-    <li><a href="{% url 'stuff:item-list' %}">Inventory</a></li>
-</ul>
+    <ul>
+        <li><a href="{% url 'home' %}">Overview</a></li>
+        <li><a href="{% url 'stuff:item-list' %}">Inventory</a></li>
+    </ul>
 {% endblock breadcrumbs %}
 
 {% block content %}
-{% partialdef list-partial inline %}
-<div class="flex justify-end gap-2 mb-4 mt-0">
-    <div
-        class="w-80"
-        x-data="{}"
-        x-on:keydown.meta.k.window="$focus.focus($refs.searchInput)">
-        <label class="input">
-            <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <g
-                    stroke-linejoin="round"
-                    stroke-linecap="round"
-                    stroke-width="2.5"
-                    fill="none"
-                    stroke="currentColor"
-                >
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <path d="m21 21-4.3-4.3"></path>
-                </g>
-            </svg>
-            <input
-                type="text"
-                x-ref="searchInput"
-                name="query"
-                id="search"
-                placeholder="Search"
-                value="{{ query }}"
-                hx-get="{% url 'stuff:item-list' %}"
-                hx-trigger="input changed delay:0.5s"
-                hx-target="#content"
-                class="grow"
-                x-on:keyup.esc.prevent.stop="$el.value = ''; $el.blur(); $el.dispatchEvent(new Event('input', { bubbles: true }))"
+    {% partialdef list-partial inline %}
+        <div class="flex justify-end gap-2 mb-4 mt-0">
+            <div
+                class="w-80"
+                x-data="{}"
+                x-on:keydown.meta.k.window="$focus.focus($refs.searchInput)"
             >
-            <kbd class="kbd kbd-sm">⌘</kbd>
-            <kbd class="kbd kbd-sm">K</kbd>
-        </label>
-    </div>
-
-    <div class="flex md:mt-0">
-        <a
-            href="{% url 'stuff:item-new' %}"
-            hx-get="{% url 'stuff:item-new' %}"
-            hx-target="#content"
-            hx-push-url="true"
-            class="btn btn-primary hidden md:inline-flex"
-        >New Item</a>
-        <a
-            href="{% url 'stuff:item-new' %}"
-            hx-get="{% url 'stuff:item-new' %}"
-            hx-target="#content"
-            hx-push-url="true"
-            class="btn btn-primary md:hidden"
-        >New</a>
-    </div>
-</div>
-
-<div class="overflow-x-auto rounded-box border border-base-300 bg-base-100">
-    <div class="h-[calc(100vh-14rem)] overflow-x-auto">
-        <table class="table table-pin-rows table-zebra">
-            <thead>
-                <tr>
-                    <th scope="col" class="w-3/4 font-semibold text-base-content">Item</th>
-                    <th scope="col" class="hidden sm:table-cell font-semibold text-base-content">Quantity</th>
-                    <th scope="col" class="font-semibold text-base-content">Location</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in items %}
-                <tr>
-                    <td class="w-3/4 whitespace-nowrap">
-                        <a
-                            href="{% url 'stuff:item-detail' item.pk %}"
-                            hx-boost="true"
-                            class="link link-hover font-semibold"
+                <label class="input">
+                    <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <g
+                            stroke-linejoin="round"
+                            stroke-linecap="round"
+                            stroke-width="2.5"
+                            fill="none"
+                            stroke="currentColor"
                         >
-                            {{ item.name }}
-                        </a>
-                        {% if item.tags.all %}
-                            <div class="mt-0.5">
-                                {% for tag in item.tags.all %}
-                                    <a
-                                        href="{% url 'stuff:item-list' %}?query=%23{{ tag }}"
-                                        hx-get="{% url 'stuff:item-list' %}?query=%23{{ tag }}"
-                                        hx-push-url="true"
-                                        hx-target="#content"
-                                        class="mr-1 text-xs link-primary"
-                                    >
-                                        <span class="hero-hashtag-mini size-2.25"></span>{{ tag }}
-                                    </a>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </td>
-                    <td class="hidden sm:table-cell text-base-content/70">{{ item.quantity }}</td>
-                    {# max-w-0 w-full hack from https://stackoverflow.com/questions/5239758/how-can-i-truncate-table-cells-but-fit-as-much-as-content-possible #}
-                    <td class="text-base-content/70 max-w-0 w-full truncate">
-                        {% for inv in item.inventories.all %}
-                            <a
-                                href="{% url 'stuff:location-detail' pk=inv.location.id %}"
-                                hx-get="{% url 'stuff:location-detail' pk=inv.location.id %}"
-                                hx-target="#content"
-                                hx-push-url="true"
-                                class="link link-hover link-secondary"
-                            >{{ inv.location.name }}</a>{% if not forloop.last %}, {% endif %}
-                        {% endfor %}
-                    </td>
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="m21 21-4.3-4.3" />
+                        </g>
+                    </svg>
+                    <input
+                        type="text"
+                        x-ref="searchInput"
+                        name="query"
+                        id="search"
+                        placeholder="Search"
+                        value="{{ query }}"
+                        hx-get="{% url 'stuff:item-list' %}"
+                        hx-trigger="input changed delay:0.5s"
+                        hx-target="#content"
+                        class="grow"
+                        x-on:keyup.esc.prevent.stop="$el.value = ''; $el.blur(); $el.dispatchEvent(new Event('input', { bubbles: true }))"
+                    >
+                    <kbd class="kbd kbd-sm">⌘</kbd>
+                    <kbd class="kbd kbd-sm">K</kbd>
+                </label>
+            </div>
 
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <div class="flex items-center justify-between border-t border-base-300 px-4 py-3 sm:px-6">
-        <p class="hidden sm:block text-sm text-base-content/70">
-            Showing
-            <span class="font-medium">{{ page_obj.start_index }}</span>
-            to
-            <span class="font-medium">{{ page_obj.end_index }}</span>
-            of
-            <span class="font-medium">{{ paginator.count }}</span>
-            results
-        </p>
-        <div class="join">
-            <a
-                {% if page_obj.has_previous %}
-                    href="{% querystring page=page_obj.previous_page_number query=query %}"
-                    hx-get="{% querystring page=page_obj.previous_page_number query=query %}"
+            <div class="flex md:mt-0">
+                <a
+                    href="{% url 'stuff:item-new' %}"
+                    hx-get="{% url 'stuff:item-new' %}"
                     hx-target="#content"
                     hx-push-url="true"
-                {% endif %}
-                class="join-item btn btn-sm btn-ghost {% if not page_obj.has_previous %}btn-disabled{% endif %}"
-            >Previous</a>
-            <a
-                {% if page_obj.has_next %}
-                    href="{% querystring page=page_obj.next_page_number query=query %}"
-                    hx-get="{% querystring page=page_obj.next_page_number query=query %}"
+                    class="btn btn-primary hidden md:inline-flex"
+                >New Item</a>
+                <a
+                    href="{% url 'stuff:item-new' %}"
+                    hx-get="{% url 'stuff:item-new' %}"
                     hx-target="#content"
                     hx-push-url="true"
-                {% endif %}
-                class="join-item btn btn-sm btn-ghost {% if not page_obj.has_next %}btn-disabled{% endif %}"
-            >Next</a>
+                    class="btn btn-primary md:hidden"
+                >New</a>
+            </div>
         </div>
-    </div>
-</div>
-{% endpartialdef list-partial %}
+
+        <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100">
+            <div class="h-[calc(100vh-14rem)] overflow-x-auto">
+                <table class="table table-pin-rows table-zebra">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="w-3/4 font-semibold text-base-content">Item</th>
+                            <th scope="col" class="hidden sm:table-cell font-semibold text-base-content">Quantity</th>
+                            <th scope="col" class="font-semibold text-base-content">Location</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                            <tr>
+                                <td class="w-3/4 whitespace-nowrap">
+                                    <a
+                                        href="{% url 'stuff:item-detail' item.pk %}"
+                                        hx-boost="true"
+                                        class="link link-hover font-semibold"
+                                    >
+                                        {{ item.name }}
+                                    </a>
+                                    {% if item.tags.all %}
+                                        <div class="mt-0.5">
+                                            {% for tag in item.tags.all %}
+                                                <a
+                                                    href="{% url 'stuff:item-list' %}?query=%23{{ tag }}"
+                                                    hx-get="{% url 'stuff:item-list' %}?query=%23{{ tag }}"
+                                                    hx-push-url="true"
+                                                    hx-target="#content"
+                                                    class="mr-1 text-xs link-primary"
+                                                >
+                                                    <span class="hero-hashtag-mini size-2.25"></span>{{ tag }}
+                                                </a>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td class="hidden sm:table-cell text-base-content/70">{{ item.quantity }}</td>
+                                {# max-w-0 w-full hack from https://stackoverflow.com/questions/5239758/how-can-i-truncate-table-cells-but-fit-as-much-as-content-possible #}
+                                <td class="text-base-content/70 max-w-0 w-full truncate">
+                                    {% for inv in item.inventories.all %}
+                                        <a
+                                            href="{% url 'stuff:location-detail' pk=inv.location.id %}"
+                                            hx-get="{% url 'stuff:location-detail' pk=inv.location.id %}"
+                                            hx-target="#content"
+                                            hx-push-url="true"
+                                            class="link link-hover link-secondary"
+                                        >{{ inv.location.name }}</a>{% if not forloop.last %},
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flex items-center justify-between border-t border-base-300 px-4 py-3 sm:px-6">
+                <p class="hidden sm:block text-sm text-base-content/70">
+                    Showing
+                    <span class="font-medium">{{ page_obj.start_index }}</span>
+                    to
+                    <span class="font-medium">{{ page_obj.end_index }}</span>
+                    of
+                    <span class="font-medium">{{ paginator.count }}</span>
+                    results
+                </p>
+                <div class="join">
+                    <a
+                        {% if page_obj.has_previous %}
+                            href="{% querystring page=page_obj.previous_page_number query=query %}"
+                            hx-get="{% querystring page=page_obj.previous_page_number query=query %}"
+                            hx-target="#content"
+                            hx-push-url="true"
+                        {% endif %}
+                        class="join-item btn btn-sm btn-ghost {% if not page_obj.has_previous %}btn-disabled{% endif %}"
+                    >Previous</a>
+                    <a
+                        {% if page_obj.has_next %}
+                            href="{% querystring page=page_obj.next_page_number query=query %}"
+                            hx-get="{% querystring page=page_obj.next_page_number query=query %}"
+                            hx-target="#content"
+                            hx-push-url="true"
+                        {% endif %}
+                        class="join-item btn btn-sm btn-ghost {% if not page_obj.has_next %}btn-disabled{% endif %}"
+                    >Next</a>
+                </div>
+            </div>
+        </div>
+    {% endpartialdef list-partial %}
 {% endblock content %}

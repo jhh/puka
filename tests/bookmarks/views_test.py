@@ -4,6 +4,8 @@ from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertTemplateUsed
 
 from puka.bookmarks.models import Bookmark
+from tests.conftest import create_bookmark
+from tests.utils import parse_html
 
 
 def test_bookmarks(admin_client, succulents_bookmark):
@@ -124,3 +126,18 @@ def test_invalid_update_bookmark(admin_client, typewriter_bookmark):
     assert len(qs) == 0
     assertContains(response, "vaporware pabst")
     assertContains(response, "error")
+
+
+def test_tags_grouped_by_bucket(admin_client):
+    for i in range(6):
+        create_bookmark(f"bookmark {i}", url=f"https://example.com/{i}", tags=["common"])
+    create_bookmark("rare bookmark", url="https://example.com/rare", tags=["rare"])
+
+    response = admin_client.get(reverse("bookmarks:tags"), headers={"HX-Request": "true"})
+    page = parse_html(response.content)
+
+    headings = [el.text for el in page.find("h2")]
+    assert headings == ["5—10", "< 5"]
+    assert len(page.find("ul")) == 2
+    badges = [el.text for el in page.find("span") if "badge" in el.attrs.get("class", "")]
+    assert badges == ["common 6", "rare 1"]

@@ -4,27 +4,21 @@
 {% block title %}Log In{% endblock %}
 
 {% block root %}
-    <div
-        class="flex min-h-full flex-col items-center justify-center py-12 sm:px-6 lg:px-8"
-    >
+    <div class="flex min-h-full flex-col items-center justify-center py-12 sm:px-6 lg:px-8">
         <div class="sm:mx-auto sm:w-full sm:max-w-md">
             <img
                 class="mx-auto h-10 w-auto"
                 src="{% static 'puka-logo.svg' %}"
                 alt="Puka"
             >
-            <h2
-                class="mt-6 text-center text-2xl/9 font-bold tracking-tight text-base-content"
-            >
+            <h2 class="mt-6 text-center text-2xl/9 font-bold tracking-tight text-base-content">
                 Sign in to your account
             </h2>
         </div>
 
         <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
-            <div
-                class="border border-base-200 bg-base-100 px-6 py-12 shadow-sm sm:rounded-lg sm:px-12"
-            >
-                <form class="space-y-6" method="POST">
+            <div class="border border-base-200 bg-base-100 px-6 py-12 shadow-sm sm:rounded-lg sm:px-12">
+                <form class="space-y-6" method="post">
                     {% csrf_token %}
                     <div>
                         <label for="id_username" class="label">
@@ -79,8 +73,6 @@
                         </button>
                     </div>
                 </form>
-
-
             </div>
 
             <p class="mt-10 text-center text-sm/6 text-base-content/60">

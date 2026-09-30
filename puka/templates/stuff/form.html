@@ -2,11 +2,11 @@
 {% load crispy_forms_tags %}
 
 {% partialdef form-partial %}
-  {% crispy form %}
+    {% crispy form %}
 {% endpartialdef form-partial %}
 
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-  {% partial form-partial %}
+    {% partial form-partial %}
 {% endblock content %}
