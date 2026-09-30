@@ -18,7 +18,9 @@ from .factories import (
     ItemFactory,
     ItemWithInventoryFactory,
     LocationFactory,
+    ScheduleFactory,
     TaskFactory,
+    TaskItemFactory,
 )
 
 
@@ -121,6 +123,8 @@ register(ItemWithInventoryFactory)
 
 register(AreaFactory)
 register(TaskFactory)
+register(ScheduleFactory)
+register(TaskItemFactory)
 
 
 @pytest.fixture

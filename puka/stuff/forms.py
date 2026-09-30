@@ -35,16 +35,16 @@ class LocationForm(MoveNodeForm):
                 css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
             ),
             Div(
-                Field("_position", wrapper_class="sm:col-span-6"),
+                Field("treebeard_position", wrapper_class="sm:col-span-6"),
                 css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
             ),
             Div(
-                Field("_ref_node_id", wrapper_class="sm:col-span-6"),
+                Field("treebeard_ref_node", wrapper_class="sm:col-span-6"),
                 css_class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6",
             ),
             Div(
                 PrimaryButton("submit", "Save location"),
-                CancelButton("stuff:location-list", "Cancel"),
+                CancelButton("stuff:location-list", "Cancel", url_args=[0]),
                 delete_button,
                 css_class="mt-4 flex gap-x-4",
             ),

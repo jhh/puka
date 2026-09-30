@@ -1,4 +1,4 @@
-from datetime import time
+from datetime import date, time
 
 from factory.declarations import RelatedFactory, SubFactory
 from factory.django import DjangoModelFactory
@@ -6,10 +6,10 @@ from factory.faker import Faker
 
 from puka.bookmarks.models import Bookmark
 from puka.stuff.models import Inventory, Item, Location
-from puka.upkeep.models import Area, Task
+from puka.upkeep.models import Area, Schedule, Task, TaskItem
 
 
-class BookmarkFactory(DjangoModelFactory):
+class BookmarkFactory(DjangoModelFactory[Bookmark]):
     class Meta:
         model = Bookmark
 
@@ -19,7 +19,7 @@ class BookmarkFactory(DjangoModelFactory):
     active = Faker("boolean")
 
 
-class LocationFactory(DjangoModelFactory):
+class LocationFactory(DjangoModelFactory[Location]):
     class Meta:
         model = Location
         django_get_or_create = ("code",)
@@ -36,7 +36,7 @@ class LocationFactory(DjangoModelFactory):
         return model_class.objects.add_child(parent, kwargs)
 
 
-class ItemFactory(DjangoModelFactory):
+class ItemFactory(DjangoModelFactory[Item]):
     class Meta:
         model = Item
 
@@ -45,7 +45,7 @@ class ItemFactory(DjangoModelFactory):
     notes = Faker("sentence")
 
 
-class InventoryFactory(DjangoModelFactory):
+class InventoryFactory(DjangoModelFactory[Inventory]):
     class Meta:
         model = Inventory
 
@@ -61,7 +61,7 @@ class ItemWithInventoryFactory(ItemFactory):
     inventory = RelatedFactory(InventoryFactory, factory_related_name="item")
 
 
-class AreaFactory(DjangoModelFactory):
+class AreaFactory(DjangoModelFactory[Area]):
     class Meta:
         model = Area
 
@@ -69,7 +69,7 @@ class AreaFactory(DjangoModelFactory):
     notes = Faker("sentence")
 
 
-class TaskFactory(DjangoModelFactory):
+class TaskFactory(DjangoModelFactory[Task]):
     class Meta:
         model = Task
 
@@ -79,3 +79,21 @@ class TaskFactory(DjangoModelFactory):
     interval = 6
     frequency = "months"
     area = SubFactory(AreaFactory)
+
+
+class ScheduleFactory(DjangoModelFactory[Schedule]):
+    class Meta:
+        model = Schedule
+
+    task = SubFactory(TaskFactory)
+    due_date = date(2024, 1, 1)
+    notes = Faker("sentence")
+
+
+class TaskItemFactory(DjangoModelFactory[TaskItem]):
+    class Meta:
+        model = TaskItem
+
+    task = SubFactory(TaskFactory)
+    item = SubFactory(ItemFactory)
+    quantity = 1

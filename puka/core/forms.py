@@ -14,10 +14,11 @@ class PrimaryButton(Submit):
 
 
 class CancelButton(HTML):
-    def __init__(self, url_name, label="Cancel"):
+    def __init__(self, url_name, label="Cancel", url_args=()):
+        url = " ".join([f"'{url_name}'", *(str(arg) for arg in url_args)])
         super().__init__(
-            f"""<a href="{{% url '{url_name}' %}}"
-            hx-get="{{% url '{url_name}' %}}"
+            f"""<a href="{{% url {url} %}}"
+            hx-get="{{% url {url} %}}"
             hx-target="#content"
             hx-push-url="true"
             class="text-sm/6 font-semibold text-gray-900">{label}</a>""",

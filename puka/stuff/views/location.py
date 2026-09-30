@@ -14,14 +14,14 @@ logger = logging.getLogger(__name__)
 
 
 class LocationListView(ListView):
-    template_name = "stuff/location_list.html"
     context_object_name = "locations"
 
     def get_template_names(self):
-        return "stuff/location_list.html"
+        return get_template(self.request, "stuff/location_list.html", "#list-partial")
 
     def get_queryset(self):
-        pk = self.kwargs.get("pk")
+        # "stuff:location" has no pk and lists the root nodes, like pk 0.
+        pk = self.kwargs.get("pk", 0)
 
         if pk == 0:
             self.ancestors = []
@@ -34,7 +34,7 @@ class LocationListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["parent_id"] = self.kwargs.get("pk")
+        context["parent_id"] = self.kwargs.get("pk", 0)
         context["ancestors"] = self.ancestors
         return context
 
@@ -64,7 +64,12 @@ class LocationCreateView(CreateView):
         return movenodeform_factory(Location, form=LocationForm)
 
     def get_initial(self):
-        return {"_ref_node_id": self.request.GET.get("parent")}
+        # parent=0 (or missing) means a new root node, which treebeard represents as None.
+        parent = self.request.GET.get("parent")
+        return {
+            "treebeard_position": "sorted-child",
+            "treebeard_ref_node": parent if parent and parent != "0" else None,
+        }
 
 
 class LocationUpdateView(UpdateView):
