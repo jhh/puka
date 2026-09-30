@@ -1,0 +1,18 @@
+{% comment %}
+<form> with the CSRF token (for POST) and the form's non-field and hidden-field errors.
+action: when set, submit with htmx (hx-post, or hx-get for method="get"); otherwise it's a
+plain form that submits to the current URL. form: the Django form, for its errors.
+class: replaces the default spacing (space-y-4).
+{% endcomment %}
+<c-vars action="" method="post" form="" class="space-y-4" />
+
+<form
+    method="{{ method }}"
+    {% if action and method == "get" %}hx-get="{{ action }}"{% elif action %}hx-post="{{ action }}"{% endif %}
+    class="{{ class }}"
+    {{ attrs }}
+>
+    {% if method == "post" %}{% csrf_token %}{% endif %}
+    {% if form %}<c-form.errors :form="form" />{% endif %}
+    {{ slot }}
+</form>

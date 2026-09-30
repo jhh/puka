@@ -1,22 +1,15 @@
 from __future__ import annotations
 
-from django.forms import CheckboxInput, ModelForm, Textarea, TextInput
-from taggit.forms import TagWidget
+from django.forms import ModelForm, TextInput
 
 from puka.bookmarks.models import Bookmark
 
 
 class BookmarkForm(ModelForm):
+    template_name = "bookmarks/forms/bookmark.html"
+
     class Meta:
         model = Bookmark
         fields = ("title", "description", "url", "tags", "active")
-        widgets = {  # noqa: RUF012
-            "title": TextInput(attrs={"class": "input w-full"}),
-            "description": Textarea(attrs={"class": "textarea w-full"}),
-            "url": TextInput(attrs={"class": "input w-full"}),
-            "tags": TagWidget(attrs={"class": "input w-full"}),
-            "active": CheckboxInput(attrs={"class": "checkbox checkbox-sm"}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        # A plain text input, not type="url", so the server validates and reports errors.
+        widgets = {"url": TextInput()}  # noqa: RUF012

@@ -1,11 +1,9 @@
 {% extends "upkeep/base.html" %}
-{% load crispy_forms_tags %}
 
 {% partialdef form-partial %}
-    {% crispy form %}
+    {# The form's own template (its template_name) lays out the fields and buttons. #}
+    <c-form.form action="{{ request.path }}" :form="form">{{ form }}</c-form.form>
 {% endpartialdef form-partial %}
-
-{% block title %}{{ title }}{% endblock %}
 
 {% block content %}
     {% partial form-partial %}

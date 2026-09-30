@@ -15,40 +15,21 @@
 {% endblock content %}
 
 {% partialdef filter-partial %}
-    <form method="get" class="mb-4">
-        <div class="fieldset mb-2">
-            <label>
-                <span class="label mb-1">Title or description contains words</span>
-                {{ filter.form.text }}
-            </label>
+    <c-form.form method="get" :form="filter.form" class="mb-4 space-y-4">
+        <div class="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2">
+            <c-form.field :field="filter.form.text" class="sm:col-span-2" />
+            <c-form.field :field="filter.form.tags" />
+            <c-form.field :field="filter.form.url" />
+            <c-form.field :field="filter.form.created" />
+            <c-form.field :field="filter.form.active" />
         </div>
-        <div class="fieldset mb-2">
-            <label>
-                <span class="label mb-1">Tag name is in</span>
-                {{ filter.form.tags }}
-            </label>
-        </div>
-        <div class="fieldset grid-cols-2 mb-2">
-            <label>
-                <div class="label mb-1 block">Year created</div>
-                {{ filter.form.created }}
-            </label>
-            <label>
-                <div class="label mb-1 block">Active</div>
-                {{ filter.form.active }}
-            </label>
-        </div>
-        <footer>
-            <button class="btn btn-primary">Search</button>
-            <a
-                href="{% url 'bookmarks:filter' %}"
-                class="btn btn-primary btn-soft"
-            >
-                Clear
-            </a>
-        </footer>
-    </form>
-    </form>
+        <c-form.actions
+            submit="Search"
+            cancel="{% url 'bookmarks:filter' %}"
+            cancel_label="Clear"
+            cancel_target=""
+        />
+    </c-form.form>
     <ul
         id="id_bookmarks"
         class="list rounded-box border border-base-300 shadow-sm bg-base-100"

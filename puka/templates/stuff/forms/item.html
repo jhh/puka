@@ -1,0 +1,19 @@
+{# ItemForm.template_name. The location, quantity and bookmark fields are only for new items. #}
+<div class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
+    <c-form.field :field="form.name" class="sm:col-span-6" />
+    <c-form.field :field="form.reorder_level" class="sm:col-span-2" />
+    <c-form.field :field="form.tags" class="sm:col-span-4" />
+    <c-form.field :field="form.notes" class="sm:col-span-6" />
+    {% if not form.instance.pk %}
+        <c-form.field :field="form.location_code" class="sm:col-span-4" />
+        <c-form.field :field="form.quantity" class="sm:col-span-2" />
+        <c-form.field :field="form.bookmark_url" class="sm:col-span-6" />
+    {% endif %}
+</div>
+{% if form.instance.pk %}{% url 'stuff:item-delete' form.instance.pk as delete_url %}{% endif %}
+<c-form.actions
+    submit="Save item"
+    cancel="{% url 'stuff:item-list' %}"
+    delete="{{ delete_url }}"
+    confirm="Delete this item?"
+/>

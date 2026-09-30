@@ -96,7 +96,6 @@ update-npm:
 # rebuild CSS
 [group('update')]
 update-css:
-    rm -f .venv/.gitignore
     npx @tailwindcss/cli --input=puka/static/puka/base.css --output=puka/static/puka/main.css
 
 # rebuild JS

@@ -18,33 +18,9 @@
 
         <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
             <div class="border border-base-200 bg-base-100 px-6 py-12 shadow-sm sm:rounded-lg sm:px-12">
-                <form class="space-y-6" method="post">
-                    {% csrf_token %}
-                    <div>
-                        <label for="id_username" class="label">
-                            User Name
-                        </label>
-                        <input
-                            type="text"
-                            name="username"
-                            id="id_username"
-                            autocomplete="username"
-                            required
-                            class="input w-full"
-                        >
-                    </div>
-
-                    <div>
-                        <label for="id_password" class="label">Password</label>
-                        <input
-                            type="password"
-                            name="password"
-                            id="id_password"
-                            autocomplete="current-password"
-                            required
-                            class="input w-full"
-                        >
-                    </div>
+                <c-form.form :form="form" class="space-y-6">
+                    <c-form.field :field="form.username" label="User Name" />
+                    <c-form.field :field="form.password" />
 
                     <div class="flex items-center justify-between">
                         <label class="flex items-center gap-3">
@@ -67,12 +43,8 @@
                         </a>
                     </div>
 
-                    <div>
-                        <button type="submit" class="btn btn-primary btn-block">
-                            Sign in
-                        </button>
-                    </div>
-                </form>
+                    <c-ui.button type="submit" variant="primary" class="btn-block">Sign in</c-ui.button>
+                </c-form.form>
             </div>
 
             <p class="mt-10 text-center text-sm/6 text-base-content/60">

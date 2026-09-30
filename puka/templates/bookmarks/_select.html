@@ -1,5 +1,4 @@
 {% extends "stuff/base.html" %}
-{% load crispy_forms_tags %}
 
 {% block title %}Select Bookmark{% endblock %}
 
@@ -8,7 +7,17 @@
 {% endblock content %}
 
 {% partialdef filter-partial %}
-    {% crispy filter.form %}
+    <c-form.form
+        method="get"
+        action="{{ request.path }}"
+        :form="filter.form"
+        hx-target="#content"
+        hx-push-url="true"
+        class="mb-4 space-y-4"
+    >
+        <c-form.fields :form="filter.form" class="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2" />
+        <c-form.actions submit="Search" cancel="{{ request.path }}" cancel_label="Clear" />
+    </c-form.form>
     <ul id="id_bookmarks" class="menu bg-base-100 shadow-sm">
         {% for bookmark in bookmarks %}
             <li>

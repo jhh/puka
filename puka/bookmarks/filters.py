@@ -1,5 +1,4 @@
 import django_filters
-from django import forms
 from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.db.models import F
 
@@ -22,7 +21,6 @@ class BookmarkFilter(django_filters.FilterSet):
     text = django_filters.CharFilter(
         method=filter_full_text_search,
         label="Title or description contains words",
-        widget=forms.TextInput(attrs={"class": "input w-full"}),
     )
     created = django_filters.ChoiceFilter(
         field_name="created",
@@ -30,16 +28,14 @@ class BookmarkFilter(django_filters.FilterSet):
         label="Year created",
         empty_label="Any",
         choices=YEAR_CHOICES,
-        widget=forms.Select(attrs={"class": "select leading-4"}),
     )
-    url = django_filters.CharFilter(lookup_expr="icontains")
-    tags = TagFilter(field_name="tags__name")
+    url = django_filters.CharFilter(lookup_expr="icontains", label="URL contains")
+    tags = TagFilter(field_name="tags__name", label="Tag name is in")
     active = django_filters.ChoiceFilter(
         field_name="active",
         label="Active",
         empty_label="Any",
         choices=[(True, "Yes"), (False, "No")],
-        widget=forms.Select(attrs={"class": "select leading-4"}),
     )
 
     class Meta:

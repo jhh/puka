@@ -1,0 +1,32 @@
+{% comment %}
+One form field as a daisyUI fieldset: label, widget, help text and errors.
+field: a BoundField, e.g. :field="form.name". label: overrides the field's label.
+class: wrapper classes, e.g. a grid span. Hidden fields render just the widget; checkboxes
+put the label beside the box. The widget's daisyUI class comes from puka.core.forms.
+{% endcomment %}
+<c-vars field label="" class />
+
+{% if field.is_hidden %}
+    {{ field }}
+{% else %}
+    <fieldset class="fieldset {{ class }}" {{ attrs }}>
+        {% if field.widget_type == "checkbox" %}
+            <label class="label gap-2 text-sm text-base-content" for="{{ field.id_for_label }}">
+                {{ field }}
+                {% firstof label field.label %}
+            </label>
+        {% else %}
+            <label class="fieldset-legend" for="{{ field.id_for_label }}">
+                {% firstof label field.label %}{% if field.field.required %}<span class="text-error" aria-hidden="true"
+                    >*</span>{% endif %}
+            </label>
+            {{ field }}
+        {% endif %}
+        {% if field.help_text %}<p id="{{ field.auto_id }}_helptext" class="label">{{ field.help_text }}</p>{% endif %}
+        {% if field.errors %}
+            <p id="{{ field.auto_id }}_error" class="label text-error">
+                {% for error in field.errors %}{{ error }}{% if not forloop.last %} {% endif %}{% endfor %}
+            </p>
+        {% endif %}
+    </fieldset>
+{% endif %}

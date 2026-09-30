@@ -1,0 +1,14 @@
+{# LocationForm.template_name, rendered inside <c-form.form> by {{ form }}. #}
+<div class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
+    <c-form.field :field="form.name" class="sm:col-span-4" />
+    <c-form.field :field="form.code" class="sm:col-span-2" />
+    <c-form.field :field="form.treebeard_position" class="sm:col-span-6" />
+    <c-form.field :field="form.treebeard_ref_node" class="sm:col-span-6" />
+</div>
+{% if form.instance.pk %}{% url 'stuff:location-delete' form.instance.pk as delete_url %}{% endif %}
+<c-form.actions
+    submit="Save location"
+    cancel="{% url 'stuff:location-list' 0 %}"
+    delete="{{ delete_url }}"
+    confirm="Delete this location?"
+/>

@@ -1,0 +1,18 @@
+{% comment %}
+A form's non-field errors, and errors on hidden fields (which have nowhere else to show).
+Field errors are shown by <c-form.field>.
+{% endcomment %}
+<c-vars form />
+
+{% if form.non_field_errors %}
+    <c-ui.alert variant="error" style="soft">
+        {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+    </c-ui.alert>
+{% endif %}
+{% for field in form.hidden_fields %}
+    {% if field.errors %}
+        <c-ui.alert variant="error" style="soft">
+            {% for error in field.errors %}<p>{{ field.label }}: {{ error }}</p>{% endfor %}
+        </c-ui.alert>
+    {% endif %}
+{% endfor %}

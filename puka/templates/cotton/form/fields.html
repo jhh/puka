@@ -1,0 +1,12 @@
+{% comment %}
+Every field of a simple form, in order: visible fields in a grid, then hidden fields.
+class: the grid classes.
+{% endcomment %}
+<c-vars form class="grid grid-cols-1 gap-x-6 gap-y-4" />
+
+<div class="{{ class }}" {{ attrs }}>
+    {% for field in form.visible_fields %}
+        <c-form.field :field="field" />
+    {% endfor %}
+</div>
+{% for field in form.hidden_fields %}{{ field }}{% endfor %}

@@ -36,8 +36,7 @@ Nix devshell, `just` task runner. Run every command inside the devshell.
 - Lint/format: `uv run ruff format .` then `uv run ruff check .`.
 - Types: `just ty`. CI runs `ty check --error-on-warning`, so use
   `uv run ty check --error-on-warning` to match; `ty` over pyright/mypy.
-- Templates: `just djangofmt` (format + lint) and `just djade`. Config is
-  `[tool.djangofmt]` in `pyproject.toml`; `templates/tailwind/` is excluded.
+- Templates: `just djangofmt` (format + lint) and `just djade`.
 - Assets: `just update-css`, `just update-js`, `just watch`. Rebuild after
   editing `base.css`/`base.js` or Tailwind classes in templates.
 - `pre-commit run --all-files`. The config is a Nix-store symlink generated
@@ -51,6 +50,10 @@ Nix devshell, `just` task runner. Run every command inside the devshell.
 - CI is only `nix flake check -L --keep-going`. Reproduce locally before
   pushing. Checks: pre-commit, `ty` (warnings fatal), NixOS integration
   tests, and pytest (Linux-only, so skipped on macOS — run `just test`).
+- Run `jj st` right before `nix flake check` (or `nix build`). Nix reads the
+  source from the git tree, which jj only updates when it snapshots the
+  working copy; without it, new or edited files may be missing from the
+  build (e.g. `TemplateDoesNotExist` in the Nix pytest check).
 - NixOS integration tests (`nix/checks/tests.py`):
   `nix build .#checks.aarch64-darwin.puka-integration-tests -L`
 
@@ -76,5 +79,6 @@ Nix devshell, `just` task runner. Run every command inside the devshell.
   `puka/core/views.py`; templates define `{% partialdef name %}` (Django 6
   built-in partials). Keep the root -> sidebar -> app template layout.
 - `htmx.org` is pinned to `4.0.0` in `just npm-update`; use htmx 4 APIs.
-- Crispy forms use `crispy-tailwind`; overrides live in
-  `puka/templates/tailwind/layout/`.
+- Forms: each form sets `template_name` to a template of `<c-form.field>`s
+  and `<c-form.actions>`; pages wrap `{{ form }}` in `<c-form.form>`.
+  `FORM_RENDERER` (`puka/core/forms.py`) adds daisyUI classes to widgets.

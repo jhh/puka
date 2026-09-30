@@ -209,19 +209,6 @@ wheels = [
 ]
 
 [[package]]
-name = "crispy-tailwind"
-version = "1.0.3"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "django" },
-    { name = "django-crispy-forms" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/ae/ac/a307ae5ce869d7151b90d4b8b042a48eb454a936dacc695f6418486e5bd8/crispy-tailwind-1.0.3.tar.gz", hash = "sha256:2bc9f616d406e4b003f25d46fcb0079f1c2522719d97adb107667271d849459a", size = 19172, upload-time = "2024-02-13T09:52:37.895Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/c9/ca/11f65e24f3c182dfaf90fd3710d2dcca0fbc3026923e47b43f52a4a2349b/crispy_tailwind-1.0.3-py3-none-any.whl", hash = "sha256:31427f66b1c4fd0d6fb040f4197cfb97d104cdbe7641ea2dea940c0057c4db4b", size = 25700, upload-time = "2024-02-13T09:52:35.928Z" },
-]
-
-[[package]]
 name = "dj-database-url"
 version = "3.1.2"
 source = { registry = "https://pypi.org/simple" }
@@ -292,18 +279,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/02/cd/5c467a1495b756f56246a6d8d36425517cd01bd3aa4bc6209a821f83ec74/django_cotton-2.7.2.tar.gz", hash = "sha256:7e050042873f724beaa5824e86d5034ced2f7de1c5478c3a9d8c053e05caa8ac", size = 33171, upload-time = "2026-06-01T22:52:00.314Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8b/9b/d75158f6280906befada54f9cb17c10d5e0eac078d8d2e189e2f90da0fc1/django_cotton-2.7.2-py3-none-any.whl", hash = "sha256:1b293037ead54ab228362654da00ededc5ca52b2ff407b6087a81cfd9390850e", size = 32084, upload-time = "2026-06-01T22:52:01.238Z" },
-]
-
-[[package]]
-name = "django-crispy-forms"
-version = "2.7"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "django" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/bc/f5/b79e3ed7cae871d5d71bf3448d627e1fabab769358bb90808bec056556fe/django_crispy_forms-2.7.tar.gz", hash = "sha256:4c59bed60417375cba26cebb2c67ab350b655934670270b1c89dbcd7e60f1b4c", size = 1097842, upload-time = "2026-07-29T11:12:12.081Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/1f/44/50335d09c4deb70affee0c54feef07ba458df015e32e45490615d9dc5b6b/django_crispy_forms-2.7-py3-none-any.whl", hash = "sha256:42a7ecb05ac3fd050d006dfe7aeceb7f318c30e5b5124ff619e2be252f36f096", size = 31478, upload-time = "2026-07-29T11:12:11.052Z" },
 ]
 
 [[package]]
@@ -910,10 +885,8 @@ name = "puka"
 version = "3.6.5"
 source = { editable = "." }
 dependencies = [
-    { name = "crispy-tailwind" },
     { name = "django" },
     { name = "django-cotton" },
-    { name = "django-crispy-forms" },
     { name = "django-filter" },
     { name = "django-htmx" },
     { name = "django-taggit" },
@@ -959,10 +932,8 @@ test = [
 
 [package.metadata]
 requires-dist = [
-    { name = "crispy-tailwind", specifier = ">=1.0.3" },
     { name = "django", specifier = ">=5.1.4" },
     { name = "django-cotton", specifier = ">=2.7.2" },
-    { name = "django-crispy-forms", specifier = ">=2.3" },
     { name = "django-filter", specifier = ">=24.3" },
     { name = "django-htmx", specifier = ">=1.21.0" },
     { name = "django-taggit", specifier = ">=6.1.0" },

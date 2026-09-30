@@ -20,12 +20,12 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.postgres",
     "django.contrib.staticfiles",
+    # Django's widget templates, for FORM_RENDERER below.
+    "django.forms",
     "django_htmx",
     # SimpleAppConfig: loaders and builtins are configured in TEMPLATES below.
     "django_cotton.apps.SimpleAppConfig",
     "django_filters",
-    "crispy_forms",
-    "crispy_tailwind",
     "taggit",
     "treebeard",
     "puka.bookmarks",
@@ -154,8 +154,9 @@ TAGGIT_CASE_INSENSITIVE = True
 # passed to them, not the whole parent context.
 COTTON_ENABLE_CONTEXT_ISOLATION = True
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
-CRISPY_TEMPLATE_PACK = "tailwind"
+# Forms render through settings.TEMPLATES (so Cotton components work in form templates)
+# with daisyUI classes on widgets; see puka/core/forms.py.
+FORM_RENDERER = "puka.core.forms.FormRenderer"
 
 MAILERS = {
     "default": {

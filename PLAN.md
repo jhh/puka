@@ -159,6 +159,9 @@ Each phase is its own jj change and has to pass `just test`,
 4. Remove `crispy_forms` and `crispy_tailwind` from `INSTALLED_APPS`, the
    `CRISPY_*` settings, the dependencies, `FormHelper` code,
    `core/forms.py` and `templates/tailwind/`.
+5. Done. `core/forms.py` stays, now holding the `FORM_RENDERER` that puts
+   daisyUI classes on widgets (templates can't), and each form sets
+   `template_name`. htmx 4 has no `hx-params`, so delete buttons drop it.
 
 ### Phase 5: Layout
 

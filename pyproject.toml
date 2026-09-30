@@ -7,14 +7,12 @@ requires-python = ">=3.12"
 dependencies = [
   "django-taggit>=6.1.0",
   "django>=5.1.4",
-  "django-crispy-forms>=2.3",
   "django-htmx>=1.21.0",
   "environs[django]>=15.0.1",
   "gunicorn>=23.0.0",
   "psycopg[c,pool]>=3.3.3",
   "whitenoise>=6.8.2",
   "django-filter>=24.3",
-  "crispy-tailwind>=1.0.3",
   "django-treebeard>=4.7.1",
   "python-dateutil>=2.9.0.post0",
   "types-python-dateutil>=2.9.0.20241206",
@@ -64,12 +62,6 @@ filterwarnings = [
   "ignore:.*quote_name_unless_alias.*:PendingDeprecationWarning",
 ]
 
-
-[tool.djangofmt]
-# crispy-forms overrides are removed in the Cotton migration (PLAN.md, phase 4).
-extend-exclude = ["puka/templates/tailwind/"]
-# pre-commit passes files explicitly; apply the excludes to them too.
-force-exclude = true
 
 [tool.django-stubs]
 django_settings_module = "puka.settings.test"

@@ -1,0 +1,14 @@
+{# ScheduleForm.template_name. #}
+<div class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
+    <c-form.field :field="form.task" class="sm:col-span-6" />
+    <c-form.field :field="form.due_date" class="sm:col-span-3" />
+    <c-form.field :field="form.completion_date" class="sm:col-span-3" />
+    <c-form.field :field="form.notes" class="sm:col-span-6" />
+</div>
+{% if form.instance.pk %}{% url 'upkeep:schedule-delete' form.instance.pk as delete_url %}{% endif %}
+<c-form.actions
+    submit="Save schedule"
+    cancel="{% url 'upkeep:home' %}"
+    delete="{{ delete_url }}"
+    confirm="Delete this schedule?"
+/>

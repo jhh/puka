@@ -1,0 +1,40 @@
+{% comment %}
+Form buttons: submit, an optional cancel link and an optional delete button.
+cancel: URL to go back to; loaded into cancel_target with htmx unless cancel_target="".
+delete: URL to POST to (with hx-confirm=confirm) to delete the object.
+The slot holds any extra buttons.
+{% endcomment %}
+<c-vars
+    submit="Save"
+    cancel=""
+    cancel_label="Cancel"
+    cancel_target="#content"
+    delete=""
+    confirm="Delete this?"
+    class
+/>
+
+<div class="flex items-center gap-x-4 pt-2 {{ class }}" {{ attrs }}>
+    <c-ui.button type="submit" variant="primary">{{ submit }}</c-ui.button>
+    {% if cancel and cancel_target %}
+        <c-ui.button
+            href="{{ cancel }}"
+            variant="ghost"
+            hx-get="{{ cancel }}"
+            hx-target="{{ cancel_target }}"
+            hx-push-url="true"
+        >{{ cancel_label }}</c-ui.button>
+    {% elif cancel %}
+        <c-ui.button href="{{ cancel }}" variant="ghost">{{ cancel_label }}</c-ui.button>
+    {% endif %}
+    {{ slot }}
+    {% if delete %}
+        <c-ui.button
+            variant="error"
+            style="outline"
+            class="ml-auto"
+            hx-post="{{ delete }}"
+            hx-confirm="{{ confirm }}"
+        >Delete</c-ui.button>
+    {% endif %}
+</div>

@@ -54,3 +54,14 @@ def test_delete_task_item(admin_client):
 
     assert_hx_location(response, reverse("upkeep:task-detail", args=[task_item.task.pk]))
     assert not TaskItem.objects.exists()
+
+
+def test_create_task_item_rejects_untagged_item(admin_client):
+    task = TaskFactory.create()
+    data = {"task": task.pk, "item": ItemFactory.create().pk, "quantity": 1}
+    url = reverse("upkeep:task-item-new", args=[task.pk])
+    response = admin_client.post(url, data, headers=HTMX)
+
+    assert response.status_code == 200
+    assert "Select a valid choice." in response.content.decode()
+    assert not TaskItem.objects.exists()

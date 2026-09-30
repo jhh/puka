@@ -2,8 +2,7 @@
 Form rendering tests.
 
 These pin down what each form renders (fields, the ``hx-post`` action, submit, cancel and
-delete controls, and errors) independently of how it's rendered, so the crispy-forms markup
-can be replaced without changing behaviour.
+delete controls, and errors) independently of how it's rendered.
 """
 
 from __future__ import annotations
@@ -258,7 +257,6 @@ def test_form_delete(form_page, form_case, objects):
     assert button.attrs["type"] == "button"
     assert button.attrs["hx-post"] == _reverse(form_case.delete, objects)
     assert button.attrs["hx-confirm"] == f"Delete this {form_case.delete_noun}?"
-    assert button.attrs["hx-params"] == "none"
 
 
 # (form url, POST data, field with the error, error message, a submitted value to redisplay)
@@ -369,7 +367,7 @@ def test_schedule_form_task_choices_include_area(admin_client, objects):
     assert page.options("task")[str(objects["task"])].text == f"{area.name}: Test Task"
 
 
-# Hand-written (non-crispy) forms.
+# Bookmark, filter and login forms.
 
 
 @pytest.mark.parametrize("name", ["bookmarks:new", "bookmarks:edit"])
@@ -405,7 +403,8 @@ def test_bookmark_filter_form(admin_client):
 
     (form,) = page.forms
     assert form.attrs["method"] == "get"
-    assert page.field_names() == {"text", "tags", "created", "active"}
+    assert page.field_names() == {"text", "tags", "url", "created", "active"}
+    assert [el.text for el in page.find("button")] == ["Search"]
 
 
 @pytest.mark.parametrize(
@@ -413,8 +412,13 @@ def test_bookmark_filter_form(admin_client):
     [("stuff:bookmark-select", "item"), ("upkeep:bookmark-select", "area")],
 )
 def test_bookmark_select_form(admin_client, objects, name, key):
-    page = parse_html(admin_client.get(reverse(name, args=[objects[key]]), headers=HTMX).content)
+    url = reverse(name, args=[objects[key]])
+    page = parse_html(admin_client.get(url, headers=HTMX).content)
 
+    (form,) = page.forms
+    assert form.attrs["method"] == "get"
+    assert form.attrs["hx-get"] == url
+    assert form.attrs["hx-target"] == "#content"
     assert page.field_names() == {"text", "created", "url", "tags", "active"}
     (link,) = page.find("a", hx_post="")
     assert json.loads(link.attrs["hx-vals"]) == {"bookmark_pk": objects["bookmark"]}
@@ -430,7 +434,6 @@ def test_login_form(client):
     assert page.find("input", name="csrfmiddlewaretoken")
 
 
-@pytest.mark.xfail(strict=True, reason="login.html doesn't render form errors")
 def test_login_form_errors(client):
     response = client.post(reverse("login"), {"username": "nobody", "password": "wrong"})
 
