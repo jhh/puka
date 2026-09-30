@@ -81,3 +81,8 @@
     --depth: 1;
     --noise: 0;
 }
+
+/* Hide Alpine-controlled elements until Alpine initializes them. */
+[x-cloak] {
+    display: none !important;
+}

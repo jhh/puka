@@ -21,6 +21,8 @@ INSTALLED_APPS = [
     "django.contrib.postgres",
     "django.contrib.staticfiles",
     "django_htmx",
+    # SimpleAppConfig: loaders and builtins are configured in TEMPLATES below.
+    "django_cotton.apps.SimpleAppConfig",
     "django_filters",
     "crispy_forms",
     "crispy_tailwind",
@@ -72,8 +74,20 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [str(APPS_DIR / "templates")],
-        "APP_DIRS": True,
         "OPTIONS": {
+            # Cotton compiles <c-*> tags first; the cached loader wraps all of them
+            # (Django's default, which also auto-reloads under DEBUG).
+            "loaders": [
+                (
+                    "django.template.loaders.cached.Loader",
+                    [
+                        "django_cotton.cotton_loader.Loader",
+                        "django.template.loaders.filesystem.Loader",
+                        "django.template.loaders.app_directories.Loader",
+                    ],
+                ),
+            ],
+            "builtins": ["django_cotton.templatetags.cotton"],
             "context_processors": [
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",

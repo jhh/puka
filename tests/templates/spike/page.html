@@ -1,0 +1,14 @@
+{% extends "spike/base.html" %}
+
+{% partialdef card-partial %}
+    <c-spike.card title="Card {{ name }}" id="card">
+        <c-spike.button variant="primary" hx-post="/save/" hx-confirm="Save {{ name }}?">Save</c-spike.button>
+    </c-spike.card>
+{% endpartialdef card-partial %}
+
+{% block content %}
+    <c-spike.button size="sm" x-bind:class="{ 'btn-active': open }" x-on:click="open = !open">
+        Toggle
+    </c-spike.button>
+    {% partial card-partial %}
+{% endblock content %}

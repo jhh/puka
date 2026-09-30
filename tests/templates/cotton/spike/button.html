@@ -1,0 +1,9 @@
+<c-vars variant="neutral" size="md" />
+
+<button
+    type="{{ type|default:'button' }}"
+    class="btn {% if variant == 'primary' %}btn-primary{% elif variant == 'error' %}btn-error{% endif %} {% if size == 'sm' %}btn-sm{% endif %}"
+    {{ attrs }}
+>
+    {{ slot }}
+</button>

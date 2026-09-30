@@ -187,7 +187,9 @@ and every htmx action) plus its tests.
 - **Partials and Cotton's loader together** are the one unknown that could
   block the plan. Phase 2 checks it before anything else. If it fails, the
   fallback is to move fragments into their own files and reference them as
-  `{% include %}` or Cotton components.
+  `{% include %}` or Cotton components. Resolved in Phase 2: `#partial`
+  names resolve through Cotton and the cached loader
+  (`tests/core/cotton_spike_test.py`).
 - **Tests in CI.** Pytest runs only on Linux in CI, so on macOS run
   `just test` locally for every change.
 - **Large templates.** Pre-commit rejects files over 25 KB. Moving markup
