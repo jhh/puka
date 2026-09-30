@@ -32,7 +32,6 @@ dev = [
   "rich>=13.9.4",
   "ruff>=0.15.12",
   "pywatchman>=2.0.0",
-  "djangofmt>=0.2.11",
 ]
 test = [
   "django-stubs[compatible-mypy]>=6.0.3",
@@ -45,6 +44,7 @@ pre-commit = [
   "add-trailing-comma>=3.1.0",
   "djade>=1.3.2",
   "django-upgrade>=1.23.1",
+  "djangofmt>=1.0.0",
 ]
 
 [build-system]
@@ -63,6 +63,12 @@ filterwarnings = [
   "ignore:.*quote_name_unless_alias.*:PendingDeprecationWarning",
 ]
 
+
+[tool.djangofmt]
+# crispy-forms overrides are removed in the Cotton migration (PLAN.md, phase 4).
+extend-exclude = ["puka/templates/tailwind/"]
+# pre-commit passes files explicitly; apply the excludes to them too.
+force-exclude = true
 
 [tool.django-stubs]
 django_settings_module = "puka.settings.test"

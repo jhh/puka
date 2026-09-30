@@ -112,8 +112,8 @@ Each phase is its own jj change and has to pass `just test`,
    - A template that uses `<c-*>` still resolves `template.html#partial`
      through Cotton's loader and the cached loader, both in `render()` and
      `{% include %}`.
-   - djade leaves `<c-vars />` and `{{ attrs }}` alone, and djangofmt too
-     if we turn it on.
+   - djade and djangofmt (now a pre-commit hook) leave `<c-vars />` and
+     `{{ attrs }}` alone.
    - Tailwind 4 auto-detection picks up `puka/templates/cotton/**`. If
      not, add an explicit `@source` to `base.css`, and check the Nix build
      in `nix/packages/static.nix` sees it.
@@ -199,5 +199,3 @@ and every htmx action) plus its tests.
    merge into the main nav?
 2. **Overview page:** should it get real counts in place of the "XXX"
    placeholders, or stay out of scope?
-3. **djangofmt:** should it become a pre-commit hook in
-   `nix/checks/pre-commit.nix`? It's already a dev dependency.

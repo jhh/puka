@@ -38,7 +38,23 @@ inputs.pre-commit-hooks.lib.${system}.run {
         entry = "${venv}/bin/add-trailing-comma";
         types = [ "python" ];
       };
+      djangofmt = {
+        enable = true;
+        name = "djangofmt";
+        description = "A fast, HTML-aware Django template formatter.";
+        entry = "${venv}/bin/djangofmt";
+        types = [ "html" ];
+      };
+      djangofmt-check = {
+        enable = true;
+        name = "djangofmt-check";
+        description = "Lint Django templates with djangofmt.";
+        entry = "${venv}/bin/djangofmt check";
+        types = [ "html" ];
+        after = [ "djade" ];
+      };
       djade = {
+        after = [ "djangofmt" ];
         enable = true;
         name = "djade";
         description = "A Django template formatter.";

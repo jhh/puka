@@ -934,6 +934,7 @@ pre-commit = [
     { name = "add-trailing-comma" },
     { name = "djade" },
     { name = "django-upgrade" },
+    { name = "djangofmt" },
 ]
 test = [
     { name = "django-stubs", extra = ["compatible-mypy"] },
@@ -967,7 +968,7 @@ dev = [
     { name = "django-debug-toolbar", specifier = ">=4.4.6" },
     { name = "django-stubs", extras = ["compatible-mypy"], specifier = ">=6.0.3" },
     { name = "django-upgrade", specifier = ">=1.23.1" },
-    { name = "djangofmt", specifier = ">=0.2.11" },
+    { name = "djangofmt", specifier = ">=1.0.0" },
     { name = "ipython", specifier = ">=8.30.0" },
     { name = "pytest-cov", specifier = ">=6.0.0" },
     { name = "pytest-django", specifier = ">=4.9.0" },
@@ -981,6 +982,7 @@ pre-commit = [
     { name = "add-trailing-comma", specifier = ">=3.1.0" },
     { name = "djade", specifier = ">=1.3.2" },
     { name = "django-upgrade", specifier = ">=1.23.1" },
+    { name = "djangofmt", specifier = ">=1.0.0" },
 ]
 test = [
     { name = "django-stubs", extras = ["compatible-mypy"], specifier = ">=6.0.3" },

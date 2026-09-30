@@ -39,6 +39,12 @@ ty:
 djade:
     uv run djade puka/templates/**/*.html
 
+# format and lint templates using djangofmt
+[group('test')]
+djangofmt:
+    uv run djangofmt puka/templates
+    uv run djangofmt check puka/templates
+
 # run tests
 [group('test')]
 test $DJANGO_SETTINGS_MODULE="puka.settings.test":

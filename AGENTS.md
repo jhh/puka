@@ -36,13 +36,15 @@ Nix devshell, `just` task runner. Run every command inside the devshell.
 - Lint/format: `uv run ruff format .` then `uv run ruff check .`.
 - Types: `just ty`. CI runs `ty check --error-on-warning`, so use
   `uv run ty check --error-on-warning` to match; `ty` over pyright/mypy.
-- Templates: `just djade`.
+- Templates: `just djangofmt` (format + lint) and `just djade`. Config is
+  `[tool.djangofmt]` in `pyproject.toml`; `templates/tailwind/` is excluded.
 - Assets: `just update-css`, `just update-js`, `just watch`. Rebuild after
   editing `base.css`/`base.js` or Tailwind classes in templates.
 - `pre-commit run --all-files`. The config is a Nix-store symlink generated
   from `nix/checks/pre-commit.nix`; edit that, not the yaml. Hooks rewrite
   code: ruff, pyupgrade `--py312-plus`, django-upgrade `--target-version=5.2`,
-  add-trailing-comma, djade, nixfmt; files >25 KB are rejected.
+  add-trailing-comma, djangofmt (then djade, then `djangofmt check`),
+  nixfmt; files >25 KB are rejected.
 
 ## Verification / CI
 
