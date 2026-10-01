@@ -3,115 +3,122 @@
 {% block title %}{{ area.name }}{% endblock %}
 
 {% partialdef field-partial %}
-    <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+    <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
         <dt class="text-sm font-medium text-base-content">{{ label }}</dt>
         <dd class="mt-1 text-sm text-base-content/70 sm:col-span-2 sm:mt-0">{{ value }}</dd>
     </div>
 {% endpartialdef field-partial %}
 
 {% partialdef detail-partial %}
-    <div class="card bg-base-100 border border-base-300 rounded-box">
-        <div class="card-body gap-6">
-            <div class="flex justify-between">
-                <div>
-                    <h3 class="text-base font-semibold text-base-content">{{ area.name }}</h3>
-                    <p class="mt-1 max-w-2xl text-sm text-base-content/70">Area details for {{ area.name }}.</p>
+    <c-layout.page-header title="{{ area.name }}">
+        <c-slot name="actions">
+            <details class="dropdown dropdown-end">
+                <summary class="btn btn-ghost btn-sm">Manage</summary>
+                <ul class="menu dropdown-content z-10 mt-2 w-56 rounded-box bg-base-100 p-2 shadow">
+                    <li>
+                        <a
+                            href="{% url 'upkeep:area-edit' area.id %}"
+                            hx-get="{% url 'upkeep:area-edit' area.id %}"
+                            hx-push-url="true"
+                            hx-target="#content"
+                        >Edit area</a>
+                    </li>
+                    <li>
+                        <a
+                            href="{% url 'upkeep:task-new' %}?area={{ area.id }}"
+                            hx-get="{% url 'upkeep:task-new' %}?area={{ area.id }}"
+                            hx-push-url="true"
+                            hx-target="#content"
+                        >Add task</a>
+                    </li>
+                    <li>
+                        <a
+                            href="{% url 'upkeep:bookmark-select' area.id %}"
+                            hx-get="{% url 'upkeep:bookmark-select' area.id %}"
+                            hx-push-url="true"
+                            hx-target="#content"
+                        >Add bookmark</a>
+                    </li>
+                    <li>
+                        <button
+                            type="button"
+                            class="text-error"
+                            hx-post="{% url 'upkeep:area-delete' area.id %}"
+                            hx-confirm="Are you sure you want to delete this area?"
+                        >
+                            Delete area
+                        </button>
+                    </li>
+                </ul>
+            </details>
+        </c-slot>
+    </c-layout.page-header>
+
+    <c-ui.card class="mb-4">
+        <dl class="divide-y divide-base-200">
+            {% with label="Name" value=area.name %}{% partial field-partial %}{% endwith %}
+            {% with label="Notes" value=area.notes %}{% partial field-partial %}{% endwith %}
+            {% if area.bookmarks.all %}
+                <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
+                    <dt class="text-sm font-medium text-base-content">Bookmarks</dt>
+                    <dd class="mt-1 sm:col-span-2 sm:mt-0">
+                        {% include "bookmarks/_detail_page.html" with item=area %}
+                    </dd>
                 </div>
-                <details class="dropdown dropdown-end">
-                    <summary class="btn btn-ghost btn-sm">Manage</summary>
-                    <ul class="menu dropdown-content z-10 mt-2 w-56 rounded-box bg-base-100 p-2 shadow">
-                        <li>
-                            <a
-                                href="{% url 'upkeep:area-edit' area.id %}"
-                                hx-get="{% url 'upkeep:area-edit' area.id %}"
-                                hx-push-url="true"
-                                hx-target="#content"
-                            >Edit area</a>
-                        </li>
-                        <li>
-                            <a
-                                href="#"
-                                hx-get="{% url 'upkeep:task-new' %}{% querystring area=area.id %}"
-                                hx-push-url="true"
-                                hx-target="#content"
-                            >Add task</a>
-                        </li>
-                        <li>
-                            <a
-                                href="#"
-                                hx-get="{% url 'upkeep:bookmark-select' area.id %}"
-                                hx-push-url="true"
-                                hx-target="#content"
-                            >Add bookmark</a>
-                        </li>
-                        <li>
-                            <a
-                                href="#"
-                                hx-post="{% url 'upkeep:area-delete' area.id %}"
-                                hx-confirm="Are you sure you want to delete this area?"
-                                hx-target="#content"
-                            >Delete area</a>
-                        </li>
-                    </ul>
-                </details>
-            </div>
-        </div>
-        <div class="border-t border-base-300">
-            <dl class="divide-y divide-base-200">
-                {% with label="Name" value=area.name %}
-                    {% partial field-partial %}
-                {% endwith %}
-                {% with label="Notes" value=area.notes %}
-                    {% partial field-partial %}
-                {% endwith %}
-                {% include "bookmarks/_detail_page.html" with item=area %}
-            </dl>
-        </div>
-        <div class="border-t border-base-300">
-            <div class="overflow-x-auto">
-                <table class="table table-sm w-full">
-                    <thead>
-                        <tr>
-                            <th scope="col" class="text-sm font-semibold text-base-content">Upcoming Task</th>
-                            <th scope="col" class="text-sm font-semibold text-base-content">Due</th>
-                            <th scope="col" class="hidden md:table-cell text-sm font-semibold text-base-content">
-                                Consumables
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for task in area.tasks.all %}
-                            <tr>
-                                <td class="text-sm font-medium text-base-content">
-                                    <a
-                                        hx-get="{% url 'upkeep:task-detail' task.id %}"
-                                        hx-target="#content"
-                                        hx-push-url="true"
-                                        href="#"
-                                        class="link link-hover link-primary"
-                                    >
-                                        {{ task.name }}
-                                    </a>
-                                </td>
-                                {# max-w-0 w-full hack from https://stackoverflow.com/questions/5239758/how-can-i-truncate-table-cells-but-fit-as-much-as-content-possible #}
-                                <td class="text-sm text-base-content/70 max-w-0 w-full truncate">
-                                    {{ task.earliest_due_date|default:"" }}
-                                </td>
-                                <td class="hidden md:table-cell text-sm text-base-content/70">
-                                    {% if task.are_consumables_stocked %}
-                                        in-stock
-                                    {% else %}
-                                        out-of-stock
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+            {% endif %}
+        </dl>
+    </c-ui.card>
+
+    <c-ui.table size="sm">
+        <thead>
+            <tr>
+                <th scope="col">Upcoming Task</th>
+                <th scope="col">Due</th>
+                <th scope="col" class="hidden md:table-cell">Consumables</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in area.tasks.all %}
+                <tr>
+                    <td class="font-medium">
+                        <a
+                            href="{% url 'upkeep:task-detail' task.id %}"
+                            hx-get="{% url 'upkeep:task-detail' task.id %}"
+                            hx-target="#content"
+                            hx-push-url="true"
+                            class="link link-hover link-primary"
+                        >{{ task.name }}</a>
+                    </td>
+                    {# max-w-0 w-full: truncate the cell but let it take the remaining width. #}
+                    <td class="w-full max-w-0 truncate text-base-content/70">
+                        {{ task.earliest_due_date|default:"" }}
+                    </td>
+                    <td class="hidden md:table-cell">
+                        {% if task.are_consumables_stocked %}
+                            <c-ui.badge variant="success" style="soft" size="sm">in stock</c-ui.badge>
+                        {% else %}
+                            <c-ui.badge variant="warning" style="soft" size="sm">out of stock</c-ui.badge>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="3">
+                        <c-ui.empty-state title="No tasks in this area" icon="hero-clipboard-document-check" />
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </c-ui.table>
 {% endpartialdef detail-partial %}
+
+{% block breadcrumbs %}
+    <ul>
+        <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
+        <c-ui.crumb href="{% url 'upkeep:area-list' %}">Areas</c-ui.crumb>
+        <c-ui.crumb>{{ area.name }}</c-ui.crumb>
+    </ul>
+{% endblock breadcrumbs %}
 
 {% block content %}
     {% partial detail-partial %}

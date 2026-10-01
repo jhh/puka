@@ -3,7 +3,7 @@
 {% block title %}Areas{% endblock %}
 
 {% partialdef list-partial %}
-    <div class="flex justify-end mb-4 mt-0 gap-4">
+    <div class="mb-4 flex justify-end gap-4">
         <c-ui.search-box
             name="query"
             value="{{ request.GET.query }}"
@@ -12,120 +12,68 @@
             hx-trigger="change"
             hx-target="#content"
         />
-
-        <div class="flex md:mt-0">
-            <button
-                hx-get="{% url 'upkeep:area-new' %}"
-                type="button"
-                hx-trigger="click"
-                hx-target="#content"
-                hx-push-url="true"
-                class="btn btn-primary hidden md:inline-flex"
-            >
-                New Area
-            </button>
-            <button
-                hx-get="{% url 'upkeep:area-new' %}"
-                type="button"
-                hx-trigger="click"
-                hx-target="#content"
-                hx-push-url="true"
-                class="btn btn-primary md:hidden"
-            >
-                New
-            </button>
-        </div>
-    </div>
-
-    <div class="border border-base-300 rounded-box bg-base-100">
-        <div class="overflow-x-auto">
-            <table class="table table-sm w-full">
-                <thead>
-                    <tr>
-                        <th scope="col" class="text-sm font-semibold text-base-content">Area</th>
-                        <th scope="col" class="text-sm font-semibold text-base-content">Tasks</th>
-                        <th scope="col" class="text-sm font-semibold text-base-content">Next Due</th>
-                        <th scope="col" class="relative">
-                            <span class="sr-only">Edit</span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for area in areas %}
-                        <tr>
-                            <td class="text-sm font-medium text-base-content">
-                                <a
-                                    hx-get="{% url 'upkeep:area-detail' area.id %}"
-                                    href="{% url 'upkeep:area-detail' area.id %}"
-                                    hx-target="#content"
-                                    hx-push-url="true"
-                                    class="link link-hover link-primary"
-                                >
-                                    {{ area.name }}
-                                </a>
-                            </td>
-                            <td class="text-sm text-base-content/70">
-                                {{ area.task_count }}
-                            </td>
-                            <td class="text-sm text-base-content/70">
-                                {% if area.due_task_id %}
-                                    {{ area.due_date }}
-                                {% endif %}
-                            </td>
-                            <td class="text-right text-sm font-medium">
-                                <a
-                                    href="#"
-                                    hx-get="{% url 'upkeep:area-edit' area.id %}"
-                                    hx-target="#content"
-                                    hx-push-url="true"
-                                    class="link link-hover link-primary"
-                                >Edit</a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <nav
-            class="flex items-center justify-between border-t border-base-300 bg-base-100 px-4 py-3 sm:px-6"
-            aria-label="Pagination"
+        <c-ui.button
+            href="{% url 'upkeep:area-new' %}"
+            variant="primary"
+            icon="hero-plus"
+            hx-get="{% url 'upkeep:area-new' %}"
+            hx-target="#content"
+            hx-push-url="true"
         >
-            <div class="hidden sm:block">
-                <p class="text-sm text-base-content/70">
-                    Showing
-                    <span class="font-medium">{{ page_obj.start_index }}</span>
-                    to
-                    <span class="font-medium">{{ page_obj.end_index }}</span>
-                    of
-                    <span class="font-medium">{{ paginator.count }}</span>
-                    results
-                </p>
-            </div>
-            <div class="flex flex-1 justify-between sm:justify-end">
-                {% if page_obj.has_previous %}
-                    <a
-                        href="{% querystring page=page_obj.previous_page_number %}"
-                        hx-get="{% querystring page=page_obj.previous_page_number %}"
-                        hx-target="#content"
-                        hx-push-url="true"
-                        class="btn btn-sm btn-outline"
-                    >Previous</a>
-                {% endif %}
-
-                {% if page_obj.has_next %}
-                    <a
-                        href="{% querystring page=page_obj.next_page_number %}"
-                        hx-get="{% querystring page=page_obj.next_page_number %}"
-                        hx-target="#content"
-                        hx-push-url="true"
-                        class="btn btn-sm btn-outline ml-3"
-                    >Next</a>
-                {% endif %}
-            </div>
-        </nav>
+            <span class="hidden md:inline">New Area</span>
+            <span class="md:hidden">New</span>
+        </c-ui.button>
     </div>
+
+    <c-ui.table size="sm">
+        <thead>
+            <tr>
+                <th scope="col">Area</th>
+                <th scope="col">Tasks</th>
+                <th scope="col">Next Due</th>
+                <th scope="col"><span class="sr-only">Edit</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for area in areas %}
+                <tr>
+                    <td class="font-medium">
+                        <a
+                            href="{% url 'upkeep:area-detail' area.id %}"
+                            hx-get="{% url 'upkeep:area-detail' area.id %}"
+                            hx-target="#content"
+                            hx-push-url="true"
+                            class="link link-hover link-primary"
+                        >{{ area.name }}</a>
+                    </td>
+                    <td class="text-base-content/70">{{ area.task_count }}</td>
+                    <td class="text-base-content/70">{% if area.due_task_id %}{{ area.due_date }}{% endif %}</td>
+                    <td class="text-right">
+                        <a
+                            href="{% url 'upkeep:area-edit' area.id %}"
+                            hx-get="{% url 'upkeep:area-edit' area.id %}"
+                            hx-target="#content"
+                            hx-push-url="true"
+                            class="link link-hover link-primary text-sm font-medium"
+                        >Edit</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4"><c-ui.empty-state title="No areas" icon="hero-home-modern" /></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </c-ui.table>
+    <c-ui.pagination :page_obj="page_obj" class="mt-4" />
 {% endpartialdef list-partial %}
+
+{% block breadcrumbs %}
+    <ul>
+        <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
+        <c-ui.crumb href="{% url 'upkeep:area-list' %}">Areas</c-ui.crumb>
+    </ul>
+{% endblock breadcrumbs %}
 
 {% block content %}
     {% partial list-partial %}
