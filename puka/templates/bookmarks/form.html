@@ -1,5 +1,16 @@
 {% extends "base.html" %}
 
+{% block title %}{{ title }}{% endblock %}
+
+{% block breadcrumbs %}
+    <ul>
+        <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
+        <c-ui.crumb href="{% url 'bookmarks:list' %}">Bookmarks</c-ui.crumb>
+        <c-ui.crumb>{{ title }}</c-ui.crumb>
+    </ul>
+{% endblock breadcrumbs %}
+
 {% block content %}
+    <c-layout.page-header title="{{ title }}" />
     <c-form.form :form="form">{{ form }}</c-form.form>
 {% endblock content %}

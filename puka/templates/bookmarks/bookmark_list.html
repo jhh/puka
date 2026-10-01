@@ -4,60 +4,34 @@
 {% block title %}Bookmarks{% endblock %}
 
 {% partialdef breadcrumbs %}
-    <ul>
-        <li><a href="{% url 'home' %}">Overview</a></li>
-        <li><a href="{% url 'bookmarks:list' %}">Bookmarks</a></li>
-        {% if 'tags' in request.GET %}
-            <li>
-                <span class="hero-hashtag-mini size-2.25 text-primary"></span><span
-                    class="text-primary"
-                >{{ request.GET.tags }}</span>
-            </li>
-        {% endif %}
-    </ul>
+    <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
+    <c-ui.crumb href="{% url 'bookmarks:list' %}">Bookmarks</c-ui.crumb>
+    {% if 'tags' in request.GET %}
+        <c-ui.crumb icon="hero-hashtag-mini" class="text-primary">{{ request.GET.tags }}</c-ui.crumb>
+    {% endif %}
 {% endpartialdef breadcrumbs %}
 
 {% block breadcrumbs %}
-    {% partial breadcrumbs %}
+    <ul>{% partial breadcrumbs %}</ul>
 {% endblock breadcrumbs %}
 
 {% block content %}
-    <div class="flex justify-end gap-4 mb-4 mt-0">
+    <div class="mb-4 flex justify-end gap-4">
         <c-ui.search-box
             hx-get="{% url 'bookmarks:list' %}"
             hx-trigger="input changed delay:0.5s"
             hx-target="#id_bookmarks"
         />
-
-        <div class="flex md:mt-0">
-            <a
-                href="{% url 'bookmarks:new' %}"
-                class="btn btn-primary hidden md:inline-flex"
-            >
-                New Bookmark
-            </a>
-            <a
-                href="{% url 'bookmarks:new' %}"
-                class="btn btn-primary md:hidden"
-            >
-                New
-            </a>
-        </div>
+        <c-ui.button href="{% url 'bookmarks:new' %}" variant="primary" icon="hero-plus">
+            <span class="hidden md:inline">New Bookmark</span>
+            <span class="md:hidden">New</span>
+        </c-ui.button>
     </div>
 
-    <ul
-        id="id_bookmarks"
-        class="list rounded-box border border-base-300 shadow-sm bg-base-100"
-    >
+    <ul id="id_bookmarks" class="list rounded-box border border-base-300 bg-base-100 shadow-sm">
         {% partialdef list-items-partial inline %}
             {% if htmx %}
-                <div
-                    id="breadcrumbs"
-                    hx-swap-oob="true"
-                    class="breadcrumbs text-sm font-semibold"
-                >
-                    {% partial breadcrumbs %}
-                </div>
+                <c-ui.breadcrumbs id="breadcrumbs" hx-swap-oob="true">{% partial breadcrumbs %}</c-ui.breadcrumbs>
             {% endif %}
 
             {% for bookmark in page_obj %}
@@ -75,40 +49,46 @@
                         target="_blank"
                         rel="nofollow"
                         tabindex="-1"
-                    >
-                    </a>
+                        aria-label="{{ bookmark.title }}"
+                    ></a>
                     <div class="list-col-grow pr-12">
                         <div class="text-base font-semibold">{{ bookmark.title }}</div>
-                        <div class="text-sm opacity-60 w-full lg:max-w-3xl">{{ bookmark.description }}</div>
-                        <div class="relative max-w-fit z-20">
-                            <span>
-                                {% for tag in bookmark.tags.all %}
-                                    <a
-                                        href="?tags={{ tag }}"
-                                        hx-get="?tags={{ tag }}"
-                                        hx-target="#id_bookmarks"
-                                        hx-push-url="true"
-                                        class="mr-1 text-sm link-primary"
-                                        tabindex="-1"
-                                    >
-                                        <span class="hero-hashtag-mini size-2.25"></span>{{ tag }}
-                                    </a>
-                                {% endfor %}
-                            </span>
-                            <div class="text-xs opacity-60 mt-1">
-                                <span class="hero-cloud-mini size-3 opacity-40"></span> {{ bookmark.url|domain }}
-                                <span class="font-black mx-1">·</span> {{ bookmark.created|date:'F Y'|lower }}
-                                {% if not bookmark.active %}<span class="font-black mx-1">·</span> inactive{% endif %}
+                        <div class="w-full text-sm opacity-60 lg:max-w-3xl">{{ bookmark.description }}</div>
+                        <div class="relative z-20 max-w-fit">
+                            {% for tag in bookmark.tags.all %}
+                                <a
+                                    href="?tags={{ tag }}"
+                                    hx-get="?tags={{ tag }}"
+                                    hx-target="#id_bookmarks"
+                                    hx-push-url="true"
+                                    class="link link-hover link-primary mr-1 text-sm"
+                                    tabindex="-1"
+                                ><c-ui.icon name="hero-hashtag-mini" class="size-3" />{{ tag }}</a>
+                            {% endfor %}
+                            <div class="mt-1 text-xs opacity-60">
+                                <c-ui.icon name="hero-cloud-mini" class="size-3 opacity-60" />
+                                {{ bookmark.url|domain }}
+                                <span class="mx-1 font-black">·</span>
+                                {{ bookmark.created|date:'F Y'|lower }}
+                                {% if not bookmark.active %}
+                                    <span class="mx-1 font-black">·</span>
+                                    <c-ui.badge size="xs" style="outline">inactive</c-ui.badge>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
-                    <a
+                    <c-ui.button
                         href="{% url 'bookmarks:edit' bookmark.pk %}"
-                        class="btn btn-soft btn-accent absolute right-3 top-3 z-20 opacity-0 transition-opacity pointer-events-none group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100"
-                    >
-                        Edit
-                    </a>
+                        variant="accent"
+                        style="soft"
+                        size="sm"
+                        class="pointer-events-none absolute top-3 right-3 z-20 opacity-0 transition-opacity group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100"
+                    >Edit</c-ui.button>
                 </li>
+            {% empty %}
+                {% if page_obj.number == 1 %}
+                    <li><c-ui.empty-state title="No bookmarks found" icon="hero-bookmark" class="w-full" /></li>
+                {% endif %}
             {% endfor %}
         {% endpartialdef list-items-partial %}
     </ul>

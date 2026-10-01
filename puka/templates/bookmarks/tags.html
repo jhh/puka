@@ -3,11 +3,7 @@
 {% block title %}Tags{% endblock %}
 
 {% partialdef tags-partial %}
-    <div class="md:flex md:items-center md:justify-between">
-        <div class="min-w-0 flex-1">
-            <h1 class="text-2xl/7 font-bold sm:truncate sm:text-3xl sm:tracking-tight">Tags</h1>
-        </div>
-    </div>
+    <c-layout.page-header title="Tags" />
     {% regroup tags by bucket as buckets %}
     {% for bucket in buckets %}
         <div class="divider"></div>
@@ -22,13 +18,20 @@
                         hx-push-url="true"
                         hx-target="#content"
                     >
-                        <span class="badge badge-primary badge-soft">{{ tag.name }} {{ tag.num_times }}</span>
+                        <c-ui.badge variant="primary" style="soft">{{ tag.name }} {{ tag.num_times }}</c-ui.badge>
                     </a>
                 </li>
             {% endfor %}
         </ul>
     {% endfor %}
 {% endpartialdef tags-partial %}
+
+{% block breadcrumbs %}
+    <ul>
+        <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
+        <c-ui.crumb href="{% url 'bookmarks:tags' %}">Tags</c-ui.crumb>
+    </ul>
+{% endblock breadcrumbs %}
 
 {% block content %}
     {% partial tags-partial %}

@@ -1,14 +1,14 @@
 {% comment %}One breadcrumb; a link when `href` is set.{% endcomment %}
-<c-vars href="" icon="" />
+<c-vars href="" icon="" class />
 
 <li>
     {% if href %}
-        <a href="{{ href }}" {{ attrs }}>
+        <a href="{{ href }}" class="{{ class }}" {{ attrs }}>
             {% if icon %}<c-ui.icon name="{{ icon }}" class="size-4" />{% endif %}
             {{ slot }}
         </a>
     {% else %}
-        <span class="inline-flex items-center gap-1" {{ attrs }}>
+        <span class="inline-flex items-center gap-1 {{ class }}" {{ attrs }}>
             {% if icon %}<c-ui.icon name="{{ icon }}" class="size-4" />{% endif %}
             {{ slot }}
         </span>

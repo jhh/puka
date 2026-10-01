@@ -4,9 +4,9 @@
 
 {% block breadcrumbs %}
     <ul>
-        <li><a href="{% url 'home' %}">Overview</a></li>
-        <li><a href="{% url 'bookmarks:list' %}">Bookmarks</a></li>
-        <li><a href="{% url 'bookmarks:list' %}">Filter</a></li>
+        <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
+        <c-ui.crumb href="{% url 'bookmarks:list' %}">Bookmarks</c-ui.crumb>
+        <c-ui.crumb href="{% url 'bookmarks:filter' %}">Filter</c-ui.crumb>
     </ul>
 {% endblock breadcrumbs %}
 
@@ -32,7 +32,7 @@
     </c-form.form>
     <ul
         id="id_bookmarks"
-        class="list rounded-box border border-base-300 shadow-sm bg-base-100"
+        class="list rounded-box border border-base-300 bg-base-100 shadow-sm"
     >
         {% include "bookmarks/bookmark_list.html#list-items-partial" %}
     </ul>

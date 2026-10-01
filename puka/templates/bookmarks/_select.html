@@ -18,52 +18,15 @@
         <c-form.fields :form="filter.form" class="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2" />
         <c-form.actions submit="Search" cancel="{{ request.path }}" cancel_label="Clear" />
     </c-form.form>
-    <ul id="id_bookmarks" class="menu bg-base-100 shadow-sm">
+    <c-layout.page-header title="Select a bookmark" />
+    <ul id="id_bookmarks" class="menu w-full rounded-box border border-base-300 bg-base-100">
         {% for bookmark in bookmarks %}
             <li>
-                <a href="#" hx-post="" hx-vals='{"bookmark_pk": {{ bookmark.id }} }'>
-                    {{ bookmark.title }}
-                </a>
+                <a href="#" hx-post="" hx-vals='{"bookmark_pk": {{ bookmark.id }} }'>{{ bookmark.title }}</a>
             </li>
         {% empty %}
-            <li class="menu-disabled"><span>No bookmarks found.</span></li>
+            <li><c-ui.empty-state title="No bookmarks found" icon="hero-bookmark" /></li>
         {% endfor %}
     </ul>
-    <nav
-        class="flex items-center justify-between border-t border-base-300 bg-base-100 px-4 py-3 sm:px-6"
-        aria-label="Pagination"
-    >
-        <div class="hidden sm:block">
-            <p class="text-sm">
-                Showing
-                <span class="font-medium">{{ page_obj.start_index }}</span>
-                to
-                <span class="font-medium">{{ page_obj.end_index }}</span>
-                of
-                <span class="font-medium">{{ paginator.count }}</span>
-                results
-            </p>
-        </div>
-        <div class="flex flex-1 justify-between sm:justify-end">
-            {% if page_obj.has_previous %}
-                <a
-                    href="{% querystring page=page_obj.previous_page_number query=query %}"
-                    hx-get="{% querystring page=page_obj.previous_page_number query=query %}"
-                    hx-target="#content"
-                    hx-push-url="true"
-                    class="btn btn-outline btn-sm"
-                >Previous</a>
-            {% endif %}
-
-            {% if page_obj.has_next %}
-                <a
-                    href="{% querystring page=page_obj.next_page_number query=query %}"
-                    hx-get="{% querystring page=page_obj.next_page_number query=query %}"
-                    hx-target="#content"
-                    hx-push-url="true"
-                    class="btn btn-outline btn-sm ml-3"
-                >Next</a>
-            {% endif %}
-        </div>
-    </nav>
+    <c-ui.pagination :page_obj="page_obj" class="mt-4" />
 {% endpartialdef filter-partial %}

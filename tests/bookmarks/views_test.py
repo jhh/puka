@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from django.urls import reverse
+from django.utils import timezone
+from django.utils.formats import date_format
 from pytest_django.asserts import assertContains, assertNotContains, assertTemplateUsed
 
 from puka.bookmarks.models import Bookmark
@@ -141,3 +143,33 @@ def test_tags_grouped_by_bucket(admin_client):
     assert len(page.find("ul")) == 2
     badges = [el.text for el in page.find("span") if "badge" in el.attrs.get("class", "")]
     assert badges == ["common 6", "rare 1"]
+
+
+def test_bookmark_detail(admin_client, succulents_bookmark):
+    response = admin_client.get(reverse("bookmarks:detail", args=[succulents_bookmark.pk]))
+    page = parse_html(response.content)
+
+    assert page.find("h1")[0].text == succulents_bookmark.title
+    dd = [el.text for el in page.find("dd")]
+    assert dd[1] == date_format(
+        timezone.localtime(succulents_bookmark.modified),
+        "DATETIME_FORMAT",
+    )
+    assert dd[2] == "Yes"
+    badges = {el.text for el in page.find("span") if "badge" in el.attrs.get("class", "")}
+    assert badges == {"thundercats", "humblebrag"}
+
+
+def test_bookmarks_empty_state(admin_client):
+    response = admin_client.get(reverse("bookmarks:list") + "?q=nothing-matches")
+    assert "No bookmarks found" in response.content.decode()
+
+
+def test_bookmarks_tag_breadcrumb_oob(admin_client, succulents_bookmark):
+    url = reverse("bookmarks:list") + "?tags=humblebrag"
+    content = admin_client.get(url, headers={"HX-Request": "true"}).content.decode()
+    (crumbs,) = parse_html(content).find("div", id="breadcrumbs")
+    assert crumbs.attrs["hx-swap-oob"] == "true"
+    trail = content[content.index('id="breadcrumbs"') : content.index("</ul>")]
+    assert "hero-hashtag-mini" in trail
+    assert "humblebrag" in trail
