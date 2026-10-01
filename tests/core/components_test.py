@@ -451,6 +451,33 @@ def test_nav_item_ignores_parent_context(rf_get):
 # layout/drawer and layout/navbar
 
 
+def test_nav_item_children():
+    source = """
+        <c-layout.nav-item url_name="bookmarks:list">
+            Bookmarks
+            <c-slot name="children">
+                <c-layout.nav-item url_name="bookmarks:filter">Filter</c-layout.nav-item>
+            </c-slot>
+        </c-layout.nav-item>
+    """
+    result = page(source, RequestFactory().get("/bookmarks/filter/"))
+    outer, inner = result.find("li")
+    assert result.elements.index(only(result, "ul")) > result.elements.index(outer)
+    parent, child = result.find("a")
+    assert "menu-active" not in classes(parent)
+    assert "menu-active" in classes(child)
+    assert child.attrs["href"] == "/bookmarks/filter/"
+    assert inner is not None
+
+
+def test_nav_item_without_children_has_no_submenu():
+    result = page(
+        '<c-layout.nav-item url_name="home">Home</c-layout.nav-item>',
+        RequestFactory().get("/"),
+    )
+    assert not result.find("ul")
+
+
 def test_drawer():
     source = """
         <c-layout.drawer id="app-drawer">
@@ -459,7 +486,11 @@ def test_drawer():
         </c-layout.drawer>
     """
     result = page(source)
-    assert classes(result.elements[0]) == ["drawer", "lg:drawer-open"]
+    root = result.elements[0]
+    assert classes(root) == ["drawer", "lg:drawer-open"]
+    assert root.attrs["x-data"] == "drawer"
+    assert root.attrs["x-on:keydown.escape.window"] == "close()"
+    assert only(result, "aside").attrs["x-on:click"] == "closeOnLink($event)"
     toggle = only(result, "input")
     assert toggle.attrs["id"] == "app-drawer"
     assert toggle.attrs["type"] == "checkbox"
@@ -539,31 +570,6 @@ def test_no_inline_scripts(admin_client, url):
     for headers in ({}, {"HX-Request": "true"}):
         result = parse_html(admin_client.get(url, headers=headers).content)
         assert all("src" in el.attrs for el in result.find("script"))
-
-
-@pytest.mark.parametrize(
-    ("template", "path", "active"),
-    [
-        ("upkeep/base.html#menu-partial", "/upkeep/area/3/", "Areas"),
-        ("upkeep/base.html#menu-partial", "/upkeep/task/", "Tasks"),
-        ("stuff/base.html#menu-partial", "/stuff/location/4/detail/", "Locations"),
-        ("stuff/base.html#menu-partial", "/stuff/", None),
-    ],
-)
-def test_app_menus_use_nav_item(rf_get, template, path, active):
-    from django.template.loader import render_to_string  # noqa: PLC0415
-
-    result = parse_html(render_to_string(template, request=rf_get(path)))
-    links = result.find("a")
-    assert links
-    for link in links:
-        assert link.attrs["hx-get"] == link.attrs["href"]
-        assert link.attrs["hx-target"] == "#content"
-    labels = [result.elements[result.elements.index(a) + 1].text for a in links]
-    current = [
-        label for a, label in zip(links, labels, strict=True) if "menu-active" in classes(a)
-    ]
-    assert current == ([active] if active else [])
 
 
 @pytest.mark.parametrize(

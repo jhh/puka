@@ -172,6 +172,9 @@ Each phase is its own jj change and has to pass `just test`,
    the sidebar, or fold those links into the main nav.
 3. Fix the drawer-close behaviour, using an `x-ref` in `base.html` or a
    small Alpine store.
+4. Done. Sub-menus are folded into the main nav (nested
+   `<c-layout.nav-item>`s); the app `{% block menu %}` partials are gone.
+   `Alpine.data("drawer")` closes the drawer on sidebar link clicks and Esc.
 
 ### Phase 6: Convert page by page
 
@@ -206,7 +209,5 @@ and every htmx action) plus its tests.
 
 ## Open questions
 
-1. **Sub-menus:** should stuff and upkeep keep their own sub-menus, or
-   merge into the main nav?
-2. **Overview page:** should it get real counts in place of the "XXX"
+1. **Overview page:** should it get real counts in place of the "XXX"
    placeholders, or stay out of scope?

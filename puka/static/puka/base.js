@@ -38,6 +38,17 @@ Alpine.data("tabs", (initial = "") => ({
   },
 }));
 
+// <c-layout.drawer>: close the (mobile) sidebar after navigating from it.
+Alpine.data("drawer", () => ({
+  close() {
+    this.$root.querySelector(":scope > .drawer-toggle").checked = false;
+  },
+
+  closeOnLink(event) {
+    if (event.target.closest("a[href]")) this.close();
+  },
+}));
+
 window.Alpine = Alpine;
 Alpine.plugin(focus);
 Alpine.start();

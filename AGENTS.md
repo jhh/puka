@@ -50,10 +50,11 @@ Nix devshell, `just` task runner. Run every command inside the devshell.
 - CI is only `nix flake check -L --keep-going`. Reproduce locally before
   pushing. Checks: pre-commit, `ty` (warnings fatal), NixOS integration
   tests, and pytest (Linux-only, so skipped on macOS — run `just test`).
-- Run `jj st` right before `nix flake check` (or `nix build`). Nix reads the
-  source from the git tree, which jj only updates when it snapshots the
-  working copy; without it, new or edited files may be missing from the
-  build (e.g. `TemplateDoesNotExist` in the Nix pytest check).
+- Run `jj st` right before `nix flake check` (or `nix build`) and
+  `pre-commit run --all-files` (which only sees files in the git index).
+  Nix reads the source from the git tree, which jj only updates when it
+  snapshots the working copy; without it, new or edited files may be
+  missing from the build (e.g. `TemplateDoesNotExist` in the Nix pytest check).
 - NixOS integration tests (`nix/checks/tests.py`):
   `nix build .#checks.aarch64-darwin.puka-integration-tests -L`
 

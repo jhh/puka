@@ -1,25 +1,3 @@
 {% extends "base.html" %}
 
 {% block title %}Upkeep{% endblock %}
-
-{% block menu %}
-    <div class="font-semibold text-neutral-content/60">Tasks</div>
-    {% partial menu-partial %}
-{% endblock menu %}
-
-{% partialdef menu-partial %}
-    <ul hx-swap-oob="true" id="id_extra_menu" role="list" class="menu -mx-2 mt-2">
-        <c-layout.nav-item
-            url_name="upkeep:area-list"
-            match="/upkeep/area/"
-            target="#content"
-            x-on:click="$refs.sidebarDrawer.checked = false"
-        >Areas</c-layout.nav-item>
-        <c-layout.nav-item
-            url_name="upkeep:task-list"
-            match="/upkeep/task/"
-            target="#content"
-            x-on:click="$refs.sidebarDrawer.checked = false"
-        >Tasks</c-layout.nav-item>
-    </ul>
-{% endpartialdef menu-partial %}

@@ -1,14 +1,20 @@
 {% comment %}
 Responsive daisyUI drawer: the sidebar is open on lg screens and toggles below that.
 id: the checkbox id that navbar and overlay labels point at. The default slot is the page;
-the `side` named slot is the sidebar content.
+the `side` named slot is the sidebar content. Backed by Alpine.data("drawer"): following a
+link in the sidebar, or pressing Esc, closes it.
 {% endcomment %}
 <c-vars id="app-drawer" side="" class />
 
-<div class="drawer lg:drawer-open {{ class }}" {{ attrs }}>
-    <input id="{{ id }}" type="checkbox" class="drawer-toggle" x-ref="drawer">
+<div
+    class="drawer lg:drawer-open {{ class }}"
+    x-data="drawer"
+    x-on:keydown.escape.window="close()"
+    {{ attrs }}
+>
+    <input id="{{ id }}" type="checkbox" class="drawer-toggle">
     <div class="drawer-content flex min-h-screen flex-col">{{ slot }}</div>
-    <aside class="drawer-side z-30">
+    <aside class="drawer-side z-30" x-on:click="closeOnLink($event)">
         <label for="{{ id }}" aria-label="close sidebar" class="drawer-overlay"></label>
         {{ side }}
     </aside>

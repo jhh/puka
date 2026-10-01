@@ -4,8 +4,9 @@ url_name, arg: reversed with {% url url_name arg %} (arg is optional).
 match: also active when the current path contains this prefix, e.g. "/stuff/location/";
 otherwise active only on an exact match.
 icon: a full heroicons class. target: when set, navigate with hx-get into that element.
+children: optional named slot of nested nav items, shown as a sub-menu.
 {% endcomment %}
-<c-vars url_name arg="" match="" icon="" target="" class />
+<c-vars url_name arg="" match="" icon="" target="" children="" class />
 
 {% if arg != "" %}{% url url_name arg as href %}{% else %}{% url url_name as href %}{% endif %}
 <li>
@@ -19,4 +20,5 @@ icon: a full heroicons class. target: when set, navigate with hx-get into that e
         {% if icon %}<c-ui.icon name="{{ icon }}" class="size-5" />{% endif %}
         <span>{{ slot }}</span>
     </a>
+    {% if children %}<ul>{{ children }}</ul>{% endif %}
 </li>
