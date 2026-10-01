@@ -420,7 +420,7 @@ def test_bookmark_select_form(admin_client, objects, name, key):
     assert form.attrs["hx-get"] == url
     assert form.attrs["hx-target"] == "#content"
     assert page.field_names() == {"text", "created", "url", "tags", "active"}
-    (link,) = page.find("a", hx_post="")
+    (link,) = page.find("button", hx_post=url)
     assert json.loads(link.attrs["hx-vals"]) == {"bookmark_pk": objects["bookmark"]}
 
 
@@ -429,7 +429,8 @@ def test_login_form(client):
 
     (form,) = page.forms
     assert form.attrs["method"].lower() == "post"
-    assert page.field_names() == {"username", "password", "remember-me"}
+    assert page.field_names() == {"username", "password"}
+    assert all(el.attrs.get("href") != "#" for el in page.find("a"))
     assert page.field("password").attrs["type"] == "password"
     assert page.find("input", name="csrfmiddlewaretoken")
 

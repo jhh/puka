@@ -17,3 +17,18 @@ def get_template(request: HttpRequest, template: str, partial: str) -> list[str]
 
 def view_404(request):
     return render(request, "404.html", status=404)
+
+
+def overview(request):
+    # Imported here: core is imported by the other apps' views.
+    from puka.bookmarks.models import Bookmark  # noqa: PLC0415
+    from puka.stuff.models import Item  # noqa: PLC0415
+    from puka.upkeep.models import Task  # noqa: PLC0415
+
+    counts = {
+        "bookmarks": Bookmark.active_objects.count(),
+        "items": Item.objects.count(),
+        "tasks": Task.objects.count(),
+        "tags": Bookmark.tags.count(),
+    }
+    return render(request, "overview.html", {"counts": counts})

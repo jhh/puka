@@ -4,7 +4,7 @@
 {% block title %}Log In{% endblock %}
 
 {% block root %}
-    <div class="flex min-h-full flex-col items-center justify-center py-12 sm:px-6 lg:px-8">
+    <div class="flex min-h-screen flex-col items-center justify-center py-12 sm:px-6 lg:px-8">
         <div class="sm:mx-auto sm:w-full sm:max-w-md">
             <img
                 class="mx-auto h-10 w-auto"
@@ -17,40 +17,14 @@
         </div>
 
         <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
-            <div class="border border-base-200 bg-base-100 px-6 py-12 shadow-sm sm:rounded-lg sm:px-12">
+            <c-ui.card class="shadow-sm" body_class="px-6 py-12 sm:px-12">
                 <c-form.form :form="form" class="space-y-6">
                     <c-form.field :field="form.username" label="User Name" />
                     <c-form.field :field="form.password" />
 
-                    <div class="flex items-center justify-between">
-                        <label class="flex items-center gap-3">
-                            <input
-                                type="checkbox"
-                                inert
-                                checked
-                                id="remember-me"
-                                name="remember-me"
-                                class="checkbox"
-                            >
-                            <span class="label">Remember me</span>
-                        </label>
-
-                        <a
-                            href="#"
-                            class="link link-primary text-sm/6"
-                        >
-                            Forgot password?
-                        </a>
-                    </div>
-
                     <c-ui.button type="submit" variant="primary" class="btn-block">Sign in</c-ui.button>
                 </c-form.form>
-            </div>
-
-            <p class="mt-10 text-center text-sm/6 text-base-content/60">
-                Not a member?
-                <a href="#" class="link link-primary">Sign up for Puka</a>
-            </p>
+            </c-ui.card>
         </div>
     </div>
 {% endblock root %}

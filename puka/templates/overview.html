@@ -1,55 +1,38 @@
 {% extends "base.html" %}
-{% load static %}
 
 {% block title %}Overview{% endblock %}
 
+{% partialdef overview-card %}
+    <a href="{{ href }}" class="card card-border border-base-300 bg-base-100 shadow-sm transition hover:shadow-md">
+        <div class="card-body">
+            <div class="flex items-center justify-between">
+                <h2 class="card-title text-base">{{ title }}</h2>
+                <c-ui.icon name="{{ icon }}" class="size-5 text-base-content/40" />
+            </div>
+            <p class="text-3xl font-semibold">{{ count }}</p>
+            <p class="text-sm text-base-content/70">{{ caption }}</p>
+        </div>
+    </a>
+{% endpartialdef overview-card %}
+
 {% block content %}
-    <h1 class="text-2xl font-semibold text-base-content">Welcome to Puka</h1>
-    <div class="mt-6 grid gap-4 lg:grid-cols-3">
-        <a
-            href="{% url 'bookmarks:list' %}"
-            class="card border border-base-200 bg-base-100 shadow-sm transition hover:shadow"
-        >
-            <div class="card-body relative">
-                <span
-                    class="hero-bookmark absolute right-4 top-4 size-5 text-base-content/40"
-                    aria-hidden="true"
-                ></span>
-                <h2 class="card-title text-base">Bookmarks</h2>
-                <p class="text-sm text-base-content/70">
-                    There are XXX active bookmarks.
-                </p>
-            </div>
-        </a>
-        <a href="#" class="card border border-base-200 bg-base-100 shadow-sm transition hover:shadow">
-            <div class="card-body relative">
-                <span
-                    class="hero-archive-box absolute right-4 top-4 size-5 text-base-content/40"
-                    aria-hidden="true"
-                ></span>
-                <h2 class="card-title text-base">Inventory</h2>
-                <p class="text-sm text-base-content/70">There are XXX active items.</p>
-            </div>
-        </a>
-        <a href="#" class="card border border-base-200 bg-base-100 shadow-sm transition hover:shadow">
-            <div class="card-body relative">
-                <span
-                    class="hero-clipboard-document-check absolute right-4 top-4 size-5 text-base-content/40"
-                    aria-hidden="true"
-                ></span>
-                <h2 class="card-title text-base">Tasks</h2>
-                <p class="text-sm text-base-content/70">There are XXX active tasks.</p>
-            </div>
-        </a>
-        <a href="#" class="card border border-base-200 bg-base-100 shadow-sm transition hover:shadow">
-            <div class="card-body relative">
-                <span
-                    class="hero-tag absolute right-4 top-4 size-5 text-base-content/40"
-                    aria-hidden="true"
-                ></span>
-                <h2 class="card-title text-base">Tags</h2>
-                <p class="text-sm text-base-content/70">There are XXX active tags.</p>
-            </div>
-        </a>
+    <c-layout.page-header title="Welcome to Puka" />
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {% url 'bookmarks:list' as href %}
+        {% with title="Bookmarks" icon="hero-bookmark" count=counts.bookmarks caption="active bookmarks" %}
+            {% partial overview-card %}
+        {% endwith %}
+        {% url 'stuff:item-list' as href %}
+        {% with title="Inventory" icon="hero-archive-box" count=counts.items caption="items" %}
+            {% partial overview-card %}
+        {% endwith %}
+        {% url 'upkeep:task-list' as href %}
+        {% with title="Tasks" icon="hero-clipboard-document-check" count=counts.tasks caption="upkeep tasks" %}
+            {% partial overview-card %}
+        {% endwith %}
+        {% url 'bookmarks:tags' as href %}
+        {% with title="Tags" icon="hero-tag" count=counts.tags caption="bookmark tags" %}
+            {% partial overview-card %}
+        {% endwith %}
     </div>
 {% endblock content %}

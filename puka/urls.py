@@ -3,13 +3,12 @@ from __future__ import annotations
 from django.conf import settings
 from django.contrib import admin
 from django.urls import URLPattern, URLResolver, include, path
-from django.views.generic import TemplateView
 from django.views.static import serve
 
-from puka.core.views import view_404
+from puka.core.views import overview, view_404
 
 urlpatterns: list[URLPattern | URLResolver] = [
-    path("", TemplateView.as_view(template_name="overview.html"), name="home"),
+    path("", overview, name="home"),
     path(
         "favicon.ico",
         serve,

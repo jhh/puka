@@ -24,12 +24,6 @@
                     <ul class="menu dropdown-content z-30 mt-2 w-56 rounded-box border border-base-200 bg-base-100 p-2 shadow">
                         <li class="menu-title"><span>Account</span></li>
                         <li>
-                            <a href="#">
-                                <c-ui.icon name="hero-cog-6-tooth" class="size-4" />
-                                Settings
-                            </a>
-                        </li>
-                        <li>
                             <form action="{% url 'logout' %}" method="post">
                                 {% csrf_token %}
                                 <button type="submit" class="flex items-center gap-2">

@@ -22,7 +22,9 @@
     <ul id="id_bookmarks" class="menu w-full rounded-box border border-base-300 bg-base-100">
         {% for bookmark in bookmarks %}
             <li>
-                <a href="#" hx-post="" hx-vals='{"bookmark_pk": {{ bookmark.id }} }'>{{ bookmark.title }}</a>
+                <button type="button" hx-post="{{ request.path }}" hx-vals='{"bookmark_pk": {{ bookmark.id }} }'>
+                    {{ bookmark.title }}
+                </button>
             </li>
         {% empty %}
             <li><c-ui.empty-state title="No bookmarks found" icon="hero-bookmark" /></li>

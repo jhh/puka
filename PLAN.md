@@ -185,6 +185,11 @@ components, and swap the remaining ad-hoc Tailwind for daisyUI classes.
 Check each converted page in the browser (full load, boosted navigation,
 and every htmx action) plus its tests.
 
+Done, one jj change per app. The overview shows real counts from a small
+`overview` view. The login page lost its non-working "Remember me",
+"Forgot password?" and "Sign up" controls, and the account menu its
+"Settings" link. Browser checks are still to do.
+
 ### Phase 7: Cleanup
 
 1. Remove the `htmx` context processor and use `request.htmx` in templates.
@@ -206,8 +211,3 @@ and every htmx action) plus its tests.
   `just test` locally for every change.
 - **Large templates.** Pre-commit rejects files over 25 KB. Moving markup
   into components keeps templates small, but watch `item_detail.html`.
-
-## Open questions
-
-1. **Overview page:** should it get real counts in place of the "XXX"
-   placeholders, or stay out of scope?
