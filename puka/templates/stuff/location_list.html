@@ -3,8 +3,8 @@
 {% block title %}Locations{% endblock %}
 
 {% partialdef list-partial %}
-    <div class="flex items-center justify-between mb-4 mt-0">
-        <h1 class="text-lg font-semibold text-base-content">
+    <c-layout.page-header>
+        <c-slot name="title">
             {% if ancestors %}
                 <a
                     href="{% url 'stuff:location-list' 0 %}"
@@ -30,101 +30,88 @@
                     {{ name }}
                 {% endif %}
             {% endfor %}
-        </h1>
-
-        <div class="flex md:mt-0">
-            <a
-                href="{% url 'stuff:location-new' %}{% querystring parent=parent_id %}"
-                hx-get="{% url 'stuff:location-new' %}{% querystring parent=parent_id %}"
+        </c-slot>
+        <c-slot name="actions">
+            {% url 'stuff:location-new' as new_url %}
+            <c-ui.button
+                href="{{ new_url }}?parent={{ parent_id }}"
+                variant="primary"
+                icon="hero-plus"
+                hx-get="{{ new_url }}?parent={{ parent_id }}"
                 hx-target="#content"
                 hx-push-url="true"
-                class="btn btn-primary hidden md:inline-flex"
-            >Add Location</a>
-            <a
-                href="{% url 'stuff:location-new' %}{% querystring parent=parent_id %}"
-                hx-get="{% url 'stuff:location-new' %}{% querystring parent=parent_id %}"
-                hx-target="#content"
-                hx-push-url="true"
-                class="btn btn-primary md:hidden"
-            >Add</a>
-        </div>
-    </div>
+            >
+                <span class="hidden md:inline">Add Location</span>
+                <span class="md:hidden">Add</span>
+            </c-ui.button>
+        </c-slot>
+    </c-layout.page-header>
 
-    <div class="rounded-box border border-base-300 bg-base-100">
-        <div class="overflow-x-auto">
-            <table class="table table-pin-rows table-zebra">
-                <thead>
-                    <tr>
-                        <th scope="col" class="font-semibold text-base-content">Location</th>
-                        <th scope="col" class="font-semibold text-base-content">Code</th>
-                        <th scope="col" class="hidden sm:table-cell font-semibold text-base-content">Children</th>
-                        <th scope="col"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for location in locations %}
-                        <tr class="group">
-                            <td class="whitespace-nowrap">
-                                {% if location.is_leaf %}
-                                    <a
-                                        hx-get="{% url 'stuff:location-detail' location.pk %}"
-                                        hx-target="#content"
-                                        hx-push-url="true"
-                                        href="#"
-                                        class="link link-hover font-semibold"
-                                    >{{ location.name }}</a>
-                                {% else %}
-                                    <a
-                                        hx-get="{% url 'stuff:location-list' location.pk %}"
-                                        hx-target="#content"
-                                        hx-push-url="true"
-                                        href="#"
-                                        class="link link-hover font-semibold"
-                                    >{{ location.name }}</a>
-                                {% endif %}
-                            </td>
-                            <td class="text-base-content/70">
-                                <div class="flex items-center gap-1">
-                                    <span>{{ location.code }}</span>
-                                    <button
-                                        @click="navigator.clipboard.writeText('{{ location.code }}')"
-                                        class="btn btn-ghost btn-xs"
-                                        type="button"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke-width="1.5"
-                                            stroke="currentColor"
-                                            class="size-4"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
-                                            />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </td>
-                            <td class="hidden sm:table-cell text-base-content/70">{{ location.numchild }}</td>
-                            <td class="text-right">
-                                <a
-                                    href="#"
-                                    hx-get="{% url 'stuff:location-edit' location.pk %}"
-                                    hx-target="#content"
-                                    hx-push-url="true"
-                                    class="link link-hover text-sm text-base-content/70 font-semibold opacity-0 group-hover:opacity-100 transition-opacity"
-                                >edit</a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+    <c-ui.table zebra="1" pin_rows="1">
+        <thead>
+            <tr>
+                <th scope="col">Location</th>
+                <th scope="col">Code</th>
+                <th scope="col" class="hidden sm:table-cell">Children</th>
+                <th scope="col"><span class="sr-only">Edit</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for location in locations %}
+                <tr class="group">
+                    <td class="whitespace-nowrap">
+                        {% if location.is_leaf %}
+                            {% url 'stuff:location-detail' location.pk as location_url %}
+                        {% else %}
+                            {% url 'stuff:location-list' location.pk as location_url %}
+                        {% endif %}
+                        <a
+                            href="{{ location_url }}"
+                            hx-get="{{ location_url }}"
+                            hx-target="#content"
+                            hx-push-url="true"
+                            class="link link-hover font-semibold"
+                        >{{ location.name }}</a>
+                    </td>
+                    <td class="text-base-content/70">
+                        <div class="flex items-center gap-1">
+                            <span>{{ location.code }}</span>
+                            <c-ui.button
+                                variant="ghost"
+                                size="xs"
+                                icon="hero-clipboard-document"
+                                aria-label="Copy code"
+                                x-data
+                                x-on:click="navigator.clipboard.writeText('{{ location.code|escapejs }}')"
+                            />
+                        </div>
+                    </td>
+                    <td class="hidden text-base-content/70 sm:table-cell">{{ location.numchild }}</td>
+                    <td class="text-right">
+                        <a
+                            href="{% url 'stuff:location-edit' location.pk %}"
+                            hx-get="{% url 'stuff:location-edit' location.pk %}"
+                            hx-target="#content"
+                            hx-push-url="true"
+                            class="link link-hover text-sm font-semibold text-base-content/70 opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
+                        >edit</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4"><c-ui.empty-state title="No locations" icon="hero-map-pin" /></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </c-ui.table>
 {% endpartialdef list-partial %}
+
+{% block breadcrumbs %}
+    <ul>
+        <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
+        <c-ui.crumb href="{% url 'stuff:location-list' 0 %}">Locations</c-ui.crumb>
+    </ul>
+{% endblock breadcrumbs %}
 
 {% block content %}
     {% partial list-partial %}

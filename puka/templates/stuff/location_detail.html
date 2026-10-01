@@ -3,93 +3,89 @@
 {% block title %}{{ location.name }}{% endblock %}
 
 {% partialdef field-partial %}
-    <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+    <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
         <dt class="text-sm font-medium text-base-content">{{ label }}</dt>
         <dd class="mt-1 text-sm text-base-content/70 sm:col-span-2 sm:mt-0">{{ value }}</dd>
     </div>
 {% endpartialdef field-partial %}
 
 {% partialdef detail-partial %}
-    <div class="card bg-base-100 border border-base-300 rounded-box">
-        <div class="card-body">
-            <h3 class="text-base font-semibold text-base-content">Location Detail</h3>
-            <p class="mt-1 max-w-2xl text-sm text-base-content/70">Location details for {{ location.name }}.</p>
-        </div>
-        <div class="border-t border-base-300">
-            <dl class="divide-y divide-base-200">
-                {% with label="Name" value=location.name %}
-                    {% partial field-partial %}
-                {% endwith %}
-                {% with label="Code" value=location.code %}
-                    {% partial field-partial %}
-                {% endwith %}
-                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-base-content">Inventory</dt>
-                    <dd class="mt-2 text-sm text-base-content sm:col-span-2 sm:mt-0">
-                        <ul role="list" class="list list-sm border border-base-300 rounded-box bg-base-100">
-                            {% for inv in location.inventories.all %}
-                                <li class="list-row">
-                                    <div>
-                                        <a
-                                            href="{% url 'stuff:item-detail' pk=inv.item.id %}"
-                                            hx-get="{% url 'stuff:item-detail' pk=inv.item.id %}"
-                                            hx-target="#content"
-                                            hx-push-url="true"
-                                            class="link link-hover link-primary"
-                                        >
-                                            {{ inv.item.name }}
-                                        </a>
-                                    </div>
-                                    <div>
-                                        <button
-                                            hx-post="{% url 'stuff:inventory-adjust' pk=inv.id %}"
-                                            hx-target="#id_quantity_{{ inv.id }}"
-                                            hx-vals='{"quantity": -1}'
-                                            type="button"
-                                            class="btn btn-primary btn-circle btn-xs mr-2"
-                                        >
-                                            <svg
-                                                class="size-3"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke-width="1.5"
-                                                stroke="currentColor"
-                                            >
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
-                                            </svg>
-                                        </button>
-                                        <span
-                                            class="inline-block text-end w-6"
-                                            id="id_quantity_{{ inv.id }}"
-                                        >{{ inv.quantity }}</span>
-                                        <button
-                                            hx-post="{% url 'stuff:inventory-adjust' pk=inv.id %}"
-                                            hx-target="#id_quantity_{{ inv.id }}"
-                                            hx-vals='{"quantity": 1}'
-                                            type="button"
-                                            class="btn btn-primary btn-circle btn-xs ml-2"
-                                        >
-                                            <svg
-                                                class="size-3"
-                                                viewBox="0 0 20 20"
-                                                fill="currentColor"
-                                                aria-hidden="true"
-                                                data-slot="icon"
-                                            >
-                                                <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </dd>
-                </div>
-            </dl>
-        </div>
-    </div>
+    <c-layout.page-header title="{{ location.name }}">
+        <c-slot name="actions">
+            <c-ui.button
+                href="{% url 'stuff:location-edit' location.pk %}"
+                variant="primary"
+                style="soft"
+                hx-get="{% url 'stuff:location-edit' location.pk %}"
+                hx-target="#content"
+                hx-push-url="true"
+            >Edit</c-ui.button>
+        </c-slot>
+    </c-layout.page-header>
+    <c-ui.card>
+        <dl class="divide-y divide-base-200">
+            {% with label="Name" value=location.name %}{% partial field-partial %}{% endwith %}
+            {% with label="Code" value=location.code %}{% partial field-partial %}{% endwith %}
+            <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
+                <dt class="text-sm font-medium text-base-content">Inventory</dt>
+                <dd class="mt-2 text-sm sm:col-span-2 sm:mt-0">
+                    <ul role="list" class="list list-sm rounded-box border border-base-300 bg-base-100">
+                        {% for inv in location.inventories.all %}
+                            <li class="list-row items-center">
+                                <a
+                                    href="{% url 'stuff:item-detail' pk=inv.item.id %}"
+                                    hx-get="{% url 'stuff:item-detail' pk=inv.item.id %}"
+                                    hx-target="#content"
+                                    hx-push-url="true"
+                                    class="link link-hover link-primary"
+                                >{{ inv.item.name }}</a>
+                                <div class="flex items-center gap-2">
+                                    <c-ui.button
+                                        variant="primary"
+                                        size="xs"
+                                        icon="hero-minus"
+                                        class="btn-circle"
+                                        aria-label="Remove one"
+                                        hx-post="{% url 'stuff:inventory-adjust' pk=inv.id %}"
+                                        hx-target="#id_quantity_{{ inv.id }}"
+                                        hx-vals='{"quantity": -1}'
+                                    />
+                                    <span
+                                        class="inline-block w-6 text-center font-medium"
+                                        id="id_quantity_{{ inv.id }}"
+                                    >{{ inv.quantity }}</span>
+                                    <c-ui.button
+                                        variant="primary"
+                                        size="xs"
+                                        icon="hero-plus"
+                                        class="btn-circle"
+                                        aria-label="Add one"
+                                        hx-post="{% url 'stuff:inventory-adjust' pk=inv.id %}"
+                                        hx-target="#id_quantity_{{ inv.id }}"
+                                        hx-vals='{"quantity": 1}'
+                                    />
+                                </div>
+                            </li>
+                        {% empty %}
+                            <li><c-ui.empty-state title="Nothing stored here" icon="hero-archive-box" /></li>
+                        {% endfor %}
+                    </ul>
+                </dd>
+            </div>
+        </dl>
+    </c-ui.card>
 {% endpartialdef detail-partial %}
+
+{% block breadcrumbs %}
+    <ul>
+        <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
+        <c-ui.crumb href="{% url 'stuff:location-list' 0 %}">Locations</c-ui.crumb>
+        {% for node in ancestors %}
+            <c-ui.crumb href="{% url 'stuff:location-list' node.pk %}">{{ node.name }}</c-ui.crumb>
+        {% endfor %}
+        <c-ui.crumb>{{ location.name }}</c-ui.crumb>
+    </ul>
+{% endblock breadcrumbs %}
 
 {% block content %}
     {% partial detail-partial %}
