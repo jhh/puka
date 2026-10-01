@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from urllib.parse import urlparse
 
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVectorField
@@ -58,3 +59,8 @@ class Bookmark(TimeStampedModel):
 
     def natural_key(self):
         return (self.url,)
+
+    @property
+    def domain(self) -> str:
+        """The URL's host, e.g. ``example.com``."""
+        return urlparse(self.url).netloc

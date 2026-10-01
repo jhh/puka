@@ -19,8 +19,8 @@ Nix devshell, `just` task runner. Run every command inside the devshell.
 - `.env` only sets `DEBUG=true`. `DJANGO_DATABASE_URL` and `PG*` come from
   the devshell `shellHook`; local Postgres data dir is `.db/`.
 - `just init`: npm install + build CSS/JS + write `.env`.
-- `just start` / `just stop`: local Postgres (+ create DB + migrate).
-- `just load` pulls production data over `ssh eris`; needs prod access.
+- `just db-start` / `just db-stop`: local Postgres (+ create DB + migrate).
+- `just db-load` pulls production data over `ssh eris`; needs prod access.
 
 ## Commands
 
@@ -28,12 +28,14 @@ Nix devshell, `just` task runner. Run every command inside the devshell.
 - manage.py: `just manage "cmd"`, `just migrate`, `just makemigrations`,
   or `uv run puka/manage.py ...`.
 - Tests: `just test` or `uv run pytest tests`. Postgres must be running
-  (`just start`); pytest-django creates `test_puka`.
+  (`just db-start`); pytest-django creates `test_puka`.
   - Bare `uv run pytest` collects nothing: `testpaths = ["puka"]` in
     `pyproject.toml`, but tests live in `tests/` (`*_test.py`).
   - Single: `uv run pytest tests/stuff/item_model_test.py::test_name`.
   - Coverage: `just coverage`.
-- Lint/format: `uv run ruff format .` then `uv run ruff check .`.
+- Lint/format: `uv run ruff format .` then `uv run ruff check .`. On NixOS
+  the ruff and ty wheels in `.venv` can't run; use `pre-commit` (ruff) and
+  the devshell/system `ty` with `--python .venv`.
 - Types: `just ty`. CI runs `ty check --error-on-warning`, so use
   `uv run ty check --error-on-warning` to match; `ty` over pyright/mypy.
 - Templates: `just djangofmt` (format + lint) and `just djade`.
@@ -78,8 +80,37 @@ Nix devshell, `just` task runner. Run every command inside the devshell.
   trailing commas in multi-line literals/calls.
 - htmx: views return `get_template(request, "path.html", "#partial")` from
   `puka/core/views.py`; templates define `{% partialdef name %}` (Django 6
-  built-in partials). Keep the root -> sidebar -> app template layout.
-- `htmx.org` is pinned to `4.0.0` in `just npm-update`; use htmx 4 APIs.
+  built-in partials). Templates extend `root.html` -> `base.html` (drawer,
+  navbar, sidebar) -> optional app `base.html` -> page. In templates, test
+  `request.htmx` (django-htmx) for htmx requests.
+- `htmx.org` is pinned to `4.0.0` in `just update-npm`; use htmx 4 APIs
+  (no `hx-params`; the `HX-Trigger` events bubble to `window`).
 - Forms: each form sets `template_name` to a template of `<c-form.field>`s
   and `<c-form.actions>`; pages wrap `{{ form }}` in `<c-form.form>`.
   `FORM_RENDERER` (`puka/core/forms.py`) adds daisyUI classes to widgets.
+
+## Cotton components
+
+- Components live in `puka/templates/cotton/{ui,form,layout}/`; filenames
+  are snake_case (`<c-ui.search-box>` is `ui/search_box.html`). Each starts
+  with a `{% comment %}` describing its variables. Explicit setup:
+  `django_cotton.apps.SimpleAppConfig`, loaders and builtins in `TEMPLATES`.
+- Components are presentation only; `partialdef`s are htmx swap targets.
+  `COTTON_ENABLE_CONTEXT_ISOLATION` means a component sees its attributes
+  plus context processors, not the parent context: pass data in. Only
+  `layout/nav-item` and `ui/pagination` read the request.
+- Attributes not declared in `<c-vars>` pass through `{{ attrs }}`, so put
+  `hx-*` and `x-*` on component tags. Declare anything that isn't an HTML
+  attribute (`variant`, `size`, `icon`, ...). Declare `class` bare
+  (`class`, since djangofmt rejects `class=""`) and merge it into the root
+  element, or the caller's class becomes a duplicate attribute.
+- On component tags use `x-on:`/`x-bind:`, not `@`/`:` (Cotton treats
+  `:attr` as a Python expression).
+- Map variants to full daisyUI class names (`{% if variant == "primary" %}
+  btn-primary{% endif %}`); never build `btn-{{ variant }}`, Tailwind can't
+  see it. Icons take the full heroicons class (`icon="hero-plus"`).
+- Alpine is only for client state (`searchBox`, `tabs`, `drawer` in
+  `Alpine.data` in `base.js`); no inline `<script>` blocks.
+- Rendering a component from a string in tests needs
+  `CottonCompiler().process(source)` first; see
+  `tests/core/components_test.py`.

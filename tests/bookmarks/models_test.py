@@ -81,3 +81,15 @@ def test_serialize_with_natural_primary_key(typewriter_bookmark, typewriter_json
     assert result[0]["fields"]["url"] == typewriter_json[0]["fields"]["url"]
     assert result[0]["fields"]["active"] == typewriter_json[0]["fields"]["active"]
     assert "pk" not in result[0]
+
+
+@pytest.mark.parametrize(
+    ("url", "domain"),
+    [
+        ("https://hipsum.co/kombucha", "hipsum.co"),
+        ("http://example.com:8000/a?b=c", "example.com:8000"),
+        ("https://sub.example.org", "sub.example.org"),
+    ],
+)
+def test_domain(url, domain):
+    assert Bookmark(url=url).domain == domain

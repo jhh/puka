@@ -198,6 +198,9 @@ Done, one jj change per app. The overview shows real counts from a small
 3. Remove the `django_browser_reload` check in `urls.py`, or install it.
 4. Update AGENTS.md with the Cotton conventions from above and the correct
    `just` recipe names.
+5. Done. `|domain` became `Bookmark.domain`, so `puka/core/templatetags/`
+   is gone. `django_browser_reload` was never installed; its URL hook is
+   removed.
 
 ## Risks
 

@@ -173,3 +173,15 @@ def test_bookmarks_tag_breadcrumb_oob(admin_client, succulents_bookmark):
     trail = content[content.index('id="breadcrumbs"') : content.index("</ul>")]
     assert "hero-hashtag-mini" in trail
     assert "humblebrag" in trail
+
+
+def test_bookmarks_list_shows_domain(admin_client, succulents_bookmark):
+    assertContains(admin_client.get(reverse("bookmarks:list")), "hipsum.co")
+
+
+def test_bookmarks_oob_breadcrumbs_only_for_htmx(admin_client, succulents_bookmark):
+    url = reverse("bookmarks:list")
+    full = admin_client.get(url).content.decode()
+    assert "hx-swap-oob" not in full
+    fragment = admin_client.get(url, headers={"HX-Request": "true"}).content.decode()
+    assert 'hx-swap-oob="true"' in fragment
