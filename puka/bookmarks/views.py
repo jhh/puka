@@ -40,7 +40,13 @@ def bookmarks(request):
     page_obj = paginator.get_page(page_number)
 
     if request.htmx and not request.htmx.boosted:
-        template = "bookmarks/bookmark_list.html#list-items-partial"
+        # A tag link on the tags page swaps into the whole content block, so it
+        # needs the toolbar and list wrapper; search/infinite scroll only want
+        # the rows.
+        if (request.htmx.target or "").endswith("#content"):
+            template = "bookmarks/bookmark_list.html#list-partial"
+        else:
+            template = "bookmarks/bookmark_list.html#list-items-partial"
     else:
         template = "bookmarks/bookmark_list.html"
 

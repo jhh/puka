@@ -14,7 +14,7 @@
     <ul>{% partial breadcrumbs %}</ul>
 {% endblock breadcrumbs %}
 
-{% block content %}
+{% partialdef list-partial %}
     <div class="mx-auto mb-4 flex max-w-4xl justify-end gap-4">
         <c-ui.search-box
             hx-get="{% url 'bookmarks:list' %}"
@@ -94,4 +94,8 @@
             {% endfor %}
         {% endpartialdef list-items-partial %}
     </ul>
+{% endpartialdef list-partial %}
+
+{% block content %}
+    {% partial list-partial %}
 {% endblock content %}

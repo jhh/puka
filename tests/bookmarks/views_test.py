@@ -78,6 +78,20 @@ def test_bookmarks_htmx_request(admin_client):
     assert "<head>" not in response.content.decode()
 
 
+def test_bookmarks_content_target_returns_full_list(admin_client, succulents_bookmark):
+    """A tag link on the tags page swaps into #content and needs the list wrapper."""
+    url = reverse("bookmarks:list") + "?tags=humblebrag"
+    response = admin_client.get(
+        url,
+        headers={"HX-Request": "true", "HX-Target": "div#content"},
+    )
+    content = response.content.decode()
+    assert "<head>" not in content
+    assert parse_html(content).find("ul", id="id_bookmarks")
+    assert "New Bookmark" in content
+    assert 'hx-swap-oob="true"' in content
+
+
 def test_create_bookmark(admin_client):
     url = reverse("bookmarks:new")
     response = admin_client.post(
