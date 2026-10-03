@@ -15,7 +15,7 @@
 {% endblock breadcrumbs %}
 
 {% block content %}
-    <div class="mb-4 flex justify-end gap-4">
+    <div class="mx-auto mb-4 flex max-w-4xl justify-end gap-4">
         <c-ui.search-box
             hx-get="{% url 'bookmarks:list' %}"
             hx-trigger="input changed delay:0.5s"
@@ -27,7 +27,10 @@
         </c-ui.button>
     </div>
 
-    <ul id="id_bookmarks" class="list rounded-box border border-base-300 bg-base-100 shadow-sm">
+    <ul
+        id="id_bookmarks"
+        class="list mx-auto max-w-4xl rounded-box border border-base-300 bg-base-100 shadow-sm"
+    >
         {% partialdef list-items-partial inline %}
             {% if request.htmx %}
                 <c-ui.breadcrumbs id="breadcrumbs" hx-swap-oob="true">{% partial breadcrumbs %}</c-ui.breadcrumbs>

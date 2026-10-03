@@ -15,7 +15,7 @@
 {% endblock content %}
 
 {% partialdef filter-partial %}
-    <c-form.form method="get" :form="filter.form" class="mb-4 space-y-4">
+    <c-form.form method="get" :form="filter.form" class="mx-auto mb-4 max-w-4xl space-y-4">
         <div class="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2">
             <c-form.field :field="filter.form.text" class="sm:col-span-2" />
             <c-form.field :field="filter.form.tags" />
@@ -32,7 +32,7 @@
     </c-form.form>
     <ul
         id="id_bookmarks"
-        class="list rounded-box border border-base-300 bg-base-100 shadow-sm"
+        class="list mx-auto max-w-4xl rounded-box border border-base-300 bg-base-100 shadow-sm"
     >
         {% include "bookmarks/bookmark_list.html#list-items-partial" %}
     </ul>
