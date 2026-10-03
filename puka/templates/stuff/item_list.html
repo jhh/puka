@@ -54,13 +54,13 @@
                             {% if item.tags.all %}
                                 <div class="mt-0.5">
                                     {% for tag in item.tags.all %}
-                                        <a
+                                        <c-ui.tag
                                             href="{% url 'stuff:item-list' %}?query=%23{{ tag }}"
                                             hx-get="{% url 'stuff:item-list' %}?query=%23{{ tag }}"
                                             hx-push-url="true"
                                             hx-target="#content"
-                                            class="link link-hover link-primary mr-1 text-xs"
-                                        ><c-ui.icon name="hero-hashtag-mini" class="size-3" />{{ tag }}</a>
+                                            class="mr-1 text-xs"
+                                        >{{ tag }}</c-ui.tag>
                                     {% endfor %}
                                 </div>
                             {% endif %}

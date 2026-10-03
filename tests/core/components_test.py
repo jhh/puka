@@ -99,6 +99,37 @@ def test_icon_class_replaces_default_size():
     assert classes(icon) == ["hero-tag", "size-3", "text-primary"]
 
 
+# ui/tag
+
+
+def test_tag():
+    source = (
+        '<c-ui.tag href="/bookmarks/?tags=ssh" class="mr-1 text-sm"'
+        ' hx-get="?tags=ssh">ssh</c-ui.tag>'
+    )
+    result = page(source)
+    tag = only(result, "a")
+    assert tag.attrs["href"] == "/bookmarks/?tags=ssh"
+    assert tag.attrs["hx-get"] == "?tags=ssh"
+    assert classes(tag) == [
+        "link",
+        "link-hover",
+        "link-primary",
+        "inline-flex",
+        "items-center",
+        "mr-1",
+        "text-sm",
+    ]
+    assert classes(only(result, "span"))[0] == "hero-hashtag-mini"
+    assert "ssh" in render(source)
+
+
+def test_tag_defaults():
+    tag = only(page("<c-ui.tag>django</c-ui.tag>"), "a")
+    assert tag.attrs["href"] == ""
+    assert classes(tag) == ["link", "link-hover", "link-primary", "inline-flex", "items-center"]
+
+
 # ui/card
 
 

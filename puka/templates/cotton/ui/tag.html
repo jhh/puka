@@ -1,0 +1,13 @@
+{% comment %}
+Tag link: hashtag icon plus the tag name, kept flush with inline-flex so no space
+appears between them.
+href: the link target. class: extra classes (size, margin) merged onto the <a>.
+hx-*/x-* attrs pass through.
+{% endcomment %}
+<c-vars href="" class />
+
+<a
+    href="{{ href }}"
+    class="link link-hover link-primary inline-flex items-center {{ class }}"
+    {{ attrs }}
+><c-ui.icon name="hero-hashtag-mini" class="size-3" />{{ slot }}</a>

@@ -58,14 +58,14 @@
                         <div class="w-full text-sm opacity-60 lg:max-w-3xl">{{ bookmark.description }}</div>
                         <div class="relative z-20 max-w-fit">
                             {% for tag in bookmark.tags.all %}
-                                <a
+                                <c-ui.tag
                                     href="?tags={{ tag }}"
                                     hx-get="?tags={{ tag }}"
                                     hx-target="#id_bookmarks"
                                     hx-push-url="true"
-                                    class="link link-hover link-primary mr-1 text-sm"
+                                    class="mr-1 text-sm"
                                     tabindex="-1"
-                                ><c-ui.icon name="hero-hashtag-mini" class="size-3" />{{ tag }}</a>
+                                >{{ tag }}</c-ui.tag>
                             {% endfor %}
                             <div class="mt-1 text-xs opacity-60">
                                 <c-ui.icon name="hero-cloud-mini" class="size-3 opacity-60" />
