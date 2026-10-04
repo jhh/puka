@@ -21,6 +21,7 @@ from tests.factories import (
     ScheduleFactory,
     TaskItemFactory,
 )
+from tests.utils import parse_html
 
 
 class Kind(Enum):
@@ -158,6 +159,12 @@ def test_full_page(admin_client, objects, case):
     response = admin_client.get(_url(case, objects))
     assert response.status_code == 200
     assert "<head>" in response.content.decode()
+    page = parse_html(response.content)
+    assert page.find("title")
+    if case.name != "login":
+        assert page.find("div", id="content")
+        assert page.find("div", id="breadcrumbs")
+        assert page.find("ul", id="sidebar")
 
 
 @pytest.mark.parametrize("case", _params(Kind.FRAGMENT))
@@ -170,13 +177,85 @@ def test_htmx_fragment(admin_client, objects, case):
     assert "<html" not in content
 
 
-@pytest.mark.parametrize("name", ["bookmarks:list", "stuff:item-detail"])
-def test_boosted_request_gets_full_page(admin_client, objects, name):
-    case = next(case for case in CASES if case.name == name)
+@pytest.mark.parametrize(
+    "case",
+    [
+        pytest.param(
+            case,
+            id=case.id or case.name,
+            marks=(
+                pytest.mark.xfail(
+                    strict=True,
+                    raises=AssertionError,
+                    reason="Step 2: get_template treats boosted navigation as a fragment",
+                )
+                if case.kind == Kind.FRAGMENT
+                and case.name not in {"bookmarks:list", "bookmarks:filter", "stuff:item-detail"}
+                else ()
+            ),
+        )
+        for case in CASES
+        if case.kind in {Kind.FRAGMENT, Kind.PAGE}
+    ],
+)
+def test_boosted_request_gets_full_page(admin_client, objects, case):
     headers = {"HX-Request": "true", "HX-Boosted": "true"}
     response = admin_client.get(_url(case, objects), headers=headers)
     assert response.status_code == 200
     assert "<head>" in response.content.decode()
+
+
+@pytest.mark.parametrize(
+    ("name", "key"),
+    [
+        ("stuff:item-detail", "item"),
+        ("stuff:location-detail", "location"),
+        ("upkeep:task-detail", "task"),
+        ("upkeep:area-detail", "area"),
+    ],
+)
+@pytest.mark.xfail(
+    strict=True,
+    raises=AssertionError,
+    reason="Step 2: content navigation leaves stale breadcrumbs",
+)
+def test_detail_fragment_updates_breadcrumbs(admin_client, objects, name, key):
+    response = admin_client.get(
+        reverse(name, args=[objects[key]]),
+        headers={"HX-Request": "true", "HX-Target": "div#content"},
+    )
+    assert response.status_code == 200
+    page = parse_html(response.content)
+    assert len(page.find("div", id="breadcrumbs")) == 1
+    (crumbs,) = page.find("div", id="breadcrumbs")
+    assert crumbs.attrs["hx-swap-oob"] == "true"
+
+
+@pytest.mark.parametrize(
+    ("name", "key"),
+    [("stuff:item-detail", "item"), ("upkeep:area-detail", "area")],
+)
+@pytest.mark.xfail(
+    strict=True,
+    raises=AssertionError,
+    reason="Step 2: content navigation leaves a stale document title",
+)
+def test_detail_fragment_updates_title(admin_client, objects, name, key):
+    url = reverse(name, args=[objects[key]])
+    full = parse_html(admin_client.get(url).content)
+    fragment = parse_html(
+        admin_client.get(url, headers={"HX-Request": "true", "HX-Target": "div#content"}).content,
+    )
+    assert len(fragment.find("title")) == 1
+    (title,) = fragment.find("title")
+    assert title.text == full.find("title")[0].text
+
+
+@pytest.mark.parametrize("case", _params(Kind.PAGE))
+def test_page_only_view_still_returns_document_for_htmx(admin_client, objects, case):
+    response = admin_client.get(_url(case, objects), headers={"HX-Request": "true"})
+    assert response.status_code == 200
+    assert parse_html(response.content).find("head")
 
 
 @pytest.mark.parametrize("case", _params(Kind.FRAGMENT, Kind.PAGE))

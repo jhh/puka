@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pytest
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import date_format
@@ -90,6 +91,86 @@ def test_bookmarks_content_target_returns_full_list(admin_client, succulents_boo
     assert parse_html(content).find("ul", id="id_bookmarks")
     assert "New Bookmark" in content
     assert 'hx-swap-oob="true"' in content
+
+
+@pytest.mark.parametrize(
+    ("target", "wrapper"),
+    [("ul#id_bookmarks", False), ("li", False), ("div#content", True)],
+    ids=["search", "infinite-scroll", "content-navigation"],
+)
+def test_bookmark_list_response_shape(admin_client, succulents_bookmark, target, wrapper):
+    response = admin_client.get(
+        reverse("bookmarks:list"),
+        headers={"HX-Request": "true", "HX-Target": target},
+    )
+    assert response.status_code == 200
+    content = response.content.decode()
+    page = parse_html(content)
+    assert succulents_bookmark.title in content
+    assert not page.find("head")
+    assert not page.find("div", id="content")
+    assert bool(page.find("ul", id="id_bookmarks")) == wrapper
+    assert bool(page.find("input", name="q")) == wrapper
+    (crumbs,) = page.find("div", id="breadcrumbs")
+    assert crumbs.attrs["hx-swap-oob"] == "true"
+
+
+def test_bookmark_infinite_scroll_response_appends_rows(admin_client):
+    for index in range(26):
+        create_bookmark(f"Bookmark {index}", url=f"https://example.com/{index}")
+    url = reverse("bookmarks:list")
+    first = parse_html(
+        admin_client.get(
+            url,
+            headers={"HX-Request": "true", "HX-Target": "ul#id_bookmarks"},
+        ).content,
+    )
+    (trigger,) = first.find("li", hx_trigger="revealed")
+    assert trigger.attrs["hx-get"] == "?page=2"
+    assert trigger.attrs["hx-swap"] == "afterend"
+    response = admin_client.get(
+        url,
+        {"page": 2},
+        headers={"HX-Request": "true", "HX-Target": "li"},
+    )
+    assert response.status_code == 200
+    page = parse_html(response.content)
+    assert len([el for el in page.find("li") if "list-row" in el.attrs.get("class", "")]) == 1
+    assert not page.find("ul", id="id_bookmarks")
+    assert not page.find("li", hx_trigger="revealed")
+
+
+@pytest.mark.parametrize("paging", [False, True], ids=["filter-page", "filter-rows"])
+def test_bookmark_filter_response_shape(admin_client, succulents_bookmark, paging):
+    response = admin_client.get(
+        reverse("bookmarks:filter"),
+        {"page": 1} if paging else {},
+        headers={"HX-Request": "true", "HX-Target": "li" if paging else "div#content"},
+    )
+    assert response.status_code == 200
+    page = parse_html(response.content)
+    assert not page.find("head")
+    assert bool(page.forms) == (not paging)
+    assert bool(page.find("ul", id="id_bookmarks")) == (not paging)
+
+
+@pytest.mark.xfail(
+    strict=True,
+    raises=AssertionError,
+    reason="Step 2: reused bookmark rows replace Filter breadcrumbs",
+)
+def test_bookmark_filter_fragment_keeps_filter_breadcrumbs(admin_client, succulents_bookmark):
+    response = admin_client.get(
+        reverse("bookmarks:filter"),
+        headers={"HX-Request": "true", "HX-Target": "div#content"},
+    )
+    assert response.status_code == 200
+    page = parse_html(response.content)
+    (crumbs,) = page.find("div", id="breadcrumbs")
+    assert crumbs.attrs["hx-swap-oob"] == "true"
+    content = response.content.decode()
+    trail = content[content.index('id="breadcrumbs"') : content.index("</ul>")]
+    assert parse_html(trail).find("a", href=reverse("bookmarks:filter"))
 
 
 def test_create_bookmark(admin_client):

@@ -13,8 +13,8 @@ from dataclasses import dataclass
 import pytest
 from django.urls import reverse
 
-from puka.stuff.models import Location
-from puka.upkeep.models import Area
+from puka.stuff.models import Inventory, Item, Location
+from puka.upkeep.models import Area, Schedule, Task, TaskItem
 from tests.factories import (
     BookmarkFactory,
     ItemFactory,
@@ -338,6 +338,44 @@ def test_form_errors(admin_client, objects, url, data, field, message, value):  
     assert page.forms[0].attrs["hx-post"] == _reverse(url, objects)
     el = page.field(field)
     assert el.attrs.get("aria-invalid") == "true"
+
+
+def test_invalid_form_preserves_database_and_returns_errors(admin_client, objects, form_case):
+    models = (Item, Location, Inventory, Area, Task, Schedule, TaskItem)
+    before = {model: list(model.objects.order_by("pk").values()) for model in models}
+    url = _reverse(form_case.url, objects)
+    response = admin_client.post(
+        url,
+        {"notes": "keep invalid notes", "quantity": "x"},
+        headers=HTMX,
+    )
+
+    assert response.status_code == 200
+    assert "<head>" not in response.content.decode()
+    assert "Location" not in response
+    assert "HX-Location" not in response
+    assert response.context["form"].errors
+    page = parse_html(response.content)
+    (form,) = page.forms
+    assert form.attrs["hx-post"] == url
+    assert page.field_names() == form_case.fields
+    assert page.find("input", name="csrfmiddlewaretoken")
+    if "notes" in form_case.fields:
+        assert page.field("notes").text == "keep invalid notes"
+    assert {model: list(model.objects.order_by("pk").values()) for model in models} == before
+
+
+@pytest.mark.xfail(
+    strict=True,
+    raises=AssertionError,
+    reason="Step 2: form fragments have no explicit response target",
+)
+def test_invalid_form_targets_content(admin_client, objects, form_case):
+    url = _reverse(form_case.url, objects)
+    response = admin_client.post(url, {}, headers=HTMX)
+    assert response.status_code == 200
+    (form,) = parse_html(response.content).forms
+    assert form.attrs.get("hx-target") == "#content"
 
 
 def test_location_form_parent_choices(admin_client, objects):

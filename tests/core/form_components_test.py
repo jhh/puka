@@ -135,6 +135,22 @@ def test_form_post_with_htmx_action():
     assert result.find("input", name="csrfmiddlewaretoken")
 
 
+def test_form_preserves_explicit_target_when_rendering_invalid_fields():
+    form = SampleForm(data={"name": "bad", "kind": "invalid"})
+    assert not form.is_valid()
+    result = page(
+        '<c-form.form action="/save/" :form="form" hx-target="#content">'
+        '<c-form.fields :form="form" /></c-form.form>',
+        RequestFactory().get("/save/"),
+        form=form,
+    )
+    (rendered_form,) = result.forms
+    assert rendered_form.attrs["hx-target"] == "#content"
+    assert rendered_form.attrs["hx-post"] == "/save/"
+    assert result.field("kind").attrs["aria-invalid"] == "true"
+    assert result.find("input", name="csrfmiddlewaretoken")
+
+
 def test_form_get_plain():
     result = page(
         '<c-form.form method="get" class="mb-4">x</c-form.form>',
