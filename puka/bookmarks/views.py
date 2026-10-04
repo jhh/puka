@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 from django_htmx.http import HttpResponseLocation, trigger_client_event
 
-from puka.core.views import get_template
+from puka.core.views import get_template, is_htmx_fragment
 
 from .filters import BookmarkFilter
 from .forms import BookmarkForm
@@ -39,7 +39,7 @@ def bookmarks(request):
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
-    if request.htmx and not request.htmx.boosted:
+    if is_htmx_fragment(request):
         # A tag link on the tags page swaps into the whole content block, so it
         # needs the toolbar and list wrapper; search/infinite scroll only want
         # the rows.
@@ -50,7 +50,11 @@ def bookmarks(request):
     else:
         template = "bookmarks/bookmark_list.html"
 
-    response = render(request, template, {"page_obj": page_obj})
+    response = render(
+        request,
+        template,
+        {"page_obj": page_obj, "update_breadcrumbs": not page_number},
+    )
     return trigger_client_event(response, "clearSearch", {}) if clear_search else response
 
 
@@ -61,11 +65,12 @@ def bookmarks_filter(request):
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
-    # if paging, just render the list items, otherwise this is a navigation to the filter page contents
-    if request.htmx and not request.htmx.boosted:
+    # Paging and tag clicks replace rows; content navigation includes the filter form.
+    if is_htmx_fragment(request):
         template = (
-            "bookmarks/bookmark_list.html#list-items-partial"
-            if page_number
+            "bookmarks/bookmark_list.html#rows"
+            if (request.htmx.target or "").endswith("#id_bookmarks")
+            or (page_number and not (request.htmx.target or "").endswith("#content"))
             else "bookmarks/filter.html#filter-partial"
         )
     else:

@@ -1,0 +1,10 @@
+{% comment %}
+Metadata for a content-navigation fragment; never included in row-only responses.
+title: the document title. The slot holds the page's breadcrumb items.
+The shared sidebar is replaced out of band to update its active navigation state.
+{% endcomment %}
+<c-vars title />
+
+<title>{{ title }}</title>
+<c-ui.breadcrumbs id="breadcrumbs" hx-swap-oob="true">{{ slot }}</c-ui.breadcrumbs>
+{% include "core/sidebar.html" with oob=True %}

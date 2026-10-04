@@ -10,6 +10,9 @@
 {% endpartialdef field-partial %}
 
 {% partialdef detail-partial %}
+    {% if request.htmx and not request.htmx.boosted and not request.htmx.history_restore_request and request.htmx.target != 'body' %}
+        <c-layout.page-meta title="{{ task.name|truncatewords:2 }}">{% partial breadcrumbs %}</c-layout.page-meta>
+    {% endif %}
     <c-layout.page-header>
         <c-slot name="title">
             <a
@@ -169,12 +172,14 @@
     </c-ui.table>
 {% endpartialdef detail-partial %}
 
+{% partialdef breadcrumbs %}
+    <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
+    <c-ui.crumb href="{% url 'upkeep:task-list' %}">Tasks</c-ui.crumb>
+    <c-ui.crumb>{{ task.name }}</c-ui.crumb>
+{% endpartialdef breadcrumbs %}
+
 {% block breadcrumbs %}
-    <ul>
-        <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
-        <c-ui.crumb href="{% url 'upkeep:task-list' %}">Tasks</c-ui.crumb>
-        <c-ui.crumb>{{ task.name }}</c-ui.crumb>
-    </ul>
+    <ul>{% partial breadcrumbs %}</ul>
 {% endblock breadcrumbs %}
 
 {% block content %}

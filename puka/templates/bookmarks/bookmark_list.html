@@ -15,6 +15,9 @@
 {% endblock breadcrumbs %}
 
 {% partialdef list-partial %}
+    {% if request.htmx and not request.htmx.boosted and not request.htmx.history_restore_request and request.htmx.target != 'body' %}
+        <c-layout.page-meta title="Bookmarks">{% partial breadcrumbs %}</c-layout.page-meta>
+    {% endif %}
     <div class="mx-auto mb-4 flex max-w-4xl justify-end gap-4">
         <c-ui.search-box
             hx-get="{% url 'bookmarks:list' %}"
@@ -31,11 +34,7 @@
         id="id_bookmarks"
         class="list mx-auto max-w-4xl rounded-box border border-base-300 bg-base-100 shadow-sm"
     >
-        {% partialdef list-items-partial inline %}
-            {% if request.htmx %}
-                <c-ui.breadcrumbs id="breadcrumbs" hx-swap-oob="true">{% partial breadcrumbs %}</c-ui.breadcrumbs>
-            {% endif %}
-
+        {% partialdef rows inline %}
             {% for bookmark in page_obj %}
                 <li
                     class="list-row group relative transition-colors hover:bg-base-200"
@@ -92,9 +91,16 @@
                     <li><c-ui.empty-state title="No bookmarks found" icon="hero-bookmark" class="w-full" /></li>
                 {% endif %}
             {% endfor %}
-        {% endpartialdef list-items-partial %}
+        {% endpartialdef rows %}
     </ul>
 {% endpartialdef list-partial %}
+
+{% partialdef list-items-partial %}
+    {% if update_breadcrumbs %}
+        <c-ui.breadcrumbs id="breadcrumbs" hx-swap-oob="true">{% partial breadcrumbs %}</c-ui.breadcrumbs>
+    {% endif %}
+    {% partial rows %}
+{% endpartialdef list-items-partial %}
 
 {% block content %}
     {% partial list-partial %}

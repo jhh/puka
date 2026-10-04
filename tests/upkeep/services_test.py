@@ -49,9 +49,9 @@ def test_get_tasks_schedules(area, start_date):
     assert len(t) == 4
     t = get_tasks_schedules(area.id)
     assert len(t) == 4
-    row = t[0]
-    assert row["area_name"] == area.name
-    assert row["id"] == area.tasks.first().id
+    # The service does not promise an ordering; compare the complete result set.
+    assert {row["area_name"] for row in t} == {area.name}
+    assert {row["id"] for row in t} == set(area.tasks.values_list("id", flat=True))
 
 
 @pytest.mark.django_db

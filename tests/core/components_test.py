@@ -433,6 +433,24 @@ def test_page_header_title_slot_without_actions():
 # layout/nav-item
 
 
+def test_page_meta(rf_get):
+    result = page(
+        '<c-layout.page-meta title="{{ title }}"><c-ui.crumb>Current page</c-ui.crumb>'
+        "</c-layout.page-meta>",
+        rf_get("/upkeep/area/"),
+        title='Area "quotes" & notes',
+    )
+    assert only(result, "title").text == 'Area "quotes" & notes'
+    crumbs = only(result, "div", id="breadcrumbs")
+    sidebar = only(result, "ul", id="sidebar")
+    assert crumbs.attrs["hx-swap-oob"] == sidebar.attrs["hx-swap-oob"] == "true"
+    assert not result.find("header")
+    assert not result.find("input", id="app-drawer")
+    active = [link for link in result.find("a") if "menu-active" in classes(link)]
+    assert len(active) == 1
+    assert active[0].attrs["href"] == "/upkeep/area/"
+
+
 @pytest.mark.parametrize(
     ("path", "active"),
     [("/bookmarks/", True), ("/bookmarks/filter/", False), ("/stuff/", False)],

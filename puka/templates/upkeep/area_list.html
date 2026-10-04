@@ -3,6 +3,9 @@
 {% block title %}Areas{% endblock %}
 
 {% partialdef list-partial %}
+    {% if request.htmx and not request.htmx.boosted and not request.htmx.history_restore_request and request.htmx.target != 'body' %}
+        <c-layout.page-meta title="Areas">{% partial breadcrumbs %}</c-layout.page-meta>
+    {% endif %}
     <div class="mb-4 flex justify-end gap-4">
         <c-ui.search-box
             name="query"
@@ -68,11 +71,13 @@
     <c-ui.pagination :page_obj="page_obj" class="mt-4" />
 {% endpartialdef list-partial %}
 
+{% partialdef breadcrumbs %}
+    <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
+    <c-ui.crumb href="{% url 'upkeep:area-list' %}">Areas</c-ui.crumb>
+{% endpartialdef breadcrumbs %}
+
 {% block breadcrumbs %}
-    <ul>
-        <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
-        <c-ui.crumb href="{% url 'upkeep:area-list' %}">Areas</c-ui.crumb>
-    </ul>
+    <ul>{% partial breadcrumbs %}</ul>
 {% endblock breadcrumbs %}
 
 {% block content %}

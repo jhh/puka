@@ -1,0 +1,53 @@
+{% load static %}
+<ul
+    id="sidebar"
+    class="menu w-full px-4 py-4 text-base-content"
+    {% if oob %}hx-swap-oob="true"{% endif %}
+>
+    <li class="lg:hidden">
+        <a href="{% url 'home' %}" class="gap-3">
+            <img src="{% static 'puka-logo.svg' %}" alt="Puka" class="h-auto w-[180px] max-w-full object-contain">
+        </a>
+    </li>
+    <c-layout.nav-item url_name="home" icon="hero-home" class="font-semibold" hx-boost="true">
+        Overview
+    </c-layout.nav-item>
+    <c-layout.nav-item url_name="bookmarks:list" icon="hero-bookmark" class="font-semibold">
+        Bookmarks
+        <c-slot name="children">
+            <c-layout.nav-item url_name="bookmarks:filter" hx-boost="true">Filter</c-layout.nav-item>
+        </c-slot>
+    </c-layout.nav-item>
+    <c-layout.nav-item
+        url_name="stuff:item-list"
+        match="/stuff/item/"
+        icon="hero-archive-box"
+        class="font-semibold"
+    >
+        Inventory
+        <c-slot name="children">
+            <c-layout.nav-item url_name="stuff:location-list" :arg="0" match="/stuff/location/">
+                Locations
+            </c-layout.nav-item>
+        </c-slot>
+    </c-layout.nav-item>
+    <c-layout.nav-item
+        url_name="upkeep:task-list"
+        match="/upkeep/task/"
+        icon="hero-clipboard-document-check"
+        class="font-semibold"
+    >
+        Tasks
+        <c-slot name="children">
+            <c-layout.nav-item url_name="upkeep:area-list" match="/upkeep/area/">
+                Areas
+            </c-layout.nav-item>
+        </c-slot>
+    </c-layout.nav-item>
+    <c-layout.nav-item url_name="bookmarks:tags" icon="hero-tag" class="font-semibold">
+        Tags
+    </c-layout.nav-item>
+    <c-layout.nav-item url_name="admin:index" icon="hero-shield-check" class="font-semibold">
+        Admin
+    </c-layout.nav-item>
+</ul>

@@ -118,5 +118,7 @@ def test_no_stale_drawer_refs(admin_client, url):
 
 def test_htmx_fragment_has_no_layout(admin_client):
     page = _get(admin_client, reverse("stuff:item-list"), **{"HX-Request": "true"})
-    assert not page.find("ul", id="sidebar")
+    (sidebar,) = page.find("ul", id="sidebar")
+    assert sidebar.attrs["hx-swap-oob"] == "true"
+    assert "menu-active" in _sidebar_links(page)["Inventory"]
     assert not page.find("input", id="app-drawer")

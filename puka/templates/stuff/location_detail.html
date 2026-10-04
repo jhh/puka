@@ -10,6 +10,9 @@
 {% endpartialdef field-partial %}
 
 {% partialdef detail-partial %}
+    {% if request.htmx and not request.htmx.boosted and not request.htmx.history_restore_request and request.htmx.target != 'body' %}
+        <c-layout.page-meta title="{{ location.name }}">{% partial breadcrumbs %}</c-layout.page-meta>
+    {% endif %}
     <c-layout.page-header title="{{ location.name }}">
         <c-slot name="actions">
             <c-ui.button
@@ -76,15 +79,17 @@
     </c-ui.card>
 {% endpartialdef detail-partial %}
 
+{% partialdef breadcrumbs %}
+    <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
+    <c-ui.crumb href="{% url 'stuff:location-list' 0 %}">Locations</c-ui.crumb>
+    {% for node in ancestors %}
+        <c-ui.crumb href="{% url 'stuff:location-list' node.pk %}">{{ node.name }}</c-ui.crumb>
+    {% endfor %}
+    <c-ui.crumb>{{ location.name }}</c-ui.crumb>
+{% endpartialdef breadcrumbs %}
+
 {% block breadcrumbs %}
-    <ul>
-        <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
-        <c-ui.crumb href="{% url 'stuff:location-list' 0 %}">Locations</c-ui.crumb>
-        {% for node in ancestors %}
-            <c-ui.crumb href="{% url 'stuff:location-list' node.pk %}">{{ node.name }}</c-ui.crumb>
-        {% endfor %}
-        <c-ui.crumb>{{ location.name }}</c-ui.crumb>
-    </ul>
+    <ul>{% partial breadcrumbs %}</ul>
 {% endblock breadcrumbs %}
 
 {% block content %}

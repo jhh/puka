@@ -1,9 +1,17 @@
 {% extends "stuff/base.html" %}
 
 {% partialdef form-partial %}
+    {% if request.htmx and not request.htmx.boosted and not request.htmx.history_restore_request and request.htmx.target != 'body' %}
+        <c-layout.page-meta title="Stuff"><c-ui.crumb>Overview</c-ui.crumb></c-layout.page-meta>
+    {% endif %}
     {# The form's own template (its template_name) lays out the fields and buttons. #}
     <c-ui.card>
-        <c-form.form action="{{ request.path }}" :form="form">{{ form }}</c-form.form>
+        <c-form.form
+            action="{{ request.path }}"
+            :form="form"
+            hx-target="#content"
+            hx-replace-url="true"
+        >{{ form }}</c-form.form>
     </c-ui.card>
 {% endpartialdef form-partial %}
 

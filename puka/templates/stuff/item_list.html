@@ -2,15 +2,20 @@
 
 {% block title %}Inventory{% endblock %}
 
+{% partialdef breadcrumbs %}
+    <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
+    <c-ui.crumb href="{% url 'stuff:item-list' %}">Inventory</c-ui.crumb>
+{% endpartialdef breadcrumbs %}
+
 {% block breadcrumbs %}
-    <ul>
-        <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
-        <c-ui.crumb href="{% url 'stuff:item-list' %}">Inventory</c-ui.crumb>
-    </ul>
+    <ul>{% partial breadcrumbs %}</ul>
 {% endblock breadcrumbs %}
 
 {% block content %}
     {% partialdef list-partial inline %}
+        {% if request.htmx and not request.htmx.boosted and not request.htmx.history_restore_request and request.htmx.target != 'body' %}
+            <c-layout.page-meta title="Inventory">{% partial breadcrumbs %}</c-layout.page-meta>
+        {% endif %}
         <div class="mb-4 flex justify-end gap-2">
             <c-ui.search-box
                 name="query"

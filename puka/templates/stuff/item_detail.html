@@ -2,16 +2,21 @@
 
 {% block title %}{{ item.name }}{% endblock %}
 
+{% partialdef breadcrumbs %}
+    <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
+    <c-ui.crumb href="{% url 'stuff:item-list' %}">Inventory</c-ui.crumb>
+    <c-ui.crumb href="{% url 'stuff:item-detail' item.pk %}">{{ item.name }}</c-ui.crumb>
+{% endpartialdef breadcrumbs %}
+
 {% block breadcrumbs %}
-    <ul>
-        <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
-        <c-ui.crumb href="{% url 'stuff:item-list' %}">Inventory</c-ui.crumb>
-        <c-ui.crumb href="{% url 'stuff:item-detail' item.pk %}">{{ item.name }}</c-ui.crumb>
-    </ul>
+    <ul>{% partial breadcrumbs %}</ul>
 {% endblock breadcrumbs %}
 
 {% block content %}
     {% partialdef detail-partial inline %}
+        {% if request.htmx and not request.htmx.boosted and not request.htmx.history_restore_request and request.htmx.target != 'body' %}
+            <c-layout.page-meta title="{{ item.name }}">{% partial breadcrumbs %}</c-layout.page-meta>
+        {% endif %}
         {% partialdef field-partial %}
             <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
                 <dt class="text-sm font-medium text-base-content">{{ label }}</dt>

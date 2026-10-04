@@ -2,12 +2,14 @@
 
 {% block title %}Filter{% endblock %}
 
+{% partialdef breadcrumbs %}
+    <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
+    <c-ui.crumb href="{% url 'bookmarks:list' %}">Bookmarks</c-ui.crumb>
+    <c-ui.crumb href="{% url 'bookmarks:filter' %}">Filter</c-ui.crumb>
+{% endpartialdef breadcrumbs %}
+
 {% block breadcrumbs %}
-    <ul>
-        <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
-        <c-ui.crumb href="{% url 'bookmarks:list' %}">Bookmarks</c-ui.crumb>
-        <c-ui.crumb href="{% url 'bookmarks:filter' %}">Filter</c-ui.crumb>
-    </ul>
+    <ul>{% partial breadcrumbs %}</ul>
 {% endblock breadcrumbs %}
 
 {% block content %}
@@ -15,6 +17,9 @@
 {% endblock content %}
 
 {% partialdef filter-partial %}
+    {% if request.htmx and not request.htmx.boosted and not request.htmx.history_restore_request and request.htmx.target != 'body' %}
+        <c-layout.page-meta title="Filter">{% partial breadcrumbs %}</c-layout.page-meta>
+    {% endif %}
     <c-form.form method="get" :form="filter.form" class="mx-auto mb-4 max-w-4xl space-y-4">
         <div class="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2">
             <c-form.field :field="filter.form.text" class="sm:col-span-2" />
@@ -34,6 +39,6 @@
         id="id_bookmarks"
         class="list mx-auto max-w-4xl rounded-box border border-base-300 bg-base-100 shadow-sm"
     >
-        {% include "bookmarks/bookmark_list.html#list-items-partial" %}
+        {% include "bookmarks/bookmark_list.html#rows" %}
     </ul>
 {% endpartialdef filter-partial %}

@@ -1,16 +1,28 @@
 from django.http import HttpRequest
 from django.shortcuts import render
+from django_htmx.middleware import HtmxDetails
+
+
+def is_htmx_fragment(request: HttpRequest) -> bool:
+    """Keep boosted, body-targeted and history-restore requests as complete pages."""
+    htmx = HtmxDetails(request)
+    return (
+        bool(htmx)
+        and not htmx.boosted
+        and not htmx.history_restore_request
+        and htmx.target != "body"
+    )
 
 
 def get_template(request: HttpRequest, template: str, partial: str) -> list[str]:
     """
     Return a template path based on request type (full page vs htmx partial).
 
-    When the request is an htmx request (indicated by the HX-Request header),
-    appends the partial suffix to load a partial template for htmx swaps.
+    Ordinary targeted htmx requests receive the named partial. Boosted navigation
+    and history restoration need the full document and application shell.
 
     """
-    if request.headers.get("HX-Request"):
+    if is_htmx_fragment(request):
         template += partial
     return [template]
 

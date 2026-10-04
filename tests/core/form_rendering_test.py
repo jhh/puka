@@ -208,6 +208,8 @@ def test_form_action(form_page, form_case, objects):
     (form,) = form_page.forms
     assert form.attrs["hx-post"] == _reverse(form_case.url, objects)
     assert form.attrs["method"] == "post"
+    assert form.attrs["hx-target"] == "#content"
+    assert form.attrs["hx-replace-url"] == "true"
     assert form_page.find("input", name="csrfmiddlewaretoken")
 
 
@@ -365,11 +367,6 @@ def test_invalid_form_preserves_database_and_returns_errors(admin_client, object
     assert {model: list(model.objects.order_by("pk").values()) for model in models} == before
 
 
-@pytest.mark.xfail(
-    strict=True,
-    raises=AssertionError,
-    reason="Step 2: form fragments have no explicit response target",
-)
 def test_invalid_form_targets_content(admin_client, objects, form_case):
     url = _reverse(form_case.url, objects)
     response = admin_client.post(url, {}, headers=HTMX)

@@ -3,6 +3,9 @@
 {% block title %}Locations{% endblock %}
 
 {% partialdef list-partial %}
+    {% if request.htmx and not request.htmx.boosted and not request.htmx.history_restore_request and request.htmx.target != 'body' %}
+        <c-layout.page-meta title="Locations">{% partial breadcrumbs %}</c-layout.page-meta>
+    {% endif %}
     <c-layout.page-header>
         <c-slot name="title">
             {% if ancestors %}
@@ -106,11 +109,13 @@
     </c-ui.table>
 {% endpartialdef list-partial %}
 
+{% partialdef breadcrumbs %}
+    <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
+    <c-ui.crumb href="{% url 'stuff:location-list' 0 %}">Locations</c-ui.crumb>
+{% endpartialdef breadcrumbs %}
+
 {% block breadcrumbs %}
-    <ul>
-        <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
-        <c-ui.crumb href="{% url 'stuff:location-list' 0 %}">Locations</c-ui.crumb>
-    </ul>
+    <ul>{% partial breadcrumbs %}</ul>
 {% endblock breadcrumbs %}
 
 {% block content %}

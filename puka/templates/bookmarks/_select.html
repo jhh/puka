@@ -7,6 +7,9 @@
 {% endblock content %}
 
 {% partialdef filter-partial %}
+    {% if request.htmx and not request.htmx.boosted and not request.htmx.history_restore_request and request.htmx.target != 'body' %}
+        <c-layout.page-meta title="Select Bookmark"><c-ui.crumb>Overview</c-ui.crumb></c-layout.page-meta>
+    {% endif %}
     <c-form.form
         method="get"
         action="{{ request.path }}"

@@ -3,6 +3,9 @@
 {% block title %}Tags{% endblock %}
 
 {% partialdef tags-partial %}
+    {% if request.htmx and not request.htmx.boosted and not request.htmx.history_restore_request and request.htmx.target != 'body' %}
+        <c-layout.page-meta title="Tags">{% partial breadcrumbs %}</c-layout.page-meta>
+    {% endif %}
     <c-layout.page-header title="Tags" />
     {% regroup tags by bucket as buckets %}
     {% for bucket in buckets %}
@@ -26,11 +29,13 @@
     {% endfor %}
 {% endpartialdef tags-partial %}
 
+{% partialdef breadcrumbs %}
+    <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
+    <c-ui.crumb href="{% url 'bookmarks:tags' %}">Tags</c-ui.crumb>
+{% endpartialdef breadcrumbs %}
+
 {% block breadcrumbs %}
-    <ul>
-        <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
-        <c-ui.crumb href="{% url 'bookmarks:tags' %}">Tags</c-ui.crumb>
-    </ul>
+    <ul>{% partial breadcrumbs %}</ul>
 {% endblock breadcrumbs %}
 
 {% block content %}

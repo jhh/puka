@@ -136,9 +136,8 @@ def test_rendering_query_baseline(  # noqa: PLR0913
     assert len(total) == len(preparation) + len(rendering) + overhead
     index = 0 if related_objects["size"] == 1 else 1
     rendering_budget = case.rendering[index]
-    if htmx and case.name == "stuff:location-detail":
-        # Only the full-page breadcrumbs evaluate the ancestor queryset.
-        rendering_budget -= 1
+    # Step 2 also renders location ancestors in fragment breadcrumbs, matching
+    # the full-page budget rather than omitting navigation metadata.
     assert len(preparation) <= case.preparation[index], preparation.captured_queries
     assert len(rendering) <= rendering_budget, rendering.captured_queries
     assert ("<head>" in response.content.decode()) == (not htmx)

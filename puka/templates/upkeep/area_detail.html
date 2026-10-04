@@ -10,6 +10,9 @@
 {% endpartialdef field-partial %}
 
 {% partialdef detail-partial %}
+    {% if request.htmx and not request.htmx.boosted and not request.htmx.history_restore_request and request.htmx.target != 'body' %}
+        <c-layout.page-meta title="{{ area.name }}">{% partial breadcrumbs %}</c-layout.page-meta>
+    {% endif %}
     <c-layout.page-header title="{{ area.name }}">
         <c-slot name="actions">
             <details class="dropdown dropdown-end">
@@ -112,12 +115,14 @@
     </c-ui.table>
 {% endpartialdef detail-partial %}
 
+{% partialdef breadcrumbs %}
+    <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
+    <c-ui.crumb href="{% url 'upkeep:area-list' %}">Areas</c-ui.crumb>
+    <c-ui.crumb>{{ area.name }}</c-ui.crumb>
+{% endpartialdef breadcrumbs %}
+
 {% block breadcrumbs %}
-    <ul>
-        <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
-        <c-ui.crumb href="{% url 'upkeep:area-list' %}">Areas</c-ui.crumb>
-        <c-ui.crumb>{{ area.name }}</c-ui.crumb>
-    </ul>
+    <ul>{% partial breadcrumbs %}</ul>
 {% endblock breadcrumbs %}
 
 {% block content %}

@@ -101,6 +101,7 @@ def test_bookmarks_content_target_returns_full_list(admin_client, succulents_boo
 def test_bookmark_list_response_shape(admin_client, succulents_bookmark, target, wrapper):
     response = admin_client.get(
         reverse("bookmarks:list"),
+        {"page": 1} if target == "li" else {},
         headers={"HX-Request": "true", "HX-Target": target},
     )
     assert response.status_code == 200
@@ -111,8 +112,13 @@ def test_bookmark_list_response_shape(admin_client, succulents_bookmark, target,
     assert not page.find("div", id="content")
     assert bool(page.find("ul", id="id_bookmarks")) == wrapper
     assert bool(page.find("input", name="q")) == wrapper
-    (crumbs,) = page.find("div", id="breadcrumbs")
-    assert crumbs.attrs["hx-swap-oob"] == "true"
+    if target == "li":
+        assert not page.find("div", id="breadcrumbs")
+    else:
+        (crumbs,) = page.find("div", id="breadcrumbs")
+        assert crumbs.attrs["hx-swap-oob"] == "true"
+    assert bool(page.find("title")) == wrapper
+    assert bool(page.find("ul", id="sidebar")) == wrapper
 
 
 def test_bookmark_infinite_scroll_response_appends_rows(admin_client):
@@ -138,6 +144,8 @@ def test_bookmark_infinite_scroll_response_appends_rows(admin_client):
     assert len([el for el in page.find("li") if "list-row" in el.attrs.get("class", "")]) == 1
     assert not page.find("ul", id="id_bookmarks")
     assert not page.find("li", hx_trigger="revealed")
+    assert "hx-swap-oob" not in response.content.decode()
+    assert not page.find("title")
 
 
 @pytest.mark.parametrize("paging", [False, True], ids=["filter-page", "filter-rows"])
@@ -152,13 +160,11 @@ def test_bookmark_filter_response_shape(admin_client, succulents_bookmark, pagin
     assert not page.find("head")
     assert bool(page.forms) == (not paging)
     assert bool(page.find("ul", id="id_bookmarks")) == (not paging)
+    assert bool(page.find("title")) == (not paging)
+    assert bool(page.find("div", id="breadcrumbs")) == (not paging)
+    assert bool(page.find("ul", id="sidebar")) == (not paging)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    raises=AssertionError,
-    reason="Step 2: reused bookmark rows replace Filter breadcrumbs",
-)
 def test_bookmark_filter_fragment_keeps_filter_breadcrumbs(admin_client, succulents_bookmark):
     response = admin_client.get(
         reverse("bookmarks:filter"),
@@ -171,6 +177,21 @@ def test_bookmark_filter_fragment_keeps_filter_breadcrumbs(admin_client, succule
     content = response.content.decode()
     trail = content[content.index('id="breadcrumbs"') : content.index("</ul>")]
     assert parse_html(trail).find("a", href=reverse("bookmarks:filter"))
+
+
+def test_bookmark_filter_tag_request_returns_only_rows(admin_client, succulents_bookmark):
+    response = admin_client.get(
+        reverse("bookmarks:filter"),
+        {"tags": "humblebrag"},
+        headers={"HX-Request": "true", "HX-Target": "ul#id_bookmarks"},
+    )
+    assert response.status_code == 200
+    page = parse_html(response.content)
+    assert succulents_bookmark.title in response.content.decode()
+    assert not page.forms
+    assert not page.find("ul", id="id_bookmarks")
+    assert not page.find("title")
+    assert "hx-swap-oob" not in response.content.decode()
 
 
 def test_create_bookmark(admin_client):
@@ -235,7 +256,7 @@ def test_tags_grouped_by_bucket(admin_client):
 
     headings = [el.text for el in page.find("h2")]
     assert headings == ["5—10", "< 5"]
-    assert len(page.find("ul")) == 2
+    assert len([el for el in page.find("ul") if "flex-wrap" in el.attrs.get("class", "")]) == 2
     badges = [el.text for el in page.find("span") if "badge" in el.attrs.get("class", "")]
     assert badges == ["common 6", "rare 1"]
 
