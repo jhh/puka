@@ -1,216 +1,182 @@
-# Plan: move puka's UI to Cotton, htmx, Alpine and daisyUI
+# Plan: simplify and optimize template rendering
 
-Decisions already made:
+## Goal and scope
 
-- Roll out incrementally, in place.
-- Replace crispy-forms with Cotton form-field components.
-- Keep the current look; clean up with daisyUI.
-- Delete `next/` in a new jj change.
-- Add view tests before refactoring.
+Improve correctness, rendering cost and maintainability without changing
+the current look or replacing the existing template architecture.
 
-## What exists today
+Execute in this order:
 
-- **Page layout.** Pages extend `root.html` → `base.html` (a daisyUI
-  drawer) → an app base → the page. `sidebar.html` is an older layout that
-  nothing uses any more.
-- **htmx fragments.** Views call
-  `get_template(request, "x.html", "#partial")`. There are about 25
-  `{% partialdef %}` blocks, and every fragment swaps into `#content`.
-- **Forms.**
-  - Seven crispy `FormHelper`/`Layout` forms in `stuff/forms.py` and
-    `upkeep/forms.py`.
-  - Hand-built buttons in `puka/core/forms.py`, styled with plain
-    indigo/gray Tailwind rather than daisyUI.
-  - One crispy override template, `tailwind/layout/select.html`.
-  - `BookmarkForm` and the login form are written by hand.
-- **Alpine.** The same search box (Cmd-K to focus, Esc to clear) is copied
-  into four templates. `stuff/item_detail.html` has tabs, and there's one
-  copy-to-clipboard button.
-- **View tests** exist only for bookmarks and stuff items.
+1. Fix fragment targeting and navigation metadata.
+2. Optimize database work triggered during rendering.
+3. Extract clearly repeated presentation components.
+4. Finish targeted URL, search and asset cleanups.
 
-### Bugs to fix along the way
+The review was static. Confirm suspected browser issues and measure query
+counts before choosing implementations. Do not assume every repeated
+related-manager access causes a query: prefetch caches may already cover it.
 
-- `bookmarks/tags.html` extends `bookmarks/base.html`, which doesn't exist,
-  so a full-page load of that page should fail.
-- The menus in `stuff/base.html` and `upkeep/base.html` never show up,
-  because `base.html` has no `{% block menu %}`.
-- Some links use `$refs.sidebarDrawer`, which only exists in the unused
-  `sidebar.html`.
-- `clearSearch()` is a global inline script, and nothing listens for the
-  `clearSearch` event the server sends.
-- Templates use `[x-cloak]`, but there's no CSS rule for it.
-- The `htmx` context processor duplicates django-htmx's `request.htmx`.
-- AGENTS.md says `just start`/`stop`/`load`, but the justfile recipes are
-  `db-start`, `db-stop` and `db-load`.
+## Constraints
 
-## Design rules for the new stack
+- Keep Django 6 partials as response fragments and Cotton components as
+  presentation only. Pass prepared data into components.
+- Preserve existing routes, appearance, CSRF protection and mutations.
+- Retain Cotton context isolation, the custom form renderer and explicit
+  Tailwind class mappings. Do not generate classes such as `btn-{{ variant }}`.
+- Keep Alpine behavior in `puka/static/puka/base.js`; use `x-on:` and
+  `x-bind:` on component tags.
+- Use htmx 4 APIs, including explicit `:inherited` attributes where needed.
+- Consult Context7 for library behavior and the required daisyUI Blueprint
+  workflow before non-trivial UI component changes.
+- Run every command inside the Nix devshell. Use jj for any VCS work.
+- Make small, independently verified changes; do not introduce a universal
+  detail-page, table or navigation framework.
 
-1. **Cotton components are reusable presentation; `partialdef`s are htmx
-   swap targets.**
-   - Views and `get_template` stay as they are. Pages keep
-     `{% partialdef %}` blocks for fragments and build their markup from
-     `<c-*>` components.
-   - Components only get data passed in. They never query the database or
-     read the request, except for a nav-item component that needs the
-     current path.
-     `COTTON_ENABLE_CONTEXT_ISOLATION` enforces this: a component sees its
-     attributes plus the context processors, not the parent context.
-2. **Component layout** under `puka/templates/cotton/`:
-   - `ui/`: button, icon, card, badge, alert, table, pagination,
-     breadcrumbs, tabs, empty state, search box → `<c-ui.button>`
-   - `form/`: form, field, errors, actions →
-     `<c-form.field :field="form.name" />`
-   - `layout/`: page header, nav item, drawer, navbar
-   - Files are snake_case: `<c-ui.search-box>` is `ui/search_box.html`.
-   - Declare `class` in `<c-vars>` (bare, `class`, since djangofmt rejects
-     `class=""`) and merge it into the root element, or a caller's `class`
-     becomes a second `class` attribute via `{{ attrs }}`.
-3. **htmx and Alpine attributes pass through** `{{ attrs }}`, so
-   `<c-ui.button hx-post="…" hx-confirm="…">` works.
-   - Anything that isn't meant to become an HTML attribute (for example
-     `variant`, `icon`, `size`) must be declared in `<c-vars>`.
-   - Alpine's shorthand `:class` has to be written `::class` on `<c-*>`
-     tags. Use full `x-bind:` on component tags to avoid confusion.
-4. **Write out full class names.** Map variants to complete daisyUI classes
-   (`{% if variant == "primary" %}btn-primary{% endif %}`) rather than
-   building `btn-{{ variant }}`. Tailwind can't find classes that are
-   assembled at render time.
-5. **Alpine only for client-side state:** the search box, tabs, clipboard
-   and drawer close. Anything repeated moves into `Alpine.data(...)` in
-   `base.js`. No inline `<script>` blocks.
-6. **Explicit Cotton setup.** Use `django_cotton.apps.SimpleAppConfig` with
-   loaders and builtins listed in `TEMPLATES`, rather than letting Cotton
-   patch settings automatically, so the cached loader and Django 6 partials
-   stay under our control.
+## Step 1: establish regression coverage and baselines
 
-## Phases
+1. Extend existing tests rather than duplicating the smoke-test suite:
+   - `tests/core/views_smoke_test.py`
+   - `tests/core/form_components_test.py`
+   - `tests/core/form_rendering_test.py`
+   - The existing bookmark, stuff and upkeep view tests.
+2. Inventory response shapes for full-page, boosted and ordinary htmx
+   requests, including the bookmark list's different targets.
+3. Reproduce invalid create/update submissions for stuff and upkeep in the
+   browser. Record the response, target and resulting DOM.
+4. Record query counts for item lists, task lists, area lists and the item,
+   location, task and area detail views with representative related data.
+5. Add small and larger fixture sets so tests can expose query growth as
+   rows, consumables and bookmarks increase. Create fixtures outside the
+   measured request or rendering block.
 
-Each phase is its own jj change and has to pass `just test`,
-`uv run ty check --error-on-warning`, `pre-commit run --all-files` and
-`nix flake check` before moving on.
+Acceptance: existing tests pass; reproduced failures have regression tests;
+query baselines distinguish request overhead from relationship queries.
 
-### Phase 0: Housekeeping
+## Step 2: fix fragment targeting and navigation metadata
 
-1. Delete `puka/templates/next/` and line 12 of `puka/urls.py`. The
-   `TemplateView` import stays because the next line still uses it.
-2. Delete the unused `sidebar.html`.
-3. Fix `bookmarks/tags.html` so it extends `base.html`.
+1. Make `puka/core/views.py` and view-specific template selection agree on
+   the response contract:
+   - Full-page requests return the document and application shell.
+   - Default boosted navigation receives a complete page.
+   - Targeted requests return markup suitable for the requested target.
+   - Bookmark searches and infinite scrolling retain their row responses.
+2. Add explicit targets to the htmx forms in
+   `puka/templates/stuff/form.html` and
+   `puka/templates/upkeep/form.html`, matching their returned fragments.
+3. Verify invalid submissions replace the intended content without nested
+   forms or cards. Verify successful submissions and delete responses
+   navigate correctly without changing data or redirect semantics.
+4. Provide breadcrumbs and document titles for content-navigation
+   fragments. Keep row-only searches and append responses from overwriting
+   unrelated page metadata. Check sidebar active state after navigation.
+5. Separate reusable bookmark rows from page-specific breadcrumbs:
+   `bookmarks/filter.html` must not receive the bookmark-list breadcrumb
+   trail merely because it reuses the list-items partial.
+6. Extend boosted-response tests beyond bookmarks and item detail before
+   simplifying any repeated htmx navigation attributes.
 
-### Phase 1: Tests first
+Acceptance: full loads, boosted links, targeted navigation, invalid forms,
+cancel/delete actions and browser back/forward preserve the correct shell,
+content, title and breadcrumbs.
 
-1. Add `tests/core/views_smoke_test.py`, parametrized over every named URL.
-   For each, check a full-page GET returns 200 and contains `<head>`. With
-   `HX-Request` set, check it returns the fragment without `<head>`.
-2. Add create/update/delete POST tests for stuff (locations, inventory) and
-   upkeep (areas, tasks, schedules, task items). Check redirects and
-   `HX-Location` headers.
-3. Add form-rendering tests: each form shows its fields, errors and
-   `hx-post` action. These protect the crispy removal in Phase 4.
-4. Fill the empty `tests/upkeep/views/` and add any missing factories in
-   `tests/factories.py`.
+## Step 3: optimize queries used by templates
 
-### Phase 2: Install and check Cotton
+1. Prepare task stock status outside template rendering. Start with
+   `Task.are_consumables_stocked()` and its consumers in task lists, area
+   detail and notification emails.
+   - Batch consumables and their items, or use suitable annotations.
+   - Prepare inventory totals without an aggregate per consumable.
+   - Preserve the existing semantics for tasks without consumables,
+     insufficient stock, multiple locations and shared items.
+2. Prepare task-detail consumables with their items and stock quantities in
+   `puka/upkeep/views/task.py`. Display prepared quantities instead of
+   calling `Item.quantity()` for each row.
+3. Match item list/detail prefetches to the actual template access paths in
+   `puka/stuff/views/item.py`:
+   - Prefetch inventories with their locations selected.
+   - Prefetch item tags and attached bookmarks' tags where displayed.
+   - Remove unused location prefetches only after checking all consumers.
+4. Load location inventories with their items in
+   `puka/stuff/views/location.py`.
+5. Load area bookmarks and their tags in `puka/upkeep/views/area.py`,
+   alongside the existing task preparation.
+6. Fix `get_areas_tasks_schedules()` in `puka/upkeep/services.py`:
+   - Stop filtering related managers after prefetching all schedules.
+   - Prefer database annotations for task count and earliest due task/date
+     so pagination happens before materializing every area's relationships.
+   - Preserve search ordering and behavior for areas without due schedules.
+7. Reuse one prepared bookmarks collection in
+   `puka/templates/bookmarks/_detail_page.html` and its callers. Eliminate
+   repeated existence checks where a loop's empty branch suffices.
+8. Compare against Step 1 baselines and add query-count regression tests
+   proving relationship-query counts do not grow per rendered row.
 
-1. Add `django-cotton` to `pyproject.toml`, then run `uv lock` and
-   `uv sync`, and configure the loaders and builtins in
-   `settings/base.py`.
-2. Spike these before building anything on top, each with a test:
-   - A template that uses `<c-*>` still resolves `template.html#partial`
-     through Cotton's loader and the cached loader, both in `render()` and
-     `{% include %}`.
-   - djade and djangofmt (now a pre-commit hook) leave `<c-vars />` and
-     `{{ attrs }}` alone.
-   - Tailwind 4 auto-detection picks up `puka/templates/cotton/**`. If
-     not, add an explicit `@source` to `base.css`, and check the Nix build
-     in `nix/packages/static.nix` sees it.
-   - The Nix integration test still passes. It depends on the order of
-     `<link>` and `<script>` tags in `root.html`.
-3. Add `[x-cloak]{display:none}` to `base.css`.
+Acceptance: quantities, due dates and stock labels are unchanged; query
+growth is bounded for paginated views; unused prefetch work is removed.
+Document measured improvements rather than estimated speedups.
 
-### Phase 3: Core components
+## Step 4: extract repeated presentation components
 
-1. Build the `ui/` and `layout/` components using daisyUI 5 syntax, checked
-   against the daisyUI Blueprint tools while building.
-2. Replace the `get_current_class` template tag with
-   `<c-layout.nav-item url_name="…">`, then remove the tag.
-3. Build `<c-ui.search-box>`, backed by `Alpine.data("searchBox")`, to
-   replace the four copied search boxes and the global `clearSearch()`
-   scripts. It either listens for the server's `clearSearch` event or the
-   trigger gets removed.
-4. Add a component test file that renders each component from a `Template`
-   string and checks the output HTML.
+1. Add a small detail-row component under `puka/templates/cotton/ui/` with
+   a label and a value slot. Replace the copied field partials in item,
+   location, task and area detail templates.
+2. Extract inventory quantity controls used by item and location detail.
+   Pass inventory ID and prepared quantity explicitly; retain target IDs,
+   adjustment values, accessible labels and page-specific edit actions.
+3. Extract the Manage dropdown shell used by item, task and area detail.
+   Keep each page's routes, confirmation messages and actions in its slot.
+4. Share the identical card/form fragment in the stuff and upkeep form
+   pages. Preserve app-specific titles, response partial names and the
+   explicit targeting fixed in Step 2.
+5. Add component rendering tests using Cotton compilation, plus page tests
+   for pass-through attributes, class merging and unchanged mutation URLs.
+6. Rebuild assets and inspect each changed page at mobile and desktop
+   sizes, including keyboard navigation and inventory adjustments.
 
-### Phase 4: Forms
+Acceptance: copied presentation markup is reduced without new database
+access, route configuration machinery or behavior changes.
 
-1. Build the form components:
-   - `<c-form.form>`: the `<form>` tag with CSRF token, the `hx-post`
-     action and non-field errors.
-   - `<c-form.field>`: a daisyUI `fieldset` with label, the widget, help
-     text and error styling. It picks the right markup by widget type:
-     text/number/date/url, textarea, select, checkbox, file, and taggit.
-   - `<c-form.actions>`: submit, cancel (`hx-get` to `#content`) and delete
-     (`hx-post` with `hx-confirm`), replacing the three buttons in
-     `core/forms.py`.
-2. Grid layout moves out of Python `Layout`s and into templates. Each form
-   gets a small template of `<c-form.field>`s inside a responsive grid, or
-   a generic loop for simple forms.
-3. Convert `LocationForm` first as the pilot, then the rest of the stuff
-   and upkeep forms, then `BookmarkForm`, the filter forms and login.
-4. Remove `crispy_forms` and `crispy_tailwind` from `INSTALLED_APPS`, the
-   `CRISPY_*` settings, the dependencies, `FormHelper` code,
-   `core/forms.py` and `templates/tailwind/`.
-5. Done. `core/forms.py` stays, now holding the `FORM_RENDERER` that puts
-   daisyUI classes on widgets (templates can't), and each form sets
-   `template_name`. htmx 4 has no `hx-params`, so delete buttons drop it.
+## Step 5: finish targeted cleanups
 
-### Phase 5: Layout
+1. Encode tag parameters in bookmark and inventory URLs. Use `urlencode`
+   or Django's `querystring` tag; deliberately choose which filters to keep
+   and reset pagination when switching filters.
+2. Add tests for tags containing spaces, `&`, `+`, `#` and Unicode. Check
+   both ordinary links and htmx requests.
+3. Give the item list a results-only search fragment so debounced searches
+   do not rebuild the toolbar and Alpine input state.
+   - Keep pagination and new-item navigation working.
+   - Verify focus, caret, clear-search behavior and rapid typing.
+   - Leave other search pages unchanged unless the same need is confirmed.
+4. Inspect computed font styles before removing the Inter stylesheet from
+   `puka/templates/root.html`. Its configuration in `base.css` is currently
+   commented out; remove the request only if the stylesheet is unused.
+5. If asset tags change, check the Nix integration test's assumptions about
+   their presence and order without weakening functional coverage.
 
-1. Rebuild `root.html` and `base.html` using the layout components. Keep
-   the drawer, `#breadcrumbs` and `#content` ids so the htmx targets don't
-   change.
-2. Decide what to do with the app sub-menus: add a `{% block menu %}` to
-   the sidebar, or fold those links into the main nav.
-3. Fix the drawer-close behaviour, using an `x-ref` in `base.html` or a
-   small Alpine store.
-4. Done. Sub-menus are folded into the main nav (nested
-   `<c-layout.nav-item>`s); the app `{% block menu %}` partials are gone.
-   `Alpine.data("drawer")` closes the drawer on sidebar link clicks and Esc.
+Acceptance: special-character filters round-trip correctly, search retains
+input state, and any asset removal leaves typography unchanged.
 
-### Phase 6: Convert page by page
+## Verification gate after each implementation step
 
-Order: bookmarks → stuff → upkeep → overview, 404 and login.
+1. Run focused tests first, then `just test` with Postgres running
+   (`just db-start`). Do not use bare pytest: tests live in `tests/`.
+2. Run `uv run ty check --error-on-warning`.
+3. For template changes, run `just djangofmt` and `just djade`. Rebuild
+   assets with `just update-css` and, when needed, `just update-js`.
+4. Run `jj st` immediately before `pre-commit run --all-files`. Inspect
+   formatter changes and rerun affected checks.
+5. Run `jj st` immediately before `nix flake check -L --keep-going`.
+   On macOS, run pytest locally because the Nix pytest check is Linux-only.
+6. Inspect the final diff and perform the step's browser acceptance checks.
+   Report unavailable checks explicitly; do not mark them as passed.
 
-For each page, keep the `partialdef` names, replace raw markup with
-components, and swap the remaining ad-hoc Tailwind for daisyUI classes.
-Check each converted page in the browser (full load, boosted navigation,
-and every htmx action) plus its tests.
+## Completion checklist
 
-Done, one jj change per app. The overview shows real counts from a small
-`overview` view. The login page lost its non-working "Remember me",
-"Forgot password?" and "Sign up" controls, and the account menu its
-"Settings" link. Browser checks are still to do.
-
-### Phase 7: Cleanup
-
-1. Remove the `htmx` context processor and use `request.htmx` in templates.
-2. Remove unused `{% load utils %}` lines, and
-   `puka/core/templatetags/utils.py` itself once `|domain` is dropped too.
-3. Remove the `django_browser_reload` check in `urls.py`, or install it.
-4. Update AGENTS.md with the Cotton conventions from above and the correct
-   `just` recipe names.
-5. Done. `|domain` became `Bookmark.domain`, so `puka/core/templatetags/`
-   is gone. `django_browser_reload` was never installed; its URL hook is
-   removed.
-
-## Risks
-
-- **Partials and Cotton's loader together** are the one unknown that could
-  block the plan. Phase 2 checks it before anything else. If it fails, the
-  fallback is to move fragments into their own files and reference them as
-  `{% include %}` or Cotton components. Resolved in Phase 2: `#partial`
-  names resolve through Cotton and the cached loader
-  (`tests/core/cotton_spike_test.py`).
-- **Tests in CI.** Pytest runs only on Linux in CI, so on macOS run
-  `just test` locally for every change.
-- **Large templates.** Pre-commit rejects files over 25 KB. Moving markup
-  into components keeps templates small, but watch `item_detail.html`.
+- Fragment targets and page metadata remain correct across navigation.
+- Query-count tests cover the optimized list and detail rendering paths.
+- Repeated detail rows, inventory controls and dropdown shells are shared.
+- Form wrappers retain titles, errors, CSRF protection and correct targets.
+- Tag URLs are encoded and item searches preserve input state.
+- Browser checks, formatting, types, tests and Nix checks are complete.
+- No unrelated redesign, dependency migration or generated-asset edits.
