@@ -37,6 +37,16 @@ def test_task_detail(admin_client):
     assert "6 months" in content
     (delete,) = page.find("button", hx_post=reverse("upkeep:task-delete", args=[task.pk]))
     assert delete.attrs["hx-confirm"] == "Are you sure you want to delete this task?"
+    (trigger,) = page.find("button", popovertarget="task-manage-menu")
+    assert trigger.text == "Manage"
+    (menu,) = page.find("ul", id="task-manage-menu")
+    assert "popover" in menu.attrs
+    for name in ("upkeep:task-edit", "upkeep:schedule-new", "upkeep:task-item-new"):
+        (link,) = page.find("a", href=reverse(name, args=[task.pk]))
+        assert link.attrs["hx-get"] == link.attrs["href"]
+        assert link.attrs["hx-target"] == "#content"
+        assert link.attrs["hx-push-url"] == "true"
+    assert [el.text for el in page.find("dt")] == ["Notes", "Interval", "Duration"]
 
 
 def test_task_detail_empty_states(admin_client):
@@ -76,6 +86,21 @@ def test_area_detail_bookmarks_inside_definition_list(admin_client):
     assert "No tasks in this area" in content
     page = parse_html(content)
     assert page.find("a", href=reverse("upkeep:task-new") + f"?area={area.pk}")
+    (trigger,) = page.find("button", popovertarget="area-manage-menu")
+    assert trigger.text == "Manage"
+    (menu,) = page.find("ul", id="area-manage-menu")
+    assert "popover" in menu.attrs
+    (delete,) = page.find("button", hx_post=reverse("upkeep:area-delete", args=[area.pk]))
+    assert delete.attrs["hx-confirm"] == "Are you sure you want to delete this area?"
+    for path in (
+        reverse("upkeep:area-edit", args=[area.pk]),
+        reverse("upkeep:task-new") + f"?area={area.pk}",
+        reverse("upkeep:bookmark-select", args=[area.pk]),
+    ):
+        (link,) = page.find("a", href=path)
+        assert link.attrs["hx-get"] == path
+        assert link.attrs["hx-target"] == "#content"
+        assert link.attrs["hx-push-url"] == "true"
 
 
 @pytest.mark.parametrize(

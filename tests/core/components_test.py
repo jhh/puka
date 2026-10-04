@@ -644,6 +644,9 @@ def test_no_inline_scripts(admin_client, url):
         '<c-layout.page-header title="t" class="x-extra" />',
         '<c-layout.drawer class="x-extra">p</c-layout.drawer>',
         '<c-layout.navbar class="x-extra">n</c-layout.navbar>',
+        '<c-ui.detail-row label="Name" class="x-extra">value</c-ui.detail-row>',
+        '<c-ui.inventory-quantity :inventory_id="7" :quantity="0" class="x-extra" />',
+        '<c-layout.manage-dropdown id="manage-test" class="x-extra" />',
     ],
 )
 def test_class_is_merged_not_duplicated(source):

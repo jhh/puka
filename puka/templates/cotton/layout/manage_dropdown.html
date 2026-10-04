@@ -1,0 +1,25 @@
+{% comment %}
+Manage menu shell using the native popover API. id: a unique menu ID, also used
+for its CSS anchor name. The slot holds page-specific list items and actions.
+class: extra wrapper classes; other attributes pass through to the wrapper.
+{% endcomment %}
+<c-vars id class />
+
+<div class="{{ class }}" {{ attrs }}>
+    <button
+        type="button"
+        class="btn btn-ghost btn-sm"
+        popovertarget="{{ id }}"
+        style="anchor-name: --{{ id }}-anchor"
+    >
+        Manage
+    </button>
+    <ul
+        id="{{ id }}"
+        popover
+        class="dropdown dropdown-end menu z-10 mt-2 w-56 rounded-box bg-base-100 p-2 shadow"
+        style="position-anchor: --{{ id }}-anchor"
+    >
+        {{ slot }}
+    </ul>
+</div>

@@ -1,0 +1,9 @@
+{# The form's own template_name lays out its fields and actions. #}
+<c-ui.card>
+    <c-form.form
+        action="{{ request.path }}"
+        :form="form"
+        hx-target="#content"
+        hx-replace-url="true"
+    >{{ form }}</c-form.form>
+</c-ui.card>

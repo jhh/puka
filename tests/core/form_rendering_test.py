@@ -12,6 +12,7 @@ from dataclasses import dataclass
 
 import pytest
 from django.urls import reverse
+from pytest_django.asserts import assertTemplateUsed
 
 from puka.stuff.models import Inventory, Item, Location
 from puka.upkeep.models import Area, Schedule, Task, TaskItem
@@ -201,6 +202,7 @@ def form_case(request) -> FormCase:
 def form_page(admin_client, objects, form_case):
     response = admin_client.get(_reverse(form_case.url, objects), headers=HTMX)
     assert response.status_code == 200
+    assertTemplateUsed(response, "core/form.html")
     return parse_html(response.content)
 
 

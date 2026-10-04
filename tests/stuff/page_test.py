@@ -29,7 +29,16 @@ def test_item_detail_tabs_and_quantity_buttons(admin_client):
     assert [b.attrs["hx-vals"] for b in buttons] == ['{"quantity": -1}', '{"quantity": 1}']
     assert all(b.attrs["hx-target"] == f"#id_quantity_{inventory.pk}" for b in buttons)
     (delete,) = page.find("button", hx_post=reverse("stuff:item-delete", args=[item.pk]))
-    assert delete.attrs["hx-confirm"]
+    assert delete.attrs["hx-confirm"] == "Are you sure you want to delete this item?"
+    (trigger,) = page.find("button", popovertarget="item-manage-menu")
+    assert trigger.text == "Manage"
+    (menu,) = page.find("ul", id="item-manage-menu")
+    assert "popover" in menu.attrs
+    for name in ("stuff:item-edit", "stuff:inventory-new", "stuff:bookmark-select"):
+        (link,) = page.find("a", href=reverse(name, args=[item.pk]))
+        assert link.attrs["hx-get"] == link.attrs["href"]
+        assert link.attrs["hx-target"] == "#content"
+        assert link.attrs["hx-push-url"] == "true"
     for link in page.find("a"):
         assert link.attrs.get("href") != "#"
 
@@ -85,3 +94,27 @@ def test_location_detail_breadcrumbs(admin_client):
         a.attrs["href"] for a in page.elements[page.elements.index(crumbs) :][:12] if a.tag == "a"
     ]
     assert reverse("stuff:location-list", args=[root.pk]) in hrefs
+
+
+@pytest.mark.parametrize("name", ["stuff:item-detail", "stuff:location-detail"])
+def test_shared_inventory_controls_on_detail_pages(admin_client, name):
+    item = ItemWithInventoryFactory.create(reorder_level=0, notes="Saved notes")
+    inventory = item.inventories.get()
+    inventory.quantity = 0
+    inventory.save()
+    pk = item.pk if name == "stuff:item-detail" else inventory.location.pk
+    response = admin_client.get(reverse(name, args=[pk]), headers=HTMX)
+    assert response.status_code == 200
+    page = parse_html(response.content)
+    (quantity,) = page.find("span", id=f"id_quantity_{inventory.pk}")
+    assert quantity.text == "0"
+    buttons = page.find("button", hx_post=reverse("stuff:inventory-adjust", args=[inventory.pk]))
+    assert [button.attrs["aria-label"] for button in buttons] == ["Remove one", "Add one"]
+    assert all(button.attrs["hx-target"] == f"#id_quantity_{inventory.pk}" for button in buttons)
+    if name == "stuff:item-detail":
+        assert [el.text for el in page.find("dt")][:3] == ["Name", "Notes", "Reorder Level"]
+        assert [el.text for el in page.find("dd")][:3] == [item.name, "Saved notes", "0"]
+        assert page.find("button", hx_get=reverse("stuff:inventory-edit", args=[inventory.pk]))
+    else:
+        assert [el.text for el in page.find("dt")][:2] == ["Name", "Code"]
+        assert not page.find("button", hx_get=reverse("stuff:inventory-edit", args=[inventory.pk]))

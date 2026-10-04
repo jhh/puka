@@ -266,3 +266,35 @@ Browser checks at 1280 x 800 and 375 x 812 confirmed a two-location total of
 in the changed regions. After adding one unit, fresh task/area requests
 showed total 6 and updated stock labels. Location inventory controls and
 bookmark removal/empty states still worked, with no JavaScript errors.
+
+## Step 4: shared presentation
+
+Three small Cotton components replace repeated detail-page markup:
+
+- `ui/detail_row.html`: label and value slot, used for scalar fields on item,
+  location, task and area detail. Rich slot content and zero values work.
+- `ui/inventory_quantity.html`: explicit inventory ID/prepared quantity,
+  unchanged adjustment URLs, target IDs, values and accessible button names.
+  The item page keeps its edit action in the slot; the location page omits it.
+- `layout/manage_dropdown.html`: a Manage trigger and menu shell. Each page
+  supplies its own links, mutation buttons and confirmation messages.
+
+The user chose to migrate Manage menus to the native popover API. Menu IDs
+and CSS anchor names are unique per page. Keyboard Enter opens the menu,
+Tab reaches its first action, Escape closes it and restores trigger focus,
+and outside clicks dismiss it. The account menu is outside this refactor.
+
+`core/form.html` now contains the shared card/form wrapper. Stuff/upkeep
+pages retain their titles, metadata and `form-partial` definitions; explicit
+`#content` targets and URL replacement behavior are unchanged.
+
+Component tests cover Cotton compilation, context isolation, rich slots,
+class merging, attribute pass-through, zero quantities and popover IDs.
+Page/form tests protect menu routes, confirmation text, per-page edit
+actions, and use of the shared form include. Step 3 query ceilings still hold.
+
+Browser checks at 1280 x 800 and 375 x 812 covered all four detail pages,
+item/area invalid forms, inventory adjustment from both item and location
+pages, menu keyboard/outside dismissal, and Edit-to-form/Cancel navigation.
+Menus stayed inside viewport bounds; changed regions had no horizontal
+overflow, duplicated shells or nested forms, and no JavaScript errors.

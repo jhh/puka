@@ -1,0 +1,35 @@
+{% comment %}
+Inventory adjustment controls. inventory_id: the inventory record's primary key.
+quantity: its prepared quantity. The slot holds page-specific extra actions.
+class: extra wrapper classes; other attributes pass through to the wrapper.
+{% endcomment %}
+<c-vars inventory_id quantity class />
+
+{% url 'stuff:inventory-adjust' pk=inventory_id as adjust_url %}
+<div class="flex items-center gap-2 {{ class }}" {{ attrs }}>
+    <c-ui.button
+        variant="primary"
+        size="xs"
+        icon="hero-minus"
+        class="btn-circle"
+        aria-label="Remove one"
+        hx-post="{{ adjust_url }}"
+        hx-target="#id_quantity_{{ inventory_id }}"
+        hx-vals='{"quantity": -1}'
+    />
+    <span
+        class="inline-block w-6 text-center font-medium"
+        id="id_quantity_{{ inventory_id }}"
+    >{{ quantity }}</span>
+    <c-ui.button
+        variant="primary"
+        size="xs"
+        icon="hero-plus"
+        class="btn-circle"
+        aria-label="Add one"
+        hx-post="{{ adjust_url }}"
+        hx-target="#id_quantity_{{ inventory_id }}"
+        hx-vals='{"quantity": 1}'
+    />
+    {{ slot }}
+</div>

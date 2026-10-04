@@ -2,13 +2,6 @@
 
 {% block title %}{{ task.name|truncatewords:2 }}{% endblock %}
 
-{% partialdef field-partial %}
-    <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
-        <dt class="text-sm font-medium text-base-content">{{ label }}</dt>
-        <dd class="mt-1 text-sm text-base-content/70 sm:col-span-2 sm:mt-0">{{ value }}</dd>
-    </div>
-{% endpartialdef field-partial %}
-
 {% partialdef detail-partial %}
     {% if request.htmx and not request.htmx.boosted and not request.htmx.history_restore_request and request.htmx.target != 'body' %}
         <c-layout.page-meta title="{{ task.name|truncatewords:2 }}">{% partial breadcrumbs %}</c-layout.page-meta>
@@ -25,58 +18,53 @@
             : {{ task.name }}
         </c-slot>
         <c-slot name="actions">
-            <details class="dropdown dropdown-end">
-                <summary class="btn btn-ghost btn-sm">Manage</summary>
-                <ul class="menu dropdown-content z-10 mt-2 w-56 rounded-box bg-base-100 p-2 shadow">
-                    <li>
-                        <a
-                            href="{% url 'upkeep:task-edit' task.id %}"
-                            hx-get="{% url 'upkeep:task-edit' task.id %}"
-                            hx-push-url="true"
-                            hx-target="#content"
-                        >Edit task</a>
-                    </li>
-                    <li>
-                        <a
-                            href="{% url 'upkeep:schedule-new' task.id %}"
-                            hx-get="{% url 'upkeep:schedule-new' task.id %}"
-                            hx-push-url="true"
-                            hx-target="#content"
-                        >Create schedule</a>
-                    </li>
-                    <li>
-                        <a
-                            href="{% url 'upkeep:task-item-new' task.id %}"
-                            hx-get="{% url 'upkeep:task-item-new' task.id %}"
-                            hx-push-url="true"
-                            hx-target="#content"
-                        >Add item</a>
-                    </li>
-                    <li>
-                        <button
-                            type="button"
-                            class="text-error"
-                            hx-post="{% url 'upkeep:task-delete' task.id %}"
-                            hx-confirm="Are you sure you want to delete this task?"
-                        >
-                            Delete task
-                        </button>
-                    </li>
-                </ul>
-            </details>
+            <c-layout.manage-dropdown id="task-manage-menu">
+                <li>
+                    <a
+                        href="{% url 'upkeep:task-edit' task.id %}"
+                        hx-get="{% url 'upkeep:task-edit' task.id %}"
+                        hx-push-url="true"
+                        hx-target="#content"
+                    >Edit task</a>
+                </li>
+                <li>
+                    <a
+                        href="{% url 'upkeep:schedule-new' task.id %}"
+                        hx-get="{% url 'upkeep:schedule-new' task.id %}"
+                        hx-push-url="true"
+                        hx-target="#content"
+                    >Create schedule</a>
+                </li>
+                <li>
+                    <a
+                        href="{% url 'upkeep:task-item-new' task.id %}"
+                        hx-get="{% url 'upkeep:task-item-new' task.id %}"
+                        hx-push-url="true"
+                        hx-target="#content"
+                    >Add item</a>
+                </li>
+                <li>
+                    <button
+                        type="button"
+                        class="text-error"
+                        hx-post="{% url 'upkeep:task-delete' task.id %}"
+                        hx-confirm="Are you sure you want to delete this task?"
+                    >
+                        Delete task
+                    </button>
+                </li>
+            </c-layout.manage-dropdown>
         </c-slot>
     </c-layout.page-header>
 
     {% if task.notes or task.interval or task.duration %}
         <c-ui.card class="mb-4">
             <dl class="divide-y divide-base-200">
-                {% if task.notes %}{% with label="Notes" value=task.notes %}{% partial field-partial %}{% endwith %}{% endif %}
+                {% if task.notes %}<c-ui.detail-row label="Notes">{{ task.notes }}</c-ui.detail-row>{% endif %}
                 {% if task.interval %}
-                    {% with label="Interval" value=task.interval|stringformat:"s"|add:" "|add:task.frequency %}
-                        {% partial field-partial %}
-                    {% endwith %}
+                    <c-ui.detail-row label="Interval">{{ task.interval }} {{ task.frequency }}</c-ui.detail-row>
                 {% endif %}
-                {% if task.duration %}{% with label="Duration" value=task.duration %}{% partial field-partial %}{% endwith %}{% endif %}
+                {% if task.duration %}<c-ui.detail-row label="Duration">{{ task.duration }}</c-ui.detail-row>{% endif %}
             </dl>
         </c-ui.card>
     {% endif %}

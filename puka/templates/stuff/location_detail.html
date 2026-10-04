@@ -2,13 +2,6 @@
 
 {% block title %}{{ location.name }}{% endblock %}
 
-{% partialdef field-partial %}
-    <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
-        <dt class="text-sm font-medium text-base-content">{{ label }}</dt>
-        <dd class="mt-1 text-sm text-base-content/70 sm:col-span-2 sm:mt-0">{{ value }}</dd>
-    </div>
-{% endpartialdef field-partial %}
-
 {% partialdef detail-partial %}
     {% if request.htmx and not request.htmx.boosted and not request.htmx.history_restore_request and request.htmx.target != 'body' %}
         <c-layout.page-meta title="{{ location.name }}">{% partial breadcrumbs %}</c-layout.page-meta>
@@ -27,8 +20,8 @@
     </c-layout.page-header>
     <c-ui.card>
         <dl class="divide-y divide-base-200">
-            {% with label="Name" value=location.name %}{% partial field-partial %}{% endwith %}
-            {% with label="Code" value=location.code %}{% partial field-partial %}{% endwith %}
+            <c-ui.detail-row label="Name">{{ location.name }}</c-ui.detail-row>
+            <c-ui.detail-row label="Code">{{ location.code }}</c-ui.detail-row>
             <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
                 <dt class="text-sm font-medium text-base-content">Inventory</dt>
                 <dd class="mt-2 text-sm sm:col-span-2 sm:mt-0">
@@ -42,32 +35,7 @@
                                     hx-push-url="true"
                                     class="link link-hover link-primary"
                                 >{{ inv.item.name }}</a>
-                                <div class="flex items-center gap-2">
-                                    <c-ui.button
-                                        variant="primary"
-                                        size="xs"
-                                        icon="hero-minus"
-                                        class="btn-circle"
-                                        aria-label="Remove one"
-                                        hx-post="{% url 'stuff:inventory-adjust' pk=inv.id %}"
-                                        hx-target="#id_quantity_{{ inv.id }}"
-                                        hx-vals='{"quantity": -1}'
-                                    />
-                                    <span
-                                        class="inline-block w-6 text-center font-medium"
-                                        id="id_quantity_{{ inv.id }}"
-                                    >{{ inv.quantity }}</span>
-                                    <c-ui.button
-                                        variant="primary"
-                                        size="xs"
-                                        icon="hero-plus"
-                                        class="btn-circle"
-                                        aria-label="Add one"
-                                        hx-post="{% url 'stuff:inventory-adjust' pk=inv.id %}"
-                                        hx-target="#id_quantity_{{ inv.id }}"
-                                        hx-vals='{"quantity": 1}'
-                                    />
-                                </div>
+                                <c-ui.inventory-quantity :inventory_id="inv.pk" :quantity="inv.quantity" />
                             </li>
                         {% empty %}
                             <li><c-ui.empty-state title="Nothing stored here" icon="hero-archive-box" /></li>

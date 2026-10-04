@@ -1,0 +1,11 @@
+{% comment %}
+One label/value row inside a definition list. label: the visible label.
+The slot holds the value, including rich markup. class: extra wrapper classes.
+Other HTML, htmx and Alpine attributes pass through to the wrapper.
+{% endcomment %}
+<c-vars label class />
+
+<div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4 {{ class }}" {{ attrs }}>
+    <dt class="text-sm font-medium text-base-content">{{ label }}</dt>
+    <dd class="mt-1 text-sm text-base-content/70 sm:col-span-2 sm:mt-0">{{ slot }}</dd>
+</div>

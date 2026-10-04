@@ -2,65 +2,55 @@
 
 {% block title %}{{ area.name }}{% endblock %}
 
-{% partialdef field-partial %}
-    <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
-        <dt class="text-sm font-medium text-base-content">{{ label }}</dt>
-        <dd class="mt-1 text-sm text-base-content/70 sm:col-span-2 sm:mt-0">{{ value }}</dd>
-    </div>
-{% endpartialdef field-partial %}
-
 {% partialdef detail-partial %}
     {% if request.htmx and not request.htmx.boosted and not request.htmx.history_restore_request and request.htmx.target != 'body' %}
         <c-layout.page-meta title="{{ area.name }}">{% partial breadcrumbs %}</c-layout.page-meta>
     {% endif %}
     <c-layout.page-header title="{{ area.name }}">
         <c-slot name="actions">
-            <details class="dropdown dropdown-end">
-                <summary class="btn btn-ghost btn-sm">Manage</summary>
-                <ul class="menu dropdown-content z-10 mt-2 w-56 rounded-box bg-base-100 p-2 shadow">
-                    <li>
-                        <a
-                            href="{% url 'upkeep:area-edit' area.id %}"
-                            hx-get="{% url 'upkeep:area-edit' area.id %}"
-                            hx-push-url="true"
-                            hx-target="#content"
-                        >Edit area</a>
-                    </li>
-                    <li>
-                        <a
-                            href="{% url 'upkeep:task-new' %}?area={{ area.id }}"
-                            hx-get="{% url 'upkeep:task-new' %}?area={{ area.id }}"
-                            hx-push-url="true"
-                            hx-target="#content"
-                        >Add task</a>
-                    </li>
-                    <li>
-                        <a
-                            href="{% url 'upkeep:bookmark-select' area.id %}"
-                            hx-get="{% url 'upkeep:bookmark-select' area.id %}"
-                            hx-push-url="true"
-                            hx-target="#content"
-                        >Add bookmark</a>
-                    </li>
-                    <li>
-                        <button
-                            type="button"
-                            class="text-error"
-                            hx-post="{% url 'upkeep:area-delete' area.id %}"
-                            hx-confirm="Are you sure you want to delete this area?"
-                        >
-                            Delete area
-                        </button>
-                    </li>
-                </ul>
-            </details>
+            <c-layout.manage-dropdown id="area-manage-menu">
+                <li>
+                    <a
+                        href="{% url 'upkeep:area-edit' area.id %}"
+                        hx-get="{% url 'upkeep:area-edit' area.id %}"
+                        hx-push-url="true"
+                        hx-target="#content"
+                    >Edit area</a>
+                </li>
+                <li>
+                    <a
+                        href="{% url 'upkeep:task-new' %}?area={{ area.id }}"
+                        hx-get="{% url 'upkeep:task-new' %}?area={{ area.id }}"
+                        hx-push-url="true"
+                        hx-target="#content"
+                    >Add task</a>
+                </li>
+                <li>
+                    <a
+                        href="{% url 'upkeep:bookmark-select' area.id %}"
+                        hx-get="{% url 'upkeep:bookmark-select' area.id %}"
+                        hx-push-url="true"
+                        hx-target="#content"
+                    >Add bookmark</a>
+                </li>
+                <li>
+                    <button
+                        type="button"
+                        class="text-error"
+                        hx-post="{% url 'upkeep:area-delete' area.id %}"
+                        hx-confirm="Are you sure you want to delete this area?"
+                    >
+                        Delete area
+                    </button>
+                </li>
+            </c-layout.manage-dropdown>
         </c-slot>
     </c-layout.page-header>
 
     <c-ui.card class="mb-4">
         <dl class="divide-y divide-base-200">
-            {% with label="Name" value=area.name %}{% partial field-partial %}{% endwith %}
-            {% with label="Notes" value=area.notes %}{% partial field-partial %}{% endwith %}
+            <c-ui.detail-row label="Name">{{ area.name }}</c-ui.detail-row>
+            <c-ui.detail-row label="Notes">{{ area.notes }}</c-ui.detail-row>
             {% with bookmarks=area.bookmarks.all %}
                 {% if bookmarks %}
                     <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">

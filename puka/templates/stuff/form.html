@@ -4,15 +4,7 @@
     {% if request.htmx and not request.htmx.boosted and not request.htmx.history_restore_request and request.htmx.target != 'body' %}
         <c-layout.page-meta title="Stuff"><c-ui.crumb>Overview</c-ui.crumb></c-layout.page-meta>
     {% endif %}
-    {# The form's own template (its template_name) lays out the fields and buttons. #}
-    <c-ui.card>
-        <c-form.form
-            action="{{ request.path }}"
-            :form="form"
-            hx-target="#content"
-            hx-replace-url="true"
-        >{{ form }}</c-form.form>
-    </c-ui.card>
+    {% include "core/form.html" %}
 {% endpartialdef form-partial %}
 
 {% block content %}
