@@ -58,7 +58,9 @@ class TaskDetailView(DetailView):
             queryset = Task.objects.select_related("area").prefetch_related("schedules")
 
         task = queryset.order_by("schedules__due_date").get(pk=pk)
-        self.extra_context = {"task_consumables": list(TaskItem.objects.filter(task=task))}
+        self.extra_context = {
+            "task_consumables": list(TaskItem.objects.with_stock_quantities().filter(task=task)),
+        }
         return task
 
 

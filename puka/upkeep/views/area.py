@@ -1,6 +1,6 @@
 from types import MappingProxyType
 
-from django.db.models import OuterRef, Prefetch, Subquery
+from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView, View
@@ -8,8 +8,8 @@ from django_htmx.http import HttpResponseLocation
 
 from puka.core.views import get_template
 from puka.upkeep.forms import AreaForm
-from puka.upkeep.models import Area, Schedule, Task
-from puka.upkeep.services import get_areas_tasks_schedules
+from puka.upkeep.models import Area
+from puka.upkeep.services import get_areas_tasks_schedules, get_tasks_with_earliest_due_date
 
 
 class AreaListView(ListView):
@@ -35,14 +35,10 @@ class AreaDetailView(DetailView):
         return get_template(self.request, "upkeep/area_detail.html", "#detail-partial")
 
     def get_queryset(self):
-        earliest_due_date_subquery = (
-            Schedule.objects.filter(task=OuterRef("pk"), completion_date__isnull=True)
-            .order_by("due_date")
-            .values("due_date")[:1]
+        return Area.objects.prefetch_related(
+            Prefetch("tasks", queryset=get_tasks_with_earliest_due_date()),
+            "bookmarks__tags",
         )
-        tasks = Task.objects.annotate(earliest_due_date=Subquery(earliest_due_date_subquery))
-
-        return Area.objects.prefetch_related(Prefetch("tasks", queryset=tasks))
 
 
 class AreaCreateView(CreateView):

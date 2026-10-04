@@ -1,5 +1,5 @@
 """
-Query baselines for template optimization (PLAN.md, Step 1).
+Constant-query rendering guards for template optimization (PLAN.md, Step 3).
 
 Fixture creation and authentication are outside measurement. Direct view dispatch
 separates context preparation from deferred template rendering; client requests add
@@ -37,23 +37,23 @@ pytestmark = pytest.mark.django_db
 @dataclass(frozen=True)
 class QueryCase:
     name: str
-    preparation: tuple[int, int]
-    rendering: tuple[int, int]
+    preparation: int
+    rendering: int
     object_key: str | None = None
 
 
 CASES = (
-    QueryCase("stuff:item-list", (1, 1), (5, 15)),
-    QueryCase("upkeep:task-list", (1, 1), (4, 22)),
-    QueryCase("upkeep:area-list", (4, 6), (0, 0)),
-    QueryCase("stuff:item-detail", (4, 4), (3, 7), "item"),
-    QueryCase("stuff:location-detail", (1, 1), (3, 5), "location"),
-    QueryCase("upkeep:task-detail", (3, 3), (2, 6), "task"),
-    QueryCase("upkeep:area-detail", (2, 2), (7, 27), "area"),
+    QueryCase("stuff:item-list", 1, 3),
+    QueryCase("upkeep:task-list", 1, 1),
+    QueryCase("upkeep:area-list", 1, 1),
+    QueryCase("stuff:item-detail", 5, 0, "item"),
+    QueryCase("stuff:location-detail", 2, 1, "location"),
+    QueryCase("upkeep:task-detail", 3, 0, "task"),
+    QueryCase("upkeep:area-detail", 4, 0, "area"),
 )
 
 
-@pytest.fixture(params=[1, 3], ids=["small", "larger"])
+@pytest.fixture(params=[1, 3, 15], ids=["small", "larger", "paginated"])
 def related_objects(request):
     size = request.param
     locations = [
@@ -134,12 +134,8 @@ def test_rendering_query_baseline(  # noqa: PLR0913
     overhead = len(auth_queries)
     assert overhead == 2
     assert len(total) == len(preparation) + len(rendering) + overhead
-    index = 0 if related_objects["size"] == 1 else 1
-    rendering_budget = case.rendering[index]
-    # Step 2 also renders location ancestors in fragment breadcrumbs, matching
-    # the full-page budget rather than omitting navigation metadata.
-    assert len(preparation) <= case.preparation[index], preparation.captured_queries
-    assert len(rendering) <= rendering_budget, rendering.captured_queries
+    assert len(preparation) <= case.preparation, preparation.captured_queries
+    assert len(rendering) <= case.rendering, rendering.captured_queries
     assert ("<head>" in response.content.decode()) == (not htmx)
     for name, count in (
         ("preparation", len(preparation)),

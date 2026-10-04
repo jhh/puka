@@ -5,7 +5,14 @@ from __future__ import annotations
 import pytest
 from django.urls import reverse
 
-from tests.factories import AreaFactory, BookmarkFactory, ScheduleFactory, TaskItemFactory
+from tests.factories import (
+    AreaFactory,
+    BookmarkFactory,
+    InventoryFactory,
+    LocationFactory,
+    ScheduleFactory,
+    TaskItemFactory,
+)
 from tests.utils import HTMX, parse_html
 
 pytestmark = pytest.mark.django_db
@@ -40,6 +47,23 @@ def test_task_detail_empty_states(admin_client):
     assert "No consumables" in content
 
 
+@pytest.mark.parametrize("quantities", [[], [0], [2, 3]])
+def test_task_detail_displays_prepared_stock_total(admin_client, quantities):
+    task_item = TaskItemFactory.create(quantity=6)
+    for index, quantity in enumerate(quantities):
+        location = LocationFactory.create(code=f"A01-{index + 1:02}")
+        InventoryFactory.create(item=task_item.item, location=location, quantity=quantity)
+    response = admin_client.get(
+        reverse("upkeep:task-detail", args=[task_item.task.pk]),
+        headers=HTMX,
+    )
+    assert response.status_code == 200
+    assert response.context["task_consumables"][0].on_hand == sum(quantities)
+    # With no schedules there is just the consumables table's one data row.
+    cells = [cell.text for cell in parse_html(response.content).find("td")]
+    assert cells[2:4] == ["6", str(sum(quantities))]
+
+
 def test_area_detail_bookmarks_inside_definition_list(admin_client):
     area = AreaFactory.create()
     area.bookmarks.add(BookmarkFactory.create())
@@ -69,3 +93,17 @@ def test_task_list_stock_badge(admin_client):
     assert [b.text for b in badges] == ["in stock"]
     for link in page.find("a"):
         assert link.attrs.get("href") != "#"
+
+
+@pytest.mark.parametrize("name", ["upkeep:task-list", "upkeep:area-detail"])
+def test_prepared_shortage_stock_badge(admin_client, name):
+    task_item = TaskItemFactory.create()
+    args = [task_item.task.area_id] if name == "upkeep:area-detail" else []
+    response = admin_client.get(reverse(name, args=args), headers=HTMX)
+    assert response.status_code == 200
+    badges = [
+        el.text
+        for el in parse_html(response.content).find("span")
+        if "badge" in el.attrs.get("class", "")
+    ]
+    assert badges == ["out of stock"]

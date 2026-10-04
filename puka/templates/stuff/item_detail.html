@@ -145,8 +145,13 @@
             </c-ui.tab-panel>
 
             <c-ui.tab-panel name="bookmarks">
-                {% include "bookmarks/_detail_page.html" %}
-                {% if not item.bookmarks.all %}<c-ui.empty-state title="No bookmarks" icon="hero-bookmark" />{% endif %}
+                {% with bookmarks=item.bookmarks.all %}
+                    {% if bookmarks %}
+                        {% include "bookmarks/_detail_page.html" %}
+                    {% else %}
+                        <c-ui.empty-state title="No bookmarks" icon="hero-bookmark" />
+                    {% endif %}
+                {% endwith %}
             </c-ui.tab-panel>
         </c-ui.tabs>
     {% endpartialdef detail-partial %}

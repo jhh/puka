@@ -1,13 +1,17 @@
+from __future__ import annotations
+
 import logging
 from itertools import chain
 from operator import attrgetter
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
-from django.db.models import CharField, OuterRef, Subquery, Sum, Value
+from django.db.models import CharField, Count, OuterRef, QuerySet, Subquery, Sum, Value
 
-from puka.stuff.models import Item
 from puka.upkeep.models import Area, Schedule, Task, TaskItem
+
+if TYPE_CHECKING:
+    from puka.stuff.models import Item
 
 logger = logging.getLogger(__name__)
 
@@ -17,9 +21,17 @@ def item_quantity_needed(item: Item) -> int:
     return result["total"] or 0
 
 
-def get_areas_tasks_schedules(query=None) -> list[dict[str, Any]]:
+def get_areas_tasks_schedules(query=None) -> QuerySet[Area, dict[str, Any]]:
     """Return all areas with count of tasks and task with the soonest due_date and id."""
-    area_queryset = Area.objects.prefetch_related("tasks__schedules")
+    earliest = Schedule.objects.filter(
+        task__area_id=OuterRef("pk"),
+        completion_date__isnull=True,
+    ).order_by("due_date", "task_id", "pk")
+    area_queryset = Area.objects.annotate(
+        task_count=Count("tasks"),
+        due_date=Subquery(earliest.values("due_date")[:1]),
+        due_task_id=Subquery(earliest.values("task_id")[:1]),
+    )
 
     if query:
         search_query = SearchQuery(query)
@@ -32,23 +44,9 @@ def get_areas_tasks_schedules(query=None) -> list[dict[str, Any]]:
             .order_by("-rank")
         )
     else:
-        area_queryset = area_queryset.all()
+        area_queryset = area_queryset.order_by("pk")
 
-    areas = []
-    for area in area_queryset:
-        row = {"id": area.pk, "name": area.name, "task_count": area.tasks.count()}
-
-        schedules: list[Schedule] = []
-        for task in area.tasks.all():
-            # TODO(jhh): this is a N+1 query, schedules are prefetched so use python to filter
-            schedules += task.schedules.filter(completion_date__isnull=True).all()
-
-        if schedules:
-            first = min(schedules, key=attrgetter("due_date"))
-            row |= {"due_date": first.due_date, "due_task_id": first.task_id}
-
-        areas.append(row)
-    return areas
+    return area_queryset.values("id", "name", "task_count", "due_date", "due_task_id")
 
 
 def get_tasks_schedules(area=None) -> list[dict[str, Any]]:
@@ -80,7 +78,9 @@ def get_tasks_with_earliest_due_date():
     )
 
     # Annotate each Task with its earliest incomplete schedule's due_date
-    return Task.objects.annotate(earliest_due_date=Subquery(earliest_due_date_subquery))
+    return Task.objects.with_stock_status().annotate(
+        earliest_due_date=Subquery(earliest_due_date_subquery),
+    )
 
 
 def search_areas_and_tasks(query_text, limit=None):

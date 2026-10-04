@@ -2,7 +2,7 @@ import logging
 from types import MappingProxyType
 
 from django.db import transaction
-from django.db.models import Sum
+from django.db.models import Prefetch, Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
@@ -32,10 +32,9 @@ class ItemListView(ListView):
         else:
             query_set = Item.objects.all().order_by("name")
 
-        return (
-            query_set.annotate(quantity=Sum("inventories__quantity"))
-            .prefetch_related("locations")
-            .prefetch_related("tags")
+        return query_set.annotate(quantity=Sum("inventories__quantity")).prefetch_related(
+            Prefetch("inventories", queryset=Inventory.objects.select_related("location")),
+            "tags",
         )
 
 
@@ -48,11 +47,10 @@ class ItemDetailView(DetailView):
         return get_template(self.request, "stuff/item_detail.html", "#detail-partial")
 
     def get_queryset(self):
-        return (
-            Item.objects.annotate(quantity=Sum("inventories__quantity"))
-            .prefetch_related("bookmarks")
-            .prefetch_related("locations")
-            .prefetch_related("tags")
+        return Item.objects.prefetch_related(
+            Prefetch("inventories", queryset=Inventory.objects.select_related("location")),
+            "tags",
+            "bookmarks__tags",
         )
 
 

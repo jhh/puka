@@ -196,3 +196,73 @@ The Step 1 query table remains the historical baseline. Step 2 adds one
 ancestor query to location-detail fragments because they now render the
 same breadcrumbs as full pages: totals are 6 and 8 for sizes 1 and 3.
 Other query budgets are unchanged. Query optimization remains Step 3.
+
+## Step 3: prepared data and constant query budgets
+
+Stock status is now computed with a correlated `Exists` query against
+consumables whose required quantity exceeds their inventory total. Missing
+inventory is treated as zero. Each task is checked independently, including
+tasks sharing the same item; a task without consumables is stocked.
+
+`get_tasks_with_earliest_due_date()` prepares this status for task lists,
+area detail and notification emails. The existing stock-status method uses
+the annotation when present and otherwise fetches the status in one query.
+Notification selection and rendering now use one query for 1, 3 or 15 tasks
+in the regression fixtures; mail delivery is mocked in those tests.
+
+Task-detail consumables load their items and annotated `on_hand` totals in
+one query. Item and location views prefetch inventories with their related
+locations/items selected. Item and area detail also prefetch bookmark tags,
+and their templates reuse one prepared bookmarks collection. No styling,
+mutation routes or empty-state behavior is changed.
+
+Area summaries are now a lazy annotated values queryset, not a Python list
+assembled before pagination. Task counts and earliest incomplete schedules
+are computed in SQL. Empty/completed-only areas have no due task or date.
+Search retains relevance ordering; unfiltered results use primary-key order
+for stable pagination. Equal due dates use task ID and then schedule ID as
+deterministic tie-breakers.
+
+Measured authenticated request totals:
+
+| View | Before, size 1 | Before, size 3 | After, sizes 1/3/15 |
+| --- | ---: | ---: | ---: |
+| Item list | 8 | 18 | 6 |
+| Task list | 7 | 25 | 4 |
+| Area list | 6 | 8 | 4 |
+| Item detail | 9 | 13 | 7 |
+| Location detail | 6 | 8 | 5 |
+| Task detail | 7 | 11 | 5 |
+| Area detail | 11 | 31 | 6 |
+
+The Before columns use full-page counts from Step 1 (also the Step 2
+budgets). After counts match for full-page and htmx responses. All totals
+include two authentication/session queries.
+
+Current preparation/rendering budgets:
+
+| View | Preparation | Rendering |
+| --- | ---: | ---: |
+| Item list | 1 | 3 |
+| Task list | 1 | 1 |
+| Area list | 1 | 1 |
+| Item detail | 5 | 0 |
+| Location detail | 2 | 1 |
+| Task detail | 3 | 0 |
+| Area detail | 4 | 0 |
+
+Lists still evaluate their primary querysets and bulk prefetches lazily
+during rendering. Location breadcrumbs still load ancestors once. Neither
+path issues a relationship query per rendered row.
+
+The query guard fixtures now include size 15, crossing task/area pagination
+boundaries. Every size uses the same scalar query ceiling. A separate area
+summary test checks lazy construction, a `LIMIT 10` first-page query, and
+correct task counts/dates without loading all tasks and schedules in Python.
+These are query-count measurements, not elapsed-time performance claims.
+
+Browser checks at 1280 x 800 and 375 x 812 confirmed a two-location total of
+5 against a requirement of 6, unchanged bookmark rendering, and no overflow
+in the changed regions. After adding one unit, fresh task/area requests
+showed total 6 and updated stock labels. Location inventory controls and
+bookmark removal/empty states still worked, with no JavaScript errors.

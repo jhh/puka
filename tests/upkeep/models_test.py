@@ -6,6 +6,13 @@ from django.db import IntegrityError
 
 from puka.upkeep.models import Area, Schedule, Task, TaskItem
 from puka.upkeep.services import item_quantity_needed
+from tests.factories import (
+    InventoryFactory,
+    ItemFactory,
+    LocationFactory,
+    TaskFactory,
+    TaskItemFactory,
+)
 
 
 @pytest.mark.django_db
@@ -139,3 +146,54 @@ def test_task_consumable_needed(area, salt_item):
     assert item_quantity_needed(salt_item) == 3
     TaskItem.objects.create(task=tasks[2], item=salt_item, quantity=3)
     assert item_quantity_needed(salt_item) == 6
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("quantities", "required", "expected"),
+    [([], 1, False), ([], 0, True), ([0], 1, False), ([2, 3], 5, True), ([2, 3], 6, False)],
+)
+def test_task_stock_status(quantities, required, expected, django_assert_num_queries):
+    task = TaskFactory.create()
+    item = ItemFactory.create()
+    TaskItemFactory.create(task=task, item=item, quantity=required)
+    for index, quantity in enumerate(quantities):
+        location = LocationFactory.create(code=f"A01-{index + 1:02}")
+        InventoryFactory.create(item=item, location=location, quantity=quantity)
+
+    with django_assert_num_queries(1):
+        assert task.are_consumables_stocked() is expected
+    prepared = Task.objects.with_stock_status().get(pk=task.pk)
+    with django_assert_num_queries(0):
+        assert prepared.are_consumables_stocked() is expected
+
+
+@pytest.mark.django_db
+def test_task_stock_status_without_consumables(django_assert_num_queries):
+    task = TaskFactory.create()
+    with django_assert_num_queries(1):
+        assert task.are_consumables_stocked()
+    prepared = Task.objects.with_stock_status().get(pk=task.pk)
+    with django_assert_num_queries(0):
+        assert prepared.are_consumables_stocked()
+
+
+@pytest.mark.django_db
+def test_task_stock_status_shared_items_and_missing_consumable():
+    first = TaskFactory.create(name="First task")
+    second = TaskFactory.create(name="Second task", area=first.area)
+    shared = ItemFactory.create(name="Shared supply")
+    missing = ItemFactory.create(name="Missing supply")
+    InventoryFactory.create(item=shared, quantity=5)
+    TaskItemFactory.create(task=first, item=shared, quantity=5)
+    TaskItemFactory.create(task=second, item=shared, quantity=5)
+    # Each task is checked independently, not against the combined requirement.
+    statuses = {
+        task.pk: task.are_consumables_stocked() for task in Task.objects.with_stock_status()
+    }
+    assert statuses == {first.pk: True, second.pk: True}
+    TaskItemFactory.create(task=second, item=missing, quantity=1)
+    statuses = {
+        task.pk: task.are_consumables_stocked() for task in Task.objects.with_stock_status()
+    }
+    assert statuses == {first.pk: True, second.pk: False}

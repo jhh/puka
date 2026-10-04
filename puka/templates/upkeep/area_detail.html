@@ -61,14 +61,16 @@
         <dl class="divide-y divide-base-200">
             {% with label="Name" value=area.name %}{% partial field-partial %}{% endwith %}
             {% with label="Notes" value=area.notes %}{% partial field-partial %}{% endwith %}
-            {% if area.bookmarks.all %}
-                <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
-                    <dt class="text-sm font-medium text-base-content">Bookmarks</dt>
-                    <dd class="mt-1 sm:col-span-2 sm:mt-0">
-                        {% include "bookmarks/_detail_page.html" with item=area %}
-                    </dd>
-                </div>
-            {% endif %}
+            {% with bookmarks=area.bookmarks.all %}
+                {% if bookmarks %}
+                    <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
+                        <dt class="text-sm font-medium text-base-content">Bookmarks</dt>
+                        <dd class="mt-1 sm:col-span-2 sm:mt-0">
+                            {% include "bookmarks/_detail_page.html" with item=area %}
+                        </dd>
+                    </div>
+                {% endif %}
+            {% endwith %}
         </dl>
     </c-ui.card>
 

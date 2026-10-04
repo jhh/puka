@@ -1,5 +1,6 @@
 import logging
 
+from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView, View
@@ -8,7 +9,7 @@ from treebeard.forms import movenodeform_factory
 
 from puka.core.views import get_template
 from puka.stuff.forms import LocationForm
-from puka.stuff.models import Location
+from puka.stuff.models import Inventory, Location
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +44,11 @@ class LocationDetailView(DetailView):
     model = Location
     template_name = "stuff/location_detail.html"
     context_object_name = "location"
+
+    def get_queryset(self):
+        return Location.objects.prefetch_related(
+            Prefetch("inventories", queryset=Inventory.objects.select_related("item")),
+        )
 
     def get_template_names(self):
         return get_template(self.request, "stuff/location_detail.html", "#detail-partial")

@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import datetime
 
 from dateutil.relativedelta import relativedelta
 from django.db import models
+from django.db.models import Exists, F, OuterRef, Sum
 from django.urls import reverse
 
 from puka.bookmarks.models import Bookmark
@@ -12,12 +15,12 @@ class Area(models.Model):
     name = models.CharField("area name", max_length=200)
     notes = models.TextField(blank=True)
     bookmarks = models.ManyToManyField(Bookmark, related_name="+")
-    tasks: models.Manager["Task"]
+    tasks: models.Manager[Task]
 
     def __str__(self):
         return self.name
 
-    def first_due_schedule(self) -> "Schedule | None":
+    def first_due_schedule(self) -> Schedule | None:
         schedules: list[Schedule] = []
         for task in self.tasks.prefetch_related("schedules").all():
             schedules += task.schedules.filter(completion_date__isnull=True).all()
@@ -25,6 +28,13 @@ class Area(models.Model):
 
 
 class TaskManager(models.Manager):
+    def with_stock_status(self):
+        shortage = TaskItem.objects.with_stock_quantities().filter(
+            task_id=OuterRef("pk"),
+            quantity__gt=F("on_hand"),
+        )
+        return self.annotate(consumables_stocked=~Exists(shortage))
+
     def search(self, _query):
         return self.order_by("area__name", "name")
 
@@ -49,7 +59,8 @@ class Task(models.Model):
     )
     area = models.ForeignKey(Area, on_delete=models.CASCADE, related_name="tasks")
     objects = TaskManager()
-    schedules: models.Manager["Schedule"]
+    schedules: models.Manager[Schedule]
+    consumables_stocked: bool
 
     def __str__(self):
         return f"{self.name} ({self.pk})"
@@ -78,16 +89,26 @@ class Task(models.Model):
                 error_msg = f"Invalid frequency: {self.frequency}"
                 raise ValueError(error_msg)
 
-    def first_due_schedule(self) -> "Schedule | None":
+    def first_due_schedule(self) -> Schedule | None:
         return self.schedules.filter(completion_date__isnull=True).order_by("due_date").first()
 
     def are_consumables_stocked(self) -> bool:
-        task_consumables = TaskItem.objects.filter(task=self)
-        is_ready = True
-        for tc in task_consumables:
-            if tc.quantity > tc.item.quantity():
-                is_ready = False
-        return is_ready
+        if hasattr(self, "consumables_stocked"):
+            return self.consumables_stocked
+        return (
+            Task.objects.with_stock_status()
+            .values_list("consumables_stocked", flat=True)
+            .get(pk=self.pk)
+        )
+
+
+class TaskItemManager(models.Manager):
+    def with_stock_quantities(self):
+        return (
+            self.select_related("item")
+            .annotate(on_hand=Sum("item__inventories__quantity", default=0))
+            .order_by("pk")
+        )
 
 
 class TaskItem(models.Model):
@@ -95,6 +116,8 @@ class TaskItem(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField("quantity required", default=1)
     task_id: int
+    objects = TaskItemManager()
+    on_hand: int
 
     class Meta:
         unique_together = ("task", "item")
