@@ -578,7 +578,7 @@ def test_navbar_without_end():
 
 
 BOOKMARK_SEARCH = ("q", "/bookmarks/", "input changed delay:0.5s", "#id_bookmarks")
-ITEM_SEARCH = ("query", "/stuff/", "input changed delay:0.5s", "#content")
+ITEM_SEARCH = ("query", "/stuff/", "input changed delay:0.5s", "#item-results")
 AREA_SEARCH = ("query", "/upkeep/area/", "change", "#content")
 TASK_SEARCH = ("query", "/upkeep/task/", "change", "#content")
 

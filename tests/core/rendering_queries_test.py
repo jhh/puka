@@ -144,3 +144,14 @@ def test_rendering_query_baseline(  # noqa: PLR0913
         ("total", len(total)),
     ):
         record_property(name, count)
+
+
+def test_item_results_fragment_query_budget(admin_client, related_objects):
+    with CaptureQueriesContext(connection) as queries:
+        response = admin_client.get(
+            reverse("stuff:item-list"),
+            headers={"HX-Request": "true", "HX-Target": "#item-results"},
+        )
+    assert response.status_code == 200
+    assert len(queries) <= 6, queries.captured_queries
+    assert len(response.context["items"]) == related_objects["size"]

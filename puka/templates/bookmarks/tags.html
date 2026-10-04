@@ -16,8 +16,8 @@
             {% for tag in bucket.list %}
                 <li class="inline">
                     <a
-                        href="{% url 'bookmarks:list' %}?tags={{ tag.name }}"
-                        hx-get="{% url 'bookmarks:list' %}?tags={{ tag.name }}"
+                        href="{% url 'bookmarks:list' %}?tags={{ tag.name|urlencode:'' }}"
+                        hx-get="{% url 'bookmarks:list' %}?tags={{ tag.name|urlencode:'' }}"
                         hx-push-url="true"
                         hx-target="#content"
                     >

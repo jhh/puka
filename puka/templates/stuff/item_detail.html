@@ -70,8 +70,8 @@
                             <dd class="mt-1 flex flex-wrap gap-1 sm:col-span-2 sm:mt-0">
                                 {% for tag in item.tags.all %}
                                     <a
-                                        href="{% url 'stuff:item-list' %}?query=%23{{ tag }}"
-                                        hx-get="{% url 'stuff:item-list' %}?query=%23{{ tag }}"
+                                        href="{% url 'stuff:item-list' %}?query=%23{{ tag.name|urlencode:'' }}"
+                                        hx-get="{% url 'stuff:item-list' %}?query=%23{{ tag.name|urlencode:'' }}"
                                         hx-push-url="true"
                                         hx-target="#content"
                                     ><c-ui.badge variant="error" style="soft" size="sm">{{ tag }}</c-ui.badge></a>

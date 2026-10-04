@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView, View
 from django_htmx.http import HttpResponseLocation
+from django_htmx.middleware import HtmxDetails
 
 from puka.core.views import get_template
 from puka.stuff.forms import InventoryForm, ItemForm
@@ -22,7 +23,12 @@ class ItemListView(ListView):
     paginate_by = 20
 
     def get_template_names(self):
-        return get_template(self.request, "stuff/item_list.html", "#list-partial")
+        partial = (
+            "#results-partial"
+            if (HtmxDetails(self.request).target or "").endswith("#item-results")
+            else "#list-partial"
+        )
+        return get_template(self.request, "stuff/item_list.html", partial)
 
     def get_queryset(self):
         if "query" in self.request.GET:

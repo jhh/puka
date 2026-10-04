@@ -1,6 +1,7 @@
 {% comment %}
 Prepared `bookmarks` attached to `item` (a stuff Item or upkeep Area), with a remove
 button that posts to `bookmark_delete_url`. The caller handles the empty state.
+Tag links quote a single name for the filter form's TagField before URL encoding.
 {% endcomment %}
 <ul role="list" class="list rounded-box border border-base-300 bg-base-100 text-sm">
     {% for bookmark in bookmarks %}
@@ -18,8 +19,8 @@ button that posts to `bookmark_delete_url`. The caller handles the empty state.
                 {% for tag in bookmark.tags.all %}
                     <li>
                         <a
-                            href="{% url 'bookmarks:filter' %}?tags={{ tag }}"
-                            hx-get="{% url 'bookmarks:filter' %}?tags={{ tag }}"
+                            href="{% url 'bookmarks:filter' %}?tags=%22{{ tag.name|urlencode:'' }}%22"
+                            hx-get="{% url 'bookmarks:filter' %}?tags=%22{{ tag.name|urlencode:'' }}%22"
                             hx-push-url="true"
                             hx-target="#content"
                         ><c-ui.badge variant="error" style="soft" size="sm">{{ tag }}</c-ui.badge></a>

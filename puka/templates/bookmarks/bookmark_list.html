@@ -57,9 +57,10 @@
                         <div class="w-full text-sm opacity-60 lg:max-w-3xl">{{ bookmark.description }}</div>
                         <div class="relative z-20 max-w-fit">
                             {% for tag in bookmark.tags.all %}
+                                {# Filter's TagField needs quotes to keep multiword tags together. #}
                                 <c-ui.tag
-                                    href="?tags={{ tag }}"
-                                    hx-get="?tags={{ tag }}"
+                                    href="?tags={% if request.resolver_match.url_name == 'filter' %}%22{% endif %}{{ tag.name|urlencode:'' }}{% if request.resolver_match.url_name == 'filter' %}%22{% endif %}"
+                                    hx-get="?tags={% if request.resolver_match.url_name == 'filter' %}%22{% endif %}{{ tag.name|urlencode:'' }}{% if request.resolver_match.url_name == 'filter' %}%22{% endif %}"
                                     hx-target="#id_bookmarks"
                                     hx-push-url="true"
                                     class="mr-1 text-sm"

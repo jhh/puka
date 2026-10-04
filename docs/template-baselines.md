@@ -298,3 +298,41 @@ item/area invalid forms, inventory adjustment from both item and location
 pages, menu keyboard/outside dismissal, and Edit-to-form/Cancel navigation.
 Menus stayed inside viewport bounds; changed regions had no horizontal
 overflow, duplicated shells or nested forms, and no JavaScript errors.
+
+## Step 5: targeted cleanups
+
+Tag links in bookmark lists, the tags page, attached-bookmark lists and item
+list/detail pages URL-encode the entire tag name. Clicking a tag keeps its
+destination route but replaces prior filters and resets pagination. Bookmark
+filter-route links also quote the single name for TagField, so spaces do not
+split it into several tags. Ordinary bookmark lists use the exact tag name;
+inventory searches keep their existing leading `#` syntax.
+
+Regression tests round-trip spaces, `&`, `+`, `#` and Unicode through ordinary
+and targeted htmx requests. Filter changes reset page 2 to page 1, while
+pagination retains the current query and filter parameters.
+
+The item list now wraps its table and pagination in `#item-results`. Only
+requests targeting that wrapper receive `results-partial`; content navigation
+retains the toolbar and page metadata, and boosted/body/history requests still
+return full pages. Search and pagination swaps leave the input, toolbar and
+Alpine state intact. Debounced search uses `hx-sync="this:replace"` so a newer
+search cancels an older in-flight request. Other search pages are unchanged.
+The results-only fragment stays within the six-query authenticated budget
+across datasets of 1, 3 and 15 items.
+
+Chrome loaded the Inter stylesheet before removal. None of the inventory
+page's 100 elements used Inter: computed families were the system sans-serif
+and monospace stacks. Removing the link left every measured font family,
+size, weight, line height and element rectangle identical. The root now loads
+only local app CSS. Nix integration checks locate that stylesheet by its
+static asset path instead of relying on it being the second stylesheet, and
+still fetch both the built CSS and deferred JavaScript assets.
+
+Desktop/mobile browser checks at 1280 x 800 and 375 x 812 verified input DOM
+and Alpine-state identity, focus and selection retention, results pagination,
+tag-driven page reset, Escape clearing, empty-input clearing, rapid typing,
+and New Item/Cancel navigation. A deliberately delayed older search was
+aborted, and its response did not overwrite the latest results. Bookmark tag
+clicks also round-tripped a combined `parts & café+#` tag. There were no
+JavaScript errors, duplicate shells, page overflow or Inter requests.

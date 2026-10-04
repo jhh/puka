@@ -48,8 +48,13 @@ with subtest("log in as superuser"):
 
 html = machine.succeed(f"{CURL} -sLf {BASE_URL}/")
 soup = BeautifulSoup(html, "html.parser")
-stylesheets = soup.find_all("link", rel="stylesheet")
-puka_stylesheet_url = stylesheets[1]["href"]
+stylesheets = [
+    link["href"]
+    for link in soup.find_all("link", rel="stylesheet")
+    if link["href"].startswith("/static/puka/main.")
+]
+assert len(stylesheets) == 1, "check static files: expected one Puka stylesheet"
+puka_stylesheet_url = stylesheets[0]
 puka_script_url = soup.find("script", {"defer": True})["src"]
 
 

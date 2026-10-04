@@ -41,11 +41,11 @@ def test_layout_ids(admin_client):
     assert page.find("header")
 
 
-def test_root_keeps_stylesheet_and_script_order(admin_client):
-    """nix/checks/tests.py reads the second stylesheet and the deferred script."""
+def test_root_keeps_local_stylesheet_and_deferred_script(admin_client):
+    """The root loads only the app CSS; Nix also verifies both assets are served."""
     page = _get(admin_client, reverse("home"))
     stylesheets = [el.attrs["href"] for el in page.find("link", rel="stylesheet")]
-    assert stylesheets[1].endswith("puka/main.css")
+    assert stylesheets == ["/static/puka/main.css"]
     (script,) = page.find("script")
     assert "defer" in script.attrs
     assert script.attrs["src"].endswith("puka/main.js")
