@@ -49,7 +49,7 @@ pkgs.mkShell {
       mailpit
       nil
       nix-output-monitor
-      nixfmt-rfc-style
+      nixfmt
       nodejs
       postgresql_17
       postgresql_17.pg_config

@@ -15,7 +15,7 @@ inputs.pre-commit-hooks.lib.${system}.run {
       };
     in
     {
-      nixfmt-rfc-style.enable = true;
+      nixfmt.enable = true;
       ruff.enable = true;
       ruff-format.enable = true;
       ruff-format.after = [ "ruff" ];
