@@ -263,58 +263,67 @@ def test_form_delete(form_page, form_case, objects):
     assert button.attrs["hx-confirm"] == f"Delete this {form_case.delete_noun}?"
 
 
-# (form url, POST data, field with the error, error message, a submitted value to redisplay)
+# Invalid form posts: the field that errors, its message, and a submitted value to redisplay.
+@dataclass(frozen=True)
+class ErrorCase:
+    url: Url
+    data: dict[str, str | int]
+    field: str
+    message: str
+    value: str
+
+
 ERROR_CASES = (
-    (
+    ErrorCase(
         ("stuff:item-new", ()),
         {"name": "", "reorder_level": "x", "notes": "keep me"},
         "name",
         "This field is required.",
         "keep me",
     ),
-    (
+    ErrorCase(
         ("stuff:item-new", ()),
         {"name": "New", "reorder_level": 1, "location_code": "A01-05", "quantity": 0},
         "quantity",
         "Quantity must be greater than zero if location provided.",
         "A01-05",
     ),
-    (
+    ErrorCase(
         ("stuff:location-new", ()),
         {"name": "", "code": "Z9", "treebeard_position": "sorted-child"},
         "name",
         "This field is required.",
         "Z9",
     ),
-    (
+    ErrorCase(
         ("stuff:inventory-edit", ("inventory",)),
         {"item": "item", "location": "location", "quantity": -1},
         "quantity",
         "Ensure this value is greater than or equal to 0.",
         "-1",
     ),
-    (
+    ErrorCase(
         ("upkeep:area-new", ()),
         {"name": "", "notes": "keep me"},
         "name",
         "This field is required.",
         "keep me",
     ),
-    (
+    ErrorCase(
         ("upkeep:task-new", ()),
         {"name": "keep me", "frequency": "fortnights"},
         "frequency",
         "Select a valid choice.",
         "keep me",
     ),
-    (
+    ErrorCase(
         ("upkeep:schedule-new", ("task",)),
         {"task": "task", "due_date": "not a date"},
         "due_date",
         "Enter a valid date.",
         "not a date",
     ),
-    (
+    ErrorCase(
         ("upkeep:task-item-new", ("task",)),
         {"task": "task", "item": "upkeep_item", "quantity": "x"},
         "quantity",
@@ -325,22 +334,22 @@ ERROR_CASES = (
 
 
 @pytest.mark.parametrize(
-    ("url", "data", "field", "message", "value"),
+    "case",
     ERROR_CASES,
-    ids=[f"{case[0][0]}-{case[2]}" for case in ERROR_CASES],
+    ids=[f"{case.url[0]}-{case.field}" for case in ERROR_CASES],
 )
-def test_form_errors(admin_client, objects, url, data, field, message, value):  # noqa: PLR0913
-    data = {k: objects.get(v, v) if isinstance(v, str) else v for k, v in data.items()}
-    response = admin_client.post(_reverse(url, objects), data, headers=HTMX)
+def test_form_errors(admin_client, objects, case):
+    data = {k: objects.get(v, v) if isinstance(v, str) else v for k, v in case.data.items()}
+    response = admin_client.post(_reverse(case.url, objects), data, headers=HTMX)
 
     assert response.status_code == 200
     content = response.content.decode()
     assert "<head>" not in content
-    assert message in content
-    assert value in content
+    assert case.message in content
+    assert case.value in content
     page = parse_html(content)
-    assert page.forms[0].attrs["hx-post"] == _reverse(url, objects)
-    el = page.field(field)
+    assert page.forms[0].attrs["hx-post"] == _reverse(case.url, objects)
+    el = page.field(case.field)
     assert el.attrs.get("aria-invalid") == "true"
 
 
