@@ -164,6 +164,24 @@ def test_card_title_slot():
     assert result.find("a")[0] is result.elements[result.elements.index(only(result, "h2")) + 1]
 
 
+def test_card_header_actions():
+    source = """
+        <c-ui.card title="Inventory">
+            <c-slot name="header_actions"><c-ui.button>Add</c-ui.button></c-slot>
+            <p>Body</p>
+        </c-ui.card>
+    """
+    result = page(source)
+    assert only(result, "h2").text == "Inventory"
+    assert only(result, "button").text == "Add"
+    header = only(
+        result,
+        "div",
+        **{"class": "flex flex-wrap items-center justify-between gap-2"},
+    )
+    assert header is not None
+
+
 # ui/badge
 
 
@@ -307,49 +325,6 @@ def test_breadcrumbs():
     last = result.find("span")[0]
     assert "href" not in last.attrs
     assert classes(result.find("span")[1])[0] == "hero-hashtag-mini"
-
-
-# ui/tabs and ui/tab-panel
-
-TABS = """
-    <c-ui.tabs :tabs="[('details', 'Details'), ('inventory', 'Inventory')]" {active}>
-        <c-ui.tab-panel name="details">Details body</c-ui.tab-panel>
-        <c-ui.tab-panel name="inventory">Inventory body</c-ui.tab-panel>
-    </c-ui.tabs>
-"""
-
-
-def test_tabs():
-    result = page(TABS.format(active=""))
-    root = result.elements[0]
-    assert root.attrs["x-data"] == "tabs('details')"
-    assert "tabs" not in root.attrs
-    assert classes(only(result, "div", role="tablist")) == ["tabs", "tabs-box", "w-fit"]
-
-    details, inventory = result.find("button", role="tab")
-    assert details.text == "Details"
-    assert details.attrs["type"] == "button"
-    assert details.attrs["x-on:click"] == "select('details')"
-    assert details.attrs["x-bind:class"] == "{ 'tab-active': isActive('details') }"
-    assert inventory.attrs["x-bind:aria-selected"] == "isActive('inventory')"
-
-    panels = result.find("div", role="tabpanel")
-    assert [panel.attrs["x-show"] for panel in panels] == [
-        "isActive('details')",
-        "isActive('inventory')",
-    ]
-    assert all("x-cloak" in panel.attrs for panel in panels)
-    assert [panel.text for panel in panels] == ["Details body", "Inventory body"]
-
-
-def test_tabs_initial_active():
-    root = page(TABS.format(active='active="inventory"')).elements[0]
-    assert root.attrs["x-data"] == "tabs('inventory')"
-
-
-def test_tabs_escape_names_for_js():
-    root = page('<c-ui.tabs :tabs="tabs"></c-ui.tabs>', tabs=[("it's", "Quote")]).elements[0]
-    assert root.attrs["x-data"] == "tabs('it\\u0027s')"
 
 
 # ui/empty-state
@@ -639,8 +614,6 @@ def test_no_inline_scripts(admin_client, url):
         '<c-form.actions class="x-extra" />',
         '<c-ui.empty-state title="t" class="x-extra" />',
         '<c-ui.search-box class="x-extra" />',
-        '<c-ui.tabs :tabs="[]" class="x-extra"></c-ui.tabs>',
-        '<c-ui.tab-panel name="a" class="x-extra">p</c-ui.tab-panel>',
         '<c-layout.page-header title="t" class="x-extra" />',
         '<c-layout.drawer class="x-extra">p</c-layout.drawer>',
         '<c-layout.navbar class="x-extra">n</c-layout.navbar>',

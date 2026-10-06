@@ -17,7 +17,7 @@
         {% if request.htmx and not request.htmx.boosted and not request.htmx.history_restore_request and request.htmx.target != 'body' %}
             <c-layout.page-meta title="{{ item.name }}">{% partial breadcrumbs %}</c-layout.page-meta>
         {% endif %}
-        <c-layout.page-header title="{{ item.name }}">
+        <c-layout.page-header title="{{ item.name }}" class="mx-auto max-w-4xl">
             <c-slot name="actions">
                 <c-layout.manage-dropdown id="item-manage-menu">
                     <li>
@@ -27,22 +27,6 @@
                             hx-push-url="true"
                             hx-target="#content"
                         >Edit item</a>
-                    </li>
-                    <li>
-                        <a
-                            href="{% url 'stuff:inventory-new' item.pk %}"
-                            hx-get="{% url 'stuff:inventory-new' item.pk %}"
-                            hx-push-url="true"
-                            hx-target="#content"
-                        >Create inventory</a>
-                    </li>
-                    <li>
-                        <a
-                            href="{% url 'stuff:bookmark-select' item.pk %}"
-                            hx-get="{% url 'stuff:bookmark-select' item.pk %}"
-                            hx-push-url="true"
-                            hx-target="#content"
-                        >Add bookmark</a>
                     </li>
                     <li>
                         <button
@@ -58,8 +42,8 @@
             </c-slot>
         </c-layout.page-header>
 
-        <c-ui.tabs :tabs="[('details', 'Details'), ('inventory', 'Inventory'), ('bookmarks', 'Bookmarks')]">
-            <c-ui.tab-panel name="details">
+        <div class="mx-auto flex max-w-4xl flex-col gap-4">
+            <c-ui.card title="Details">
                 <dl class="divide-y divide-base-200">
                     <c-ui.detail-row label="Name">{{ item.name }}</c-ui.detail-row>
                     <c-ui.detail-row label="Notes">{{ item.notes }}</c-ui.detail-row>
@@ -80,10 +64,22 @@
                         </div>
                     {% endif %}
                 </dl>
-            </c-ui.tab-panel>
+            </c-ui.card>
 
-            <c-ui.tab-panel name="inventory">
-                <ul role="list" class="list list-sm rounded-box border border-base-300 bg-base-100">
+            <c-ui.card title="Inventory">
+                <c-slot name="header_actions">
+                    <c-ui.button
+                        href="{% url 'stuff:inventory-new' item.pk %}"
+                        variant="primary"
+                        style="soft"
+                        size="sm"
+                        icon="hero-plus"
+                        hx-get="{% url 'stuff:inventory-new' item.pk %}"
+                        hx-push-url="true"
+                        hx-target="#content"
+                    >Create inventory</c-ui.button>
+                </c-slot>
+                <ul role="list" class="list rounded-box border border-base-300 bg-base-100">
                     {% for inv in item.inventories.all %}
                         <li class="list-row items-center">
                             <a
@@ -112,9 +108,21 @@
                         <li><c-ui.empty-state title="Not stocked anywhere" icon="hero-archive-box" /></li>
                     {% endfor %}
                 </ul>
-            </c-ui.tab-panel>
+            </c-ui.card>
 
-            <c-ui.tab-panel name="bookmarks">
+            <c-ui.card title="Bookmarks">
+                <c-slot name="header_actions">
+                    <c-ui.button
+                        href="{% url 'stuff:bookmark-select' item.pk %}"
+                        variant="primary"
+                        style="soft"
+                        size="sm"
+                        icon="hero-plus"
+                        hx-get="{% url 'stuff:bookmark-select' item.pk %}"
+                        hx-push-url="true"
+                        hx-target="#content"
+                    >Add bookmark</c-ui.button>
+                </c-slot>
                 {% with bookmarks=item.bookmarks.all %}
                     {% if bookmarks %}
                         {% include "bookmarks/_detail_page.html" %}
@@ -122,7 +130,7 @@
                         <c-ui.empty-state title="No bookmarks" icon="hero-bookmark" />
                     {% endif %}
                 {% endwith %}
-            </c-ui.tab-panel>
-        </c-ui.tabs>
+            </c-ui.card>
+        </div>
     {% endpartialdef detail-partial %}
 {% endblock content %}

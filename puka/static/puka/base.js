@@ -25,19 +25,6 @@ Alpine.data("searchBox", () => ({
   },
 }));
 
-// <c-ui.tabs> and <c-ui.tab-panel>.
-Alpine.data("tabs", (initial = "") => ({
-  active: initial,
-
-  select(name) {
-    this.active = name;
-  },
-
-  isActive(name) {
-    return this.active === name;
-  },
-}));
-
 // <c-layout.drawer>: close the (mobile) sidebar after navigating from it.
 Alpine.data("drawer", () => ({
   close() {

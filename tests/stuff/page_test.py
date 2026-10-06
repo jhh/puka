@@ -12,18 +12,13 @@ from tests.utils import HTMX, parse_html
 pytestmark = pytest.mark.django_db
 
 
-def test_item_detail_tabs_and_quantity_buttons(admin_client):
+def test_item_detail_sections_and_quantity_buttons(admin_client):
     item = ItemWithInventoryFactory.create()
     inventory = item.inventories.get()
     url = reverse("stuff:item-detail", args=[item.pk])
     page = parse_html(admin_client.get(url, headers=HTMX).content)
 
-    assert [el.text for el in page.find("button", role="tab")] == [
-        "Details",
-        "Inventory",
-        "Bookmarks",
-    ]
-    assert len(page.find("div", role="tabpanel")) == 3
+    assert [el.text for el in page.find("h2")] == ["Details", "Inventory", "Bookmarks"]
     adjust = reverse("stuff:inventory-adjust", args=[inventory.pk])
     buttons = page.find("button", hx_post=adjust)
     assert [b.attrs["hx-vals"] for b in buttons] == ['{"quantity": -1}', '{"quantity": 1}']
