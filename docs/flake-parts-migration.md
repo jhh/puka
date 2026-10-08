@@ -1,5 +1,9 @@
 # Plan: migrate Blueprint to flake-parts
 
+> **Follow-up:** the flake now uses the treefmt-nix and git-hooks.nix
+> flake-parts modules. See
+> [flake-parts-idioms.md](flake-parts-idioms.md) for that refactor.
+
 ## Goal and scope
 
 Replace numtide Blueprint with flake-parts while preserving the project's

@@ -1,4 +1,4 @@
-{ flake, ... }:
+{ withSystem }:
 {
   config,
   lib,
@@ -7,8 +7,11 @@
 }:
 let
   cfg = config.services.puka;
-  inherit (pkgs.stdenv.hostPlatform) system;
-  inherit (flake.packages.${system}) manage static venv;
+  inherit (withSystem pkgs.stdenv.hostPlatform.system ({ config, ... }: config.packages))
+    manage
+    static
+    venv
+    ;
 
   inherit (lib.options) mkOption;
   inherit (lib.modules) mkIf;

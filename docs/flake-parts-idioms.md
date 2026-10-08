@@ -34,19 +34,18 @@ Do not change package implementations, dependency revisions or
 These are the only public output changes. Everything else must stay the
 same.
 
-| Before                         | After                                 |
+| Before | After |
 | ------------------------------ | ------------------------------------- |
-| `packages.<sys>.formatter`     | removed (`formatter.<sys>` remains)   |
-| `checks.<sys>.pkgs-formatter`  | replaced by `checks.<sys>.treefmt`    |
-| `modules.nixos.puka`           | removed (`nixosModules.puka` remains) |
+| `packages.<sys>.formatter` | removed (`formatter.<sys>` remains) |
+| `checks.<sys>.pkgs-formatter` | replaced by `checks.<sys>.treefmt` |
+| `modules.nixos.puka` | removed (`nixosModules.puka` remains) |
 
 `modules.nixos.puka` has no known consumers. The production host
 (`cosmos/modules/hosts/eris/services/puka.nix`) imports
 `inputs.puka.nixosModules.puka`, and nothing in this repository reads
 `modules.nixos.puka`. Do not import `inputs.flake-parts.flakeModules.modules`.
 
-Kept unchanged: `lib`, `nixosModules.puka`, `packages.<sys>.{heroicons,
-manage,static,venv}`, `devShells.<sys>.default`, and the checks
+Kept unchanged: `lib`, `nixosModules.puka`, `packages.<sys>.{heroicons, manage,static,venv}`, `devShells.<sys>.default`, and the checks
 `pre-commit`, `puka-integration-tests`, `pkgs-heroicons`, `pkgs-manage`,
 `pkgs-static`, `pkgs-venv`, `pkgs-venv-ty-check`, `pkgs-venv-pytest`
 (Linux only) and `devshell-default`.
@@ -327,8 +326,7 @@ let
   # rest unchanged
 ```
 
-Remove the `flake` argument and the `inherit (pkgs.stdenv.hostPlatform)
-system` line.
+Remove the `flake` argument and the `inherit (pkgs.stdenv.hostPlatform) system` line.
 
 ## Step 9: verify
 
@@ -369,10 +367,10 @@ nix fmt
 - [ ] `nix/flake-module.nix` is deleted; `flake.nix` imports `./nix`.
 - [ ] treefmt and pre-commit use their flake-parts modules.
 - [ ] `packages.<sys>.formatter` and `checks.<sys>.pkgs-formatter` are
-      gone; `formatter.<sys>` and `checks.<sys>.treefmt` exist.
+  gone; `formatter.<sys>` and `checks.<sys>.treefmt` exist.
 - [ ] The NixOS module uses `importApply` and `withSystem`.
 - [ ] `modules.nixos.puka` is gone; `nixosModules.puka` remains.
 - [ ] No `perSystem` code reads `self.lib`.
 - [ ] All other outputs match the baseline.
 - [ ] `nix flake check`, the integration test, pre-commit and `just test`
-      pass.
+  pass.

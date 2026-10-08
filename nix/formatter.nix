@@ -1,18 +1,20 @@
-{ inputs, pkgs, ... }:
-inputs.treefmt-nix.lib.mkWrapper pkgs {
-  projectRootFile = "flake.nix";
+{
+  perSystem.treefmt = {
+    projectRootFile = "flake.nix";
 
-  programs.mdformat.enable = true;
-  programs.mdformat.settings.number = true;
+    flakeCheck = true;
 
-  programs.nixfmt.enable = true;
-  programs.ruff-format.enable = true;
-  programs.yamlfmt.enable = true;
-  programs.just.enable = true;
-  programs.jsonfmt.enable = true;
+    programs = {
+      mdformat.enable = true;
+      mdformat.settings.number = true;
+      nixfmt.enable = true;
+      ruff-format.enable = true;
+      yamlfmt.enable = true;
+      just.enable = true;
+      jsonfmt.enable = true;
+    };
 
-  settings = {
-    global.excludes = [
+    settings.excludes = [
       "*.{age,gif,png,svg,env,envrc,gitignore,pickle}"
       ".idea/*"
       ".vscode/*"

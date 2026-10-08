@@ -42,8 +42,9 @@ Nix devshell, `just` task runner. Run every command inside the devshell.
 - Assets: `just update-css`, `just update-js`, `just watch`. Rebuild after
   editing `base.css`/`base.js` or Tailwind classes in templates.
 - `pre-commit run --all-files`. The config is a Nix-store symlink generated
-  from `nix/checks/pre-commit.nix`; edit that, not the yaml. Hooks rewrite
-  code: ruff, pyupgrade `--py312-plus`, django-upgrade `--target-version=5.2`,
+  from the git-hooks flake-parts module in `nix/checks/pre-commit.nix`; edit
+  that, not the yaml. Hooks rewrite code: ruff, pyupgrade `--py312-plus`,
+  django-upgrade `--target-version=5.2`,
   add-trailing-comma, djangofmt (then djade, then `djangofmt check`),
   nixfmt; files >25 KB are rejected.
 
@@ -106,8 +107,7 @@ Nix devshell, `just` task runner. Run every command inside the devshell.
   element, or the caller's class becomes a duplicate attribute.
 - On component tags use `x-on:`/`x-bind:`, not `@`/`:` (Cotton treats
   `:attr` as a Python expression).
-- Map variants to full daisyUI class names (`{% if variant == "primary" %}
-  btn-primary{% endif %}`); never build `btn-{{ variant }}`, Tailwind can't
+- Map variants to full daisyUI class names (`{% if variant == "primary" %} btn-primary{% endif %}`); never build `btn-{{ variant }}`, Tailwind can't
   see it. Icons take the full heroicons class (`icon="hero-plus"`).
 - Alpine is only for client state (`searchBox`, `tabs`, `drawer` in
   `Alpine.data` in `base.js`); no inline `<script>` blocks.

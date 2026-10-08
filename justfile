@@ -5,29 +5,29 @@ _default:
 # initialize and start the development database
 [group('db')]
 db-start:
-  pg-start
-  puka-db-init
-  @just manage migrate
+    pg-start
+    puka-db-init
+    @just manage migrate
 
 # stop the development database
 [group('db')]
 db-stop:
-  pg-stop
+    pg-stop
 
 # load data into the development database
 [group('db')]
 db-load:
-  #!/usr/bin/env bash
-  set -euo pipefail
-  tmpfile=$(mktemp).json
-  ssh eris puka-manage dumpdata --natural-foreign -e contenttypes -e auth.permission > $tmpfile
-  echo Loading data from $tmpfile...
-  uv run puka/manage.py loaddata $tmpfile
+    #!/usr/bin/env bash
+    set -euo pipefail
+    tmpfile=$(mktemp).json
+    ssh eris puka-manage dumpdata --natural-foreign -e contenttypes -e auth.permission > $tmpfile
+    echo Loading data from $tmpfile...
+    uv run puka/manage.py loaddata $tmpfile
 
 # bootstrap the development environment
 [group('init')]
 init: npm-install update-css update-js
-  echo DEBUG=true > .env
+    echo DEBUG=true > .env
 
 # run ty type checks
 [group('test')]
