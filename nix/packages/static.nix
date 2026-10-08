@@ -1,13 +1,10 @@
 {
-  flake,
+  heroicons,
   pkgs,
-  perSystem,
-  ...
+  pythonSet,
+  venv,
 }:
 let
-  pythonSet = flake.lib.pythonSets pkgs;
-  inherit (perSystem.self) venv;
-
   baseCss = "puka/static/puka/base.css";
 
   pukaCssJs = pkgs.buildNpmPackage {
@@ -18,7 +15,7 @@ let
 
     buildPhase = ''
       runHook preBuild
-      export HEROICONS_DIR="${perSystem.self.heroicons}/share/heroicons/optimized/"
+      export HEROICONS_DIR="${heroicons}/share/heroicons/optimized/"
       npx @tailwindcss/cli --minify --input=${baseCss} --output=$out/puka/main.css
       npx esbuild --bundle --minify --outfile=$out/puka/main.js puka/static/puka/base.js
       runHook postBuild

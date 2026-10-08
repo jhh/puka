@@ -1,7 +1,6 @@
 {
-  flake,
   pkgs,
-  ...
+  pukaModule,
 }:
 let
   secrets = pkgs.writeText "puka-test-secrets" ''
@@ -20,7 +19,7 @@ pkgs.testers.nixosTest {
     in
     {
       imports = [
-        flake.modules.nixos.puka
+        pukaModule
       ];
 
       services.puka = {

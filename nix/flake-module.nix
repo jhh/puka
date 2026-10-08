@@ -28,39 +28,50 @@
       ...
     }:
     let
-      # Supply arguments expected by the existing Nix functions.
-      call = pkgs.lib.callPackageWith (
-        pkgs
-        // {
-          inherit inputs pkgs system;
-          flake = self;
-
-          perSystem = {
-            self = config.packages;
-            uv2nix = inputs'.uv2nix.packages;
-          };
-        }
-      );
+      pythonSet = self.lib.pythonSets pkgs;
+      workspace = self.lib.workspace;
     in
     {
       packages = {
-        heroicons = call ./packages/heroicons.nix { };
-        manage = call ./packages/manage.nix { };
-        static = call ./packages/static.nix { };
-        venv = call ./packages/venv.nix { };
+        heroicons = pkgs.callPackage ./packages/heroicons.nix { };
+
+        manage = pkgs.callPackage ./packages/manage.nix {
+          venv = config.packages.venv;
+        };
+
+        static = pkgs.callPackage ./packages/static.nix {
+          heroicons = config.packages.heroicons;
+          inherit pythonSet;
+          venv = config.packages.venv;
+        };
+
+        venv = pkgs.callPackage ./packages/venv.nix {
+          inherit pythonSet workspace;
+        };
 
         # Preserve Blueprint's formatter package export.
-        formatter = call ./formatter.nix { };
+        formatter = pkgs.callPackage ./formatter.nix {
+          inherit inputs;
+        };
       };
 
       formatter = config.packages.formatter;
 
-      devShells.default = call ./devshell.nix { };
+      devShells.default = pkgs.callPackage ./devshell.nix {
+        heroicons = config.packages.heroicons;
+        pre-commit = config.checks.pre-commit;
+        inherit pythonSet;
+        uv = inputs'.uv2nix.packages.uv-bin;
+      };
 
       checks = {
-        pre-commit = call ./checks/pre-commit.nix { };
+        pre-commit = pkgs.callPackage ./checks/pre-commit.nix {
+          inherit inputs pythonSet system;
+        };
 
-        puka-integration-tests = call ./checks/puka-integration-tests.nix { };
+        puka-integration-tests = pkgs.callPackage ./checks/puka-integration-tests.nix {
+          pukaModule = self.nixosModules.puka;
+        };
 
         # Preserve automatic package-build checks.
         pkgs-heroicons = config.packages.heroicons;

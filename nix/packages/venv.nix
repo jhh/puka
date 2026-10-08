@@ -1,13 +1,8 @@
 {
-  flake,
   pkgs,
-  perSystem,
-  ...
+  pythonSet,
+  workspace,
 }:
-let
-  pythonSet = flake.lib.pythonSets pkgs;
-  workspace = flake.lib.workspace;
-in
 pythonSet.mkVirtualEnv "puka-env" workspace.deps.default
 // {
   passthru.tests =

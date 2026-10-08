@@ -1,8 +1,4 @@
-{
-  pkgs,
-  perSystem,
-  ...
-}:
+{ pkgs, venv }:
 pkgs.writeShellApplication {
   name = "puka-manage";
   text = ''
@@ -16,6 +12,6 @@ pkgs.writeShellApplication {
     export SECRET_KEY=not-secret
     runuser -u puka \
       -w DJANGO_SETTINGS_MODULE,DJANGO_DATABASE_URL,SECRET_KEY,DJANGO_SUPERUSER_PASSWORD \
-      -- ${perSystem.self.venv}/bin/puka-manage "$@"
+      -- ${venv}/bin/puka-manage "$@"
   '';
 }

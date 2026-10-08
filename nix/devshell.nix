@@ -1,14 +1,11 @@
 {
-  flake,
-  inputs,
-  perSystem,
+  heroicons,
   pkgs,
-  system,
+  pre-commit,
+  pythonSet,
+  uv,
 }:
 let
-  pythonSet = flake.lib.pythonSets pkgs;
-  inherit (inputs.self.checks.${system}) pre-commit;
-
   pg-stop = pkgs.writeShellScriptBin "pg-stop" ''
     pg_ctl stop -D "$PGDATA" -m fast
   '';
@@ -53,7 +50,7 @@ pkgs.mkShell {
       nodejs
       postgresql_17
       postgresql_17.pg_config
-      perSystem.uv2nix.uv-bin
+      uv
       watchman
       pg-stop
       pg-start
@@ -63,7 +60,7 @@ pkgs.mkShell {
     ++ pre-commit.enabledPackages;
 
   env = {
-    HEROICONS_DIR = "${flake.packages.${system}.heroicons}/share/heroicons/optimized/";
+    HEROICONS_DIR = "${heroicons}/share/heroicons/optimized/";
     UV_NO_SYNC = "1";
     UV_PYTHON = pythonSet.python.interpreter;
     UV_PYTHON_DOWNLOADS = "never";

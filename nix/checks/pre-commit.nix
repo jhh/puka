@@ -1,15 +1,13 @@
 {
-  flake,
   inputs,
   pkgs,
+  pythonSet,
   system,
-  ...
 }:
 inputs.pre-commit-hooks.lib.${system}.run {
   src = ../../.;
   hooks =
     let
-      pythonSet = flake.lib.pythonSets pkgs;
       venv = pythonSet.mkVirtualEnv "pre-commit-env" {
         puka = [ "pre-commit" ];
       };
