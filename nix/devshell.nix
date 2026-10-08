@@ -1,16 +1,25 @@
 {
   heroicons,
-  pkgs,
+  just,
+  mailpit,
+  mkShell,
+  nil,
+  nix-output-monitor,
+  nixfmt,
+  nodejs,
+  postgresql_17,
   pre-commit,
   pythonSet,
   uv,
+  watchman,
+  writeShellScriptBin,
 }:
 let
-  pg-stop = pkgs.writeShellScriptBin "pg-stop" ''
+  pg-stop = writeShellScriptBin "pg-stop" ''
     pg_ctl stop -D "$PGDATA" -m fast
   '';
 
-  pg-start = pkgs.writeShellScriptBin "pg-start" ''
+  pg-start = writeShellScriptBin "pg-start" ''
     if ! pg_ctl status > /dev/null 2>&1; then
       echo "starting PostgreSQL..."
       : > "$PGDATA/postgres.log"
@@ -18,7 +27,7 @@ let
     fi
   '';
 
-  pg-status = pkgs.writeShellScriptBin "pg-status" ''
+  pg-status = writeShellScriptBin "pg-status" ''
     if pg_isready -h "$PGHOST" -p "$PGPORT" -q; then
       echo "PostgreSQL is ready."
     else
@@ -26,7 +35,7 @@ let
     fi
   '';
 
-  puka-db-init = pkgs.writeShellScriptBin "puka-db-init" ''
+  puka-db-init = writeShellScriptBin "puka-db-init" ''
     if ! psql -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='puka'" | grep -q 1; then
       psql -d postgres -tA << END_INPUT
       CREATE DATABASE puka;
@@ -37,27 +46,25 @@ let
     fi
   '';
 in
-pkgs.mkShell {
-  packages =
-    with pkgs;
-    [
-      pythonSet.python
-      just
-      mailpit
-      nil
-      nix-output-monitor
-      nixfmt
-      nodejs
-      postgresql_17
-      postgresql_17.pg_config
-      uv
-      watchman
-      pg-stop
-      pg-start
-      pg-status
-      puka-db-init
-    ]
-    ++ pre-commit.enabledPackages;
+mkShell {
+  packages = [
+    pythonSet.python
+    just
+    mailpit
+    nil
+    nix-output-monitor
+    nixfmt
+    nodejs
+    postgresql_17
+    postgresql_17.pg_config
+    uv
+    watchman
+    pg-stop
+    pg-start
+    pg-status
+    puka-db-init
+  ]
+  ++ pre-commit.enabledPackages;
 
   env = {
     HEROICONS_DIR = "${heroicons}/share/heroicons/optimized/";
