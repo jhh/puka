@@ -1,26 +1,5 @@
 {
   "nodes": {
-    "blueprint": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "systems": "systems"
-      },
-      "locked": {
-        "lastModified": 1788342924,
-        "narHash": "sha256-Sfyygt2dL88+160d014gaXMlWTGIL2HGxlIzLGsGPvE=",
-        "owner": "numtide",
-        "repo": "blueprint",
-        "rev": "8be75245e274a789b87cc4df542abbcd8c5e7f93",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "blueprint",
-        "type": "github"
-      }
-    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -34,6 +13,26 @@
       "original": {
         "owner": "NixOS",
         "repo": "flake-compat",
+        "type": "github"
+      }
+    },
+    "flake-parts": {
+      "inputs": {
+        "nixpkgs-lib": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1790898470,
+        "narHash": "sha256-zTwuwezD0w3hpga6a6P8emidzAZFyWqlNeRBlpWOOl8=",
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "rev": "024633cd702b10285db5cb19b40ad48d2399ba60",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
         "type": "github"
       }
     },
@@ -122,28 +121,13 @@
     },
     "root": {
       "inputs": {
-        "blueprint": "blueprint",
+        "flake-parts": "flake-parts",
         "nixpkgs": "nixpkgs",
         "pre-commit-hooks": "pre-commit-hooks",
         "pyproject-build-systems": "pyproject-build-systems",
         "pyproject-nix": "pyproject-nix",
         "treefmt-nix": "treefmt-nix",
         "uv2nix": "uv2nix"
-      }
-    },
-    "systems": {
-      "locked": {
-        "lastModified": 1681028828,
-        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
-        "owner": "nix-systems",
-        "repo": "default",
-        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nix-systems",
-        "repo": "default",
-        "type": "github"
       }
     },
     "treefmt-nix": {
