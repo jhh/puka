@@ -7,7 +7,6 @@ in
     inputs.treefmt-nix.flakeModule
     inputs.pre-commit-hooks.flakeModule
     ./checks
-    ./checks/pre-commit.nix
     ./devshell.nix
     ./formatter.nix
     ./modules

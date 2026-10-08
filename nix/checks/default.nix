@@ -1,5 +1,7 @@
 { self, ... }:
 {
+  imports = [ ./pre-commit.nix ];
+
   perSystem =
     {
       config,
