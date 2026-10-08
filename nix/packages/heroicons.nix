@@ -1,17 +1,17 @@
 {
-  pkgs,
+  fetchFromGitHub,
+  lib,
+  stdenvNoCC,
 }:
-let
-  version = "2.2.0";
-in
-pkgs.stdenvNoCC.mkDerivation {
-  pname = "heroicons";
-  inherit version;
 
-  src = pkgs.fetchFromGitHub {
+stdenvNoCC.mkDerivation (finalAttrs: {
+  pname = "heroicons";
+  version = "2.2.0";
+
+  src = fetchFromGitHub {
     owner = "tailwindlabs";
     repo = "heroicons";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     sha256 = "sha256-Jcxr1fSbmXO9bZKeg39Z/zVN0YJp17TX3LH5Us4lsZU=";
   };
 
@@ -25,9 +25,9 @@ pkgs.stdenvNoCC.mkDerivation {
     runHook postInstall
   '';
 
-  meta = with pkgs.lib; {
+  meta = {
     description = "A set of free MIT-licensed high-quality SVG icons";
     homepage = "https://heroicons.com";
-    license = licenses.mit;
+    license = lib.licenses.mit;
   };
-}
+})

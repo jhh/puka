@@ -1,18 +1,21 @@
 {
-  pkgs,
+  lib,
+  postgresql,
+  postgresqlTestHook,
   pythonSet,
+  stdenvNoCC,
   workspace,
 }:
-pythonSet.mkVirtualEnv "puka-env" workspace.deps.default
-// {
-  passthru.tests =
-    let
-      venv = pythonSet.mkVirtualEnv "puka-test-env" {
-        puka = [ "test" ];
-      };
-      inherit (pkgs.stdenvNoCC) mkDerivation;
-    in
-    {
+let
+  baseVenv = pythonSet.mkVirtualEnv "puka-env" workspace.deps.default;
+  venv = pythonSet.mkVirtualEnv "puka-test-env" {
+    puka = [ "test" ];
+  };
+  inherit (stdenvNoCC) mkDerivation;
+in
+baseVenv.overrideAttrs (old: {
+  passthru = (old.passthru or { }) // {
+    tests = (old.passthru.tests or { }) // {
       # pytests are not included in checks due to requiring postgres
 
       ty-check = mkDerivation {
@@ -35,7 +38,7 @@ pythonSet.mkVirtualEnv "puka-env" workspace.deps.default
         inherit (pythonSet.puka) src;
 
         nativeBuildInputs = [ venv ];
-        nativeCheckInputs = with pkgs; [
+        nativeCheckInputs = [
           postgresql
           postgresqlTestHook
         ];
@@ -53,7 +56,8 @@ pythonSet.mkVirtualEnv "puka-env" workspace.deps.default
           runHook postCheck
         '';
 
-        meta.platforms = pkgs.lib.platforms.linux;
+        meta.platforms = lib.platforms.linux;
       };
     };
-}
+  };
+})

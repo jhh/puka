@@ -1,5 +1,5 @@
-{ pkgs, venv }:
-pkgs.writeShellApplication {
+{ venv, writeShellApplication }:
+writeShellApplication {
   name = "puka-manage";
   text = ''
     if [ "$UID" -ne 0 ]; then

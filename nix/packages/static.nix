@@ -1,13 +1,14 @@
 {
+  buildNpmPackage,
   heroicons,
-  pkgs,
   pythonSet,
+  stdenv,
   venv,
 }:
 let
   baseCss = "puka/static/puka/base.css";
 
-  pukaCssJs = pkgs.buildNpmPackage {
+  pukaCssJs = buildNpmPackage {
     name = "django-static-deps";
     src = ../../.;
     npmDepsHash = "sha256-UP78Wtf1ieNGXXKLv2Jgt9sjhDWS6ccuVutU85Zj75c=";
@@ -25,7 +26,7 @@ let
       runHook postInstall
     '';
   };
-  inherit (pkgs.stdenv) mkDerivation;
+  inherit (stdenv) mkDerivation;
 in
 mkDerivation {
   pname = "puka-static";
