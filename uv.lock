@@ -911,7 +911,6 @@ dev = [
     { name = "pytest-cov" },
     { name = "pytest-django" },
     { name = "pytest-factoryboy" },
-    { name = "pywatchman" },
     { name = "rich" },
     { name = "ruff" },
     { name = "ty" },
@@ -958,7 +957,6 @@ dev = [
     { name = "pytest-cov", specifier = ">=6.0.0" },
     { name = "pytest-django", specifier = ">=4.9.0" },
     { name = "pytest-factoryboy", specifier = ">=2.7.0" },
-    { name = "pywatchman", specifier = ">=2.0.0" },
     { name = "rich", specifier = ">=13.9.4" },
     { name = "ruff", specifier = ">=0.15.12" },
     { name = "ty", specifier = ">=0.0.85" },
@@ -1072,17 +1070,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/74/26/2fbeedb218a787a5eea551c7532cac4e009f83d689dd2faa0d0353473f86/python_dotenv-1.2.4.tar.gz", hash = "sha256:f0d53e69935a851c0dcc78f3ab7aaccd8cabef0b92382b576b824212902873c0", size = 60824, upload-time = "2026-10-01T05:36:10Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/60/d1/38f3a3405989a89ac18390803e70c6ad7c7760da4f9b83cbeca0c44a0c72/python_dotenv-1.2.4-py3-none-any.whl", hash = "sha256:42269a8a5b3fd54ffa6f3d84b18abed50064717576b4ecf03dc4a55d8aa04fdc", size = 23266, upload-time = "2026-10-01T05:36:08.633Z" },
-]
-
-[[package]]
-name = "pywatchman"
-version = "4.0.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/38/71/343c1ecc70bf32726c33c1cdcb999f27e27bc1d181118bcdafaf360b767a/pywatchman-4.0.0.tar.gz", hash = "sha256:2dea10710160c6f6bcd220c49a27895234897cfdec62c5b1098f6a0ee4edd79a", size = 40906, upload-time = "2026-06-12T17:00:35.871Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/21/55/3e0b28c67548a6662a3abf2c8663ce1496550dbb716c48886e90a4fa01de/pywatchman-4.0.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:aa63e2c73a75a49b183c9efc5e1e6c8e984a0258123be8c7b6b53a31c5039f38", size = 52597, upload-time = "2026-06-12T17:00:31.316Z" },
-    { url = "https://files.pythonhosted.org/packages/cc/61/468e82204fce33e9c898215d8b22f0356507775bcd89accee0e9192733b1/pywatchman-4.0.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:b5d49394a989dd1954a738e0e9ebef4cac43ad74c0817c63c0ffce1fb5cd3e64", size = 52589, upload-time = "2026-06-12T17:00:32.406Z" },
-    { url = "https://files.pythonhosted.org/packages/44/84/60760fc16a50dda2890b8a8d6440e38a39da0a6d4780979d1302930adaba/pywatchman-4.0.0-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:45866688d3372f68b9a60fd38cee657fb30906f1110aa266cb82d3b0afaa1b1c", size = 52583, upload-time = "2026-06-12T17:00:33.282Z" },
 ]
 
 [[package]]

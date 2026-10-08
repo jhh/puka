@@ -19,7 +19,11 @@ Nix devshell, `just` task runner. Run every command inside the devshell.
 - `.env` only sets `DEBUG=true`. `DJANGO_DATABASE_URL` and `PG*` come from
   the devshell `shellHook`; local Postgres data dir is `.db/`.
 - `just init`: npm install + build CSS/JS + write `.env`.
-- `just db-start` / `just db-stop`: local Postgres (+ create DB + migrate).
+- `just up` / `just down`: development services (Postgres, migrate,
+  Django runserver, Tailwind watcher, Mailpit) via process-compose
+  (`nix/process-compose.nix`). `just db-start` starts Postgres + migrations
+  only. `just attach` opens the process-compose TUI; `just pc ...` passes
+  through other process-compose commands. Socket and logs are in `.run/`.
 - `just db-load` pulls production data over `ssh eris`; needs prod access.
 
 ## Commands
@@ -29,6 +33,8 @@ Nix devshell, `just` task runner. Run every command inside the devshell.
   or `uv run puka/manage.py ...`.
 - Tests: `just test` or `uv run pytest tests`. Postgres must be running
   (`just db-start`); pytest-django creates `test_puka`.
+  - `just up` runs the dev server, Tailwind watcher and Mailpit in the
+    background; don't run `just run` alongside it (both use port 8000).
   - Bare `uv run pytest` collects nothing: `testpaths = ["puka"]` in
     `pyproject.toml`, but tests live in `tests/` (`*_test.py`).
   - Single: `uv run pytest tests/stuff/item_model_test.py::test_name`.
@@ -60,6 +66,9 @@ Nix devshell, `just` task runner. Run every command inside the devshell.
   missing from the build (e.g. `TemplateDoesNotExist` in the Nix pytest check).
 - NixOS integration tests (`nix/checks/tests.py`):
   `nix build .#checks.aarch64-darwin.puka-integration-tests -L`
+- Postgres and process-compose use Unix sockets under the repo (`.db/`,
+  `.run/`); the ~103-byte macOS socket limit means very deep worktree
+  paths can break them.
 
 ## Layout
 

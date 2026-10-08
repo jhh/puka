@@ -11,6 +11,10 @@
     pre-commit-hooks.url = "github:cachix/git-hooks.nix";
     pre-commit-hooks.inputs.nixpkgs.follows = "nixpkgs";
 
+    process-compose-flake.url = "github:Platonic-Systems/process-compose-flake";
+
+    services-flake.url = "github:juspay/services-flake";
+
     pyproject-nix.url = "github:nix-community/pyproject.nix";
     pyproject-nix.inputs.nixpkgs.follows = "nixpkgs";
 

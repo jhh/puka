@@ -11,6 +11,7 @@ in
     ./formatter.nix
     ./modules
     ./packages
+    ./process-compose.nix
   ];
 
   systems = [

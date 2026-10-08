@@ -26,9 +26,6 @@ attach to and inspect it.
 Do not change production packages, the NixOS module, the integration tests,
 Django settings or `DJANGO_DATABASE_URL` semantics.
 
-[pcf]: https://github.com/Platonic-Systems/process-compose-flake
-[sf]: https://github.com/juspay/services-flake
-
 ## Constraints
 
 - Run every command inside the Nix devshell (`direnv` / `nix develop`).
@@ -55,9 +52,11 @@ Django settings or `DJANGO_DATABASE_URL` semantics.
 - Data directory and socket directory: `<repo root>/.db`. `PGHOST` is that
   directory, and `DJANGO_DATABASE_URL` is
   `postgres://<url-encoded .db path>/puka`.
+
 - Postgres 17 (`pkgs.postgresql_17`), superuser `postgres`, trust auth,
   `--encoding=UTF8 --locale=C`, port 5432. Postgres also listens on TCP
   localhost.
+
 - Database `puka`, configured with:
 
   ```sql
@@ -68,8 +67,10 @@ Django settings or `DJANGO_DATABASE_URL` semantics.
 
 - `just db-start` blocks until Postgres is up, `puka` exists and migrations
   have been applied. Afterwards `just test` and `just db-load` work.
+
 - `PGUSER=postgres`, `PGDATABASE=puka` and `PGPORT=5432` stay in the
   devshell, so plain `psql` keeps working.
+
 - Existing `.db` directories, initialized by the old `shellHook`, must keep
   working with no manual migration.
 
@@ -155,8 +156,7 @@ just db-stop
 ```
 
 Record the outputs of `ls .db`, `psql -c '\l'` and
-`psql -c 'SELECT name, setting FROM pg_settings WHERE name IN
-(''timezone'', ''default_transaction_isolation'', ''client_encoding'')'`
+`psql -c 'SELECT name, setting FROM pg_settings WHERE name IN (''timezone'', ''default_transaction_isolation'', ''client_encoding'')'`
 while the database is running. Step 6 compares against them.
 
 ## Step 2: flake inputs
@@ -263,10 +263,12 @@ Notes:
 
 1. Delete the `let` bindings `pg-stop`, `pg-start`, `pg-status` and
    `puka-db-init`, and remove them from `packages`.
+
 2. Add `config.packages.puka-dev` to `packages`. Keep
    `pkgs.postgresql_17` and `pkgs.postgresql_17.pg_config`, which provide
    `psql` and the psycopg build. Remove `pkgs.mailpit`, since the process
    now uses it by store path.
+
 3. Take the port and directory from the service config, so they are
    defined in one place:
 
@@ -277,12 +279,16 @@ Notes:
    Use `PGPORT = pg.port;` and build `PGDATA`/`PGHOST` from `pg.dataDir`
    (`.db`) in `shellHook`. `pg.dataDir` must remain a relative path for
    this to work.
+
 4. In `shellHook`, delete the `initdb` block (`postgres-init` now handles
    it). Keep the `PGDATA`, `PGHOST` and `DJANGO_DATABASE_URL` exports.
+
 5. Update the "not running" banner to say `just up` (full stack) or
    `just db-start` (database only). The current text names a nonexistent
    `just start`. Keep the `pg_isready` check.
+
 6. Add `watch_file nix/process-compose.nix` to `.envrc`.
+
 7. Add `.run` to `.gitignore`.
 
 ## Step 5: `justfile`
@@ -431,3 +437,6 @@ Run these with nothing else bound to ports 5432, 8000, 1025 or 8025.
 - `nix flake check` passes, and the only new outputs are `puka-dev` and
   `pkgs-puka-dev`.
 - The change is described in a single jj change. Do not push.
+
+[pcf]: https://github.com/Platonic-Systems/process-compose-flake
+[sf]: https://github.com/juspay/services-flake
