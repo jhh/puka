@@ -1,15 +1,18 @@
 {
-  pkgs,
+  lib,
   pukaModule,
+  testers,
+  writeShellScript,
+  writeText,
 }:
 let
-  secrets = pkgs.writeText "puka-test-secrets" ''
+  secrets = writeText "puka-test-secrets" ''
     DJANGO_DATABASE_URL="postgres:///puka"
     DJANGO_ALLOWED_HOSTS="localhost,127.0.0.1"
     SECRET_KEY="test-secret-key"
   '';
 in
-pkgs.testers.nixosTest {
+testers.nixosTest {
   name = "puka-integration-tests";
 
   nodes.machine =
@@ -59,7 +62,7 @@ pkgs.testers.nixosTest {
       inherit (nodes.machine.services.puka) port venv;
       username = "alice";
       password = "sekret";
-      createSuperUser = pkgs.writeShellScript "create-puka-superuser" ''
+      createSuperUser = writeShellScript "create-puka-superuser" ''
         set -euo pipefail
         export DJANGO_SUPERUSER_PASSWORD="sekret"
         puka-manage createsuperuser --no-input --username="${username}" --email=alice@example.com
@@ -80,5 +83,5 @@ pkgs.testers.nixosTest {
         "${username}"
         "${password}"
       ]
-      (pkgs.lib.readFile ./tests.py);
+      (lib.readFile ./tests.py);
 }
