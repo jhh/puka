@@ -84,8 +84,7 @@
                             class="link link-hover link-primary"
                         >{{ task.name }}</a>
                     </td>
-                    {# max-w-0 w-full: truncate the cell but let it take the remaining width. #}
-                    <td class="w-full max-w-0 truncate text-base-content/70">
+                    <td class="whitespace-nowrap text-base-content/70">
                         {{ task.earliest_due_date|default:"" }}
                     </td>
                     <td class="hidden md:table-cell">
