@@ -1,0 +1,23 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "servers": {
+      "playwright": {
+        "type": "local",
+        "command": [
+          "nix",
+          "run",
+          "nixpkgs/nixos-26.05#playwright-mcp",
+          "--",
+          "--headless",
+          "--isolated",
+          "--output-dir",
+          ".playwright-mcp"
+        ],
+        "timeout": {
+          "startup": 120000
+        }
+      }
+    }
+  }
+}

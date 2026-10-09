@@ -266,3 +266,4 @@ puka.sql.gz
 .db
 .cpcache
 .run
+.playwright-mcp

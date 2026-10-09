@@ -66,6 +66,11 @@ Nix devshell, `just` task runner. Run every command inside the devshell.
   missing from the build (e.g. `TemplateDoesNotExist` in the Nix pytest check).
 - NixOS integration tests (`nix/checks/tests.py`):
   `nix build .#checks.aarch64-darwin.puka-integration-tests -L`
+- Browser QA: the `playwright` MCP server in `opencode.json` runs
+  headless Chromium (`nix run nixpkgs/nixos-26.05#playwright-mcp`,
+  intentionally outside the flake outputs to keep `nix flake check`
+  lean). Run `just up` first and keep screenshots in `.playwright-mcp/`
+  (gitignored).
 - Postgres and process-compose use Unix sockets under the repo (`.db/`,
   `.run/`); the ~103-byte macOS socket limit means very deep worktree
   paths can break them.
