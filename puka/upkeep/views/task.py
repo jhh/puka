@@ -5,15 +5,15 @@ from django.urls import reverse
 from django.views.generic import CreateView, DetailView, ListView, UpdateView, View
 from django_htmx.http import HttpResponseLocation
 
+from puka.core.pagination import PageSizeMixin
 from puka.core.views import get_template
 from puka.upkeep.forms import TaskForm
 from puka.upkeep.models import Task, TaskItem
 from puka.upkeep.services import get_tasks_with_earliest_due_date
 
 
-class TaskListView(ListView):
+class TaskListView(PageSizeMixin, ListView):
     context_object_name = "tasks"
-    paginate_by = 10
     paginate_orphans = 2
 
     def get_template_names(self):

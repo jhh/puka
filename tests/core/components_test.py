@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+from urllib.parse import parse_qs, urlsplit
+
 import pytest
-from django.core.paginator import Paginator
 from django.template import engines
 from django.test import RequestFactory
+from django.urls import resolve
 from django_cotton.compiler_regex import CottonCompiler
 
+from puka.core.pagination import PageSizePaginator
 from tests.utils import Element, Page, parse_html
 
 
@@ -261,7 +264,7 @@ def rf_get():
 
 
 def _page(number: int):
-    return Paginator(list(range(25)), 10).page(number)
+    return PageSizePaginator(list(range(25)), 10).page(number)
 
 
 def test_pagination_middle_page(rf_get):
@@ -269,16 +272,50 @@ def test_pagination_middle_page(rf_get):
     result = page('<c-ui.pagination :page_obj="page_obj" />', request, page_obj=_page(2))
 
     assert only(result, "nav").attrs["aria-label"] == "Pagination"
-    prev, nxt = result.find("a")
+    prev, nxt = (link for link in result.find("a") if link.text in {"Previous", "Next"})
     assert prev.text == "Previous"
     assert prev.attrs["href"] == "?query=salt&page=1"
     assert prev.attrs["hx-get"] == prev.attrs["href"]
     assert prev.attrs["hx-target"] == "#content"
     assert prev.attrs["hx-push-url"] == "true"
     assert nxt.attrs["href"] == "?query=salt&page=3"
-    assert not result.find("button")
     summary = [el.text for el in result.find("span")]
     assert summary == ["11", "20", "25"]
+
+    (sizer,) = result.find("button")
+    assert sizer.text == "10 / page"
+    assert sizer.attrs["popovertarget"] == "page-size-menu"
+    (size_state,) = (
+        element for element in result.find("div") if "pageSize(" in element.attrs.get("x-data", "")
+    )
+    assert size_state.attrs["x-data"] == "pageSize('page-size:/stuff/', '10', '10,25,50,100')"
+    assert size_state.attrs["x-init"] == "restore()"
+
+    menu = [link for link in result.find("a") if link.text.endswith(" / page")]
+    assert [link.text for link in menu] == ["10 / page", "25 / page", "50 / page", "100 / page"]
+    assert [link.attrs.get("aria-current") for link in menu] == ["true", None, None, None]
+    for size, link in zip(("10", "25", "50", "100"), menu, strict=True):
+        assert link.attrs["hx-get"] == link.attrs["href"]
+        assert link.attrs["hx-target"] == "#content"
+        assert link.attrs["hx-push-url"] == "true"
+        assert link.attrs["data-page-size"] == size
+        assert link.attrs["x-on:click"] == f"remember('{size}')"
+    assert parse_qs(urlsplit(menu[1].attrs["href"]).query) == {
+        "query": ["salt"],
+        "page": ["1"],
+        "page_size": ["25"],
+    }
+
+
+def test_pagination_page_size_key_uses_view_name(rf_get):
+    request = rf_get("/stuff/")
+    request.resolver_match = resolve("/stuff/")
+    result = page('<c-ui.pagination :page_obj="page_obj" />', request, page_obj=_page(1))
+
+    (size_state,) = (
+        element for element in result.find("div") if "pageSize(" in element.attrs.get("x-data", "")
+    )
+    assert size_state.attrs["x-data"].startswith("pageSize('page-size:stuff:item-list'")
 
 
 def test_pagination_first_and_last_pages_disable_buttons(rf_get):
@@ -287,19 +324,22 @@ def test_pagination_first_and_last_pages_disable_buttons(rf_get):
         rf_get("/"),
         page_obj=_page(1),
     )
-    (disabled,) = first.find("button")
-    assert disabled.text == "Previous"
+    (disabled,) = (button for button in first.find("button") if button.text == "Previous")
     assert "disabled" in disabled.attrs
-    assert only(first, "a").attrs["hx-target"] == "#list"
+    (next_link,) = (link for link in first.find("a") if link.text == "Next")
+    assert next_link.attrs["hx-target"] == "#list"
 
     last = page('<c-ui.pagination :page_obj="page_obj" />', rf_get("/"), page_obj=_page(3))
-    assert only(last, "button").text == "Next"
+    (disabled,) = (button for button in last.find("button") if button.text == "Next")
+    assert "disabled" in disabled.attrs
 
 
-def test_pagination_hidden_for_single_page(rf_get):
-    single = Paginator([1, 2], 10).page(1)
-    html = render('<c-ui.pagination :page_obj="page_obj" />', rf_get("/"), page_obj=single)
-    assert not html.strip()
+def test_pagination_single_page_keeps_the_size_menu(rf_get):
+    single = PageSizePaginator([1, 2], 10).page(1)
+    result = page('<c-ui.pagination :page_obj="page_obj" />', rf_get("/"), page_obj=single)
+
+    assert result.find("nav")
+    assert not [button for button in result.find("button") if button.text in {"Previous", "Next"}]
 
 
 # ui/breadcrumbs and ui/crumb

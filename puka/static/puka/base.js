@@ -25,6 +25,28 @@ Alpine.data("searchBox", () => ({
   },
 }));
 
+// <c-ui.pagination>: remember the chosen page size per table in localStorage.
+Alpine.data("pageSize", (key, current, options) => ({
+  // Restore the stored size by clicking its menu link, which htmx swaps in.
+  restore() {
+    // A page_size in the URL is an explicit choice (e.g. a shared link); keep it.
+    if (new URL(location.href).searchParams.has("page_size")) return;
+    const stored = localStorage.getItem(key);
+    if (!stored) return;
+    if (!options.split(",").includes(stored)) {
+      localStorage.removeItem(key);
+      return;
+    }
+    if (stored === current) return;
+    const link = this.$root.querySelector(`[data-page-size="${stored}"]`);
+    if (link) link.click();
+  },
+
+  remember(size) {
+    localStorage.setItem(key, size);
+  },
+}));
+
 // <c-layout.drawer>: close the (mobile) sidebar after navigating from it.
 Alpine.data("drawer", () => ({
   close() {

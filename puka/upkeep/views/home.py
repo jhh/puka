@@ -2,13 +2,13 @@ from datetime import UTC, datetime, timedelta
 
 from django.views.generic import ListView
 
+from puka.core.pagination import PageSizeMixin
 from puka.core.views import get_template
 from puka.upkeep.services import get_tasks_with_earliest_due_date
 
 
-class HomeListView(ListView):
+class HomeListView(PageSizeMixin, ListView):
     context_object_name = "tasks"
-    paginate_by = 10
 
     def get_template_names(self):
         return get_template(self.request, "upkeep/task_list.html", "#list-partial")

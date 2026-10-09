@@ -33,7 +33,7 @@ def test_search_response_is_results_only(admin_client, search_items, target):
         headers={**RESULTS_HEADERS, "HX-Target": target},
     )
     assert response.status_code == 200
-    assert list(response.context["items"]) == items[:20]
+    assert list(response.context["items"]) == items[:10]
     page = parse_html(response.content)
     assert page.find("table")
     assert page.find("nav", aria_label="Pagination")
@@ -90,9 +90,9 @@ def test_results_pagination_keeps_query_and_filter_click_resets_page(admin_clien
         reverse("stuff:item-list") + next_link.attrs["href"],
         headers=RESULTS_HEADERS,
     )
-    assert list(response.context["items"]) == items[20:]
+    assert list(response.context["items"]) == items[10:20]
     page = parse_html(response.content)
-    (tag_link,) = (
+    tag_link = next(
         link
         for link in page.find("a")
         if link.attrs.get("href", "").startswith(reverse("stuff:item-list") + "?query=")

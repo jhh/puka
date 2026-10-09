@@ -153,4 +153,4 @@ def test_item_results_fragment_query_budget(admin_client, related_objects):
         )
     assert response.status_code == 200
     assert len(queries) <= 6, queries.captured_queries
-    assert len(response.context["items"]) == related_objects["size"]
+    assert len(response.context["items"]) == min(related_objects["size"], 10)

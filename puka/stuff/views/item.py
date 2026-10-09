@@ -10,6 +10,7 @@ from django.views.generic import CreateView, DetailView, ListView, UpdateView, V
 from django_htmx.http import HttpResponseLocation
 from django_htmx.middleware import HtmxDetails
 
+from puka.core.pagination import PageSizeMixin
 from puka.core.views import get_template
 from puka.stuff.forms import InventoryForm, ItemForm
 from puka.stuff.models import Bookmark, Inventory, Item
@@ -18,9 +19,8 @@ from puka.stuff.services import adjust_inventory_quantity, get_or_create_locatio
 logger = logging.getLogger(__name__)
 
 
-class ItemListView(ListView):
+class ItemListView(PageSizeMixin, ListView):
     context_object_name = "items"
-    paginate_by = 20
 
     def get_template_names(self):
         partial = (

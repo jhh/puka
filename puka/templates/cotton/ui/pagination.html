@@ -1,11 +1,15 @@
 {% comment %}
-Previous/next pager for a Django Page. Links keep the current query string (via
-{% querystring %}) and swap into `target`.
+Previous/next pager for a Django Page plus a page-size menu. Links keep the
+current query string (via {% querystring %}) and swap into `target`.
+page_obj.paginator.page_size_options (puka.core.pagination.PageSizePaginator)
+lists the offered sizes; id is the size menu's popover id; every other
+attribute passes through to the <nav>. The chosen size is stored in
+localStorage per view and restored on later visits (Alpine.data("pageSize")).
 {% endcomment %}
-<c-vars page_obj target="#content" class />
+<c-vars page_obj target="#content" id="page-size-menu" class />
 
-{% if page_obj.has_other_pages %}
-    <nav class="flex items-center justify-between gap-4 {{ class }}" aria-label="Pagination" {{ attrs }}>
+{% if page_obj.paginator.count %}
+    <nav class="flex flex-wrap items-center justify-between gap-4 {{ class }}" aria-label="Pagination" {{ attrs }}>
         <p class="hidden text-sm text-base-content/70 sm:block">
             Showing
             <span class="font-medium">{{ page_obj.start_index }}</span>
@@ -15,28 +19,72 @@ Previous/next pager for a Django Page. Links keep the current query string (via
             <span class="font-medium">{{ page_obj.paginator.count }}</span>
             results
         </p>
-        <div class="join ml-auto">
-            {% if page_obj.has_previous %}
-                <a
-                    href="{% querystring page=page_obj.previous_page_number %}"
-                    hx-get="{% querystring page=page_obj.previous_page_number %}"
-                    hx-target="{{ target }}"
-                    hx-push-url="true"
-                    class="join-item btn btn-sm"
-                >Previous</a>
-            {% else %}
-                <button type="button" class="join-item btn btn-sm" disabled>Previous</button>
+        <div class="ml-auto flex items-center gap-2">
+            {% if page_obj.paginator.page_size_options %}
+                <div
+                    class="dropdown dropdown-end"
+                    x-data="pageSize('page-size:{% firstof request.resolver_match.view_name request.path %}', '{{ page_obj.paginator.per_page }}', '{{ page_obj.paginator.page_size_options|join:',' }}')"
+                    x-init="restore()"
+                >
+                    <button
+                        type="button"
+                        class="btn btn-sm"
+                        aria-label="Page size"
+                        popovertarget="{{ id }}"
+                        style="anchor-name: --{{ id }}-anchor"
+                    >
+                        {{ page_obj.paginator.per_page }} / page
+                    </button>
+                    <ul
+                        id="{{ id }}"
+                        popover
+                        class="dropdown dropdown-end menu z-30 mt-2 w-32 rounded-box border border-base-200 bg-base-100 p-2 shadow"
+                        style="position-anchor: --{{ id }}-anchor"
+                    >
+                        {% for size in page_obj.paginator.page_size_options %}
+                            <li>
+                                <a
+                                    href="{% querystring page_size=size page=1 %}"
+                                    hx-get="{% querystring page_size=size page=1 %}"
+                                    hx-target="{{ target }}"
+                                    hx-push-url="true"
+                                    data-page-size="{{ size }}"
+                                    x-on:click="remember('{{ size }}')"
+                                    {% if size == page_obj.paginator.per_page %}
+                                        class="menu-active"
+                                        aria-current="true"
+                                    {% endif %}
+                                >{{ size }} / page</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
             {% endif %}
-            {% if page_obj.has_next %}
-                <a
-                    href="{% querystring page=page_obj.next_page_number %}"
-                    hx-get="{% querystring page=page_obj.next_page_number %}"
-                    hx-target="{{ target }}"
-                    hx-push-url="true"
-                    class="join-item btn btn-sm"
-                >Next</a>
-            {% else %}
-                <button type="button" class="join-item btn btn-sm" disabled>Next</button>
+            {% if page_obj.has_other_pages %}
+                <div class="join">
+                    {% if page_obj.has_previous %}
+                        <a
+                            href="{% querystring page=page_obj.previous_page_number %}"
+                            hx-get="{% querystring page=page_obj.previous_page_number %}"
+                            hx-target="{{ target }}"
+                            hx-push-url="true"
+                            class="join-item btn btn-sm"
+                        >Previous</a>
+                    {% else %}
+                        <button type="button" class="join-item btn btn-sm" disabled>Previous</button>
+                    {% endif %}
+                    {% if page_obj.has_next %}
+                        <a
+                            href="{% querystring page=page_obj.next_page_number %}"
+                            hx-get="{% querystring page=page_obj.next_page_number %}"
+                            hx-target="{{ target }}"
+                            hx-push-url="true"
+                            class="join-item btn btn-sm"
+                        >Next</a>
+                    {% else %}
+                        <button type="button" class="join-item btn btn-sm" disabled>Next</button>
+                    {% endif %}
+                </div>
             {% endif %}
         </div>
     </nav>

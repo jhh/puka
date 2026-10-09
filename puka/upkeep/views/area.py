@@ -6,16 +6,16 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView, View
 from django_htmx.http import HttpResponseLocation
 
+from puka.core.pagination import PageSizeMixin
 from puka.core.views import get_template
 from puka.upkeep.forms import AreaForm
 from puka.upkeep.models import Area
 from puka.upkeep.services import get_areas_tasks_schedules, get_tasks_with_earliest_due_date
 
 
-class AreaListView(ListView):
+class AreaListView(PageSizeMixin, ListView):
     context_object_name = "areas"
     model = Area
-    paginate_by = 10
     paginate_orphans = 2
 
     def get_template_names(self):

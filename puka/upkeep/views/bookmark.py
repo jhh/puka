@@ -9,16 +9,16 @@ from django_htmx.http import HttpResponseLocation
 
 from puka.bookmarks.filters import BookmarkFilter
 from puka.bookmarks.models import Bookmark
+from puka.core.pagination import PageSizeMixin
 from puka.core.views import get_template
 from puka.upkeep.models import Area
 
 logger = logging.getLogger(__name__)
 
 
-class BookmarkSelectView(ListView):
+class BookmarkSelectView(PageSizeMixin, ListView):
     model = Bookmark
     context_object_name = "bookmarks"
-    paginate_by = 10
 
     def get_template_names(self):
         return get_template(self.request, "bookmarks/_select.html", "#filter-partial")

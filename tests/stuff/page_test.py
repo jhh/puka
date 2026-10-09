@@ -50,6 +50,20 @@ def test_item_list_empty_and_pagination(admin_client):
     assert nxt.text == "Next"
 
 
+def test_item_list_table_grows_with_its_rows(admin_client):
+    # The page-size menu is pointless if a fixed height keeps the table from growing.
+    ItemFactory.create(name="Item")
+    page = parse_html(admin_client.get(reverse("stuff:item-list"), headers=HTMX).content)
+    (wrapper,) = (
+        element
+        for element in page.find("div")
+        if "overflow-x-auto" in element.attrs.get("class", "")
+    )
+    assert "h-[" not in wrapper.attrs["class"]
+    assert "max-h-[" not in wrapper.attrs["class"]
+    assert "overflow-y-auto" not in wrapper.attrs["class"]
+
+
 def test_location_list_links_and_copy(admin_client):
     inventory = ItemWithInventoryFactory.create().inventories.get()
     leaf = inventory.location
