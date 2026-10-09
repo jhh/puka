@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+from django.template.loader import render_to_string
 from django.urls import reverse
 
 from tests.utils import Page, parse_html
@@ -55,10 +56,13 @@ def test_root_keeps_local_stylesheet_and_deferred_script(admin_client):
     ("url", "active"),
     [
         ("/", {"Overview"}),
-        ("/bookmarks/filter/", {"Filter"}),
+        ("/bookmarks/", {"Bookmarks"}),
+        ("/bookmarks/filter/", {"Bookmarks", "Filter"}),
+        ("/bookmarks/tags/", {"Bookmarks", "Tags"}),
         ("/stuff/", {"Inventory"}),
-        ("/stuff/location/0/", {"Locations"}),
+        ("/stuff/location/0/", {"Inventory", "Locations"}),
         ("/upkeep/task/", {"Tasks"}),
+        ("/upkeep/area/", {"Tasks", "Areas"}),
     ],
 )
 def test_sidebar_active_item(admin_client, url, active):
@@ -67,14 +71,70 @@ def test_sidebar_active_item(admin_client, url, active):
         "Overview",
         "Bookmarks",
         "Filter",
+        "Tags",
         "Inventory",
         "Locations",
         "Tasks",
         "Areas",
-        "Tags",
         "Admin",
     }
     assert {label for label, cls in links.items() if "menu-active" in cls} == active
+
+
+@pytest.mark.parametrize(
+    ("url", "open_"),
+    [
+        ("/", False),
+        ("/bookmarks/", False),
+        ("/bookmarks/filter/", True),
+        ("/bookmarks/tags/", True),
+        ("/stuff/", False),
+        ("/stuff/item/new/", False),
+        ("/stuff/location/0/", True),
+        ("/upkeep/task/", False),
+        ("/upkeep/area/", True),
+    ],
+)
+def test_sidebar_manage_opens_when_active(admin_client, url, open_):
+    page = _get(admin_client, url)
+    (sidebar,) = page.find("ul", id="sidebar")
+    (details,) = (
+        el for el in page.elements[page.elements.index(sidebar) :] if el.tag == "details"
+    )
+    assert ("open" in details.attrs) is open_
+
+
+def test_sidebar_manage_structure(admin_client):
+    """Secondary pages live in a collapsible Manage menu, grouped by section."""
+    page = _get(admin_client, reverse("home"))
+    (sidebar,) = page.find("ul", id="sidebar")
+    elements = page.elements[page.elements.index(sidebar) :]
+    (details,) = (el for el in elements if el.tag == "details")
+    summary = elements[elements.index(details) + 1]
+    assert summary.tag == "summary"
+    assert "font-semibold" in summary.attrs.get("class", "").split()
+    icon = elements[elements.index(summary) + 1]
+    assert icon.tag == "span"
+    assert icon.attrs["class"] == "hero-cog-6-tooth size-5"
+    assert any(el.tag == "span" and el.text == "Manage" for el in elements)
+    titles = [el.text for el in elements if "menu-title" in el.attrs.get("class", "").split()]
+    assert titles == ["Bookmarks", "Inventory", "Tasks"]
+
+
+def test_no_leaked_template_comments(admin_client):
+    """Cotton emits multi-line {# #} comments as text; templates use {% comment %}."""
+    for url in ("/", "/stuff/", "/upkeep/area/", "/bookmarks/"):
+        content = admin_client.get(url).content.decode()
+        assert "{#" not in content
+
+
+def test_sidebar_admin_state(rf):
+    """Admin is a Manage item; Django's own admin layout does not render the sidebar."""
+    page = parse_html(render_to_string("core/sidebar.html", request=rf.get("/admin/")))
+    links = _sidebar_links(page)
+    assert "menu-active" in links["Admin"]
+    (details,) = page.find("details")
+    assert "open" in details.attrs
 
 
 def test_sidebar_hrefs(admin_client):

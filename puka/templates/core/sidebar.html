@@ -9,45 +9,67 @@
             <img src="{% static 'puka-logo.svg' %}" alt="Puka" class="h-auto w-[180px] max-w-full object-contain">
         </a>
     </li>
+
+    {# Main pages: the four primary destinations. #}
     <c-layout.nav-item url_name="home" icon="hero-home" class="font-semibold" hx-boost="true">
         Overview
     </c-layout.nav-item>
-    <c-layout.nav-item url_name="bookmarks:list" icon="hero-bookmark" class="font-semibold">
+    <c-layout.nav-item
+        url_name="bookmarks:list"
+        match="/bookmarks/"
+        icon="hero-bookmark"
+        class="font-semibold"
+    >
         Bookmarks
-        <c-slot name="children">
-            <c-layout.nav-item url_name="bookmarks:filter" hx-boost="true">Filter</c-layout.nav-item>
-        </c-slot>
     </c-layout.nav-item>
     <c-layout.nav-item
         url_name="stuff:item-list"
-        match="/stuff/item/"
+        match="/stuff/"
         icon="hero-archive-box"
         class="font-semibold"
     >
         Inventory
-        <c-slot name="children">
-            <c-layout.nav-item url_name="stuff:location-list" :arg="0" match="/stuff/location/">
-                Locations
-            </c-layout.nav-item>
-        </c-slot>
     </c-layout.nav-item>
     <c-layout.nav-item
         url_name="upkeep:task-list"
-        match="/upkeep/task/"
+        match="/upkeep/"
         icon="hero-clipboard-document-check"
         class="font-semibold"
     >
         Tasks
-        <c-slot name="children">
-            <c-layout.nav-item url_name="upkeep:area-list" match="/upkeep/area/">
-                Areas
-            </c-layout.nav-item>
-        </c-slot>
     </c-layout.nav-item>
-    <c-layout.nav-item url_name="bookmarks:tags" icon="hero-tag" class="font-semibold">
-        Tags
-    </c-layout.nav-item>
-    <c-layout.nav-item url_name="admin:index" icon="hero-shield-check" class="font-semibold">
-        Admin
-    </c-layout.nav-item>
+
+    {% comment %}
+    Secondary pages, grouped by the main section they manage. The menu opens
+    when one of these pages is active; the paths mirror the match attributes
+    of its items.
+    {% endcomment %}
+    <li>
+        <details
+            {% if '/bookmarks/filter/' in request.path or '/bookmarks/tags/' in request.path or '/stuff/location/' in request.path or '/upkeep/area/' in request.path or '/admin/' in request.path %}
+                open
+            {% endif %}
+        >
+            <summary class="gap-3 font-semibold">
+                <c-ui.icon name="hero-cog-6-tooth" class="size-5" />
+                <span>Manage</span>
+            </summary>
+            <ul>
+                <li class="menu-title">Bookmarks</li>
+                <c-layout.nav-item url_name="bookmarks:filter" hx-boost="true">Filter</c-layout.nav-item>
+                <c-layout.nav-item url_name="bookmarks:tags">Tags</c-layout.nav-item>
+
+                <li class="menu-title">Inventory</li>
+                <c-layout.nav-item url_name="stuff:location-list" :arg="0" match="/stuff/location/">
+                    Locations
+                </c-layout.nav-item>
+
+                <li class="menu-title">Tasks</li>
+                <c-layout.nav-item url_name="upkeep:area-list" match="/upkeep/area/">Areas</c-layout.nav-item>
+
+                <li></li>
+                <c-layout.nav-item url_name="admin:index" match="/admin/">Admin</c-layout.nav-item>
+            </ul>
+        </details>
+    </li>
 </ul>

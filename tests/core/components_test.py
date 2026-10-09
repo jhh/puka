@@ -461,9 +461,9 @@ def test_page_meta(rf_get):
     assert crumbs.attrs["hx-swap-oob"] == sidebar.attrs["hx-swap-oob"] == "true"
     assert not result.find("header")
     assert not result.find("input", id="app-drawer")
-    active = [link for link in result.find("a") if "menu-active" in classes(link)]
-    assert len(active) == 1
-    assert active[0].attrs["href"] == "/upkeep/area/"
+    active = {link.attrs["href"] for link in result.find("a") if "menu-active" in classes(link)}
+    # Areas is a Manage item, so its parent Tasks stays highlighted too.
+    assert active == {"/upkeep/task/", "/upkeep/area/"}
 
 
 @pytest.mark.parametrize(
