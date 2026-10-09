@@ -1,4 +1,5 @@
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
+from django.db.models import F
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.generic import CreateView, DetailView, ListView, UpdateView, View
@@ -39,7 +40,7 @@ class TaskListView(ListView):
             query_set = (
                 get_tasks_with_earliest_due_date()
                 .select_related("area")
-                .order_by("area__name", "name")
+                .order_by(F("earliest_due_date").asc(nulls_last=True), "pk")
             )
 
         return query_set

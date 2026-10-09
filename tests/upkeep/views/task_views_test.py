@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+from datetime import date
+
 import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertContains
 
 from puka.upkeep.models import Task
-from tests.factories import AreaFactory, TaskFactory
+from tests.factories import AreaFactory, ScheduleFactory, TaskFactory
 from tests.utils import HTMX, assert_hx_location, assert_redirect
 
 pytestmark = pytest.mark.django_db
@@ -74,3 +76,15 @@ def test_delete_task(admin_client, task):
 
     assert_hx_location(response, reverse("upkeep:task-list"))
     assert not Task.objects.exists()
+
+
+def test_task_list_due_date_order(admin_client):
+    sooner = TaskFactory.create(name="Sooner")
+    later = TaskFactory.create(name="Later")
+    TaskFactory.create(name="Undated")
+    ScheduleFactory.create(task=sooner, due_date=date(2024, 1, 1))
+    ScheduleFactory.create(task=later, due_date=date(2024, 6, 1))
+
+    response = admin_client.get(reverse("upkeep:task-list"))
+
+    assert [task.name for task in response.context["tasks"]] == ["Sooner", "Later", "Undated"]
