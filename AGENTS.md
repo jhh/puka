@@ -40,30 +40,39 @@ Nix devshell, `just` task runner. Run every command inside the devshell.
   - Single: `uv run pytest tests/stuff/item_model_test.py::test_name`.
   - Coverage: `just coverage`.
 - Lint/format: `uv run ruff format .` then `uv run ruff check .`. On NixOS
-  the ruff and ty wheels in `.venv` can't run; use `pre-commit` (ruff) and
-  the devshell/system `ty` with `--python .venv`.
+  the ruff and ty wheels in `.venv` can't run; use the devshell `ruff`
+  and `ty` with `--python .venv` instead.
 - Types: `just ty`. CI runs `ty check --error-on-warning`, so use
   `uv run ty check --error-on-warning` to match; `ty` over pyright/mypy.
 - Templates: `just djangofmt` (format + lint) and `just djade`.
 - Assets: `just update-css`, `just update-js`, `just watch`. Rebuild after
   editing `base.css`/`base.js` or Tailwind classes in templates.
-- `pre-commit run --all-files`. The config is a Nix-store symlink generated
-  from the git-hooks flake-parts module in `nix/checks/pre-commit.nix`; edit
+- Pre-commit hooks: there is no `pre-commit` CLI on PATH; run the hook
+  suite with `nix build .#checks.aarch64-darwin.pre-commit -L` (see
+  Verification / CI). The config is a Nix-store symlink generated from
+  the git-hooks flake-parts module in `nix/checks/pre-commit.nix`; edit
   that, not the yaml. Hooks rewrite code: ruff, pyupgrade `--py312-plus`,
-  django-upgrade `--target-version=5.2`,
-  add-trailing-comma, djangofmt (then djade, then `djangofmt check`),
-  nixfmt; files >25 KB are rejected.
+  django-upgrade `--target-version=5.2`, add-trailing-comma, djangofmt
+  (then djade, then `djangofmt check`), nixfmt; files >25 KB are
+  rejected.
 
 ## Verification / CI
 
 - CI is only `nix flake check -L --keep-going`. Reproduce locally before
-  pushing. Checks: pre-commit, `ty` (warnings fatal), NixOS integration
-  tests, and pytest (Linux-only, so skipped on macOS — run `just test`).
-- Run `jj st` right before `nix flake check` (or `nix build`) and
-  `pre-commit run --all-files` (which only sees files in the git index).
-  Nix reads the source from the git tree, which jj only updates when it
-  snapshots the working copy; without it, new or edited files may be
-  missing from the build (e.g. `TemplateDoesNotExist` in the Nix pytest check).
+  pushing. It builds the `checks` output: pre-commit, treefmt, `ty`
+  (warnings fatal), a check per package and devShell (`pkgs-*`,
+  `devshell-default`), NixOS integration tests, and pytest (Linux-only,
+  so skipped on macOS — run `just test`).
+- Run `jj st` right before `nix flake check` (or `nix build`). Nix reads
+  the source from the git tree, which jj only updates when it snapshots
+  the working copy; without it, new or edited files may be missing from
+  the build (e.g. `TemplateDoesNotExist` in the Nix pytest check).
+- Pre-commit check: the `pre-commit` CLI is not on PATH, and jj does not
+  run git hooks. Run the hook suite as a check instead:
+  `nix build .#checks.aarch64-darwin.pre-commit -L` — it fails when a
+  hook would rewrite a file. Formatter check only:
+  `nix build .#checks.aarch64-darwin.treefmt -L`. `ruff`, `nixfmt` and
+  `pyupgrade` are on PATH for quick local fixes.
 - NixOS integration tests (`nix/checks/tests.py`):
   `nix build .#checks.aarch64-darwin.puka-integration-tests -L`
 - Browser QA: the `playwright` MCP server in `opencode.json` runs
