@@ -206,7 +206,7 @@ def form_page(admin_client, objects, form_case):
     return parse_html(response.content)
 
 
-def test_form_action(form_page, form_case, objects):
+def test_form(form_page, form_case, objects):
     (form,) = form_page.forms
     assert form.attrs["hx-post"] == _reverse(form_case.url, objects)
     assert form.attrs["method"] == "post"
@@ -214,27 +214,19 @@ def test_form_action(form_page, form_case, objects):
     assert form.attrs["hx-replace-url"] == "true"
     assert form_page.find("input", name="csrfmiddlewaretoken")
 
-
-def test_form_fields(form_page, form_case):
     assert form_page.field_names() == form_case.fields
     for name in form_case.fields:
         el = form_page.field(name)
         assert el.attrs["id"] == f"id_{name}"
         assert (el.attrs.get("type") == "hidden") == (name in form_case.hidden)
 
-
-def test_form_labels(form_page, form_case):
     labelled = {el.attrs.get("for") for el in form_page.find("label")}
     visible = form_case.fields - form_case.hidden
     assert {f"id_{name}" for name in visible} <= labelled
 
-
-def test_form_autofocus(form_page, form_case):
     autofocused = {el.attrs["name"] for el in form_page.elements if "autofocus" in el.attrs}
     assert autofocused == ({form_case.autofocus} if form_case.autofocus else set())
 
-
-def test_form_submit(form_page, form_case):
     (submit,) = (
         el
         for el in form_page.elements
@@ -242,8 +234,6 @@ def test_form_submit(form_page, form_case):
     )
     assert form_case.submit in {submit.attrs.get("value"), submit.text}
 
-
-def test_form_cancel(form_page, form_case, objects):
     cancel_url = _reverse(form_case.cancel, objects)
     (cancel,) = form_page.find("a", hx_get=cancel_url)
     assert cancel.text == "Cancel"
@@ -251,16 +241,14 @@ def test_form_cancel(form_page, form_case, objects):
     assert cancel.attrs["hx-target"] == "#content"
     assert cancel.attrs["hx-push-url"] == "true"
 
-
-def test_form_delete(form_page, form_case, objects):
     buttons = [el for el in form_page.find("button") if el.text == "Delete"]
     if form_case.delete is None:
         assert not buttons
-        return
-    (button,) = buttons
-    assert button.attrs["type"] == "button"
-    assert button.attrs["hx-post"] == _reverse(form_case.delete, objects)
-    assert button.attrs["hx-confirm"] == f"Delete this {form_case.delete_noun}?"
+    else:
+        (button,) = buttons
+        assert button.attrs["type"] == "button"
+        assert button.attrs["hx-post"] == _reverse(form_case.delete, objects)
+        assert button.attrs["hx-confirm"] == f"Delete this {form_case.delete_noun}?"
 
 
 # Invalid form posts: the field that errors, its message, and a submitted value to redisplay.
@@ -371,19 +359,12 @@ def test_invalid_form_preserves_database_and_returns_errors(admin_client, object
     page = parse_html(response.content)
     (form,) = page.forms
     assert form.attrs["hx-post"] == url
+    assert form.attrs.get("hx-target") == "#content"
     assert page.field_names() == form_case.fields
     assert page.find("input", name="csrfmiddlewaretoken")
     if "notes" in form_case.fields:
         assert page.field("notes").text == "keep invalid notes"
     assert {model: list(model.objects.order_by("pk").values()) for model in models} == before
-
-
-def test_invalid_form_targets_content(admin_client, objects, form_case):
-    url = _reverse(form_case.url, objects)
-    response = admin_client.post(url, {}, headers=HTMX)
-    assert response.status_code == 200
-    (form,) = parse_html(response.content).forms
-    assert form.attrs.get("hx-target") == "#content"
 
 
 def test_location_form_parent_choices(admin_client, objects):

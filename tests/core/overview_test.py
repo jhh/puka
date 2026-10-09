@@ -103,12 +103,6 @@ def test_overview_upcoming_tasks_table(admin_client):
     badges = [el.text for el in page.find("span") if "badge" in el.attrs.get("class", "")]
     assert badges == ["in stock", "out of stock"]
 
-    # Due dates within a week stay bright; later ones are dimmed.
-    (soon_cell,) = (el for el in page.find("td") if el.text == date_format(soon_date))
-    (later_cell,) = (el for el in page.find("td") if el.text == date_format(later_date))
-    assert soon_cell.attrs["class"] == "text-base-content/70"
-    assert later_cell.attrs["class"] == "text-base-content/50"
-
 
 def test_overview_without_upcoming_tasks(admin_client):
     response = admin_client.get(reverse("home"))

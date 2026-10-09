@@ -98,7 +98,6 @@ def related_objects(request):
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda case: case.name)
-@pytest.mark.parametrize("htmx", [False, True], ids=["full", "fragment"])
 def test_rendering_query_baseline(  # noqa: PLR0913
     *,
     admin_client,
@@ -106,44 +105,44 @@ def test_rendering_query_baseline(  # noqa: PLR0913
     rf,
     related_objects,
     case,
-    htmx,
     record_property,
 ):
     args = [related_objects[case.object_key]] if case.object_key else []
     url = reverse(case.name, args=args)
-    headers = HTMX if htmx else {}
-    request = rf.get(url, headers=headers)
-    request.user = admin_user
-    request.htmx = HtmxDetails(request)
     match = resolve(url)
 
-    with CaptureQueriesContext(connection) as preparation:
-        response = match.func(request, *match.args, **match.kwargs)
-    assert isinstance(response, TemplateResponse)
-    assert response.status_code == 200
-    with CaptureQueriesContext(connection) as rendering:
-        response.render()
-    with CaptureQueriesContext(connection) as total:
-        client_response = admin_client.get(url, headers=headers)
-    assert client_response.status_code == 200
-    auth_queries = [
-        query
-        for query in total
-        if 'FROM "django_session"' in query["sql"] or 'FROM "users_customuser"' in query["sql"]
-    ]
-    overhead = len(auth_queries)
-    assert overhead == 2
-    assert len(total) == len(preparation) + len(rendering) + overhead
-    assert len(preparation) <= case.preparation, preparation.captured_queries
-    assert len(rendering) <= case.rendering, rendering.captured_queries
-    assert ("<head>" in response.content.decode()) == (not htmx)
-    for name, count in (
-        ("preparation", len(preparation)),
-        ("rendering", len(rendering)),
-        ("authentication", overhead),
-        ("total", len(total)),
-    ):
-        record_property(name, count)
+    for mode, headers in (("full", {}), ("fragment", HTMX)):
+        request = rf.get(url, headers=headers)
+        request.user = admin_user
+        request.htmx = HtmxDetails(request)
+
+        with CaptureQueriesContext(connection) as preparation:
+            response = match.func(request, *match.args, **match.kwargs)
+        assert isinstance(response, TemplateResponse)
+        assert response.status_code == 200
+        with CaptureQueriesContext(connection) as rendering:
+            response.render()
+        with CaptureQueriesContext(connection) as total:
+            client_response = admin_client.get(url, headers=headers)
+        assert client_response.status_code == 200
+        auth_queries = [
+            query
+            for query in total
+            if 'FROM "django_session"' in query["sql"] or 'FROM "users_customuser"' in query["sql"]
+        ]
+        overhead = len(auth_queries)
+        assert overhead == 2
+        assert len(total) == len(preparation) + len(rendering) + overhead
+        assert len(preparation) <= case.preparation, preparation.captured_queries
+        assert len(rendering) <= case.rendering, rendering.captured_queries
+        assert ("<head>" in response.content.decode()) == (mode == "full")
+        for name, count in (
+            ("preparation", len(preparation)),
+            ("rendering", len(rendering)),
+            ("authentication", overhead),
+            ("total", len(total)),
+        ):
+            record_property(f"{mode}-{name}", count)
 
 
 def test_item_results_fragment_query_budget(admin_client, related_objects):

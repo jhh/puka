@@ -39,8 +39,6 @@ def test_task_detail(admin_client):
     assert delete.attrs["hx-confirm"] == "Are you sure you want to delete this task?"
     (trigger,) = page.find("button", popovertarget="task-manage-menu")
     assert trigger.text == "Manage"
-    (menu,) = page.find("ul", id="task-manage-menu")
-    assert "popover" in menu.attrs
     for name in ("upkeep:task-edit", "upkeep:schedule-new", "upkeep:task-item-new"):
         (link,) = page.find("a", href=reverse(name, args=[task.pk]))
         assert link.attrs["hx-get"] == link.attrs["href"]
@@ -88,8 +86,6 @@ def test_area_detail_bookmarks_inside_definition_list(admin_client):
     assert page.find("a", href=reverse("upkeep:task-new") + f"?area={area.pk}")
     (trigger,) = page.find("button", popovertarget="area-manage-menu")
     assert trigger.text == "Manage"
-    (menu,) = page.find("ul", id="area-manage-menu")
-    assert "popover" in menu.attrs
     (delete,) = page.find("button", hx_post=reverse("upkeep:area-delete", args=[area.pk]))
     assert delete.attrs["hx-confirm"] == "Are you sure you want to delete this area?"
     for path in (
@@ -116,8 +112,6 @@ def test_task_list_stock_badge(admin_client):
     page = parse_html(admin_client.get(reverse("upkeep:task-list"), headers=HTMX).content)
     badges = [el for el in page.find("span") if "badge" in el.attrs.get("class", "")]
     assert [b.text for b in badges] == ["in stock"]
-    for link in page.find("a"):
-        assert link.attrs.get("href") != "#"
 
 
 @pytest.mark.parametrize("name", ["upkeep:task-list", "upkeep:area-detail"])

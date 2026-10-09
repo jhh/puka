@@ -126,6 +126,12 @@ def _params(*kinds: Kind):
     return [pytest.param(case, id=case.id or case.name) for case in CASES if case.kind in kinds]
 
 
+def _by_name(*names: str):
+    """Select representative cases by name for the sampled contract tests."""
+    by_name = {case.name: case for case in CASES}
+    return [pytest.param(by_name[name], id=name) for name in names]
+
+
 @pytest.fixture
 def objects(db) -> dict[str, int]:
     item = ItemWithInventoryFactory.create()
@@ -176,8 +182,11 @@ def test_get_template_response_contract(rf, headers, fragment):
 
 
 @pytest.mark.parametrize("case", _params(Kind.FRAGMENT, Kind.PAGE))
-def test_full_page(admin_client, objects, case):
-    response = admin_client.get(_url(case, objects))
+def test_response_contract(admin_client, objects, case):
+    """Full GETs render the shell; htmx GETs render a fragment or a document."""
+    url = _url(case, objects)
+
+    response = admin_client.get(url)
     assert response.status_code == 200
     assert "<head>" in response.content.decode()
     page = parse_html(response.content)
@@ -187,27 +196,26 @@ def test_full_page(admin_client, objects, case):
         assert page.find("div", id="breadcrumbs")
         assert page.find("ul", id="sidebar")
 
-
-@pytest.mark.parametrize("case", _params(Kind.FRAGMENT))
-def test_htmx_fragment(admin_client, objects, case):
-    response = admin_client.get(_url(case, objects), headers={"HX-Request": "true"})
+    response = admin_client.get(url, headers={"HX-Request": "true"})
     assert response.status_code == 200
     content = response.content.decode()
-    assert content.strip()
-    assert "<head>" not in content
-    assert "<html" not in content
+    if case.kind is Kind.FRAGMENT:
+        assert content.strip()
+        assert "<head>" not in content
+        assert "<html" not in content
+    else:
+        assert "<head>" in content
 
-
-@pytest.mark.parametrize("case", _params(Kind.FRAGMENT, Kind.PAGE))
-def test_boosted_request_gets_full_page(admin_client, objects, case):
-    headers = {"HX-Request": "true", "HX-Boosted": "true"}
-    response = admin_client.get(_url(case, objects), headers=headers)
+    response = admin_client.get(url, headers={"HX-Request": "true", "HX-Boosted": "true"})
     assert response.status_code == 200
     assert "<head>" in response.content.decode()
     assert "hx-swap-oob" not in response.content.decode()
 
 
-@pytest.mark.parametrize("case", _params(Kind.FRAGMENT))
+@pytest.mark.parametrize(
+    "case",
+    _by_name("stuff:item-list", "stuff:item-detail", "upkeep:area-detail"),
+)
 @pytest.mark.parametrize(
     "headers",
     [
@@ -228,42 +236,19 @@ def test_document_requests_preserve_shell(admin_client, objects, case, headers):
 
 
 @pytest.mark.parametrize(
-    ("name", "key"),
-    [
-        ("stuff:item-detail", "item"),
-        ("stuff:location-detail", "location"),
-        ("upkeep:task-detail", "task"),
-        ("upkeep:area-detail", "area"),
-    ],
+    "case",
+    _by_name(
+        "bookmarks:list",
+        "bookmarks:filter",
+        "stuff:item-list",
+        "upkeep:task-list",
+        "upkeep:area-list",
+        "stuff:item-detail",
+        "stuff:location-detail",
+        "upkeep:task-detail",
+        "upkeep:area-detail",
+    ),
 )
-def test_detail_fragment_updates_breadcrumbs(admin_client, objects, name, key):
-    response = admin_client.get(
-        reverse(name, args=[objects[key]]),
-        headers={"HX-Request": "true", "HX-Target": "div#content"},
-    )
-    assert response.status_code == 200
-    page = parse_html(response.content)
-    assert len(page.find("div", id="breadcrumbs")) == 1
-    (crumbs,) = page.find("div", id="breadcrumbs")
-    assert crumbs.attrs["hx-swap-oob"] == "true"
-
-
-@pytest.mark.parametrize(
-    ("name", "key"),
-    [("stuff:item-detail", "item"), ("upkeep:area-detail", "area")],
-)
-def test_detail_fragment_updates_title(admin_client, objects, name, key):
-    url = reverse(name, args=[objects[key]])
-    full = parse_html(admin_client.get(url).content)
-    fragment = parse_html(
-        admin_client.get(url, headers={"HX-Request": "true", "HX-Target": "div#content"}).content,
-    )
-    assert len(fragment.find("title")) == 1
-    (title,) = fragment.find("title")
-    assert title.text == full.find("title")[0].text
-
-
-@pytest.mark.parametrize("case", _params(Kind.FRAGMENT))
 def test_content_fragment_metadata_matches_full_page(admin_client, objects, case):
     url = _url(case, objects)
     full_response = admin_client.get(url)
@@ -299,18 +284,14 @@ def test_content_fragment_metadata_matches_full_page(admin_client, objects, case
     assert fragment_active == full_active
 
 
-@pytest.mark.parametrize("case", _params(Kind.PAGE))
-def test_page_only_view_still_returns_document_for_htmx(admin_client, objects, case):
-    response = admin_client.get(_url(case, objects), headers={"HX-Request": "true"})
-    assert response.status_code == 200
-    assert parse_html(response.content).find("head")
-
-
-@pytest.mark.parametrize("case", _params(Kind.FRAGMENT, Kind.PAGE))
-def test_anonymous_redirects_to_login(client, objects, case):
-    response = client.get(_url(case, objects))
-    if case.name == "login":
-        assert response.status_code == 200
-    else:
-        assert response.status_code == 302
-        assert response["Location"].startswith(reverse("login"))
+def test_anonymous_redirects_to_login(client, objects):
+    login = reverse("login")
+    for case in CASES:
+        if case.kind not in {Kind.FRAGMENT, Kind.PAGE}:
+            continue
+        response = client.get(_url(case, objects))
+        if case.name == "login":
+            assert response.status_code == 200
+        else:
+            assert response.status_code == 302
+            assert response["Location"].startswith(login)

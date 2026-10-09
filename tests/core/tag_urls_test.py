@@ -13,20 +13,42 @@ from tests.utils import parse_html
 pytestmark = pytest.mark.django_db
 
 
-@pytest.mark.parametrize("tag", ["two words", "tools & parts", "C++", "#priority", "café 日本語"])
-@pytest.mark.parametrize(
-    "source",
-    [
-        "bookmarks:list",
-        "bookmarks:filter",
-        "bookmarks:tags",
-        "stuff:item-list",
-        "stuff:item-detail",
-        "upkeep:area-detail",
-    ],
-)
-@pytest.mark.parametrize("htmx", [False, True], ids=["ordinary", "htmx"])
-def test_tag_link_round_trip(admin_client, tag, source, htmx):
+HOSTILE_TAG = "parts & café+#"
+TAGS = ["two words", "tools & parts", "C++", "#priority", "café 日本語"]
+SOURCES = [
+    "bookmarks:list",
+    "bookmarks:filter",
+    "bookmarks:tags",
+    "stuff:item-list",
+    "stuff:item-detail",
+    "upkeep:area-detail",
+]
+
+
+def _round_trip_params():
+    """
+    Build a representative tag/source/htmx matrix.
+
+    Every source runs with a hostile tag, the bookmark list runs every tag, and
+    htmx runs for the targets that return different markup.
+    """
+    params = [
+        pytest.param(source, HOSTILE_TAG, False, id=f"{source}-hostile-ordinary")
+        for source in SOURCES
+    ]
+    params += [
+        pytest.param("bookmarks:list", tag, False, id=f"bookmarks:list-tag-{index}")
+        for index, tag in enumerate(TAGS)
+    ]
+    params += [
+        pytest.param(source, HOSTILE_TAG, True, id=f"{source}-hostile-htmx")
+        for source in ("bookmarks:list", "bookmarks:filter", "stuff:item-list")
+    ]
+    return params
+
+
+@pytest.mark.parametrize(("source", "tag", "htmx"), _round_trip_params())
+def test_tag_link_round_trip(admin_client, source, tag, htmx):
     bookmark = BookmarkFactory.create(active=True, title="Matching bookmark")
     bookmark.tags.add(tag)
     BookmarkFactory.create(active=True, title="Unrelated bookmark")

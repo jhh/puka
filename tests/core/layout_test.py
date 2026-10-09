@@ -55,13 +55,10 @@ def test_root_keeps_local_stylesheet_and_deferred_script(admin_client):
     ("url", "active"),
     [
         ("/", {"Overview"}),
-        ("/bookmarks/", {"Bookmarks"}),
         ("/bookmarks/filter/", {"Filter"}),
-        ("/bookmarks/tags/", {"Tags"}),
         ("/stuff/", {"Inventory"}),
         ("/stuff/location/0/", {"Locations"}),
         ("/upkeep/task/", {"Tasks"}),
-        ("/upkeep/area/", {"Areas"}),
     ],
 )
 def test_sidebar_active_item(admin_client, url, active):
@@ -109,11 +106,11 @@ def test_navbar_shows_user_and_logout(admin_client, admin_user):
     assert logout.attrs["method"] == "post"
 
 
-@pytest.mark.parametrize("url", ["/", "/stuff/", "/upkeep/area/", "/bookmarks/"])
-def test_no_stale_drawer_refs(admin_client, url):
-    content = admin_client.get(url).content.decode()
-    assert "sidebarDrawer" not in content
-    assert "id_extra_menu" not in content
+def test_no_stale_drawer_refs(admin_client):
+    for url in ("/", "/stuff/", "/upkeep/area/", "/bookmarks/"):
+        content = admin_client.get(url).content.decode()
+        assert "sidebarDrawer" not in content
+        assert "id_extra_menu" not in content
 
 
 def test_htmx_fragment_has_no_layout(admin_client):

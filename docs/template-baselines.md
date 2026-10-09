@@ -336,3 +336,27 @@ and New Item/Cancel navigation. A deliberately delayed older search was
 aborted, and its response did not overwrite the latest results. Bookmark tag
 clicks also round-tripped a combined `parts & café+#` tag. There were no
 JavaScript errors, duplicate shells, page overflow or Inter requests.
+
+## Consolidation after the refactor
+
+The Step 1 suites were scaffolding for the refactor. Once Steps 2-5 landed,
+they were consolidated so they protect behavior without pinning markup
+details:
+
+- `views_smoke_test.py` samples representative routes for the header and
+  shell matrices instead of running every variant over every URL. Every
+  named URL still renders its full page and fragment contract once.
+- `form_rendering_test.py` asserts fields, labels, submit, cancel, delete
+  and errors in one test per form case, and merges the invalid-post checks.
+- `tag_urls_test.py` runs a hostile tag through every source plus every tag
+  through the bookmark list, instead of the full tag/source/htmx product.
+- `rendering_queries_test.py` loops full and fragment requests over one
+  dataset per case; the budgets are unchanged.
+- Page tests assert behavior (routes, confirmation text, empty states,
+  badges, `HX-Location`) rather than class lists and DOM order, which
+  `components_test.py` covers.
+
+`puka/settings/test.py` uses the MD5 password hasher: every test that takes
+`admin_client` creates a user, and PBKDF2 hashing dominated the suite (the
+full run went from 106 s to 14 s with this change alone). The consolidation
+above left 486 tests running in about 9 s.
