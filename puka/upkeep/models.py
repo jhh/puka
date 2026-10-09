@@ -61,6 +61,7 @@ class Task(models.Model):
     objects = TaskManager()
     schedules: models.Manager[Schedule]
     consumables_stocked: bool
+    due_soon: bool
 
     def __str__(self):
         return f"{self.name} ({self.pk})"

@@ -17,6 +17,56 @@
 
 {% block content %}
     <c-layout.page-header title="Welcome to Puka" />
+    <section class="mb-6">
+        <div class="mb-2 flex flex-wrap items-baseline justify-between gap-2">
+            <h2 class="text-base font-semibold text-base-content">Upcoming Tasks</h2>
+            <p class="text-sm text-base-content/70">
+                Due within a week, or out of stock and due within a month.
+            </p>
+        </div>
+        <c-ui.table size="sm">
+            <thead>
+                <tr>
+                    <th scope="col">Task</th>
+                    <th scope="col">Area</th>
+                    <th scope="col">Due</th>
+                    <th scope="col">Consumables</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in upcoming_tasks %}
+                    <tr>
+                        <td class="font-medium">
+                            <a
+                                href="{% url 'upkeep:task-detail' task.id %}"
+                                hx-get="{% url 'upkeep:task-detail' task.id %}"
+                                hx-target="#content"
+                                hx-push-url="true"
+                                class="link link-hover link-primary"
+                            >{{ task.name }}</a>
+                        </td>
+                        <td class="text-base-content/70">{{ task.area.name }}</td>
+                        <td class="{% if task.due_soon %}text-base-content/70{% else %}text-base-content/50{% endif %}">
+                            {{ task.earliest_due_date }}
+                        </td>
+                        <td>
+                            {% if task.are_consumables_stocked %}
+                                <c-ui.badge variant="success" style="soft" size="sm">in stock</c-ui.badge>
+                            {% else %}
+                                <c-ui.badge variant="warning" style="soft" size="sm">out of stock</c-ui.badge>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4">
+                            <c-ui.empty-state title="No upcoming tasks" icon="hero-clipboard-document-check" />
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </c-ui.table>
+    </section>
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {% url 'bookmarks:list' as href %}
         {% with title="Bookmarks" icon="hero-bookmark" count=counts.bookmarks caption="active bookmarks" %}

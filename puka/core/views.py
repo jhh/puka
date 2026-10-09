@@ -36,6 +36,7 @@ def overview(request):
     from puka.bookmarks.models import Bookmark  # noqa: PLC0415
     from puka.stuff.models import Item  # noqa: PLC0415
     from puka.upkeep.models import Task  # noqa: PLC0415
+    from puka.upkeep.services import get_upcoming_tasks  # noqa: PLC0415
 
     counts = {
         "bookmarks": Bookmark.active_objects.count(),
@@ -43,4 +44,8 @@ def overview(request):
         "tasks": Task.objects.count(),
         "tags": Bookmark.tags.count(),
     }
-    return render(request, "overview.html", {"counts": counts})
+    context = {
+        "counts": counts,
+        "upcoming_tasks": get_upcoming_tasks(),
+    }
+    return render(request, "overview.html", context)

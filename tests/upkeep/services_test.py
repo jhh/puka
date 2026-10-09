@@ -12,8 +12,16 @@ from django.db.models import QuerySet
 from puka.upkeep.services import (
     get_areas_tasks_schedules,
     get_tasks_schedules,
+    get_upcoming_tasks,
 )
-from tests.factories import AreaFactory, ItemFactory, ScheduleFactory, TaskFactory, TaskItemFactory
+from tests.factories import (
+    AreaFactory,
+    InventoryFactory,
+    ItemFactory,
+    ScheduleFactory,
+    TaskFactory,
+    TaskItemFactory,
+)
 
 
 @pytest.mark.django_db
@@ -66,6 +74,77 @@ def test_get_tasks_schedules(area, start_date):
 def test_get_tasks_schedules_none(area, start_date):
     t = get_tasks_schedules(99)
     assert len(t) == 0
+
+
+@pytest.mark.django_db
+def test_get_upcoming_tasks_due_soon_or_short_stocked(start_date):
+    area = AreaFactory.create()
+    stocked = ItemFactory.create(name="Stocked")
+    InventoryFactory.create(item=stocked, quantity=5)
+    shortage = ItemFactory.create(name="Shortage")
+
+    due_soon = TaskFactory.create(area=area, name="Due soon")
+    ScheduleFactory.create(task=due_soon, due_date=start_date + timedelta(days=7))
+
+    due_soon_short = TaskFactory.create(area=area, name="Due soon, out of stock")
+    ScheduleFactory.create(task=due_soon_short, due_date=start_date + timedelta(days=2))
+    TaskItemFactory.create(task=due_soon_short, item=shortage, quantity=1)
+
+    stocked_later = TaskFactory.create(area=area, name="Due later, stocked")
+    ScheduleFactory.create(task=stocked_later, due_date=start_date + timedelta(days=21))
+    TaskItemFactory.create(task=stocked_later, item=stocked, quantity=5)
+
+    short_later = TaskFactory.create(area=area, name="Due later, out of stock")
+    ScheduleFactory.create(task=short_later, due_date=start_date + timedelta(days=30))
+    TaskItemFactory.create(task=short_later, item=shortage, quantity=1)
+
+    too_far = TaskFactory.create(area=area, name="Too far, out of stock")
+    ScheduleFactory.create(task=too_far, due_date=start_date + timedelta(days=31))
+    TaskItemFactory.create(task=too_far, item=shortage, quantity=1)
+
+    completed = TaskFactory.create(area=area, name="Completed")
+    ScheduleFactory.create(
+        task=completed,
+        due_date=start_date + timedelta(days=1),
+        completion_date=start_date,
+    )
+
+    tasks = list(get_upcoming_tasks(start_date))
+    assert [task.name for task in tasks] == [
+        "Due soon, out of stock",
+        "Due soon",
+        "Due later, out of stock",
+    ]
+    assert [task.are_consumables_stocked() for task in tasks] == [False, True, False]
+    assert [task.due_soon for task in tasks] == [True, True, False]
+
+
+@pytest.mark.django_db
+def test_get_upcoming_tasks_uses_earliest_incomplete_schedule(start_date):
+    task = TaskFactory.create()
+    ScheduleFactory.create(
+        task=task,
+        due_date=start_date + timedelta(days=2),
+        completion_date=start_date,
+    )
+    ScheduleFactory.create(task=task, due_date=start_date + timedelta(days=60))
+
+    assert list(get_upcoming_tasks(start_date)) == []
+
+
+@pytest.mark.django_db
+def test_get_upcoming_tasks_uses_one_query(start_date, django_assert_num_queries):
+    item = ItemFactory.create()
+    for index in range(3):
+        task = TaskFactory.create(name=f"Short stocked {index}")
+        ScheduleFactory.create(task=task, due_date=start_date + timedelta(days=index))
+        TaskItemFactory.create(task=task, item=item)
+
+    with django_assert_num_queries(1):
+        tasks = list(get_upcoming_tasks(start_date))
+
+    assert [task.are_consumables_stocked() for task in tasks] == [False, False, False]
+    assert [task.due_soon for task in tasks] == [True, True, True]
 
 
 @pytest.mark.django_db

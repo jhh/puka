@@ -1,12 +1,25 @@
 from __future__ import annotations
 
+import datetime
 import logging
 from itertools import chain
 from operator import attrgetter
 from typing import TYPE_CHECKING, Any
 
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
-from django.db.models import CharField, Count, OuterRef, QuerySet, Subquery, Sum, Value
+from django.db.models import (
+    BooleanField,
+    Case,
+    CharField,
+    Count,
+    OuterRef,
+    Q,
+    QuerySet,
+    Subquery,
+    Sum,
+    Value,
+    When,
+)
 
 from puka.upkeep.models import Area, Schedule, Task, TaskItem
 
@@ -80,6 +93,43 @@ def get_tasks_with_earliest_due_date():
     # Annotate each Task with its earliest incomplete schedule's due_date
     return Task.objects.with_stock_status().annotate(
         earliest_due_date=Subquery(earliest_due_date_subquery),
+    )
+
+
+def get_upcoming_tasks(
+    start_date: datetime.date | None = None,
+    task_within_days: int = 7,
+    supplies_within_days: int = 30,
+) -> QuerySet[Task]:
+    """
+    Return tasks due within a week or short on consumables due within a month.
+
+    A task qualifies while its earliest incomplete schedule is due within
+    ``supplies_within_days``. It is returned when that due date falls within
+    ``task_within_days`` or a consumable has less stock than the quantity
+    required. Overdue tasks are included. ``due_soon`` is True when the due
+    date falls within ``task_within_days``.
+
+    """
+    if start_date is None:
+        start_date = datetime.datetime.now(tz=datetime.UTC).date()
+
+    task_within_date = start_date + datetime.timedelta(days=task_within_days)
+    supplies_within_date = start_date + datetime.timedelta(days=supplies_within_days)
+
+    return (
+        get_tasks_with_earliest_due_date()
+        .select_related("area")
+        .annotate(
+            due_soon=Case(
+                When(earliest_due_date__lte=task_within_date, then=True),
+                default=False,
+                output_field=BooleanField(),
+            ),
+        )
+        .filter(earliest_due_date__isnull=False, earliest_due_date__lte=supplies_within_date)
+        .filter(Q(earliest_due_date__lte=task_within_date) | Q(consumables_stocked=False))
+        .order_by("earliest_due_date")
     )
 
 
