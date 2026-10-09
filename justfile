@@ -180,7 +180,7 @@ coverage:
 
 # run manage.py with command
 [group('run')]
-manage command:
+manage *command:
     uv run puka/manage.py {{ command }}
 
 # run the development server
