@@ -191,9 +191,12 @@ def test_card_header_actions():
 @pytest.mark.parametrize(
     ("attrs", "expected"),
     [
-        ("", ["badge"]),
+        ("", ["badge", "badge-soft"]),
         ('variant="primary" style="soft"', ["badge", "badge-primary", "badge-soft"]),
-        ('variant="warning" size="sm"', ["badge", "badge-warning", "badge-sm"]),
+        (
+            'variant="warning" size="sm"',
+            ["badge", "badge-warning", "badge-soft", "badge-sm"],
+        ),
         (
             'variant="neutral" style="outline" size="lg"',
             ["badge", "badge-neutral", "badge-outline", "badge-lg"],

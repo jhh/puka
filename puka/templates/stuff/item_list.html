@@ -60,17 +60,18 @@
                                         {{ item.name }}
                                     </a>
                                     {% if item.tags.all %}
-                                        <div class="mt-0.5">
+                                        <ul role="list" aria-label="Item tags" class="mt-1 flex flex-wrap gap-1">
                                             {% for tag in item.tags.all %}
-                                                <c-ui.tag
-                                                    href="{% url 'stuff:item-list' %}?query=%23{{ tag.name|urlencode:'' }}"
-                                                    hx-get="{% url 'stuff:item-list' %}?query=%23{{ tag.name|urlencode:'' }}"
-                                                    hx-push-url="true"
-                                                    hx-target="#content"
-                                                    class="mr-1 text-xs"
-                                                >{{ tag }}</c-ui.tag>
+                                                <li>
+                                                    <a
+                                                        href="{% url 'stuff:item-list' %}?query=%23{{ tag.name|urlencode:'' }}"
+                                                        hx-get="{% url 'stuff:item-list' %}?query=%23{{ tag.name|urlencode:'' }}"
+                                                        hx-push-url="true"
+                                                        hx-target="#content"
+                                                    ><c-ui.badge variant="info" size="sm">{{ tag }}</c-ui.badge></a>
+                                                </li>
                                             {% endfor %}
-                                        </div>
+                                        </ul>
                                     {% endif %}
                                 </td>
                                 <td class="hidden text-base-content/70 sm:table-cell">{{ item.quantity }}</td>

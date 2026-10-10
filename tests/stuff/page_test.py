@@ -65,7 +65,7 @@ def test_item_detail_empty_states(admin_client):
     assert "No bookmarks" in content
 
 
-def test_item_and_bookmark_tags_use_matching_neutral_badges(admin_client):
+def test_item_and_bookmark_tags_use_matching_info_badges(admin_client):
     item = ItemFactory.create(notes="Compact header notes", reorder_level=3)
     item.tags.add("electronics")
     bookmark = BookmarkFactory.create()
@@ -83,8 +83,9 @@ def test_item_and_bookmark_tags_use_matching_neutral_badges(admin_client):
     for name in ("electronics", "manual"):
         (badge,) = (span for span in page.find("span") if span.text == name)
         classes = badge.attrs["class"].split()
-        assert "badge-neutral" in classes
-        assert "badge-soft" not in classes
+        assert "badge-info" in classes
+        assert "badge-soft" in classes
+        assert "badge-neutral" not in classes
         assert "badge-error" not in classes
     assert "Manage this item's details" not in response.content.decode()
 

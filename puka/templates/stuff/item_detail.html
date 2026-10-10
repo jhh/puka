@@ -80,7 +80,7 @@
                                     hx-get="{% url 'stuff:item-list' %}?query=%23{{ tag.name|urlencode:'' }}"
                                     hx-push-url="true"
                                     hx-target="#content"
-                                ><c-ui.badge variant="neutral" size="sm">{{ tag }}</c-ui.badge></a>
+                                ><c-ui.badge variant="info" size="sm">{{ tag }}</c-ui.badge></a>
                             </li>
                         {% endfor %}
                     </ul>
@@ -179,7 +179,7 @@
             </div>
             {% with bookmarks=item.bookmarks.all %}
                 {% if bookmarks %}
-                    {% include "bookmarks/_detail_page.html" with neutral_tags=True %}
+                    {% include "bookmarks/_detail_page.html" with info_tags=True %}
                 {% else %}
                     <div class="rounded-box border border-base-300 bg-base-100">
                         <c-ui.empty-state title="No bookmarks" icon="hero-bookmark"><p class="text-sm">

@@ -1,8 +1,8 @@
 {% comment %}
 variant: primary | secondary | accent | neutral | info | success | warning | error | ghost
-style: soft | outline | dash (optional); size: xs | sm | md | lg
+style: soft (default) | outline | dash; size: xs | sm | md | lg
 {% endcomment %}
-<c-vars variant="" style="" size="md" class />
+<c-vars variant="" style="soft" size="md" class />
 
 <span
     class="badge {% if variant == 'primary' %}badge-primary{% elif variant == 'secondary' %}badge-secondary{% elif variant == 'accent' %}badge-accent{% elif variant == 'neutral' %}badge-neutral{% elif variant == 'info' %}badge-info{% elif variant == 'success' %}badge-success{% elif variant == 'warning' %}badge-warning{% elif variant == 'error' %}badge-error{% elif variant == 'ghost' %}badge-ghost{% endif %} {% if style == 'soft' %}badge-soft{% elif style == 'outline' %}badge-outline{% elif style == 'dash' %}badge-dash{% endif %} {% if size == 'xs' %}badge-xs{% elif size == 'sm' %}badge-sm{% elif size == 'lg' %}badge-lg{% endif %} {{ class }}"
