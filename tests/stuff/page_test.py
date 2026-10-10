@@ -5,8 +5,8 @@ from __future__ import annotations
 import pytest
 from django.urls import reverse
 
-from puka.stuff.models import Location
-from tests.factories import ItemFactory, ItemWithInventoryFactory
+from puka.stuff.models import Inventory, Location
+from tests.factories import BookmarkFactory, ItemFactory, ItemWithInventoryFactory, LocationFactory
 from tests.utils import HTMX, parse_html
 
 pytestmark = pytest.mark.django_db
@@ -16,16 +16,41 @@ def test_item_detail_sections_and_quantity_buttons(admin_client):
     item = ItemWithInventoryFactory.create()
     inventory = item.inventories.get()
     url = reverse("stuff:item-detail", args=[item.pk])
-    page = parse_html(admin_client.get(url, headers=HTMX).content)
+    response = admin_client.get(url, headers=HTMX)
+    page = parse_html(response.content)
 
-    assert [el.text for el in page.find("h2")] == ["Details", "Inventory", "Bookmarks"]
+    assert [el.attrs["id"] for el in page.find("h2")] == [
+        "inventory-heading",
+        "bookmarks-heading",
+    ]
+    assert [el.attrs["aria-labelledby"] for el in page.find("section")] == [
+        "inventory-heading",
+        "bookmarks-heading",
+    ]
+    assert page.find("table")
+    (location,) = page.find(
+        "a",
+        href=reverse("stuff:location-list", args=[inventory.location_id]),
+    )
+    assert location.text == inventory.location.name
+    assert location.attrs["hx-get"] == location.attrs["href"]
+    assert location.attrs["hx-target"] == "#content"
+    assert "max-w-4xl" not in response.content.decode()
     adjust = reverse("stuff:inventory-adjust", args=[inventory.pk])
     buttons = page.find("button", hx_post=adjust)
     assert all(b.attrs["hx-target"] == f"#id_quantity_{inventory.pk}" for b in buttons)
     (delete,) = page.find("button", hx_post=reverse("stuff:item-delete", args=[item.pk]))
     assert delete.attrs["hx-confirm"] == "Are you sure you want to delete this item?"
-    (trigger,) = page.find("button", popovertarget="item-manage-menu")
-    assert trigger.text == "Manage"
+    assert not page.find("button", popovertarget="item-manage-menu")
+    (edit,) = page.find("a", href=reverse("stuff:item-edit", args=[item.pk]))
+    assert "btn" in edit.attrs["class"].split()
+    (up,) = (
+        link
+        for link in page.find("a", href=reverse("stuff:item-list"))
+        if "btn" in link.attrs.get("class", "").split()
+    )
+    assert up.attrs["hx-get"] == reverse("stuff:item-list")
+    assert up.attrs["hx-target"] == "#content"
     for name in ("stuff:item-edit", "stuff:inventory-new", "stuff:bookmark-select"):
         (link,) = page.find("a", href=reverse(name, args=[item.pk]))
         assert link.attrs["hx-get"] == link.attrs["href"]
@@ -38,6 +63,78 @@ def test_item_detail_empty_states(admin_client):
     content = admin_client.get(reverse("stuff:item-detail", args=[item.pk])).content.decode()
     assert "Not stocked anywhere" in content
     assert "No bookmarks" in content
+
+
+def test_item_and_bookmark_tags_use_matching_neutral_badges(admin_client):
+    item = ItemFactory.create(notes="Compact header notes", reorder_level=3)
+    item.tags.add("electronics")
+    bookmark = BookmarkFactory.create()
+    bookmark.tags.add("manual")
+    item.bookmarks.add(bookmark)
+    response = admin_client.get(reverse("stuff:item-detail", args=[item.pk]), headers=HTMX)
+    page = parse_html(response.content)
+
+    assert not page.find("h2", id="details-heading")
+    assert not page.find("dl")
+    (notes,) = page.find("p", id="item-notes")
+    assert notes.text == item.notes
+    (reorder_level,) = page.find("span", id="item-reorder-level")
+    assert reorder_level.text == "3"
+    for name in ("electronics", "manual"):
+        (badge,) = (span for span in page.find("span") if span.text == name)
+        classes = badge.attrs["class"].split()
+        assert "badge-neutral" in classes
+        assert "badge-soft" not in classes
+        assert "badge-error" not in classes
+    assert "Manage this item's details" not in response.content.decode()
+
+
+@pytest.mark.parametrize(
+    ("quantity", "variant"),
+    [(0, "warning"), (2, "warning"), (3, "success"), (4, "success")],
+)
+def test_item_reorder_badge_compares_stock_with_minimum(admin_client, quantity, variant):
+    item = ItemWithInventoryFactory.create(reorder_level=3)
+    inventory = item.inventories.get()
+    inventory.quantity = quantity
+    inventory.save()
+    response = admin_client.get(reverse("stuff:item-detail", args=[item.pk]), headers=HTMX)
+    page = parse_html(response.content)
+    (badge,) = page.find("span", id="item-reorder-level")
+    assert f"badge-{variant}" in badge.attrs["class"].split()
+
+
+def test_item_reorder_badge_uses_stock_across_locations(admin_client):
+    item = ItemWithInventoryFactory.create(reorder_level=12)
+    location = LocationFactory.create(name="Other shelf", code="A01-03")
+    Inventory.objects.create(item=item, location=location, quantity=2)
+    response = admin_client.get(reverse("stuff:item-detail", args=[item.pk]), headers=HTMX)
+    page = parse_html(response.content)
+    (badge,) = page.find("span", id="item-reorder-level")
+    assert "badge-success" in badge.attrs["class"].split()
+
+
+def test_item_reorder_badge_can_refresh_without_replacing_page(admin_client):
+    item = ItemWithInventoryFactory.create(reorder_level=12)
+    inventory = item.inventories.get()
+    url = reverse("stuff:item-detail", args=[item.pk])
+    headers = {**HTMX, "HX-Target": "span#item-reorder-status"}
+    response = admin_client.get(url, headers=headers)
+    page = parse_html(response.content)
+    (badge,) = page.find("span", id="item-reorder-level")
+    assert "badge-warning" in badge.attrs["class"].split()
+    assert not page.find("h1")
+    (status,) = page.find("span", id="item-reorder-status")
+    assert status.attrs["hx-swap"] == "outerHTML"
+    assert status.attrs["hx-trigger"] == f"inventoryChanged[detail.item_id=={item.pk}] from:window"
+
+    inventory.quantity = 12
+    inventory.save()
+    response = admin_client.get(url, headers=headers)
+    page = parse_html(response.content)
+    (badge,) = page.find("span", id="item-reorder-level")
+    assert badge.text == "12"
+    assert "badge-success" in badge.attrs["class"].split()
 
 
 def test_item_list_empty_and_pagination(admin_client):
@@ -112,9 +209,10 @@ def test_shared_inventory_controls_on_detail_pages(admin_client, name):
     assert [button.attrs["aria-label"] for button in buttons] == ["Remove one", "Add one"]
     assert all(button.attrs["hx-target"] == f"#id_quantity_{inventory.pk}" for button in buttons)
     if name == "stuff:item-detail":
-        assert [el.text for el in page.find("dt")][:3] == ["Name", "Notes", "Reorder Level"]
-        assert [el.text for el in page.find("dd")][:3] == [item.name, "Saved notes", "0"]
-        assert page.find("button", hx_get=reverse("stuff:inventory-edit", args=[inventory.pk]))
+        (notes,) = page.find("p", id="item-notes")
+        assert notes.text == "Saved notes"
+        assert not page.find("span", id="item-reorder-level")
+        assert page.find("a", hx_get=reverse("stuff:inventory-edit", args=[inventory.pk]))
     else:
         assert [el.text for el in page.find("dt")][:2] == ["Name", "Code"]
         assert not page.find("button", hx_get=reverse("stuff:inventory-edit", args=[inventory.pk]))

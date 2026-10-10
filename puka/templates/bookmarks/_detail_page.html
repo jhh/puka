@@ -2,6 +2,7 @@
 Prepared `bookmarks` attached to `item` (a stuff Item or upkeep Area), with a remove
 button that posts to `bookmark_delete_url`. The caller handles the empty state.
 Tag links quote a single name for the filter form's TagField before URL encoding.
+neutral_tags: use solid theme-aware neutral badges for item reference tags.
 {% endcomment %}
 <ul role="list" class="list rounded-box border border-base-300 bg-base-100 text-sm">
     {% for bookmark in bookmarks %}
@@ -23,7 +24,11 @@ Tag links quote a single name for the filter form's TagField before URL encoding
                             hx-get="{% url 'bookmarks:filter' %}?tags=%22{{ tag.name|urlencode:'' }}%22"
                             hx-push-url="true"
                             hx-target="#content"
-                        ><c-ui.badge variant="error" style="soft" size="sm">{{ tag }}</c-ui.badge></a>
+                        ><c-ui.badge
+                                variant="{% if neutral_tags %}neutral{% else %}error{% endif %}"
+                                style="{% if not neutral_tags %}soft{% endif %}"
+                                size="sm"
+                            >{{ tag }}</c-ui.badge></a>
                     </li>
                 {% endfor %}
             </ul>

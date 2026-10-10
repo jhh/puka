@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertContains
@@ -83,6 +85,9 @@ def test_adjust_inventory(admin_client, inventory, adjustment, expected):
     assert response.status_code == 200
     assert response["Content-Type"].startswith("text/plain")
     assert response.content.decode() == str(expected)
+    assert json.loads(response["HX-Trigger"]) == {
+        "inventoryChanged": {"item_id": inventory.item_id},
+    }
     inventory.refresh_from_db()
     assert inventory.quantity == expected
 

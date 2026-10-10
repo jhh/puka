@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView, View
-from django_htmx.http import HttpResponseLocation
+from django_htmx.http import HttpResponseLocation, trigger_client_event
 from django_htmx.middleware import HtmxDetails
 
 from puka.core.pagination import PageSizeMixin
@@ -50,10 +50,17 @@ class ItemDetailView(DetailView):
     extra_context = MappingProxyType({"bookmark_delete_url": "stuff:bookmark-delete"})
 
     def get_template_names(self):
-        return get_template(self.request, "stuff/item_detail.html", "#detail-partial")
+        partial = (
+            "#reorder-partial"
+            if (HtmxDetails(self.request).target or "").endswith("#item-reorder-status")
+            else "#detail-partial"
+        )
+        return get_template(self.request, "stuff/item_detail.html", partial)
 
     def get_queryset(self):
-        return Item.objects.prefetch_related(
+        return Item.objects.annotate(
+            total_quantity=Sum("inventories__quantity", default=0),
+        ).prefetch_related(
             Prefetch("inventories", queryset=Inventory.objects.select_related("location")),
             "tags",
             "bookmarks__tags",
@@ -111,7 +118,8 @@ def adjust_inventory(request, pk):
     quantity = int(request.POST.get("quantity", 0))
     inventory = get_object_or_404(Inventory, pk=pk)
     adjust_inventory_quantity(inventory, quantity)
-    return HttpResponse(str(inventory.quantity), content_type="text/plain")
+    response = HttpResponse(str(inventory.quantity), content_type="text/plain")
+    return trigger_client_event(response, "inventoryChanged", {"item_id": inventory.item_id})
 
 
 class InventoryCreateView(CreateView):

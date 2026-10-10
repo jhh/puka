@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "stuff/base.html" %}
 
 {% block title %}{{ item.name }}{% endblock %}
 
@@ -12,125 +12,199 @@
     <ul>{% partial breadcrumbs %}</ul>
 {% endblock breadcrumbs %}
 
+{% partialdef reorder-partial %}
+    <span
+        id="item-reorder-status"
+        class="inline-flex items-center"
+        hx-get="{% url 'stuff:item-detail' item.pk %}"
+        hx-trigger="inventoryChanged[detail.item_id=={{ item.pk }}] from:window"
+        hx-swap="outerHTML"
+    >
+        {% if item.reorder_level > 0 %}
+            {% if item.total_quantity < item.reorder_level %}
+                <c-ui.badge
+                    id="item-reorder-level"
+                    variant="warning"
+                    size="sm"
+                    aria-label="Below minimum stock of {{ item.reorder_level }}"
+                >{{ item.reorder_level }}</c-ui.badge>
+            {% else %}
+                <c-ui.badge
+                    id="item-reorder-level"
+                    variant="success"
+                    size="sm"
+                    aria-label="Minimum stock of {{ item.reorder_level }} met"
+                >{{ item.reorder_level }}</c-ui.badge>
+            {% endif %}
+        {% endif %}
+    </span>
+{% endpartialdef reorder-partial %}
+
 {% block content %}
     {% partialdef detail-partial inline %}
         {% if request.htmx and not request.htmx.boosted and not request.htmx.history_restore_request and request.htmx.target != 'body' %}
             <c-layout.page-meta title="{{ item.name }}">{% partial breadcrumbs %}</c-layout.page-meta>
         {% endif %}
-        <c-layout.page-header title="{{ item.name }}" class="mx-auto max-w-4xl">
+        <c-layout.page-header title="{{ item.name }}">
             <c-slot name="actions">
-                <c-layout.manage-dropdown id="item-manage-menu">
-                    <li>
-                        <a
-                            href="{% url 'stuff:item-edit' item.pk %}"
-                            hx-get="{% url 'stuff:item-edit' item.pk %}"
-                            hx-push-url="true"
-                            hx-target="#content"
-                        >Edit item</a>
-                    </li>
-                    <li>
-                        <button
-                            type="button"
-                            class="text-error"
-                            hx-post="{% url 'stuff:item-delete' item.pk %}"
-                            hx-confirm="Are you sure you want to delete this item?"
-                        >
-                            Delete item
-                        </button>
-                    </li>
-                </c-layout.manage-dropdown>
+                <c-ui.button
+                    href="{% url 'stuff:item-list' %}"
+                    icon="hero-arrow-up"
+                    hx-get="{% url 'stuff:item-list' %}"
+                    hx-target="#content"
+                    hx-push-url="true"
+                >Up</c-ui.button>
+                <c-ui.button
+                    href="{% url 'stuff:item-edit' item.pk %}"
+                    icon="hero-pencil-square"
+                    hx-get="{% url 'stuff:item-edit' item.pk %}"
+                    hx-target="#content"
+                    hx-push-url="true"
+                >Edit item</c-ui.button>
             </c-slot>
         </c-layout.page-header>
 
-        <div class="mx-auto flex max-w-4xl flex-col gap-4">
-            <c-ui.card title="Details">
-                <dl class="divide-y divide-base-200">
-                    <c-ui.detail-row label="Name">{{ item.name }}</c-ui.detail-row>
-                    <c-ui.detail-row label="Notes">{{ item.notes }}</c-ui.detail-row>
-                    <c-ui.detail-row label="Reorder Level">{{ item.reorder_level }}</c-ui.detail-row>
-                    {% if item.tags.all %}
-                        <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
-                            <dt class="text-sm font-medium text-base-content">Item Tags</dt>
-                            <dd class="mt-1 flex flex-wrap gap-1 sm:col-span-2 sm:mt-0">
-                                {% for tag in item.tags.all %}
-                                    <a
-                                        href="{% url 'stuff:item-list' %}?query=%23{{ tag.name|urlencode:'' }}"
-                                        hx-get="{% url 'stuff:item-list' %}?query=%23{{ tag.name|urlencode:'' }}"
-                                        hx-push-url="true"
-                                        hx-target="#content"
-                                    ><c-ui.badge variant="error" style="soft" size="sm">{{ tag }}</c-ui.badge></a>
-                                {% endfor %}
-                            </dd>
-                        </div>
-                    {% endif %}
-                </dl>
-            </c-ui.card>
+        <div class="mb-6 space-y-3">
+            {% if item.notes %}
+                <p id="item-notes" class="text-sm break-words text-base-content/70">
+                    {{ item.notes|linebreaksbr }}
+                </p>
+            {% endif %}
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+                {% if item.tags.all %}
+                    <ul role="list" aria-label="Item tags" class="flex flex-wrap gap-1">
+                        {% for tag in item.tags.all %}
+                            <li>
+                                <a
+                                    href="{% url 'stuff:item-list' %}?query=%23{{ tag.name|urlencode:'' }}"
+                                    hx-get="{% url 'stuff:item-list' %}?query=%23{{ tag.name|urlencode:'' }}"
+                                    hx-push-url="true"
+                                    hx-target="#content"
+                                ><c-ui.badge variant="neutral" size="sm">{{ tag }}</c-ui.badge></a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
 
-            <c-ui.card title="Inventory">
-                <c-slot name="header_actions">
-                    <c-ui.button
-                        href="{% url 'stuff:inventory-new' item.pk %}"
-                        variant="primary"
-                        style="soft"
-                        size="sm"
-                        icon="hero-plus"
-                        hx-get="{% url 'stuff:inventory-new' item.pk %}"
-                        hx-push-url="true"
-                        hx-target="#content"
-                    >Create inventory</c-ui.button>
-                </c-slot>
-                <ul role="list" class="list rounded-box border border-base-300 bg-base-100">
+        <section aria-labelledby="inventory-heading" class="mb-8 min-w-0">
+            <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+                <h2 id="inventory-heading" class="flex flex-wrap items-center gap-2 font-semibold">
+                    <c-ui.icon name="hero-archive-box" class="size-5" />
+                    Inventory
+                    {% if item.reorder_level > 0 %}
+                        {% partial reorder-partial %}
+                    {% endif %}
+                </h2>
+                <c-ui.button
+                    href="{% url 'stuff:inventory-new' item.pk %}"
+                    variant="primary"
+                    icon="hero-plus"
+                    hx-get="{% url 'stuff:inventory-new' item.pk %}"
+                    hx-push-url="true"
+                    hx-target="#content"
+                >Create inventory</c-ui.button>
+            </div>
+            <c-ui.table zebra="1">
+                <thead>
+                    <tr>
+                        <th scope="col">Location</th>
+                        <th scope="col" class="max-sm:hidden">Code</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col"><span class="sr-only">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
                     {% for inv in item.inventories.all %}
-                        <li class="list-row items-center">
-                            <a
-                                href="{% url 'stuff:location-detail' pk=inv.location.id %}"
-                                hx-get="{% url 'stuff:location-detail' pk=inv.location.id %}"
-                                hx-target="#content"
-                                hx-push-url="true"
-                                class="link link-hover link-primary"
-                            >{{ inv.location }}</a>
-                            <c-ui.inventory-quantity
-                                :inventory_id="inv.pk"
-                                :quantity="inv.quantity"
-                                class="justify-end"
-                            >
+                        <tr>
+                            <td>
+                                <a
+                                    href="{% url 'stuff:location-list' inv.location_id %}"
+                                    hx-get="{% url 'stuff:location-list' inv.location_id %}"
+                                    hx-target="#content"
+                                    hx-push-url="true"
+                                    class="link link-hover font-semibold"
+                                >{{ inv.location.name }}</a>
+                                <p class="mt-1 text-xs text-base-content/70 sm:hidden">{{ inv.location.code }}</p>
+                            </td>
+                            <td class="text-base-content/70 max-sm:hidden">{{ inv.location.code }}</td>
+                            <td>
+                                <c-ui.inventory-quantity
+                                    :inventory_id="inv.pk"
+                                    :quantity="inv.quantity"
+                                    class="font-mono tabular-nums"
+                                />
+                            </td>
+                            <td class="text-right">
                                 <c-ui.button
-                                    variant="ghost"
-                                    size="xs"
-                                    class="ml-1"
+                                    href="{% url 'stuff:inventory-edit' inv.pk %}"
+                                    icon="hero-pencil-square"
+                                    aria-label="Edit inventory at {{ inv.location.name }}"
                                     hx-get="{% url 'stuff:inventory-edit' inv.id %}"
                                     hx-target="#content"
                                     hx-push-url="true"
-                                >edit</c-ui.button>
-                            </c-ui.inventory-quantity>
-                        </li>
+                                >Edit</c-ui.button>
+                            </td>
+                        </tr>
                     {% empty %}
-                        <li><c-ui.empty-state title="Not stocked anywhere" icon="hero-archive-box" /></li>
+                        <tr>
+                            <td colspan="4">
+                                <c-ui.empty-state
+                                    title="Not stocked anywhere"
+                                    icon="hero-archive-box"
+                                ><p class="text-sm">
+                                        Create inventory to store this item in a location.
+                                    </p></c-ui.empty-state>
+                            </td>
+                        </tr>
                     {% endfor %}
-                </ul>
-            </c-ui.card>
+                </tbody>
+            </c-ui.table>
+        </section>
 
-            <c-ui.card title="Bookmarks">
-                <c-slot name="header_actions">
-                    <c-ui.button
-                        href="{% url 'stuff:bookmark-select' item.pk %}"
-                        variant="primary"
-                        style="soft"
-                        size="sm"
-                        icon="hero-plus"
-                        hx-get="{% url 'stuff:bookmark-select' item.pk %}"
-                        hx-push-url="true"
-                        hx-target="#content"
-                    >Add bookmark</c-ui.button>
-                </c-slot>
-                {% with bookmarks=item.bookmarks.all %}
-                    {% if bookmarks %}
-                        {% include "bookmarks/_detail_page.html" %}
-                    {% else %}
-                        <c-ui.empty-state title="No bookmarks" icon="hero-bookmark" />
-                    {% endif %}
-                {% endwith %}
-            </c-ui.card>
+        <section aria-labelledby="bookmarks-heading" class="min-w-0">
+            <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+                <h2 id="bookmarks-heading" class="flex items-center gap-2 font-semibold">
+                    <c-ui.icon name="hero-bookmark" class="size-5" />
+                    Bookmarks
+                </h2>
+                <c-ui.button
+                    href="{% url 'stuff:bookmark-select' item.pk %}"
+                    icon="hero-plus"
+                    hx-get="{% url 'stuff:bookmark-select' item.pk %}"
+                    hx-push-url="true"
+                    hx-target="#content"
+                >Add bookmark</c-ui.button>
+            </div>
+            {% with bookmarks=item.bookmarks.all %}
+                {% if bookmarks %}
+                    {% include "bookmarks/_detail_page.html" with neutral_tags=True %}
+                {% else %}
+                    <div class="rounded-box border border-base-300 bg-base-100">
+                        <c-ui.empty-state title="No bookmarks" icon="hero-bookmark"><p class="text-sm">
+                                Add links to manuals, product pages, or other references.
+                            </p></c-ui.empty-state>
+                    </div>
+                {% endif %}
+            {% endwith %}
+        </section>
+        <div class="mt-8 border-t border-base-300 pt-4">
+            <form method="post" action="{% url 'stuff:item-delete' item.pk %}">
+                {% csrf_token %}
+                <c-ui.button
+                    type="submit"
+                    variant="error"
+                    style="outline"
+                    icon="hero-trash"
+                    hx-post="{% url 'stuff:item-delete' item.pk %}"
+                    hx-target="#content"
+                    hx-confirm="Are you sure you want to delete this item?"
+                >Delete item</c-ui.button>
+            </form>
+            <p class="mt-2 text-xs text-base-content/70">
+                Deleting this item removes its inventory records from every location.
+            </p>
         </div>
     {% endpartialdef detail-partial %}
 {% endblock content %}
