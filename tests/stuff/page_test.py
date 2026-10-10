@@ -138,6 +138,66 @@ def test_item_reorder_badge_can_refresh_without_replacing_page(admin_client):
     assert "badge-success" in badge.attrs["class"].split()
 
 
+@pytest.mark.parametrize(
+    ("quantity", "variant"),
+    [(0, "warning"), (2, "warning"), (3, "success"), (4, "success")],
+)
+def test_item_list_reorder_badge_compares_stock_with_minimum(admin_client, quantity, variant):
+    item = ItemWithInventoryFactory.create(reorder_level=3)
+    inventory = item.inventories.get()
+    inventory.quantity = quantity
+    inventory.save()
+    page = parse_html(admin_client.get(reverse("stuff:item-list"), headers=HTMX).content)
+
+    (quantity_cell,) = (
+        el for el in page.find("span") if "tabular-nums" in el.attrs.get("class", "").split()
+    )
+    assert quantity_cell.text == str(quantity)
+    assert any(
+        el.text == "Minimum stock" and "sr-only" in el.attrs.get("class", "").split()
+        for el in page.find("span")
+    )
+    label = "Below minimum stock of 3" if variant == "warning" else "Minimum stock of 3 met"
+    (badge,) = page.find("span", **{"aria-label": label})
+    assert badge.text == "3"
+    classes = badge.attrs["class"].split()
+    assert f"badge-{variant}" in classes
+    assert "badge-soft" in classes
+
+
+def test_item_list_reorder_badge_hidden_without_reorder_level(admin_client):
+    ItemFactory.create(reorder_level=0)
+    page = parse_html(admin_client.get(reverse("stuff:item-list"), headers=HTMX).content)
+
+    (quantity_cell,) = (
+        el for el in page.find("span") if "tabular-nums" in el.attrs.get("class", "").split()
+    )
+    assert quantity_cell.text == "0"
+    assert not any("badge" in el.attrs.get("class", "").split() for el in page.find("span"))
+
+
+def test_item_list_orders_below_minimum_items_first(
+    admin_client,
+    inventory_factory,
+    location_factory,
+):
+    below_a = ItemFactory.create(name="Below A", reorder_level=5)
+    below_b = ItemFactory.create(name="Below B", reorder_level=2)
+    met = ItemFactory.create(name="Met", reorder_level=2)
+    ItemFactory.create(name="No minimum", reorder_level=0)
+    inventory_factory(item=below_a, location=location_factory(name="A", code="A"), quantity=1)
+    inventory_factory(item=below_b, location=location_factory(name="B", code="B"), quantity=0)
+    inventory_factory(item=met, location=location_factory(name="C", code="C"), quantity=5)
+    page = parse_html(admin_client.get(reverse("stuff:item-list"), headers=HTMX).content)
+
+    names = [
+        link.text
+        for link in page.find("a")
+        if {"link-hover", "font-semibold"} <= set(link.attrs.get("class", "").split())
+    ]
+    assert names == ["Below A", "Below B", "Met", "No minimum"]
+
+
 def test_item_list_empty_and_pagination(admin_client):
     content = admin_client.get(reverse("stuff:item-list") + "?query=zzz").content.decode()
     assert "No items found" in content

@@ -2,7 +2,7 @@ import logging
 from types import MappingProxyType
 
 from django.db import transaction
-from django.db.models import Prefetch, Sum
+from django.db.models import Case, F, IntegerField, Prefetch, Sum, Value, When
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
@@ -38,9 +38,25 @@ class ItemListView(PageSizeMixin, ListView):
         else:
             query_set = Item.objects.all().order_by("name")
 
-        return query_set.annotate(quantity=Sum("inventories__quantity")).prefetch_related(
-            Prefetch("inventories", queryset=Inventory.objects.select_related("location")),
-            "tags",
+        # Restock order: below-minimum items first, then items whose minimum is
+        # met, then items without a minimum. Keep the queryset's own ordering
+        # (name, relevance, location code) within each group.
+        ordering = query_set.query.order_by or ("name",)
+        return (
+            query_set.annotate(quantity=Sum("inventories__quantity", default=0))
+            .annotate(
+                reorder_rank=Case(
+                    When(reorder_level__gt=0, quantity__lt=F("reorder_level"), then=Value(0)),
+                    When(reorder_level__gt=0, then=Value(1)),
+                    default=Value(2),
+                    output_field=IntegerField(),
+                ),
+            )
+            .order_by("reorder_rank", *ordering)
+            .prefetch_related(
+                Prefetch("inventories", queryset=Inventory.objects.select_related("location")),
+                "tags",
+            )
         )
 
 
