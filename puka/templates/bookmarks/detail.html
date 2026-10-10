@@ -20,7 +20,7 @@
         {% if bookmark.description %}<p class="max-w-prose">{{ bookmark.description }}</p>{% endif %}
         <ul class="flex flex-wrap items-center gap-1.5">
             {% for tag in bookmark.tags.all %}
-                <li><c-ui.badge variant="primary" style="soft">{{ tag }}</c-ui.badge></li>
+                <li><c-ui.badge variant="info" size="sm">{{ tag }}</c-ui.badge></li>
             {% endfor %}
         </ul>
         <a class="link link-primary break-all" href="{{ bookmark.url }}" target="_blank" rel="noopener noreferrer">

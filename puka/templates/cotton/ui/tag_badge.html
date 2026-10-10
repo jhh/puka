@@ -1,0 +1,7 @@
+{% comment %}
+Tag badge: an info-soft badge inside a link. href: the link target; class merges
+onto the <a>; hx-*/x-* attrs pass through.
+{% endcomment %}
+<c-vars href="" class />
+
+<a href="{{ href }}" class="{{ class }}" {{ attrs }}><c-ui.badge variant="info" size="sm">{{ slot }}</c-ui.badge></a>

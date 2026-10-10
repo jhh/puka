@@ -64,12 +64,12 @@
                                         <ul role="list" aria-label="Item tags" class="mt-1 flex flex-wrap gap-1">
                                             {% for tag in item.tags.all %}
                                                 <li>
-                                                    <a
+                                                    <c-ui.tag-badge
                                                         href="{% url 'stuff:item-list' %}?query=%23{{ tag.name|urlencode:'' }}"
                                                         hx-get="{% url 'stuff:item-list' %}?query=%23{{ tag.name|urlencode:'' }}"
                                                         hx-push-url="true"
                                                         hx-target="#content"
-                                                    ><c-ui.badge variant="info" size="sm">{{ tag }}</c-ui.badge></a>
+                                                    >{{ tag }}</c-ui.tag-badge>
                                                 </li>
                                             {% endfor %}
                                         </ul>

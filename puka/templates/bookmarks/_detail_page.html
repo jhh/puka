@@ -2,7 +2,6 @@
 Prepared `bookmarks` attached to `item` (a stuff Item or upkeep Area), with a remove
 button that posts to `bookmark_delete_url`. The caller handles the empty state.
 Tag links quote a single name for the filter form's TagField before URL encoding.
-info_tags: use info badges for item reference tags.
 {% endcomment %}
 <ul role="list" class="list rounded-box border border-base-300 bg-base-100 text-sm">
     {% for bookmark in bookmarks %}
@@ -19,15 +18,12 @@ info_tags: use info badges for item reference tags.
             <ul role="list" class="ml-auto flex shrink-0 flex-wrap justify-end gap-1">
                 {% for tag in bookmark.tags.all %}
                     <li>
-                        <a
+                        <c-ui.tag-badge
                             href="{% url 'bookmarks:filter' %}?tags=%22{{ tag.name|urlencode:'' }}%22"
                             hx-get="{% url 'bookmarks:filter' %}?tags=%22{{ tag.name|urlencode:'' }}%22"
                             hx-push-url="true"
                             hx-target="#content"
-                        ><c-ui.badge
-                                variant="{% if info_tags %}info{% else %}error{% endif %}"
-                                size="sm"
-                            >{{ tag }}</c-ui.badge></a>
+                        >{{ tag }}</c-ui.tag-badge>
                     </li>
                 {% endfor %}
             </ul>

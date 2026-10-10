@@ -15,14 +15,12 @@
         <ul class="flex flex-wrap gap-2 mt-2">
             {% for tag in bucket.list %}
                 <li class="inline">
-                    <a
+                    <c-ui.tag-badge
                         href="{% url 'bookmarks:list' %}?tags={{ tag.name|urlencode:'' }}"
                         hx-get="{% url 'bookmarks:list' %}?tags={{ tag.name|urlencode:'' }}"
                         hx-push-url="true"
                         hx-target="#content"
-                    >
-                        <c-ui.badge variant="primary" style="soft">{{ tag.name }} {{ tag.num_times }}</c-ui.badge>
-                    </a>
+                    >{{ tag.name }} {{ tag.num_times }}</c-ui.tag-badge>
                 </li>
             {% endfor %}
         </ul>

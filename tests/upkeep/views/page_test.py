@@ -74,7 +74,9 @@ def test_task_detail_displays_prepared_stock_total(admin_client, quantities):
 
 def test_area_detail_bookmarks_inside_definition_list(admin_client):
     area = AreaFactory.create()
-    area.bookmarks.add(BookmarkFactory.create())
+    bookmark = BookmarkFactory.create()
+    bookmark.tags.add("manual")
+    area.bookmarks.add(bookmark)
     content = admin_client.get(
         reverse("upkeep:area-detail", args=[area.pk]),
         headers=HTMX,
@@ -83,6 +85,8 @@ def test_area_detail_bookmarks_inside_definition_list(admin_client):
     assert "<dd" in dl[dl.index("Bookmarks") :]
     assert "No tasks in this area" in content
     page = parse_html(content)
+    (badge,) = (el for el in page.find("span") if el.text == "manual")
+    assert {"badge-info", "badge-soft"} <= set(badge.attrs["class"].split())
     assert page.find("a", href=reverse("upkeep:task-new") + f"?area={area.pk}")
     (trigger,) = page.find("button", popovertarget="area-manage-menu")
     assert trigger.text == "Manage"

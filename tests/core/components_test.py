@@ -102,35 +102,23 @@ def test_icon_class_replaces_default_size():
     assert classes(icon) == ["hero-tag", "size-3", "text-primary"]
 
 
-# ui/tag
+# ui/tag_badge
 
 
-def test_tag():
+def test_tag_badge():
     source = (
-        '<c-ui.tag href="/bookmarks/?tags=ssh" class="mr-1 text-sm"'
-        ' hx-get="?tags=ssh">ssh</c-ui.tag>'
+        '<c-ui.tag-badge href="/bookmarks/?tags=ssh" class="mr-1"'
+        ' hx-get="?tags=ssh" tabindex="-1">ssh</c-ui.tag-badge>'
     )
     result = page(source)
-    tag = only(result, "a")
-    assert tag.attrs["href"] == "/bookmarks/?tags=ssh"
-    assert tag.attrs["hx-get"] == "?tags=ssh"
-    assert classes(tag) == [
-        "link",
-        "link-hover",
-        "link-primary",
-        "inline-flex",
-        "items-center",
-        "mr-1",
-        "text-sm",
-    ]
-    assert classes(only(result, "span"))[0] == "hero-hashtag-mini"
-    assert "ssh" in render(source)
-
-
-def test_tag_defaults():
-    tag = only(page("<c-ui.tag>django</c-ui.tag>"), "a")
-    assert tag.attrs["href"] == ""
-    assert classes(tag) == ["link", "link-hover", "link-primary", "inline-flex", "items-center"]
+    link = only(result, "a")
+    assert link.attrs["href"] == "/bookmarks/?tags=ssh"
+    assert link.attrs["hx-get"] == "?tags=ssh"
+    assert link.attrs["tabindex"] == "-1"
+    assert classes(link) == ["mr-1"]
+    badge = only(result, "span")
+    assert classes(badge) == ["badge", "badge-info", "badge-soft", "badge-sm"]
+    assert badge.text == "ssh"
 
 
 # ui/card

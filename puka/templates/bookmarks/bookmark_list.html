@@ -55,28 +55,34 @@
                     <div class="list-col-grow pr-12">
                         <div class="text-base font-semibold">{{ bookmark.title }}</div>
                         <div class="w-full text-sm opacity-60 lg:max-w-3xl">{{ bookmark.description }}</div>
-                        <div class="relative z-20 max-w-fit">
-                            {% for tag in bookmark.tags.all %}
-                                {# Filter's TagField needs quotes to keep multiword tags together. #}
-                                <c-ui.tag
-                                    href="?tags={% if request.resolver_match.url_name == 'filter' %}%22{% endif %}{{ tag.name|urlencode:'' }}{% if request.resolver_match.url_name == 'filter' %}%22{% endif %}"
-                                    hx-get="?tags={% if request.resolver_match.url_name == 'filter' %}%22{% endif %}{{ tag.name|urlencode:'' }}{% if request.resolver_match.url_name == 'filter' %}%22{% endif %}"
-                                    hx-target="#id_bookmarks"
-                                    hx-push-url="true"
-                                    class="mr-1 text-sm"
-                                    tabindex="-1"
-                                >{{ tag }}</c-ui.tag>
-                            {% endfor %}
-                            <div class="mt-1 text-xs opacity-60">
+                        <div class="relative z-20 mt-1 flex max-w-fit flex-wrap items-center gap-x-1.5 gap-y-1 text-xs">
+                            <span class="flex items-center gap-1 opacity-60">
                                 <c-ui.icon name="hero-cloud-mini" class="size-3 opacity-60" />
                                 {{ bookmark.domain }}
-                                <span class="mx-1 font-black">·</span>
-                                {{ bookmark.created|date:'F Y'|lower }}
-                                {% if not bookmark.active %}
-                                    <span class="mx-1 font-black">·</span>
-                                    <c-ui.badge size="xs" style="outline">inactive</c-ui.badge>
-                                {% endif %}
-                            </div>
+                            </span>
+                            <span class="font-black opacity-60" aria-hidden="true">·</span>
+                            <span class="opacity-60">{{ bookmark.created|date:'F Y'|lower }}</span>
+                            {% if not bookmark.active %}
+                                <span class="font-black opacity-60" aria-hidden="true">·</span>
+                                <c-ui.badge size="xs" style="outline">inactive</c-ui.badge>
+                            {% endif %}
+                            {% if bookmark.tags.all %}
+                                <span class="font-black opacity-60" aria-hidden="true">·</span>
+                                <ul role="list" aria-label="Bookmark tags" class="flex flex-wrap items-center gap-1">
+                                    {% for tag in bookmark.tags.all %}
+                                        {# Filter's TagField needs quotes to keep multiword tags together. #}
+                                        <li>
+                                            <c-ui.tag-badge
+                                                href="?tags={% if request.resolver_match.url_name == 'filter' %}%22{% endif %}{{ tag.name|urlencode:'' }}{% if request.resolver_match.url_name == 'filter' %}%22{% endif %}"
+                                                hx-get="?tags={% if request.resolver_match.url_name == 'filter' %}%22{% endif %}{{ tag.name|urlencode:'' }}{% if request.resolver_match.url_name == 'filter' %}%22{% endif %}"
+                                                hx-target="#id_bookmarks"
+                                                hx-push-url="true"
+                                                tabindex="-1"
+                                            >{{ tag }}</c-ui.tag-badge>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
                         </div>
                     </div>
                     <c-ui.button

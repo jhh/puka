@@ -23,6 +23,14 @@ def test_bookmarks(admin_client, succulents_bookmark):
         assertContains(response, tag)
 
 
+def test_bookmark_list_tags_use_info_badges(admin_client, succulents_bookmark):
+    page = parse_html(admin_client.get(reverse("bookmarks:list")).content)
+
+    badges = [el for el in page.find("span") if "badge" in el.attrs.get("class", "")]
+    assert {el.text for el in badges} == {"thundercats", "humblebrag"}
+    assert all({"badge-info", "badge-soft"} <= set(el.attrs["class"].split()) for el in badges)
+
+
 def test_bookmarks_with_tag(admin_client, succulents_bookmark, typewriter_bookmark):
     url = reverse("bookmarks:list")
     response = admin_client.get(f"{url}?tags=humblebrag")
@@ -257,8 +265,9 @@ def test_tags_grouped_by_bucket(admin_client):
     headings = [el.text for el in page.find("h2")]
     assert headings == ["5—10", "< 5"]
     assert len([el for el in page.find("ul") if "flex-wrap" in el.attrs.get("class", "")]) == 2
-    badges = [el.text for el in page.find("span") if "badge" in el.attrs.get("class", "")]
-    assert badges == ["common 6", "rare 1"]
+    badges = [el for el in page.find("span") if "badge" in el.attrs.get("class", "")]
+    assert [el.text for el in badges] == ["common 6", "rare 1"]
+    assert all({"badge-info", "badge-soft"} <= set(el.attrs["class"].split()) for el in badges)
 
 
 def test_bookmark_detail(admin_client, succulents_bookmark):
@@ -272,8 +281,9 @@ def test_bookmark_detail(admin_client, succulents_bookmark):
         "DATETIME_FORMAT",
     )
     assert dd[2] == "Yes"
-    badges = {el.text for el in page.find("span") if "badge" in el.attrs.get("class", "")}
-    assert badges == {"thundercats", "humblebrag"}
+    badges = [el for el in page.find("span") if "badge" in el.attrs.get("class", "")]
+    assert {el.text for el in badges} == {"thundercats", "humblebrag"}
+    assert all({"badge-info", "badge-soft"} <= set(el.attrs["class"].split()) for el in badges)
 
 
 def test_bookmarks_empty_state(admin_client):
