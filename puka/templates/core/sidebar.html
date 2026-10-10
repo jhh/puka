@@ -56,19 +56,30 @@
             </summary>
             <ul>
                 <li class="menu-title">Bookmarks</li>
-                <c-layout.nav-item url_name="bookmarks:filter" hx-boost="true">Filter</c-layout.nav-item>
-                <c-layout.nav-item url_name="bookmarks:tags">Tags</c-layout.nav-item>
+                <c-layout.nav-item url_name="bookmarks:filter" class="font-semibold" hx-boost="true">
+                    Filter
+                </c-layout.nav-item>
+                <c-layout.nav-item url_name="bookmarks:tags" class="font-semibold">Tags</c-layout.nav-item>
 
                 <li class="menu-title">Inventory</li>
-                <c-layout.nav-item url_name="stuff:location-list" :arg="0" match="/stuff/location/">
+                <c-layout.nav-item
+                    url_name="stuff:location-list"
+                    :arg="0"
+                    match="/stuff/location/"
+                    class="font-semibold"
+                >
                     Locations
                 </c-layout.nav-item>
 
                 <li class="menu-title">Tasks</li>
-                <c-layout.nav-item url_name="upkeep:area-list" match="/upkeep/area/">Areas</c-layout.nav-item>
+                <c-layout.nav-item url_name="upkeep:area-list" match="/upkeep/area/" class="font-semibold">
+                    Areas
+                </c-layout.nav-item>
 
                 <li></li>
-                <c-layout.nav-item url_name="admin:index" match="/admin/">Admin</c-layout.nav-item>
+                <c-layout.nav-item url_name="admin:index" match="/admin/" class="font-semibold">
+                    Admin
+                </c-layout.nav-item>
             </ul>
         </details>
     </li>
