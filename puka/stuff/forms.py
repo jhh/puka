@@ -95,6 +95,14 @@ class InventoryForm(ModelForm):
         widgets = {"item": forms.HiddenInput()}  # noqa: RUF012
 
 
+class ItemImportForm(forms.Form):
+    csv_file = forms.FileField(
+        label="CSV file",
+        help_text="UTF-8 CSV, one item per row.",
+        widget=forms.ClearableFileInput(attrs={"accept": ".csv,text/csv"}),
+    )
+
+
 class LocationInventoryForm(LocationFormContext, ModelForm):
     template_name = "stuff/forms/location_inventory.html"
 

@@ -46,7 +46,7 @@
     {% endcomment %}
     <li>
         <details
-            {% if '/bookmarks/filter/' in request.path or '/bookmarks/tags/' in request.path or '/stuff/location/' in request.path or '/upkeep/area/' in request.path or '/admin/' in request.path %}
+            {% if '/bookmarks/filter/' in request.path or '/bookmarks/tags/' in request.path or '/stuff/location/' in request.path or '/stuff/item/import/' in request.path or '/upkeep/area/' in request.path or '/admin/' in request.path %}
                 open
             {% endif %}
         >
@@ -70,6 +70,7 @@
                 >
                     Locations
                 </c-layout.nav-item>
+                <c-layout.nav-item url_name="stuff:item-import" class="font-semibold">Import</c-layout.nav-item>
 
                 <li class="menu-title">Tasks</li>
                 <c-layout.nav-item url_name="upkeep:area-list" match="/upkeep/area/" class="font-semibold">

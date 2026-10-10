@@ -1,20 +1,27 @@
 import logging
 from types import MappingProxyType
 
-from django.db import transaction
 from django.db.models import Case, F, IntegerField, Prefetch, Sum, Value, When
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
-from django.views.generic import CreateView, DetailView, ListView, UpdateView, View
+from django.views.generic import CreateView, DetailView, FormView, ListView, UpdateView, View
 from django_htmx.http import HttpResponseLocation, trigger_client_event
 from django_htmx.middleware import HtmxDetails
 
 from puka.core.pagination import PageSizeMixin
 from puka.core.views import get_template
-from puka.stuff.forms import InventoryForm, ItemForm
-from puka.stuff.models import Bookmark, Inventory, Item
-from puka.stuff.services import adjust_inventory_quantity, get_or_create_location
+from puka.stuff.forms import InventoryForm, ItemForm, ItemImportForm
+from puka.stuff.importer import (
+    ERRORS_SESSION_KEY,
+    IMPORT_SESSION_KEY,
+    ImportFormatError,
+    failed_rows_csv,
+    import_upload,
+    template_csv,
+)
+from puka.stuff.models import Inventory, Item
+from puka.stuff.services import adjust_inventory_quantity, create_item_from_form
 
 logger = logging.getLogger(__name__)
 
@@ -91,27 +98,57 @@ class ItemCreateView(CreateView):
     def get_template_names(self):
         return get_template(self.request, "stuff/form.html", "#form-partial")
 
-    @transaction.atomic
     def form_valid(self, form):
-        self.object: Item = form.save()
+        self.object: Item = create_item_from_form(form)
+        return HttpResponseRedirect(self.get_success_url())
 
-        location_code = form.cleaned_data["location_code"]
-        quantity = form.cleaned_data["quantity"]
 
-        if location_code and quantity:
-            location, _ = get_or_create_location(location_code)
-            Inventory.objects.create(item=self.object, location=location, quantity=quantity)
+class ItemImportView(FormView):
+    form_class = ItemImportForm
+    template_name = "stuff/item_import.html"
 
-        bookmark_url = form.cleaned_data["bookmark_url"]
-        if bookmark_url:
-            bookmark, _ = Bookmark.objects.get_or_create(
-                url=bookmark_url,
-                defaults={"title": self.object.name, "active": False},
-            )
-            bookmark.tags.add("stuff")
-            self.object.bookmarks.add(bookmark)
+    def get_template_names(self):
+        return get_template(self.request, "stuff/item_import.html", "#import-partial")
 
-        return super().form_valid(form)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["import_summary"] = self.request.session.get(IMPORT_SESSION_KEY)
+        return context
+
+    def form_valid(self, form):
+        upload = form.cleaned_data["csv_file"]
+        try:
+            result = import_upload(upload)
+        except ImportFormatError as error:
+            form.add_error("csv_file", str(error))
+            return self.form_invalid(form)
+
+        self.request.session[IMPORT_SESSION_KEY] = {
+            "filename": upload.name,
+            "total": result.total,
+            "imported": result.imported,
+            "failed": len(result.failed),
+        }
+        if result.failed:
+            self.request.session[ERRORS_SESSION_KEY] = failed_rows_csv(result.failed)
+        else:
+            self.request.session.pop(ERRORS_SESSION_KEY, None)
+        return HttpResponseRedirect(self.request.path)
+
+
+def item_import_template(_request):
+    response = HttpResponse(template_csv(), content_type="text/csv; charset=utf-8")
+    response["Content-Disposition"] = 'attachment; filename="item-import-template.csv"'
+    return response
+
+
+def item_import_errors(request):
+    csv_text = request.session.get(ERRORS_SESSION_KEY)
+    if not csv_text:
+        raise Http404
+    response = HttpResponse(csv_text, content_type="text/csv; charset=utf-8")
+    response["Content-Disposition"] = 'attachment; filename="item-import-errors.csv"'
+    return response
 
 
 class ItemUpdateView(UpdateView):

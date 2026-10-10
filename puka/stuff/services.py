@@ -1,8 +1,14 @@
+from __future__ import annotations
+
 import logging
+from typing import TYPE_CHECKING
 
 from django.db import transaction
 
-from puka.stuff.models import Inventory, Location
+from puka.stuff.models import Bookmark, Inventory, Item, Location
+
+if TYPE_CHECKING:
+    from puka.stuff.forms import ItemForm
 
 logger = logging.getLogger(__name__)
 
@@ -129,3 +135,32 @@ def get_or_create_location(code: str) -> tuple[Location, bool]:
         parent = Location.objects.get(code=parent_code)
         child = Location.objects.add_child(parent, {"name": code, "code": code})
         return Location.objects.get(pk=child.pk), True
+
+
+@transaction.atomic
+def create_item_from_form(form: ItemForm) -> Item:
+    """
+    Create an item with its first inventory row and bookmark from a valid ItemForm.
+
+    Shared by the item create view and the CSV bulk import so both follow the
+    same rules.
+
+    """
+    item = form.save()
+
+    location_code = form.cleaned_data["location_code"]
+    quantity = form.cleaned_data["quantity"]
+    if location_code and quantity:
+        location, _ = get_or_create_location(location_code)
+        Inventory.objects.create(item=item, location=location, quantity=quantity)
+
+    bookmark_url = form.cleaned_data["bookmark_url"]
+    if bookmark_url:
+        bookmark, _ = Bookmark.objects.get_or_create(
+            url=bookmark_url,
+            defaults={"title": item.name, "active": False},
+        )
+        bookmark.tags.add("stuff")
+        item.bookmarks.add(bookmark)
+
+    return item

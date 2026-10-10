@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Import Items{% endblock %}
+
+{% partialdef breadcrumbs %}
+    <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
+    <c-ui.crumb href="{% url 'stuff:item-list' %}">Inventory</c-ui.crumb>
+    <c-ui.crumb href="{% url 'stuff:item-import' %}">Import</c-ui.crumb>
+{% endpartialdef breadcrumbs %}
+
+{% block breadcrumbs %}
+    <ul>{% partial breadcrumbs %}</ul>
+{% endblock breadcrumbs %}
+
+{% partialdef import-partial %}
+    {% if request.htmx and not request.htmx.boosted and not request.htmx.history_restore_request and request.htmx.target != 'body' %}
+        <c-layout.page-meta title="Import Items">{% partial breadcrumbs %}</c-layout.page-meta>
+    {% endif %}
+    <c-layout.page-header title="Import items">
+        <c-slot name="actions">
+            <c-ui.button href="{% url 'stuff:item-import-template' %}" icon="hero-arrow-down-tray">
+                Download template
+            </c-ui.button>
+        </c-slot>
+    </c-layout.page-header>
+
+    {% if import_summary %}
+        {% if import_summary.total == 0 %}
+            <c-ui.alert variant="info" style="soft" class="mb-4">
+                <p>No data rows found in {{ import_summary.filename }}.</p>
+            </c-ui.alert>
+        {% elif import_summary.failed %}
+            <c-ui.alert variant="warning" style="soft" class="mb-4">
+                <p class="font-semibold">
+                    Imported {{ import_summary.imported }} of {{ import_summary.total }} items from
+                    {{ import_summary.filename }}.
+                </p>
+                <p class="text-sm">
+                    {{ import_summary.failed }} row{{ import_summary.failed|pluralize }} failed validation. Fix them in
+                    the error CSV and upload the file again; the Error column is ignored.
+                </p>
+                <div class="mt-2 flex flex-wrap gap-2">
+                    <c-ui.button href="{% url 'stuff:item-import-errors' %}" icon="hero-arrow-down-tray" size="sm">
+                        Download error CSV
+                    </c-ui.button>
+                    <c-ui.button href="{% url 'stuff:item-list' %}" variant="ghost" size="sm">
+                        View inventory
+                    </c-ui.button>
+                </div>
+            </c-ui.alert>
+        {% else %}
+            <c-ui.alert variant="success" style="soft" class="mb-4">
+                <p class="font-semibold">
+                    Imported {{ import_summary.imported }} item{{ import_summary.imported|pluralize }} from
+                    {{ import_summary.filename }}.
+                </p>
+                <div class="mt-2">
+                    <c-ui.button href="{% url 'stuff:item-list' %}" variant="ghost" size="sm">
+                        View inventory
+                    </c-ui.button>
+                </div>
+            </c-ui.alert>
+        {% endif %}
+    {% endif %}
+
+    <c-ui.card>
+        <c-form.form :form="form" enctype="multipart/form-data">
+            <c-form.field :field="form.csv_file" />
+            <p class="text-sm text-base-content/70">
+                Expected columns:
+                <code class="font-mono text-xs"
+                >Name, Quantity, Reorder Level, Location Code, Tags, Bookmark URL, Notes</code>
+            </p>
+            <ul class="space-y-1 text-sm text-base-content/70">
+                <li>Each row creates one item with its first stock count and bookmark.</li>
+                <li>
+                    Separate multiple tags with commas; a code like <code class="font-mono text-xs">A01-03</code> is
+                    created when its parent location exists.
+                </li>
+                <li>Rows with errors are skipped; fix them in the error CSV and upload the file again.</li>
+            </ul>
+            <c-form.actions submit="Import items" cancel="{% url 'stuff:item-list' %}" />
+        </c-form.form>
+    </c-ui.card>
+{% endpartialdef import-partial %}
+
+{% block content %}
+    {% partial import-partial %}
+{% endblock content %}

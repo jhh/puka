@@ -32,6 +32,8 @@ class Kind(Enum):
     PAGE = auto()
     # POST/PATCH only; covered by the create/update/delete tests.
     ACTION = auto()
+    # GET returns a file download; covered by the feature tests.
+    DOWNLOAD = auto()
 
 
 @dataclass(frozen=True)
@@ -61,6 +63,9 @@ CASES = (
     Case("stuff:item-new", Kind.FRAGMENT),
     Case("stuff:item-edit", Kind.FRAGMENT, ("item",)),
     Case("stuff:item-delete", Kind.ACTION, ("item",)),
+    Case("stuff:item-import", Kind.FRAGMENT),
+    Case("stuff:item-import-template", Kind.DOWNLOAD),
+    Case("stuff:item-import-errors", Kind.DOWNLOAD),
     Case("stuff:location", Kind.FRAGMENT),
     Case("stuff:location-list", Kind.FRAGMENT, (0,), id="stuff:location-list-root"),
     Case("stuff:location-list", Kind.FRAGMENT, ("root_location",), id="stuff:location-list-child"),
