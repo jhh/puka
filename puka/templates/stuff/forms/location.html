@@ -8,7 +8,7 @@
 {% if form.instance.pk %}{% url 'stuff:location-delete' form.instance.pk as delete_url %}{% endif %}
 <c-form.actions
     submit="Save location"
-    cancel="{% url 'stuff:location-list' 0 %}"
+    cancel="{{ form.cancel_url }}"
     delete="{{ delete_url }}"
-    confirm="Delete this location?"
+    confirm="Delete this location, all its sublocations, and their inventory records? Item definitions will be kept."
 />

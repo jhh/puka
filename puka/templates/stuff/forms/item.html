@@ -11,9 +11,10 @@
     {% endif %}
 </div>
 {% if form.instance.pk %}{% url 'stuff:item-delete' form.instance.pk as delete_url %}{% endif %}
+{% url 'stuff:item-list' as item_list_url %}
 <c-form.actions
     submit="Save item"
-    cancel="{% url 'stuff:item-list' %}"
+    cancel="{{ form.cancel_url|default:item_list_url }}"
     delete="{{ delete_url }}"
     confirm="Delete this item?"
 />

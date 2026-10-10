@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVectorField
 from django.db import models
@@ -14,16 +16,17 @@ class Location(MP_Node):
     code: models.CharField = models.CharField(max_length=25, unique=True)
     alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
     node_order_by = ("name",)
+    inventories: models.Manager[Inventory]
 
     def __str__(self):
         return self.code
 
 
 class ItemManager(models.Manager["Item"]):
-    def with_tag(self, tag: str) -> models.QuerySet["Item"]:
+    def with_tag(self, tag: str) -> models.QuerySet[Item]:
         return self.get_queryset().filter(tags__name__iexact=tag).order_by("name")
 
-    def with_text(self, text: str) -> models.QuerySet["Item"]:
+    def with_text(self, text: str) -> models.QuerySet[Item]:
         query = SearchQuery(text, search_type="websearch", config="english")
         return (
             self.get_queryset()
@@ -32,10 +35,10 @@ class ItemManager(models.Manager["Item"]):
             .order_by("-rank")
         )
 
-    def with_location(self, location: str) -> models.QuerySet["Item"]:
+    def with_location(self, location: str) -> models.QuerySet[Item]:
         return self.filter(locations__code__istartswith=location)
 
-    def search(self, text: str) -> models.QuerySet["Item"]:
+    def search(self, text: str) -> models.QuerySet[Item]:
         query = text.strip()
         if query.startswith("#"):
             tag = query[1:]
@@ -65,7 +68,7 @@ class Item(models.Model):
     name_notes_search = SearchVectorField(null=True, editable=False)
 
     objects = ItemManager()
-    inventories: models.Manager["Inventory"]
+    inventories: models.Manager[Inventory]
 
     class Meta:
         ordering = ("name",)
@@ -86,6 +89,8 @@ class Item(models.Model):
 
 
 class Inventory(models.Model):
+    item_id: int
+    location_id: int
     item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name="inventories")
     location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="inventories")
     quantity = models.PositiveIntegerField()

@@ -1,0 +1,34 @@
+{% extends "stuff/base.html" %}
+
+{% block title %}{{ form_title }}{% endblock %}
+
+{% partialdef form-partial %}
+    {% if request.htmx and not request.htmx.boosted and not request.htmx.history_restore_request and request.htmx.target != 'body' %}
+        <c-layout.page-meta title="{{ form_title }}">
+            <c-ui.crumb href="{% url 'stuff:location' %}">Locations</c-ui.crumb>
+            <c-ui.crumb>{{ form_title }}</c-ui.crumb>
+        </c-layout.page-meta>
+    {% endif %}
+    <c-layout.page-header title="{{ form_title }}" />
+    {% if location %}
+        <p class="mb-4 text-sm text-base-content/70">{{ location.name }} · {{ location.code }}</p>
+    {% endif %}
+    {% if inventory %}
+        <p class="mb-4 text-sm">{{ inventory.item.name }} · {{ inventory.quantity }} available</p>
+        <p class="mb-4 text-sm text-base-content/70">
+            Existing stock at the destination will be combined with the moved quantity.
+        </p>
+    {% elif form.instance.item_id %}
+        <p class="mb-4 text-sm">{{ form.instance.item.name }}</p>
+    {% endif %}
+    <div class="max-w-2xl">{% include "core/form.html" with form_action=request.get_full_path %}</div>
+{% endpartialdef form-partial %}
+
+{% block breadcrumbs %}
+    <ul>
+        <c-ui.crumb href="{% url 'stuff:location' %}">Locations</c-ui.crumb>
+        <c-ui.crumb>{{ form_title }}</c-ui.crumb>
+    </ul>
+{% endblock breadcrumbs %}
+
+{% block content %}{% partial form-partial %}{% endblock %}

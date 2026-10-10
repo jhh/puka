@@ -2,7 +2,7 @@ import logging
 
 from django.db import transaction
 
-from puka.stuff.models import Location
+from puka.stuff.models import Inventory, Location
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +48,32 @@ def adjust_inventory_quantity(inventory, quantity):
 
 
 MIN_LOCATION_CODE_SEGMENTS = 2
+
+
+@transaction.atomic
+def move_inventory(inventory, destination, quantity):
+    # Lock this item's stock in a consistent order, including an existing destination row.
+    stock = list(
+        Inventory.objects.select_for_update().filter(item_id=inventory.item_id).order_by("pk"),
+    )
+    source = next((row for row in stock if row.pk == inventory.pk), None)
+    if source is None or quantity < 1 or quantity > source.quantity:
+        msg = "You cannot move more than the available quantity."
+        raise ValueError(msg)
+    if destination.pk == source.location_id:
+        msg = "Choose a different destination location."
+        raise ValueError(msg)
+    target = next((row for row in stock if row.location_id == destination.pk), None)
+    if target:
+        target.quantity += quantity
+        target.save(update_fields=["quantity"])
+    else:
+        Inventory.objects.create(item_id=source.item_id, location=destination, quantity=quantity)
+    source.quantity -= quantity
+    if source.quantity:
+        source.save(update_fields=["quantity"])
+    else:
+        source.delete()
 
 
 def parse_location_code(code: str) -> tuple[str, str]:

@@ -76,7 +76,7 @@ FORM_CASES = (
         ("stuff:location-edit", ("location",)),
         {"name", "code", "treebeard_position", "treebeard_ref_node"},
         "Save location",
-        ("stuff:location-list", (0,)),
+        ("stuff:location-list", ("location",)),
         delete=("stuff:location-delete", ("location",)),
         delete_noun="location",
     ),
@@ -248,7 +248,13 @@ def test_form(form_page, form_case, objects):
         (button,) = buttons
         assert button.attrs["type"] == "button"
         assert button.attrs["hx-post"] == _reverse(form_case.delete, objects)
-        assert button.attrs["hx-confirm"] == f"Delete this {form_case.delete_noun}?"
+        if form_case.delete_noun == "location":
+            assert button.attrs["hx-confirm"] == (
+                "Delete this location, all its sublocations, and their inventory records? "
+                "Item definitions will be kept."
+            )
+        else:
+            assert button.attrs["hx-confirm"] == f"Delete this {form_case.delete_noun}?"
 
 
 # Invalid form posts: the field that errors, its message, and a submitted value to redisplay.

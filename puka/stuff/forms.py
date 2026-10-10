@@ -9,7 +9,12 @@ from puka.stuff.models import Inventory, Item, Location
 from puka.stuff.services import parse_location_code
 
 
-class LocationForm(MoveNodeForm):
+class LocationFormContext:
+    cancel_url: str
+    delete_url: str
+
+
+class LocationForm(LocationFormContext, MoveNodeForm):
     template_name = "stuff/forms/location.html"
 
     def __init__(self, *args, **kwargs):
@@ -54,6 +59,9 @@ class ItemForm(ModelForm):
         if not value:
             return value
 
+        if Location.objects.filter(code=value).exists():
+            return value
+
         try:
             parent, _ = parse_location_code(value)
         except ValueError as e:
@@ -72,7 +80,7 @@ class ItemForm(ModelForm):
         if "location_code" not in self.cleaned_data or not self.cleaned_data["location_code"]:
             return
 
-        quantity = self.cleaned_data["quantity"]
+        quantity = self.cleaned_data.get("quantity")
         if not quantity or quantity <= 0:
             msg = "Quantity must be greater than zero if location provided."
             self.add_error("quantity", msg)
@@ -85,3 +93,56 @@ class InventoryForm(ModelForm):
         model = Inventory
         fields = ("item", "location", "quantity")
         widgets = {"item": forms.HiddenInput()}  # noqa: RUF012
+
+
+class LocationInventoryForm(LocationFormContext, ModelForm):
+    template_name = "stuff/forms/location_inventory.html"
+
+    class Meta:
+        model = Inventory
+        fields = ("item", "quantity")
+
+
+class LocationItemForm(LocationFormContext, ItemForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["location_code"].disabled = True
+        self.fields["location_code"].widget = forms.HiddenInput()
+        self.fields["quantity"] = forms.IntegerField(min_value=1, initial=1)
+
+
+class InventoryQuantityForm(LocationFormContext, ModelForm):
+    template_name = "stuff/forms/location_inventory.html"
+
+    class Meta:
+        model = Inventory
+        fields = ("quantity",)
+
+
+class DestinationField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return f"{obj.name} ({obj.code})"
+
+
+class InventoryMoveForm(LocationFormContext, forms.Form):
+    template_name = "stuff/forms/location_inventory.html"
+
+    destination = DestinationField(queryset=Location.objects.all(), label="Move to")
+    quantity = forms.IntegerField(min_value=1, label="Quantity to move")
+
+    def __init__(self, *args, inventory, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["destination"] = DestinationField(
+            queryset=Location.objects.exclude(pk=inventory.location_id),
+            label="Move to",
+        )
+        self.fields["quantity"].widget.attrs["max"] = inventory.quantity
+        self.initial["quantity"] = inventory.quantity
+        self.inventory = inventory
+
+    def clean_quantity(self):
+        quantity = self.cleaned_data["quantity"]
+        if quantity > self.inventory.quantity:
+            msg = "You cannot move more than the available quantity."
+            raise ValidationError(msg)
+        return quantity

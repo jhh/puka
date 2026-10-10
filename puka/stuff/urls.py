@@ -21,6 +21,13 @@ from puka.stuff.views.location import (
     LocationListView,
     LocationUpdateView,
 )
+from puka.stuff.views.location_inventory import (
+    LocationInventoryCreateView,
+    LocationInventoryDeleteView,
+    LocationInventoryMoveView,
+    LocationInventoryUpdateView,
+    LocationItemCreateView,
+)
 
 app_name = "stuff"
 urlpatterns: list[URLPattern | URLResolver] = [
@@ -36,6 +43,31 @@ urlpatterns: list[URLPattern | URLResolver] = [
     path("location/new/", LocationCreateView.as_view(), name="location-new"),
     path("location/<int:pk>/edit/", LocationUpdateView.as_view(), name="location-edit"),
     path("location/<int:pk>/delete/", LocationDeleteView.as_view(), name="location-delete"),
+    path(
+        "location/<int:location_pk>/item/new/",
+        LocationItemCreateView.as_view(),
+        name="location-item-new",
+    ),
+    path(
+        "location/<int:location_pk>/inventory/new/",
+        LocationInventoryCreateView.as_view(),
+        name="location-inventory-new",
+    ),
+    path(
+        "location/<int:location_pk>/inventory/<int:pk>/edit/",
+        LocationInventoryUpdateView.as_view(),
+        name="location-inventory-edit",
+    ),
+    path(
+        "location/<int:location_pk>/inventory/<int:pk>/move/",
+        LocationInventoryMoveView.as_view(),
+        name="location-inventory-move",
+    ),
+    path(
+        "location/<int:location_pk>/inventory/<int:pk>/delete/",
+        LocationInventoryDeleteView.as_view(),
+        name="location-inventory-delete",
+    ),
     # Inventory
     path("item/<int:pk>/inventory/new/", InventoryCreateView.as_view(), name="inventory-new"),
     path("inventory/<int:pk>/edit/", InventoryUpdateView.as_view(), name="inventory-edit"),

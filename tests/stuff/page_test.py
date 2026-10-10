@@ -86,7 +86,7 @@ def test_location_list_links_and_copy(admin_client):
     page = parse_html(
         admin_client.get(reverse("stuff:location-list", args=[root.pk]), headers=HTMX).content,
     )
-    assert page.find("a", href=reverse("stuff:location-detail", args=[leaf.pk]))
+    assert page.find("a", href=reverse("stuff:location-list", args=[leaf.pk]))
 
     page = parse_html(admin_client.get(reverse("stuff:location-detail", args=[leaf.pk])).content)
     (crumbs,) = page.find("div", id="breadcrumbs")

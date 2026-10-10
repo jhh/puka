@@ -1,0 +1,8 @@
+{# Location inventory forms share fields and contextual actions. #}
+{% for field in form %}<c-form.field :field="field" />{% endfor %}
+<c-form.actions
+    submit="Save"
+    cancel="{{ form.cancel_url }}"
+    delete="{{ form.delete_url }}"
+    confirm="Remove this inventory record from this location? The item itself will be kept."
+/>
