@@ -22,6 +22,7 @@ from puka.stuff.importer import (
 )
 from puka.stuff.models import Inventory, Item
 from puka.stuff.services import adjust_inventory_quantity, create_item_from_form
+from puka.upkeep.models import TaskItem
 
 logger = logging.getLogger(__name__)
 
@@ -85,6 +86,13 @@ class ItemDetailView(DetailView):
             total_quantity=Sum("inventories__quantity", default=0),
         ).prefetch_related(
             Prefetch("inventories", queryset=Inventory.objects.select_related("location")),
+            Prefetch(
+                "taskitem_set",
+                queryset=TaskItem.objects.select_related("task__area").order_by(
+                    "task__area__name",
+                    "task__name",
+                ),
+            ),
             "tags",
             "bookmarks__tags",
         )

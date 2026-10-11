@@ -46,7 +46,7 @@ CASES = (
     QueryCase("stuff:item-list", 1, 3),
     QueryCase("upkeep:task-list", 1, 1),
     QueryCase("upkeep:area-list", 1, 1),
-    QueryCase("stuff:item-detail", 5, 0, "item"),
+    QueryCase("stuff:item-detail", 6, 0, "item"),
     QueryCase("stuff:location-detail", 2, 1, "location"),
     QueryCase("upkeep:task-detail", 3, 0, "task"),
     QueryCase("upkeep:area-detail", 4, 0, "area"),

@@ -6,7 +6,15 @@ import pytest
 from django.urls import reverse
 
 from puka.stuff.models import Inventory, Location
-from tests.factories import BookmarkFactory, ItemFactory, ItemWithInventoryFactory, LocationFactory
+from tests.factories import (
+    AreaFactory,
+    BookmarkFactory,
+    ItemFactory,
+    ItemWithInventoryFactory,
+    LocationFactory,
+    TaskFactory,
+    TaskItemFactory,
+)
 from tests.utils import HTMX, parse_html
 
 pytestmark = pytest.mark.django_db
@@ -57,6 +65,31 @@ def test_item_detail_empty_states(admin_client):
     content = admin_client.get(reverse("stuff:item-detail", args=[item.pk])).content.decode()
     assert "Not stocked anywhere" in content
     assert "No bookmarks" in content
+    assert "tasks-heading" not in content
+
+
+def test_item_detail_tasks_section(admin_client):
+    item = ItemFactory.create()
+    task = TaskFactory.create(area=AreaFactory.create(name="Garage"), name="Replace filter")
+    TaskItemFactory.create(task=task, item=item, quantity=2)
+    unrelated = TaskFactory.create(name="Oil the hinges")
+    TaskItemFactory.create(
+        task=unrelated, item=ItemFactory.create(name="Unrelated item"), quantity=1
+    )
+
+    response = admin_client.get(reverse("stuff:item-detail", args=[item.pk]), headers=HTMX)
+    page = parse_html(response.content)
+
+    assert page.find("h2", id="tasks-heading")
+    assert page.find("section", aria_labelledby="tasks-heading")
+    (link,) = page.find("a", href=reverse("upkeep:task-detail", args=[task.pk]))
+    assert link.text == task.name
+    assert link.attrs["hx-get"] == link.attrs["href"]
+    assert link.attrs["hx-target"] == "#content"
+    assert link.attrs["hx-push-url"] == "true"
+    assert "Garage" in {el.text for el in page.find("td")}
+    assert "2" in {el.text for el in page.find("td")}
+    assert not page.find("a", href=reverse("upkeep:task-detail", args=[unrelated.pk]))
 
 
 def test_item_and_bookmark_tags_use_matching_info_badges(admin_client):
