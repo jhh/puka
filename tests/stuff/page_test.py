@@ -74,7 +74,9 @@ def test_item_detail_tasks_section(admin_client):
     TaskItemFactory.create(task=task, item=item, quantity=2)
     unrelated = TaskFactory.create(name="Oil the hinges")
     TaskItemFactory.create(
-        task=unrelated, item=ItemFactory.create(name="Unrelated item"), quantity=1
+        task=unrelated,
+        item=ItemFactory.create(name="Unrelated item"),
+        quantity=1,
     )
 
     response = admin_client.get(reverse("stuff:item-detail", args=[item.pk]), headers=HTMX)

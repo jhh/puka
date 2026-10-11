@@ -167,6 +167,15 @@ djangofmt:
     uv run djangofmt puka/templates
     uv run djangofmt check puka/templates
 
+# run the pre-commit hook suite as a nix check
+[group('test')]
+pre-commit:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    # Snapshot the working copy so Nix sees the latest files.
+    jj st >/dev/null
+    nix build ".#checks.$(nix eval --impure --raw --expr builtins.currentSystem).pre-commit" -L
+
 # run tests
 [group('test')]
 test $DJANGO_SETTINGS_MODULE="puka.settings.test":
