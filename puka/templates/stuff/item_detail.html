@@ -48,13 +48,6 @@
         <c-layout.page-header title="{{ item.name }}">
             <c-slot name="actions">
                 <c-ui.button
-                    href="{% url 'stuff:item-list' %}"
-                    icon="hero-arrow-up"
-                    hx-get="{% url 'stuff:item-list' %}"
-                    hx-target="#content"
-                    hx-push-url="true"
-                >Up</c-ui.button>
-                <c-ui.button
                     href="{% url 'stuff:item-edit' item.pk %}"
                     icon="hero-pencil-square"
                     hx-get="{% url 'stuff:item-edit' item.pk %}"

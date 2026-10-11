@@ -44,13 +44,7 @@ def test_item_detail_sections_and_quantity_buttons(admin_client):
     assert not page.find("button", popovertarget="item-manage-menu")
     (edit,) = page.find("a", href=reverse("stuff:item-edit", args=[item.pk]))
     assert "btn" in edit.attrs["class"].split()
-    (up,) = (
-        link
-        for link in page.find("a", href=reverse("stuff:item-list"))
-        if "btn" in link.attrs.get("class", "").split()
-    )
-    assert up.attrs["hx-get"] == reverse("stuff:item-list")
-    assert up.attrs["hx-target"] == "#content"
+    assert not any(link.text == "Up" for link in page.find("a"))
     for name in ("stuff:item-edit", "stuff:inventory-new", "stuff:bookmark-select"):
         (link,) = page.find("a", href=reverse(name, args=[item.pk]))
         assert link.attrs["hx-get"] == link.attrs["href"]
