@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import date
+
 import pytest
 from django.urls import reverse
 
@@ -11,6 +13,7 @@ from tests.factories import (
     InventoryFactory,
     LocationFactory,
     ScheduleFactory,
+    TaskFactory,
     TaskItemFactory,
 )
 from tests.utils import HTMX, parse_html
@@ -53,6 +56,56 @@ def test_task_detail_empty_states(admin_client):
     content = admin_client.get(reverse("upkeep:task-detail", args=[task.pk])).content.decode()
     assert "No schedules" in content
     assert "No consumables" in content
+
+
+def test_task_detail_shows_latest_complete_and_upcoming_schedules(admin_client):
+    task = TaskFactory.create()
+    old = ScheduleFactory.create(
+        task=task,
+        due_date=date(2024, 1, 1),
+        completion_date=date(2024, 1, 2),
+    )
+    latest = ScheduleFactory.create(
+        task=task,
+        due_date=date(2024, 2, 1),
+        completion_date=date(2024, 2, 3),
+    )
+    upcoming = ScheduleFactory.create(task=task, due_date=date(2024, 3, 1))
+    later = ScheduleFactory.create(task=task, due_date=date(2024, 4, 1))
+
+    page = parse_html(
+        admin_client.get(reverse("upkeep:task-detail", args=[task.pk]), headers=HTMX).content,
+    )
+
+    toggles = page.find("input", type="checkbox")
+    assert [el.attrs["hx-patch"] for el in toggles] == [
+        reverse("upkeep:schedule-toggle", args=[latest.pk]),
+        reverse("upkeep:schedule-toggle", args=[upcoming.pk]),
+        reverse("upkeep:schedule-toggle", args=[later.pk]),
+    ]
+    assert "checked" in toggles[0].attrs
+    assert "checked" not in toggles[1].attrs
+    assert page.find("a", href=reverse("upkeep:schedule-edit", args=[latest.pk]))
+    assert page.find("a", href=reverse("upkeep:schedule-edit", args=[upcoming.pk]))
+    assert not page.find("a", href=reverse("upkeep:schedule-edit", args=[old.pk]))
+
+
+def test_task_detail_without_upcoming_shows_only_latest_complete(admin_client):
+    task = TaskFactory.create()
+    ScheduleFactory.create(task=task, due_date=date(2024, 1, 1), completion_date=date(2024, 1, 2))
+    latest = ScheduleFactory.create(
+        task=task,
+        due_date=date(2024, 2, 1),
+        completion_date=date(2024, 2, 3),
+    )
+
+    page = parse_html(
+        admin_client.get(reverse("upkeep:task-detail", args=[task.pk]), headers=HTMX).content,
+    )
+
+    (toggle,) = page.find("input", type="checkbox")
+    assert toggle.attrs["hx-patch"] == reverse("upkeep:schedule-toggle", args=[latest.pk])
+    assert "checked" in toggle.attrs
 
 
 @pytest.mark.parametrize("quantities", [[], [0], [2, 3]])

@@ -1,5 +1,5 @@
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
-from django.db.models import F
+from django.db.models import F, OuterRef, Prefetch, Q, Subquery
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.generic import CreateView, DetailView, ListView, UpdateView, View
@@ -8,7 +8,7 @@ from django_htmx.http import HttpResponseLocation
 from puka.core.pagination import PageSizeMixin
 from puka.core.views import get_template
 from puka.upkeep.forms import TaskForm
-from puka.upkeep.models import Task, TaskItem
+from puka.upkeep.models import Schedule, Task, TaskItem
 from puka.upkeep.services import get_tasks_with_earliest_due_date
 
 
@@ -56,7 +56,19 @@ class TaskDetailView(DetailView):
     def get_object(self, queryset=None) -> Task:
         pk = self.kwargs.get("pk")
         if queryset is None:
-            queryset = Task.objects.select_related("area").prefetch_related("schedules")
+            latest_complete = (
+                Schedule.objects.filter(task=OuterRef("task_id"), completion_date__isnull=False)
+                .order_by("-completion_date", "-pk")
+                .values("pk")[:1]
+            )
+            queryset = Task.objects.select_related("area").prefetch_related(
+                Prefetch(
+                    "schedules",
+                    queryset=Schedule.objects.filter(
+                        Q(completion_date__isnull=True) | Q(pk=Subquery(latest_complete)),
+                    ),
+                ),
+            )
 
         task = queryset.order_by("schedules__due_date").get(pk=pk)
         self.extra_context = {
