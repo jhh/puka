@@ -22,7 +22,3 @@ urlpatterns: list[URLPattern | URLResolver] = [
     path("admin/", admin.site.urls),
     path("404/", view_404),
 ]
-
-
-if "debug_toolbar" in settings.INSTALLED_APPS:  # pragma: no cover
-    urlpatterns = [*urlpatterns, path("__debug__/", include("debug_toolbar.urls"))]
