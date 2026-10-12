@@ -26,11 +26,17 @@ def test_overview_counts_and_links(admin_client):
     inactive = create_bookmark("three", url="https://example.com/3", tags=["c"])
     inactive.active = False
     inactive.save()
-    ItemFactory.create(name="Salt")
+    ItemFactory.create(name="Salt").tags.add("c", "d")
     ScheduleFactory.create()
 
     response = admin_client.get(reverse("home"))
-    assert response.context["counts"] == {"bookmarks": 2, "items": 1, "tasks": 1, "tags": 3}
+    assert response.context["counts"] == {
+        "bookmarks": 2,
+        "items": 1,
+        "tasks": 1,
+        "bookmark_tags": 3,
+        "item_tags": 2,
+    }
 
     page = parse_html(response.content)
     cards = [a for a in page.find("a") if "card" in a.attrs.get("class", "").split()]
@@ -38,10 +44,23 @@ def test_overview_counts_and_links(admin_client):
         reverse("bookmarks:list"),
         reverse("stuff:item-list"),
         reverse("upkeep:task-list"),
-        reverse("bookmarks:tags"),
     ]
     numbers = [el.text for el in page.find("p") if "text-3xl" in el.attrs.get("class", "")]
-    assert numbers == ["2", "1", "1", "3"]
+    assert numbers == ["2", "1", "1"]
+
+    # The Tags card links each count row to its tags page.
+    tag_links = [
+        el for el in page.find("a") if "hover:bg-base-200" in el.attrs.get("class", "").split()
+    ]
+    assert [el.attrs["href"] for el in tag_links] == [
+        reverse("bookmarks:tags"),
+        reverse("stuff:item-tags"),
+    ]
+    tag_rows = []
+    for link in tag_links:
+        index = page.elements.index(link)
+        tag_rows.append((page.elements[index + 1].text, page.elements[index + 2].text))
+    assert tag_rows == [("3", "bookmark"), ("2", "item")]
     assert "XXX" not in response.content.decode()
 
 

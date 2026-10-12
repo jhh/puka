@@ -42,7 +42,8 @@ def overview(request):
         "bookmarks": Bookmark.active_objects.count(),
         "items": Item.objects.count(),
         "tasks": Task.objects.count(),
-        "tags": Bookmark.tags.count(),
+        "bookmark_tags": Bookmark.tags.count(),
+        "item_tags": Item.tags.count(),
     }
     context = {
         "counts": counts,
