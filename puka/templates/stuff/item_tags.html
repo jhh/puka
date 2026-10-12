@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Tags{% endblock %}
+
+{% partialdef tags-partial %}
+    {% if request.htmx and not request.htmx.boosted and not request.htmx.history_restore_request and request.htmx.target != 'body' %}
+        <c-layout.page-meta title="Tags">{% partial breadcrumbs %}</c-layout.page-meta>
+    {% endif %}
+    <c-layout.page-header title="Tags" />
+    {% regroup tags by bucket as buckets %}
+    {% for bucket in buckets %}
+        <div class="divider"></div>
+        <h2 class="text-base font-semibold">{{ bucket.grouper }}</h2>
+
+        <ul class="flex flex-wrap gap-2 mt-2">
+            {% for tag in bucket.list %}
+                <li class="inline">
+                    <c-ui.tag-badge
+                        href="{% url 'stuff:item-list' %}?query=%23{{ tag.name|urlencode:'' }}"
+                        hx-get="{% url 'stuff:item-list' %}?query=%23{{ tag.name|urlencode:'' }}"
+                        hx-push-url="true"
+                        hx-target="#content"
+                    >{{ tag.name }} {{ tag.num_times }}</c-ui.tag-badge>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+{% endpartialdef tags-partial %}
+
+{% partialdef breadcrumbs %}
+    <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
+    <c-ui.crumb href="{% url 'stuff:item-list' %}">Inventory</c-ui.crumb>
+    <c-ui.crumb href="{% url 'stuff:item-tags' %}">Tags</c-ui.crumb>
+{% endpartialdef breadcrumbs %}
+
+{% block breadcrumbs %}
+    <ul>{% partial breadcrumbs %}</ul>
+{% endblock breadcrumbs %}
+
+{% block content %}
+    {% partial tags-partial %}
+{% endblock content %}

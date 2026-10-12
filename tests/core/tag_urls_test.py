@@ -21,6 +21,7 @@ SOURCES = [
     "bookmarks:tags",
     "stuff:item-list",
     "stuff:item-detail",
+    "stuff:item-tags",
     "upkeep:area-detail",
 ]
 
@@ -65,7 +66,7 @@ def test_tag_link_round_trip(admin_client, source, tag, htmx):
     )
     assert response.status_code == 200
     page = parse_html(response.content)
-    inventory = source in {"stuff:item-list", "stuff:item-detail"}
+    inventory = source in {"stuff:item-list", "stuff:item-detail", "stuff:item-tags"}
     (link,) = (
         el
         for el in page.find("a")

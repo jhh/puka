@@ -1,10 +1,11 @@
 import logging
 from types import MappingProxyType
 
-from django.db.models import Case, F, IntegerField, Prefetch, Sum, Value, When
+from django.db.models import Case, Count, F, IntegerField, Prefetch, Sum, Value, When
 from django.http import Http404, HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
+from django.views.decorators.http import require_http_methods
 from django.views.generic import CreateView, DetailView, FormView, ListView, UpdateView, View
 from django_htmx.http import HttpResponseLocation, trigger_client_event
 from django_htmx.middleware import HtmxDetails
@@ -211,3 +212,34 @@ class InventoryDeleteView(View):
             reverse("stuff:item-detail", kwargs={"pk": item_id}),
             target="#content",
         )
+
+
+@require_http_methods(["GET"])
+def item_tags(request):
+    tags = Item.tags.annotate(
+        num_times=Count(Item.tags.through.tag_relname()),
+        bucket=Case(
+            When(
+                num_times__gt=100,
+                then=Value("> 100"),
+            ),
+            When(
+                num_times__gte=50,
+                num_times__lte=100,
+                then=Value("50—100"),
+            ),
+            When(
+                num_times__gte=10,
+                num_times__lt=50,
+                then=Value("10—50"),
+            ),
+            When(
+                num_times__gte=5,
+                num_times__lt=10,
+                then=Value("5—10"),
+            ),
+            default=Value("< 5"),
+        ),
+    ).order_by("-num_times")
+    template = get_template(request, "stuff/item_tags.html", "#tags-partial")
+    return render(request, template, {"tags": tags})

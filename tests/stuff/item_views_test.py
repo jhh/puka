@@ -5,6 +5,8 @@ from pytest_django.asserts import assertContains
 
 from puka.bookmarks.models import Bookmark
 from puka.stuff.models import Item
+from tests.factories import ItemFactory
+from tests.utils import parse_html
 
 
 @pytest.mark.django_db
@@ -69,3 +71,38 @@ class TestItemCreateView:
         assert Item.objects.all().count() == 1
 
         assert Bookmark.objects.all().count() == 2
+
+
+@pytest.mark.django_db
+def test_item_tags_grouped_by_bucket(admin_client):
+    for i in range(6):
+        ItemFactory.create(name=f"Item {i}").tags.add("common")
+    ItemFactory.create(name="Rare item").tags.add("rare")
+
+    response = admin_client.get(reverse("stuff:item-tags"))
+    page = parse_html(response.content)
+
+    headings = [el.text for el in page.find("h2")]
+    assert headings == ["5—10", "< 5"]
+    badges = [el for el in page.find("span") if "badge" in el.attrs.get("class", "")]
+    assert [el.text for el in badges] == ["common 6", "rare 1"]
+    assert all({"badge-info", "badge-soft"} <= set(el.attrs["class"].split()) for el in badges)
+
+    (common,) = (
+        el for el in page.find("a") if el.attrs.get("href", "").endswith("?query=%23common")
+    )
+    assert common.attrs["href"] == f"{reverse('stuff:item-list')}?query=%23common"
+    assert common.attrs["hx-get"] == common.attrs["href"]
+    assert common.attrs["hx-target"] == "#content"
+
+    (breadcrumbs,) = page.find("div", id="breadcrumbs")
+    crumbs = [
+        el.attrs["href"]
+        for el in page.elements[page.elements.index(breadcrumbs) :]
+        if el.tag == "a"
+    ][:3]
+    assert crumbs == [
+        reverse("home"),
+        reverse("stuff:item-list"),
+        reverse("stuff:item-tags"),
+    ]

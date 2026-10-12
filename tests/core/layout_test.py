@@ -18,7 +18,7 @@ def _get(client, url: str, **headers) -> Page:
 
 
 def _sidebar_links(page: Page) -> dict[str, list[str]]:
-    """Sidebar nav-item label -> the link's classes. The label is the link's last <span>."""
+    """Sidebar nav-item href -> the link's classes. A nav item labels its link in a <span>."""
     (sidebar,) = page.find("ul", id="sidebar")
     links: dict[str, list[str]] = {}
     current = None
@@ -26,7 +26,7 @@ def _sidebar_links(page: Page) -> dict[str, list[str]]:
         if el.tag == "a":
             current = el
         elif el.tag == "span" and el.text and current is not None:
-            links[el.text] = current.attrs.get("class", "").split()
+            links[current.attrs.get("href", "")] = current.attrs.get("class", "").split()
             current = None
     return links
 
@@ -55,32 +55,34 @@ def test_root_keeps_local_stylesheet_and_deferred_script(admin_client):
 @pytest.mark.parametrize(
     ("url", "active"),
     [
-        ("/", {"Overview"}),
-        ("/bookmarks/", {"Bookmarks"}),
-        ("/bookmarks/filter/", {"Bookmarks", "Filter"}),
-        ("/bookmarks/tags/", {"Bookmarks", "Tags"}),
-        ("/stuff/", {"Inventory"}),
-        ("/stuff/location/0/", {"Inventory", "Locations"}),
-        ("/stuff/item/import/", {"Inventory", "Import"}),
-        ("/upkeep/task/", {"Tasks"}),
-        ("/upkeep/area/", {"Tasks", "Areas"}),
+        ("/", {"/"}),
+        ("/bookmarks/", {"/bookmarks/"}),
+        ("/bookmarks/filter/", {"/bookmarks/", "/bookmarks/filter/"}),
+        ("/bookmarks/tags/", {"/bookmarks/", "/bookmarks/tags/"}),
+        ("/stuff/", {"/stuff/"}),
+        ("/stuff/item/tags/", {"/stuff/", "/stuff/item/tags/"}),
+        ("/stuff/location/0/", {"/stuff/", "/stuff/location/0/"}),
+        ("/stuff/item/import/", {"/stuff/", "/stuff/item/import/"}),
+        ("/upkeep/task/", {"/upkeep/task/"}),
+        ("/upkeep/area/", {"/upkeep/task/", "/upkeep/area/"}),
     ],
 )
 def test_sidebar_active_item(admin_client, url, active):
     links = _sidebar_links(_get(admin_client, url))
     assert set(links) == {
-        "Overview",
-        "Bookmarks",
-        "Filter",
-        "Tags",
-        "Inventory",
-        "Locations",
-        "Import",
-        "Tasks",
-        "Areas",
-        "Admin",
+        "/",
+        "/bookmarks/",
+        "/bookmarks/filter/",
+        "/bookmarks/tags/",
+        "/stuff/",
+        "/stuff/item/tags/",
+        "/stuff/location/0/",
+        "/stuff/item/import/",
+        "/upkeep/task/",
+        "/upkeep/area/",
+        "/admin/",
     }
-    assert {label for label, cls in links.items() if "menu-active" in cls} == active
+    assert {href for href, cls in links.items() if "menu-active" in cls} == active
 
 
 @pytest.mark.parametrize(
@@ -94,6 +96,7 @@ def test_sidebar_active_item(admin_client, url, active):
         ("/stuff/item/new/", False),
         ("/stuff/location/0/", True),
         ("/stuff/item/import/", True),
+        ("/stuff/item/tags/", True),
         ("/upkeep/task/", False),
         ("/upkeep/area/", True),
     ],
@@ -135,7 +138,7 @@ def test_sidebar_admin_state(rf):
     """Admin is a Manage item; Django's own admin layout does not render the sidebar."""
     page = parse_html(render_to_string("core/sidebar.html", request=rf.get("/admin/")))
     links = _sidebar_links(page)
-    assert "menu-active" in links["Admin"]
+    assert "menu-active" in links["/admin/"]
     (details,) = page.find("details")
     assert "open" in details.attrs
 
@@ -150,6 +153,7 @@ def test_sidebar_hrefs(admin_client):
         "/bookmarks/tags/",
         "/stuff/",
         "/stuff/location/0/",
+        "/stuff/item/tags/",
         "/stuff/item/import/",
         "/upkeep/task/",
         "/upkeep/area/",
@@ -181,5 +185,5 @@ def test_htmx_fragment_has_no_layout(admin_client):
     page = _get(admin_client, reverse("stuff:item-list"), **{"HX-Request": "true"})
     (sidebar,) = page.find("ul", id="sidebar")
     assert sidebar.attrs["hx-swap-oob"] == "true"
-    assert "menu-active" in _sidebar_links(page)["Inventory"]
+    assert "menu-active" in _sidebar_links(page)["/stuff/"]
     assert not page.find("input", id="app-drawer")

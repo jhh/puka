@@ -16,6 +16,7 @@ from puka.stuff.views.item import (
     adjust_inventory,
     item_import_errors,
     item_import_template,
+    item_tags,
 )
 from puka.stuff.views.location import (
     LocationCreateView,
@@ -43,6 +44,8 @@ urlpatterns: list[URLPattern | URLResolver] = [
     path("item/import/", ItemImportView.as_view(), name="item-import"),
     path("item/import/template/", item_import_template, name="item-import-template"),
     path("item/import/errors/", item_import_errors, name="item-import-errors"),
+    # Item tags
+    path("item/tags/", item_tags, name="item-tags"),
     # Location
     path("location/", LocationListView.as_view(), name="location"),
     path("location/<int:pk>/", LocationListView.as_view(), name="location-list"),
