@@ -29,6 +29,7 @@
 
 {% partialdef breadcrumbs %}
     <c-ui.crumb href="{% url 'home' %}">Overview</c-ui.crumb>
+    <c-ui.crumb href="{% url 'bookmarks:list' %}">Bookmarks</c-ui.crumb>
     <c-ui.crumb href="{% url 'bookmarks:tags' %}">Tags</c-ui.crumb>
 {% endpartialdef breadcrumbs %}
 
