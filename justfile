@@ -132,6 +132,10 @@ attach:
 pc *args:
     puka-dev {{ args }}
 
+# sign the Playwright MCP browser in to the dev server
+[group('dev')]
+browser-auth: (up "migrate") (manage "browser_auth")
+
 # initialize and start the development database
 [group('db')]
 db-start: (up "migrate")

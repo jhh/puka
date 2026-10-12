@@ -79,7 +79,10 @@ Nix devshell, `just` task runner. Run every command inside the devshell.
   headless Chromium (`nix run nixpkgs/nixos-26.05#playwright-mcp`,
   intentionally outside the flake outputs to keep `nix flake check`
   lean). Run `just up` first and keep screenshots in `.playwright-mcp/`
-  (gitignored).
+  (gitignored). `just browser-auth` writes `.playwright-mcp/auth.json`,
+  which the server loads via `--storage-state` to sign the browser in as
+  a local `qa` user; rerun it after the session expires or the database
+  is rebuilt.
 - Postgres and process-compose use Unix sockets under the repo (`.db/`,
   `.run/`); the ~103-byte macOS socket limit means very deep worktree
   paths can break them.

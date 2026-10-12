@@ -11,6 +11,8 @@
           "--",
           "--headless",
           "--isolated",
+          "--storage-state",
+          ".playwright-mcp/auth.json",
           "--output-dir",
           ".playwright-mcp"
         ],
