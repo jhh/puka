@@ -43,6 +43,28 @@
                     </ul>
                 </dd>
             </div>
+            {% with areas=location.areas.all %}
+                {% if areas %}
+                    <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
+                        <dt class="text-sm font-medium text-base-content">Areas</dt>
+                        <dd class="mt-2 text-sm sm:col-span-2 sm:mt-0">
+                            <ul role="list" class="list list-sm rounded-box border border-base-300 bg-base-100">
+                                {% for area in areas %}
+                                    <li class="list-row items-center">
+                                        <a
+                                            href="{% url 'upkeep:area-detail' area.pk %}"
+                                            hx-get="{% url 'upkeep:area-detail' area.pk %}"
+                                            hx-target="#content"
+                                            hx-push-url="true"
+                                            class="link link-hover link-primary"
+                                        >{{ area.name }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </dd>
+                    </div>
+                {% endif %}
+            {% endwith %}
         </dl>
     </c-ui.card>
 {% endpartialdef detail-partial %}

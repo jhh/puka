@@ -50,6 +50,15 @@
     <c-ui.card class="mb-4">
         <dl class="divide-y divide-base-200">
             <c-ui.detail-row label="Name">{{ area.name }}</c-ui.detail-row>
+            <c-ui.detail-row label="Location">
+                <a
+                    href="{% url 'stuff:location-detail' area.location.pk %}"
+                    hx-get="{% url 'stuff:location-detail' area.location.pk %}"
+                    hx-target="#content"
+                    hx-push-url="true"
+                    class="link link-hover link-primary"
+                >{{ area.location.name }} ({{ area.location.code }})</a>
+            </c-ui.detail-row>
             <c-ui.detail-row label="Notes">{{ area.notes }}</c-ui.detail-row>
             {% with bookmarks=area.bookmarks.all %}
                 {% if bookmarks %}

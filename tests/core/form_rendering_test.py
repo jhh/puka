@@ -101,7 +101,7 @@ FORM_CASES = (
     FormCase(
         "area-new",
         ("upkeep:area-new", ()),
-        {"name", "notes"},
+        {"name", "location", "notes"},
         "Save area",
         ("upkeep:area-list", ()),
         autofocus="name",
@@ -109,7 +109,7 @@ FORM_CASES = (
     FormCase(
         "area-edit",
         ("upkeep:area-edit", ("area",)),
-        {"name", "notes"},
+        {"name", "location", "notes"},
         "Save area",
         ("upkeep:area-list", ()),
         delete=("upkeep:area-delete", ("area",)),

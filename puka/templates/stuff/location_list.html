@@ -67,7 +67,7 @@
                     <th scope="col">Code</th>
                     <th scope="col" class="max-sm:hidden">Sublocations</th>
                     <th scope="col" class="max-sm:hidden">Items</th>
-                    <th scope="col"><span class="sr-only">Actions</span></th>
+                    <th scope="col" class="max-sm:hidden">Areas</th>
                 </tr>
             </thead>
             <tbody>
@@ -84,6 +84,7 @@
                             >{{ location.name }}</a>
                             <p class="mt-1 text-xs text-base-content/70 sm:hidden">
                                 {{ location.numchild }} sublocations · {{ location.inventory_count }} items
+                                {% if location.area_count %}· {{ location.area_count }} areas{% endif %}
                             </p>
                         </td>
                         <td class="text-base-content/70">
@@ -103,17 +104,7 @@
                         <td class="text-base-content/70 max-sm:hidden">
                             {{ location.inventory_count }}
                         </td>
-                        <td class="text-right">
-                            <c-ui.button
-                                href="{% url 'stuff:location-edit' location.pk %}"
-                                variant="ghost"
-                                icon="hero-pencil-square"
-                                aria-label="Edit {{ location.name }}"
-                                hx-get="{% url 'stuff:location-edit' location.pk %}"
-                                hx-target="#content"
-                                hx-push-url="true"
-                            />
-                        </td>
+                        <td class="text-base-content/70 max-sm:hidden">{{ location.area_count }}</td>
                     </tr>
                 {% empty %}
                     <tr>
@@ -218,22 +209,69 @@
                 </tbody>
             </c-ui.table>
         </section>
+        {% if areas %}
+            <section aria-labelledby="areas-heading" class="mt-8 min-w-0">
+                <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+                    <h2 id="areas-heading" class="flex items-center gap-2 font-semibold">
+                        <c-ui.icon name="hero-home-modern" class="size-5" />
+                        Areas <span class="badge badge-sm">{{ areas|length }}</span>
+                    </h2>
+                </div>
+                <c-ui.table zebra="1">
+                    <thead>
+                        <tr>
+                            <th scope="col">Area</th>
+                            <th scope="col" class="max-sm:hidden">Tasks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for area in areas %}
+                            <tr>
+                                <td>
+                                    <a
+                                        href="{% url 'upkeep:area-detail' area.id %}"
+                                        hx-get="{% url 'upkeep:area-detail' area.id %}"
+                                        hx-target="#content"
+                                        hx-push-url="true"
+                                        class="link link-hover font-semibold"
+                                    >{{ area.name }}</a>
+                                </td>
+                                <td class="text-base-content/70 max-sm:hidden">{{ area.task_count }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </c-ui.table>
+            </section>
+        {% endif %}
         <div class="mt-8 border-t border-base-300 pt-4">
-            <form method="post" action="{% url 'stuff:location-delete' location.pk %}">
-                {% csrf_token %}
+            {% if location.code == none_location_code %}
                 <c-ui.button
-                    type="submit"
+                    type="button"
                     variant="error"
                     style="outline"
                     icon="hero-trash"
-                    hx-post="{% url 'stuff:location-delete' location.pk %}"
-                    hx-target="#content"
-                    hx-confirm="Delete this location, all its sublocations, and their inventory records? Item definitions will be kept."
+                    disabled
                 >Delete location</c-ui.button>
-            </form>
-            <p class="mt-2 text-xs text-base-content/70">
-                Deleting a location also removes its sublocations and their stock records, not the items themselves.
-            </p>
+                <p class="mt-2 text-xs text-base-content/70">
+                    This is the default location for areas and cannot be deleted.
+                </p>
+            {% else %}
+                <form method="post" action="{% url 'stuff:location-delete' location.pk %}">
+                    {% csrf_token %}
+                    <c-ui.button
+                        type="submit"
+                        variant="error"
+                        style="outline"
+                        icon="hero-trash"
+                        hx-post="{% url 'stuff:location-delete' location.pk %}"
+                        hx-target="#content"
+                        hx-confirm="Delete this location, all its sublocations, and their inventory records? Item definitions will be kept."
+                    >Delete location</c-ui.button>
+                </form>
+                <p class="mt-2 text-xs text-base-content/70">
+                    Deleting a location also removes its sublocations and their stock records, not the items themselves.
+                </p>
+            {% endif %}
         </div>
     {% endif %}
 {% endpartialdef list-partial %}

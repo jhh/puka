@@ -127,7 +127,9 @@ class InventoryQuantityForm(LocationFormContext, ModelForm):
         fields = ("quantity",)
 
 
-class DestinationField(forms.ModelChoiceField):
+class LocationChoiceField(forms.ModelChoiceField):
+    """Shows each location as "Name (CODE)" in select inputs."""
+
     def label_from_instance(self, obj):
         return f"{obj.name} ({obj.code})"
 
@@ -135,12 +137,12 @@ class DestinationField(forms.ModelChoiceField):
 class InventoryMoveForm(LocationFormContext, forms.Form):
     template_name = "stuff/forms/location_inventory.html"
 
-    destination = DestinationField(queryset=Location.objects.all(), label="Move to")
+    destination = LocationChoiceField(queryset=Location.objects.all(), label="Move to")
     quantity = forms.IntegerField(min_value=1, label="Quantity to move")
 
     def __init__(self, *args, inventory, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["destination"] = DestinationField(
+        self.fields["destination"] = LocationChoiceField(
             queryset=Location.objects.exclude(pk=inventory.location_id),
             label="Move to",
         )

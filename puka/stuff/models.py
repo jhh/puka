@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVectorField
 from django.db import models
@@ -10,6 +12,12 @@ from treebeard.mp_tree import MP_Node
 
 from puka.bookmarks.models import Bookmark
 
+if TYPE_CHECKING:
+    from puka.upkeep.models import Area
+
+# Every Area without an explicit location falls back to this one.
+NONE_LOCATION_CODE = "N"
+
 
 class Location(MP_Node):
     name: models.CharField = models.CharField(max_length=100)
@@ -17,6 +25,7 @@ class Location(MP_Node):
     alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
     node_order_by = ("name",)
     inventories: models.Manager[Inventory]
+    areas: models.Manager[Area]
 
     def __str__(self):
         return self.code

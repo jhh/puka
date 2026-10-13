@@ -35,7 +35,7 @@ class AreaDetailView(DetailView):
         return get_template(self.request, "upkeep/area_detail.html", "#detail-partial")
 
     def get_queryset(self):
-        return Area.objects.prefetch_related(
+        return Area.objects.select_related("location").prefetch_related(
             Prefetch("tasks", queryset=get_tasks_with_earliest_due_date()),
             "bookmarks__tags",
         )

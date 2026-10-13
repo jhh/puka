@@ -22,3 +22,7 @@ class Command(BaseCommand):
                 d1,
                 {"name": f"D01-{i:02}", "code": f"S-D01-{i:02}"},
             )
+
+        # Areas need a default location (NONE_LOCATION_CODE). Added last so
+        # existing primary keys in the seeded tree do not change.
+        Location.objects.add_root({"name": "None", "code": "N"})

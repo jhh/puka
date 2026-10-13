@@ -59,7 +59,14 @@ def get_areas_tasks_schedules(query=None) -> QuerySet[Area, dict[str, Any]]:
     else:
         area_queryset = area_queryset.order_by("pk")
 
-    return area_queryset.values("id", "name", "task_count", "due_date", "due_task_id")
+    return area_queryset.values(
+        "id",
+        "name",
+        "location__name",
+        "task_count",
+        "due_date",
+        "due_task_id",
+    )
 
 
 def get_tasks_schedules(area=None) -> list[dict[str, Any]]:

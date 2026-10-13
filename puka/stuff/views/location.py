@@ -4,6 +4,7 @@ import logging
 from typing import cast
 
 from django.db.models import Count, Prefetch
+from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views.generic import CreateView, DetailView, ListView, UpdateView, View
@@ -12,7 +13,8 @@ from treebeard.forms import movenodeform_factory
 
 from puka.core.views import get_template
 from puka.stuff.forms import LocationForm
-from puka.stuff.models import Inventory, Location
+from puka.stuff.models import NONE_LOCATION_CODE, Inventory, Location
+from puka.upkeep.models import Area
 
 logger = logging.getLogger(__name__)
 
@@ -30,24 +32,34 @@ class LocationListView(ListView):
         if pk == 0:
             self.location = None
             self.ancestors = []
-            return Location.objects.get_root_nodes().annotate(inventory_count=Count("inventories"))
+            return Location.objects.get_root_nodes().annotate(
+                inventory_count=Count("inventories", distinct=True),
+                area_count=Count("areas", distinct=True),
+            )
 
         parent = get_object_or_404(Location, pk=pk)
         self.location = parent
         self.ancestors = [(node.pk, node.name) for node in Location.objects.get_ancestors(parent)]
         self.ancestors.append((parent.pk, parent.name))
-        return Location.objects.get_children(parent).annotate(inventory_count=Count("inventories"))
+        return Location.objects.get_children(parent).annotate(
+            inventory_count=Count("inventories", distinct=True),
+            area_count=Count("areas", distinct=True),
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["parent_id"] = self.kwargs.get("pk", 0)
         context["ancestors"] = self.ancestors
         context["location"] = self.location
+        context["none_location_code"] = NONE_LOCATION_CODE
         if self.location:
             parent = Location.objects.get_parent(self.location)
             context["up_id"] = parent.pk if parent else 0
             context["inventories"] = self.location.inventories.select_related("item").order_by(
                 "item__name",
+            )
+            context["areas"] = self.location.areas.annotate(task_count=Count("tasks")).order_by(
+                "name",
             )
         return context
 
@@ -60,6 +72,7 @@ class LocationDetailView(DetailView):
     def get_queryset(self):
         return Location.objects.prefetch_related(
             Prefetch("inventories", queryset=Inventory.objects.select_related("item")),
+            Prefetch("areas", queryset=Area.objects.order_by("name")),
         )
 
     def get_template_names(self):
@@ -128,9 +141,19 @@ class LocationUpdateView(UpdateView):
 class LocationDeleteView(View):
     def post(self, request, pk):
         location = get_object_or_404(Location, pk=pk)
+        if self._contains_none_location(location):
+            return HttpResponseBadRequest(
+                "The None location is the default for areas and cannot be deleted.",
+            )
         parent = Location.objects.get_parent(location)
         url = reverse("stuff:location-list", args=[parent.pk if parent else 0])
         location.delete()
         if request.htmx:
             return HttpResponseLocation(url, target="#content")
         return redirect(url)
+
+    @staticmethod
+    def _contains_none_location(location: Location) -> bool:
+        """Return whether ``location`` or any descendant is the "None" location."""
+        subtree = Location.objects.get_descendants(location, include_self=True)
+        return subtree.filter(code=NONE_LOCATION_CODE).exists()

@@ -1,6 +1,7 @@
 from django import forms
 
-from puka.stuff.models import Item
+from puka.stuff.forms import LocationChoiceField
+from puka.stuff.models import Item, Location
 
 from .models import Area, Schedule, Task, TaskItem
 
@@ -15,11 +16,16 @@ class AreaForm(forms.ModelForm):
 
     class Meta:
         model = Area
-        fields = ("name", "notes")
+        fields = ("name", "location", "notes")
+        field_classes = {"location": LocationChoiceField}  # noqa: RUF012
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["name"].widget.attrs["autocomplete"] = "off"
+        field = self.fields["location"]
+        field.queryset = Location.objects.order_by("path")  # ty: ignore[unresolved-attribute]
+        # A callable model default makes Django render a hidden initial input.
+        field.show_hidden_initial = False
         if self.instance.pk is None:
             self.fields["name"].widget.attrs["autofocus"] = True
 

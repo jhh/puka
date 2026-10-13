@@ -5,8 +5,8 @@ from django.urls import reverse
 from pytest_django.asserts import assertContains
 
 from puka.upkeep.models import Area
-from tests.factories import AreaFactory, BookmarkFactory
-from tests.utils import HTMX, assert_hx_location, assert_redirect
+from tests.factories import AreaFactory, BookmarkFactory, LocationFactory
+from tests.utils import HTMX, assert_hx_location, assert_redirect, parse_html
 
 pytestmark = pytest.mark.django_db
 
@@ -16,17 +16,18 @@ def area():
     return AreaFactory.create()
 
 
-def test_create_area(admin_client):
-    data = {"name": "Kitchen", "notes": "downstairs"}
+def test_create_area(admin_client, none_location):
+    data = {"name": "Kitchen", "notes": "downstairs", "location": none_location.pk}
     response = admin_client.post(reverse("upkeep:area-new"), data, headers=HTMX)
 
     assert_redirect(response, reverse("upkeep:area-list"))
     area = Area.objects.get()
     assert area.name == "Kitchen"
     assert area.notes == "downstairs"
+    assert area.location == none_location
 
 
-def test_create_area_invalid(admin_client):
+def test_create_area_invalid(admin_client, none_location):
     response = admin_client.post(reverse("upkeep:area-new"), {"name": ""}, headers=HTMX)
 
     assert response.status_code == 200
@@ -34,8 +35,24 @@ def test_create_area_invalid(admin_client):
     assert not Area.objects.exists()
 
 
+def test_create_area_form_defaults_to_none_location(admin_client, none_location):
+    response = admin_client.get(reverse("upkeep:area-new"), headers=HTMX)
+
+    form = response.context["form"]
+    assert form["location"].value() == none_location.pk
+
+
+def test_area_form_location_options(admin_client, none_location):
+    location = LocationFactory.create(name="Garage", code="G")
+    response = admin_client.get(reverse("upkeep:area-new"), headers=HTMX)
+
+    options = parse_html(response.content).options("location")
+    assert options[str(none_location.pk)].text == "None (N)"
+    assert options[str(location.pk)].text == "Garage (G)"
+
+
 def test_update_area(admin_client, area):
-    data = {"name": "Renamed", "notes": ""}
+    data = {"name": "Renamed", "notes": "", "location": area.location_id}
     url = reverse("upkeep:area-edit", args=[area.pk])
     response = admin_client.post(url, data, headers=HTMX)
 
@@ -43,6 +60,37 @@ def test_update_area(admin_client, area):
     area.refresh_from_db()
     assert area.name == "Renamed"
     assert area.notes == ""
+
+
+def test_update_area_location(admin_client, area):
+    location = LocationFactory.create(name="Garage", code="G")
+    data = {"name": area.name, "notes": "", "location": location.pk}
+    url = reverse("upkeep:area-edit", args=[area.pk])
+    response = admin_client.post(url, data, headers=HTMX)
+
+    assert_redirect(response, reverse("upkeep:area-list"))
+    area.refresh_from_db()
+    assert area.location == location
+
+
+def test_area_detail_shows_location(admin_client, area):
+    location = LocationFactory.create(name="Garage", code="G")
+    area.location = location
+    area.save()
+    response = admin_client.get(reverse("upkeep:area-detail", args=[area.pk]), headers=HTMX)
+
+    page = parse_html(response.content)
+    (link,) = page.find("a", href=reverse("stuff:location-detail", args=[location.pk]))
+    assert link.text == "Garage (G)"
+
+
+def test_area_list_shows_location(admin_client, area):
+    location = LocationFactory.create(name="Garage", code="G")
+    area.location = location
+    area.save()
+    response = admin_client.get(reverse("upkeep:area-list"), headers=HTMX)
+
+    assertContains(response, ">Garage<")
 
 
 def test_delete_area(admin_client, area):

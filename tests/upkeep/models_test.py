@@ -4,6 +4,7 @@ from datetime import timedelta
 import pytest
 from django.db import IntegrityError
 
+from puka.stuff.models import Location
 from puka.upkeep.models import Area, Schedule, Task, TaskItem
 from puka.upkeep.services import item_quantity_needed
 from tests.factories import (
@@ -24,13 +25,25 @@ def test_area(area):
 
 
 @pytest.mark.django_db
-def test_area_first_due_no_tasks():
+def test_area_defaults_to_none_location(none_location):
+    area = Area.objects.create(name="Test Area")
+    assert area.location == none_location
+
+
+@pytest.mark.django_db
+def test_area_default_requires_none_location():
+    with pytest.raises(Location.DoesNotExist):
+        Area.objects.create(name="Test Area")
+
+
+@pytest.mark.django_db
+def test_area_first_due_no_tasks(none_location):
     area = Area.objects.create(name="Test Area")
     assert area.first_due_schedule() is None
 
 
 @pytest.mark.django_db
-def test_area_first_due_no_schedules():
+def test_area_first_due_no_schedules(none_location):
     area = Area.objects.create(name="Test Area")
     Task.objects.create(name="Test Task", area=area)
     assert area.tasks.count() == 1
@@ -97,7 +110,7 @@ def test_task_bad_frequency():
 
 
 @pytest.mark.django_db
-def test_task_manager():
+def test_task_manager(none_location):
     a = Area.objects.create(name="Test Area")
     t = Task.objects.create(area=a, name="test 1", interval=1, frequency="days")
 

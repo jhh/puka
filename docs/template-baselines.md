@@ -247,13 +247,16 @@ Current preparation/rendering budgets:
 | Task list | 1 | 1 |
 | Area list | 1 | 1 |
 | Item detail | 5 | 0 |
-| Location detail | 2 | 1 |
+| Location detail | 3 | 1 |
 | Task detail | 3 | 0 |
 | Area detail | 4 | 0 |
 
 Lists still evaluate their primary querysets and bulk prefetches lazily
 during rendering. Location breadcrumbs still load ancestors once. Neither
-path issues a relationship query per rendered row.
+path issues a relationship query per rendered row. Location detail's
+preparation grew from 2 to 3 when the areas prefetch was added (see
+`docs/area-location.md`); the prefetch runs while `DetailView` evaluates
+its queryset, so it counts as preparation rather than rendering.
 
 The query guard fixtures now include size 15, crossing task/area pagination
 boundaries. Every size uses the same scalar query ceiling. A separate area

@@ -36,6 +36,23 @@ class LocationFactory(DjangoModelFactory[Location]):
         return model_class.objects.add_child(parent, kwargs)
 
 
+class NoneLocationFactory(DjangoModelFactory[Location]):
+    """The default "None" location (code N) that ``Area.location`` falls back to."""
+
+    class Meta:
+        model = Location
+
+    name = "None"
+    code = "N"
+
+    @classmethod
+    def _create(cls, model_class, *_args, **kwargs):
+        location = model_class.objects.filter(code=kwargs["code"]).first()
+        if location is None:
+            location = model_class.objects.add_root(kwargs)
+        return location
+
+
 class ItemFactory(DjangoModelFactory[Item]):
     class Meta:
         model = Item
@@ -67,6 +84,7 @@ class AreaFactory(DjangoModelFactory[Area]):
 
     name = "Test Area"
     notes = Faker("sentence")
+    location = SubFactory(NoneLocationFactory)
 
 
 class TaskFactory(DjangoModelFactory[Task]):

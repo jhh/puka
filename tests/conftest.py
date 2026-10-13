@@ -18,6 +18,7 @@ from .factories import (
     ItemFactory,
     ItemWithInventoryFactory,
     LocationFactory,
+    NoneLocationFactory,
     ScheduleFactory,
     TaskFactory,
     TaskItemFactory,
@@ -182,7 +183,12 @@ def start_date():
 
 
 @pytest.fixture
-def area(db, start_date):
+def none_location(db):
+    return NoneLocationFactory.create()
+
+
+@pytest.fixture
+def area(db, start_date, none_location):
     area = Area.objects.create(name="Test Area")
 
     for i in range(3):

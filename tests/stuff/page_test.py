@@ -9,6 +9,7 @@ from puka.stuff.models import Inventory, Location
 from tests.factories import (
     AreaFactory,
     BookmarkFactory,
+    InventoryFactory,
     ItemFactory,
     ItemWithInventoryFactory,
     LocationFactory,
@@ -281,6 +282,52 @@ def test_location_list_links_and_copy(admin_client):
         a.attrs["href"] for a in page.elements[page.elements.index(crumbs) :][:12] if a.tag == "a"
     ]
     assert reverse("stuff:location-list", args=[root.pk]) in hrefs
+
+
+def test_location_list_shows_area_counts(admin_client):
+    root = Location.objects.add_root({"name": "Garage", "code": "G"})
+    shelf = Location.objects.add_child(root, {"name": "Shelf", "code": "G-S"})
+    AreaFactory.create(name="Garden", location=root)
+    AreaFactory.create(name="Workshop", location=root)
+    AreaFactory.create(name="Shelf duty", location=shelf)
+    InventoryFactory.create(item=ItemFactory.create(name="Ladder"), location=root)
+    InventoryFactory.create(item=ItemFactory.create(name="Hose"), location=root)
+
+    response = admin_client.get(reverse("stuff:location-list", args=[0]), headers=HTMX)
+    page = parse_html(response.content)
+    assert "Areas" in [el.text for el in page.find("th")]
+    (garage,) = (loc for loc in response.context["locations"] if loc.pk == root.pk)
+    # Both counts must ignore the join to the other relation.
+    assert garage.area_count == 2
+    assert garage.inventory_count == 2
+
+    response = admin_client.get(reverse("stuff:location-list", args=[root.pk]), headers=HTMX)
+    (row,) = (loc for loc in response.context["locations"] if loc.pk == shelf.pk)
+    assert row.area_count == 1
+
+
+def test_location_page_lists_areas(admin_client):
+    location = LocationFactory.create(name="Garage", code="G")
+    area = AreaFactory.create(name="Garden", location=location)
+    TaskFactory.create(area=area)
+
+    page = parse_html(
+        admin_client.get(reverse("stuff:location-list", args=[location.pk]), headers=HTMX).content,
+    )
+
+    (link,) = page.find("a", href=reverse("upkeep:area-detail", args=[area.pk]))
+    assert link.attrs["hx-get"] == link.attrs["href"]
+    assert link.attrs["hx-target"] == "#content"
+    assert link.attrs["hx-push-url"] == "true"
+    assert page.find("h2", id="areas-heading")
+
+
+def test_location_page_hides_empty_areas_section(admin_client, location):
+    page = parse_html(
+        admin_client.get(reverse("stuff:location-list", args=[location.pk]), headers=HTMX).content,
+    )
+
+    assert not page.find("h2", id="areas-heading")
 
 
 @pytest.mark.parametrize("name", ["stuff:item-detail", "stuff:location-detail"])

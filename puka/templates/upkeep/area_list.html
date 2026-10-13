@@ -32,9 +32,9 @@
         <thead>
             <tr>
                 <th scope="col">Area</th>
+                <th scope="col">Location</th>
                 <th scope="col">Tasks</th>
                 <th scope="col">Next Due</th>
-                <th scope="col"><span class="sr-only">Edit</span></th>
             </tr>
         </thead>
         <tbody>
@@ -49,17 +49,9 @@
                             class="link link-hover link-primary"
                         >{{ area.name }}</a>
                     </td>
+                    <td class="text-base-content/70">{{ area.location__name }}</td>
                     <td class="text-base-content/70">{{ area.task_count }}</td>
                     <td class="text-base-content/70">{% if area.due_task_id %}{{ area.due_date }}{% endif %}</td>
-                    <td class="text-right">
-                        <a
-                            href="{% url 'upkeep:area-edit' area.id %}"
-                            hx-get="{% url 'upkeep:area-edit' area.id %}"
-                            hx-target="#content"
-                            hx-push-url="true"
-                            class="link link-hover link-primary text-sm font-medium"
-                        >Edit</a>
-                    </td>
                 </tr>
             {% empty %}
                 <tr>

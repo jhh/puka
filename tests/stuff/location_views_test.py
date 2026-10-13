@@ -5,7 +5,7 @@ from django.urls import reverse
 from pytest_django.asserts import assertContains
 
 from puka.stuff.models import Inventory, Item, Location
-from tests.factories import ItemWithInventoryFactory
+from tests.factories import AreaFactory, ItemWithInventoryFactory
 from tests.utils import HTMX, assert_hx_location, assert_redirect
 
 pytestmark = pytest.mark.django_db
@@ -126,6 +126,65 @@ def test_delete_location_without_htmx_returns_to_parent(admin_client, location):
     parent = Location.objects.get_parent(location)
     response = admin_client.post(reverse("stuff:location-delete", args=[location.pk]))
     assert_redirect(response, reverse("stuff:location-list", args=[parent.pk]))
+
+
+def test_delete_location_moves_areas_to_none(admin_client, location, none_location):
+    area = AreaFactory.create(location=location)
+    parent = Location.objects.get_parent(location)
+    response = admin_client.post(
+        reverse("stuff:location-delete", args=[location.pk]),
+        headers=HTMX,
+    )
+
+    assert_hx_location(response, reverse("stuff:location-list", args=[parent.pk]))
+    area.refresh_from_db()
+    assert area.location == none_location
+
+
+def test_delete_parent_location_moves_descendant_areas_to_none(
+    admin_client,
+    location,
+    none_location,
+):
+    area = AreaFactory.create(location=location)
+    parent = Location.objects.get_parent(location)
+    response = admin_client.post(reverse("stuff:location-delete", args=[parent.pk]), headers=HTMX)
+
+    assert_hx_location(response, LOCATION_ROOT)
+    area.refresh_from_db()
+    assert area.location == none_location
+
+
+@pytest.mark.parametrize("htmx", [True, False], ids=["htmx", "plain"])
+def test_delete_none_location_is_blocked(admin_client, none_location, htmx):
+    headers = HTMX if htmx else {}
+    response = admin_client.post(
+        reverse("stuff:location-delete", args=[none_location.pk]),
+        headers=headers,
+    )
+
+    assert response.status_code == 400
+    assert Location.objects.filter(pk=none_location.pk).exists()
+
+
+def test_delete_ancestor_of_none_location_is_blocked(admin_client, location, none_location):
+    Location.objects.move(none_location, location, "sorted-child")
+    response = admin_client.post(
+        reverse("stuff:location-delete", args=[location.pk]),
+        headers=HTMX,
+    )
+
+    assert response.status_code == 400
+    assert Location.objects.filter(pk=none_location.pk).exists()
+
+
+def test_none_location_delete_action_is_disabled(admin_client, none_location):
+    response = admin_client.get(
+        reverse("stuff:location-list", args=[none_location.pk]),
+        headers=HTMX,
+    )
+
+    assertContains(response, "cannot be deleted")
 
 
 def test_create_form_keeps_parent_on_submission(admin_client, location):
