@@ -34,13 +34,14 @@ def view_404(request):
 def overview(request):
     # Imported here: core is imported by the other apps' views.
     from puka.bookmarks.models import Bookmark  # noqa: PLC0415
-    from puka.stuff.models import Item  # noqa: PLC0415
+    from puka.stuff.models import Item, Location  # noqa: PLC0415
     from puka.upkeep.models import Task  # noqa: PLC0415
     from puka.upkeep.services import get_upcoming_tasks  # noqa: PLC0415
 
     counts = {
         "bookmarks": Bookmark.active_objects.count(),
         "items": Item.objects.count(),
+        "locations": Location.objects.count(),
         "tasks": Task.objects.count(),
         "bookmark_tags": Bookmark.tags.count(),
         "item_tags": Item.tags.count(),

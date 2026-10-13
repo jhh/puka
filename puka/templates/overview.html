@@ -94,13 +94,17 @@
             </tbody>
         </c-ui.table>
     </section>
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
         {% url 'bookmarks:list' as href %}
         {% with title="Bookmarks" icon="hero-bookmark" count=counts.bookmarks caption="active bookmarks" %}
             {% partial overview-card %}
         {% endwith %}
         {% url 'stuff:item-list' as href %}
         {% with title="Inventory" icon="hero-archive-box" count=counts.items caption="items" %}
+            {% partial overview-card %}
+        {% endwith %}
+        {% url 'stuff:location-list' 0 as href %}
+        {% with title="Locations" icon="hero-map-pin" count=counts.locations caption="locations" %}
             {% partial overview-card %}
         {% endwith %}
         {% url 'upkeep:task-list' as href %}

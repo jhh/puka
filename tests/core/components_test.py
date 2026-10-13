@@ -496,6 +496,26 @@ def test_nav_item_match_and_arg(rf_get, path, active):
         assert var not in link.attrs
 
 
+@pytest.mark.parametrize(
+    ("path", "active"),
+    [
+        ("/stuff/", True),
+        ("/stuff/item/import/", True),
+        ("/stuff/location/0/", False),
+        ("/stuff/location/7/detail/", False),
+    ],
+)
+def test_nav_item_match_exclude(rf_get, path, active):
+    source = (
+        '<c-layout.nav-item url_name="stuff:item-list" match="/stuff/"'
+        ' exclude="/stuff/location/">Inventory</c-layout.nav-item>'
+    )
+    link = only(page(source, rf_get(path)), "a")
+    assert link.attrs["href"] == "/stuff/"
+    assert ("menu-active" in classes(link)) is active
+    assert "exclude" not in link.attrs
+
+
 def test_nav_item_ignores_parent_context(rf_get):
     """Context isolation: a parent's `match` variable doesn't leak into the component."""
     source = '<c-layout.nav-item url_name="home">Overview</c-layout.nav-item>'

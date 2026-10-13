@@ -10,7 +10,7 @@
         </a>
     </li>
 
-    {# Main pages: the four primary destinations. #}
+    {# Main pages: the primary destinations. #}
     <c-layout.nav-item url_name="home" icon="hero-home" class="font-semibold" hx-boost="true">
         Overview
     </c-layout.nav-item>
@@ -25,10 +25,20 @@
     <c-layout.nav-item
         url_name="stuff:item-list"
         match="/stuff/"
+        exclude="/stuff/location/"
         icon="hero-archive-box"
         class="font-semibold"
     >
         Inventory
+    </c-layout.nav-item>
+    <c-layout.nav-item
+        url_name="stuff:location-list"
+        :arg="0"
+        match="/stuff/location/"
+        icon="hero-map-pin"
+        class="font-semibold"
+    >
+        Locations
     </c-layout.nav-item>
     <c-layout.nav-item
         url_name="upkeep:task-list"
@@ -46,7 +56,7 @@
     {% endcomment %}
     <li>
         <details
-            {% if '/bookmarks/filter/' in request.path or '/bookmarks/tags/' in request.path or '/stuff/location/' in request.path or '/stuff/item/import/' in request.path or '/stuff/item/tags/' in request.path or '/upkeep/area/' in request.path or '/admin/' in request.path %}
+            {% if '/bookmarks/filter/' in request.path or '/bookmarks/tags/' in request.path or '/stuff/item/import/' in request.path or '/stuff/item/tags/' in request.path or '/upkeep/area/' in request.path or '/admin/' in request.path %}
                 open
             {% endif %}
         >
@@ -62,14 +72,6 @@
                 <c-layout.nav-item url_name="bookmarks:tags" class="font-semibold">Tags</c-layout.nav-item>
 
                 <li class="menu-title">Inventory</li>
-                <c-layout.nav-item
-                    url_name="stuff:location-list"
-                    :arg="0"
-                    match="/stuff/location/"
-                    class="font-semibold"
-                >
-                    Locations
-                </c-layout.nav-item>
                 <c-layout.nav-item url_name="stuff:item-tags" class="font-semibold">Tags</c-layout.nav-item>
                 <c-layout.nav-item url_name="stuff:item-import" class="font-semibold">Import</c-layout.nav-item>
 

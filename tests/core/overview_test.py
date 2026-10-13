@@ -33,6 +33,8 @@ def test_overview_counts_and_links(admin_client):
     assert response.context["counts"] == {
         "bookmarks": 2,
         "items": 1,
+        # The schedule's task creates an area, which creates the None location.
+        "locations": 1,
         "tasks": 1,
         "bookmark_tags": 3,
         "item_tags": 2,
@@ -43,10 +45,11 @@ def test_overview_counts_and_links(admin_client):
     assert [a.attrs["href"] for a in cards] == [
         reverse("bookmarks:list"),
         reverse("stuff:item-list"),
+        reverse("stuff:location-list", args=[0]),
         reverse("upkeep:task-list"),
     ]
     numbers = [el.text for el in page.find("p") if "text-3xl" in el.attrs.get("class", "")]
-    assert numbers == ["2", "1", "1"]
+    assert numbers == ["2", "1", "1", "1"]
 
     # The Tags card links each count row to its tags page.
     tag_links = [
