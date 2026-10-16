@@ -917,7 +917,7 @@ test = [
 
 [package.metadata]
 requires-dist = [
-    { name = "django", specifier = ">=5.1.4" },
+    { name = "django", specifier = ">=6.1" },
     { name = "django-cotton", specifier = ">=2.7.2" },
     { name = "django-filter", specifier = ">=24.3" },
     { name = "django-htmx", specifier = ">=1.21.0" },

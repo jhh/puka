@@ -23,7 +23,7 @@
         check-merge-conflicts.enable = true;
         check-symlinks.enable = true;
         pyupgrade.enable = true;
-        pyupgrade.args = [ "--py312-plus" ];
+        pyupgrade.args = [ "--py313-plus" ];
         add-trailing-comma = {
           enable = true;
           name = "add-trailing-comma";
@@ -58,7 +58,7 @@
           enable = true;
           name = "django-upgrade";
           description = "Automatically upgrade your Django project code.";
-          entry = "${venv}/bin/django-upgrade --target-version=5.2";
+          entry = "${venv}/bin/django-upgrade";
           types = [ "python" ];
         };
       };

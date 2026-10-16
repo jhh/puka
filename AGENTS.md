@@ -51,8 +51,9 @@ Nix devshell, `just` task runner. Run every command inside the devshell.
   suite with `nix build .#checks.aarch64-darwin.pre-commit -L` (see
   Verification / CI). The config is a Nix-store symlink generated from
   the git-hooks flake-parts module in `nix/checks/pre-commit.nix`; edit
-  that, not the yaml. Hooks rewrite code: ruff, pyupgrade `--py312-plus`,
-  django-upgrade `--target-version=5.2`, add-trailing-comma, djangofmt
+  that, not the yaml. Hooks rewrite code: ruff, pyupgrade `--py313-plus`,
+  django-upgrade (target auto-detected from `pyproject.toml`),
+  add-trailing-comma, djangofmt
   (then djade, then `djangofmt check`), nixfmt; files >25 KB are
   rejected.
 

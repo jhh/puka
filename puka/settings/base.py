@@ -140,11 +140,6 @@ STATIC_ROOT = os.environ.get("DJANGO_STATIC_ROOT", BASE_DIR / "static")
 # STATICFILES_DIR is where "django.contrib.staticfiles" looks during development
 STATICFILES_DIRS = [str(APPS_DIR / "static")]
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
-
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
 LOGIN_REDIRECT_URL = "/"
 
 TAGGIT_CASE_INSENSITIVE = True
@@ -169,4 +164,4 @@ MAILERS = {
     },
 }
 
-ADMINS = [("Jeff", "jeff@j3ff.io")]
+ADMINS = ["jeff@j3ff.io"]

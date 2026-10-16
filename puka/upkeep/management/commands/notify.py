@@ -58,5 +58,4 @@ class Command(BaseCommand):
             html_message=html_content,
             from_email="Upkeep Home Maintenance Tracker <upkeep@j3ff.io>",
             recipient_list=["jeff@j3ff.io"],
-            fail_silently=False,
         )
