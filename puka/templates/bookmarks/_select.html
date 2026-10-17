@@ -21,17 +21,32 @@
         <c-form.fields :form="filter.form" class="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2" />
         <c-form.actions submit="Search" cancel="{{ request.path }}" cancel_label="Clear" />
     </c-form.form>
-    <c-layout.page-header title="Select a bookmark" />
-    <ul id="id_bookmarks" class="menu w-full rounded-box border border-base-300 bg-base-100">
-        {% for bookmark in bookmarks %}
-            <li>
-                <button type="button" hx-post="{{ request.path }}" hx-vals='{"bookmark_pk": {{ bookmark.id }} }'>
-                    {{ bookmark.title }}
-                </button>
-            </li>
-        {% empty %}
-            <li><c-ui.empty-state title="No bookmarks found" icon="hero-bookmark" /></li>
-        {% endfor %}
-    </ul>
-    <c-ui.pagination :page_obj="page_obj" class="mt-4" />
+
+    <c-form.form method="post" action="{{ request.path }}" hx-target="#content">
+        <c-layout.page-header title="Select a bookmark" />
+        <ul
+            id="id_bookmarks"
+            role="list"
+            class="divide-y divide-base-200 overflow-hidden rounded-box border border-base-300 bg-base-100"
+        >
+            {% for bookmark in bookmarks %}
+                <li>
+                    <label class="flex cursor-pointer items-center gap-3 px-4 py-2.5 hover:bg-base-200">
+                        <input
+                            type="radio"
+                            name="bookmark_pk"
+                            value="{{ bookmark.id }}"
+                            required
+                            class="radio radio-sm"
+                        >
+                        {{ bookmark.title }}
+                    </label>
+                </li>
+            {% empty %}
+                <li><c-ui.empty-state title="No bookmarks found" icon="hero-bookmark" /></li>
+            {% endfor %}
+        </ul>
+        <c-ui.pagination :page_obj="page_obj" class="mt-4" />
+        <c-form.actions submit="Save" cancel="{{ cancel_url }}" />
+    </c-form.form>
 {% endpartialdef filter-partial %}

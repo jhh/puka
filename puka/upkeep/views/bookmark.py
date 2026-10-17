@@ -33,13 +33,16 @@ class BookmarkSelectView(PageSizeMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["filter"] = self.filter
+        context["cancel_url"] = reverse("upkeep:area-detail", args=[self.kwargs["pk"]])
         return context
 
     def post(self, request, pk):
         area = Area.objects.get(pk=pk)
         bookmark_pk = request.POST.get("bookmark_pk")
-        bookmark = Bookmark.objects.get(pk=bookmark_pk)
-        area.bookmarks.add(bookmark)
+        # Save with no selection (an empty filtered list) is a no-op.
+        if bookmark_pk:
+            bookmark = Bookmark.objects.get(pk=bookmark_pk)
+            area.bookmarks.add(bookmark)
         return HttpResponseLocation(
             reverse("upkeep:area-detail", args=[area.pk]),
             target="#content",

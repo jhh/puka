@@ -117,6 +117,14 @@ def test_select_bookmark(admin_client, item, bookmark):
     assert list(item.bookmarks.all()) == [bookmark]
 
 
+def test_select_bookmark_without_selection_adds_nothing(admin_client, item):
+    url = reverse("stuff:bookmark-select", args=[item.pk])
+    response = admin_client.post(url, headers=HTMX)
+
+    assert_hx_location(response, reverse("stuff:item-detail", args=[item.pk]))
+    assert not item.bookmarks.exists()
+
+
 def test_delete_bookmark(admin_client, item, bookmark):
     item.bookmarks.add(bookmark)
     url = reverse("stuff:bookmark-delete", args=[item.pk])

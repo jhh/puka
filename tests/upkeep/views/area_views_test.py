@@ -109,6 +109,14 @@ def test_select_bookmark(admin_client, area):
     assert list(area.bookmarks.all()) == [bookmark]
 
 
+def test_select_bookmark_without_selection_adds_nothing(admin_client, area):
+    url = reverse("upkeep:bookmark-select", args=[area.pk])
+    response = admin_client.post(url, headers=HTMX)
+
+    assert_hx_location(response, reverse("upkeep:area-detail", args=[area.pk]))
+    assert not area.bookmarks.exists()
+
+
 def test_delete_bookmark(admin_client, area):
     bookmark = BookmarkFactory.create()
     area.bookmarks.add(bookmark)

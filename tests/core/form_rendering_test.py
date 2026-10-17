@@ -7,7 +7,6 @@ delete controls, and errors) independently of how it's rendered.
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass
 
 import pytest
@@ -451,20 +450,41 @@ def test_bookmark_filter_form(admin_client):
 
 
 @pytest.mark.parametrize(
-    ("name", "key"),
-    [("stuff:bookmark-select", "item"), ("upkeep:bookmark-select", "area")],
+    ("name", "key", "cancel_name"),
+    [
+        ("stuff:bookmark-select", "item", "stuff:item-detail"),
+        ("upkeep:bookmark-select", "area", "upkeep:area-detail"),
+    ],
 )
-def test_bookmark_select_form(admin_client, objects, name, key):
+def test_bookmark_select_form(admin_client, objects, name, key, cancel_name):
     url = reverse(name, args=[objects[key]])
     page = parse_html(admin_client.get(url, headers=HTMX).content)
 
-    (form,) = page.forms
-    assert form.attrs["method"] == "get"
-    assert form.attrs["hx-get"] == url
-    assert form.attrs["hx-target"] == "#content"
-    assert page.field_names() == {"text", "created", "url", "tags", "active"}
-    (link,) = page.find("button", hx_post=url)
-    assert json.loads(link.attrs["hx-vals"]) == {"bookmark_pk": objects["bookmark"]}
+    (filter_form, picker) = page.forms
+    assert filter_form.attrs["method"] == "get"
+    assert filter_form.attrs["hx-get"] == url
+    assert filter_form.attrs["hx-target"] == "#content"
+    assert page.field_names(0) == {"text", "created", "url", "tags", "active"}
+
+    assert picker.attrs["method"] == "post"
+    assert picker.attrs["hx-post"] == url
+    assert page.field_names(1) == {"bookmark_pk"}
+
+    (radio,) = page.find("input", name="bookmark_pk")
+    assert radio.attrs["type"] == "radio"
+    assert radio.attrs["value"] == str(objects["bookmark"])
+    assert "required" in radio.attrs
+    assert "checked" not in radio.attrs
+
+    (save,) = (button for button in page.find("button") if button.text == "Save")
+    assert save.attrs["type"] == "submit"
+
+    cancel_url = reverse(cancel_name, args=[objects[key]])
+    (cancel,) = page.find("a", href=cancel_url)
+    assert cancel.text == "Cancel"
+    assert cancel.attrs["hx-get"] == cancel_url
+    assert cancel.attrs["hx-target"] == "#content"
+    assert cancel.attrs["hx-push-url"] == "true"
 
 
 def test_login_form(client):
