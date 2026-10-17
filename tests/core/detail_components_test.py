@@ -63,38 +63,3 @@ def test_inventory_quantity_controls_and_slot():
         assert "btn-circle" in classes(button)
     assert only(result, "span", id="id_quantity_7").text == "0"
     assert only(result, "a").attrs["href"] == "/edit/"
-
-
-def test_manage_dropdown_popover_and_slot():
-    result = page(
-        '<c-layout.manage-dropdown id="manage-test" class="ml-2" x-show="visible">'
-        '<li><a href="/edit/" hx-get="/edit/">Edit</a></li>'
-        "</c-layout.manage-dropdown>",
-    )
-    root = result.elements[0]
-    assert classes(root) == ["ml-2"]
-    assert root.attrs["x-show"] == "visible"
-    trigger = only(result, "button")
-    assert trigger.text == "Manage"
-    assert trigger.attrs["type"] == "button"
-    assert trigger.attrs["popovertarget"] == "manage-test"
-    assert trigger.attrs["style"] == "anchor-name: --manage-test-anchor"
-    menu = only(result, "ul")
-    assert menu.attrs["id"] == "manage-test"
-    assert "popover" in menu.attrs
-    assert menu.attrs["style"] == "position-anchor: --manage-test-anchor"
-    assert only(result, "a").attrs["hx-get"] == "/edit/"
-    assert not result.find("details")
-    assert not result.find("summary")
-
-
-def test_manage_dropdown_ids_are_unique():
-    result = page(
-        '<c-layout.manage-dropdown id="first-menu" />'
-        '<c-layout.manage-dropdown id="second-menu" />',
-    )
-    assert [button.attrs["popovertarget"] for button in result.find("button")] == [
-        "first-menu",
-        "second-menu",
-    ]
-    assert [menu.attrs["id"] for menu in result.find("ul")] == ["first-menu", "second-menu"]

@@ -1,163 +1,178 @@
 {% extends "upkeep/base.html" %}
 
-{% block title %}{{ task.name|truncatewords:2 }}{% endblock %}
+{% block title %}{{ task.name }}{% endblock %}
 
 {% partialdef detail-partial %}
     {% if request.htmx and not request.htmx.boosted and not request.htmx.history_restore_request and request.htmx.target != 'body' %}
-        <c-layout.page-meta title="{{ task.name|truncatewords:2 }}">{% partial breadcrumbs %}</c-layout.page-meta>
+        <c-layout.page-meta title="{{ task.name }}">{% partial breadcrumbs %}</c-layout.page-meta>
     {% endif %}
-    <c-layout.page-header>
-        <c-slot name="title">
-            <a
-                href="{% url 'upkeep:area-detail' task.area_id %}"
-                hx-get="{% url 'upkeep:area-detail' task.area_id %}"
-                hx-push-url="true"
-                hx-target="#content"
-                class="link link-hover link-primary"
-            >{{ task.area.name }}</a>
-            : {{ task.name }}
-        </c-slot>
+    <c-layout.page-header title="{{ task.name }}">
         <c-slot name="actions">
-            <c-layout.manage-dropdown id="task-manage-menu">
-                <li>
-                    <a
-                        href="{% url 'upkeep:task-edit' task.id %}"
-                        hx-get="{% url 'upkeep:task-edit' task.id %}"
-                        hx-push-url="true"
-                        hx-target="#content"
-                    >Edit task</a>
-                </li>
-                <li>
-                    <a
-                        href="{% url 'upkeep:schedule-new' task.id %}"
-                        hx-get="{% url 'upkeep:schedule-new' task.id %}"
-                        hx-push-url="true"
-                        hx-target="#content"
-                    >Create schedule</a>
-                </li>
-                <li>
-                    <a
-                        href="{% url 'upkeep:task-item-new' task.id %}"
-                        hx-get="{% url 'upkeep:task-item-new' task.id %}"
-                        hx-push-url="true"
-                        hx-target="#content"
-                    >Add item</a>
-                </li>
-                <li>
-                    <button
-                        type="button"
-                        class="text-error"
-                        hx-post="{% url 'upkeep:task-delete' task.id %}"
-                        hx-confirm="Are you sure you want to delete this task?"
-                    >
-                        Delete task
-                    </button>
-                </li>
-            </c-layout.manage-dropdown>
+            <c-ui.button
+                href="{% url 'upkeep:task-edit' task.id %}"
+                icon="hero-pencil-square"
+                hx-get="{% url 'upkeep:task-edit' task.id %}"
+                hx-target="#content"
+                hx-push-url="true"
+            >Edit task</c-ui.button>
         </c-slot>
     </c-layout.page-header>
 
-    {% if task.notes or task.interval or task.duration %}
-        <c-ui.card class="mb-4">
-            <dl class="divide-y divide-base-200">
-                {% if task.notes %}<c-ui.detail-row label="Notes">{{ task.notes }}</c-ui.detail-row>{% endif %}
-                {% if task.interval %}
-                    <c-ui.detail-row label="Interval">{{ task.interval }} {{ task.frequency }}</c-ui.detail-row>
-                {% endif %}
-                {% if task.duration %}<c-ui.detail-row label="Duration">{{ task.duration }}</c-ui.detail-row>{% endif %}
-            </dl>
-        </c-ui.card>
-    {% endif %}
+    <c-ui.card class="mb-8">
+        <dl class="divide-y divide-base-200">
+            <c-ui.detail-row label="Area">
+                <a
+                    href="{% url 'upkeep:area-detail' task.area_id %}"
+                    hx-get="{% url 'upkeep:area-detail' task.area_id %}"
+                    hx-target="#content"
+                    hx-push-url="true"
+                    class="link link-hover link-primary"
+                >{{ task.area.name }}</a>
+            </c-ui.detail-row>
+            {% if task.notes %}<c-ui.detail-row label="Notes">{{ task.notes }}</c-ui.detail-row>{% endif %}
+            {% if task.interval %}
+                <c-ui.detail-row label="Interval">{{ task.interval }} {{ task.frequency }}</c-ui.detail-row>
+            {% endif %}
+            {% if task.duration %}<c-ui.detail-row label="Duration">{{ task.duration }}</c-ui.detail-row>{% endif %}
+        </dl>
+    </c-ui.card>
 
-    <h2 class="mb-2 text-base font-semibold">Schedules</h2>
-    <c-ui.table size="sm" class="mb-6">
-        <thead>
-            <tr>
-                <th scope="col">Completed</th>
-                <th scope="col">Due Date</th>
-                <th scope="col">Date Completed</th>
-                <th scope="col" class="hidden md:table-cell">Notes</th>
-                <th scope="col"><span class="sr-only">Edit</span></th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for schedule in task.schedules.all %}
+    <section aria-labelledby="schedules-heading" class="mb-8 min-w-0">
+        <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <h2 id="schedules-heading" class="flex flex-wrap items-center gap-2 font-semibold">
+                <c-ui.icon name="hero-calendar" class="size-5" />
+                Schedules
+            </h2>
+            <c-ui.button
+                href="{% url 'upkeep:schedule-new' task.id %}"
+                variant="primary"
+                icon="hero-plus"
+                hx-get="{% url 'upkeep:schedule-new' task.id %}"
+                hx-target="#content"
+                hx-push-url="true"
+            >Create schedule</c-ui.button>
+        </div>
+        <c-ui.table zebra="1">
+            <thead>
                 <tr>
-                    <td>
-                        <input
-                            type="checkbox"
-                            class="checkbox checkbox-sm checkbox-primary"
-                            aria-label="Completed"
-                            hx-patch="{% url 'upkeep:schedule-toggle' schedule.id %}"
-                            {% if schedule.is_complete %}checked{% endif %}
-                        >
-                    </td>
-                    <td class="text-base-content/70">{{ schedule.due_date }}</td>
-                    <td class="text-base-content/70">{{ schedule.completion_date|default:'' }}</td>
-                    <td class="hidden text-base-content/70 md:table-cell">{{ schedule.notes }}</td>
-                    <td class="text-right">
-                        <c-ui.button
-                            href="{% url 'upkeep:schedule-edit' schedule.id %}"
-                            variant="ghost"
-                            size="xs"
-                            hx-get="{% url 'upkeep:schedule-edit' schedule.id %}"
-                            hx-target="#content"
-                            hx-push-url="true"
-                        >edit</c-ui.button>
-                    </td>
+                    <th scope="col">Completed</th>
+                    <th scope="col">Due Date</th>
+                    <th scope="col">Date Completed</th>
+                    <th scope="col" class="hidden md:table-cell">Notes</th>
+                    <th scope="col"><span class="sr-only">Actions</span></th>
                 </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="5"><c-ui.empty-state title="No schedules" icon="hero-calendar" /></td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </c-ui.table>
+            </thead>
+            <tbody>
+                {% for schedule in task.schedules.all %}
+                    <tr>
+                        <td>
+                            <input
+                                type="checkbox"
+                                class="checkbox checkbox-sm checkbox-primary"
+                                aria-label="Completed"
+                                hx-patch="{% url 'upkeep:schedule-toggle' schedule.id %}"
+                                {% if schedule.is_complete %}checked{% endif %}
+                            >
+                        </td>
+                        <td class="text-base-content/70">{{ schedule.due_date }}</td>
+                        <td class="text-base-content/70">{{ schedule.completion_date|default:'' }}</td>
+                        <td class="hidden text-base-content/70 md:table-cell">{{ schedule.notes }}</td>
+                        <td class="text-right">
+                            <c-ui.button
+                                href="{% url 'upkeep:schedule-edit' schedule.id %}"
+                                icon="hero-pencil-square"
+                                aria-label="Edit schedule due {{ schedule.due_date }}"
+                                hx-get="{% url 'upkeep:schedule-edit' schedule.id %}"
+                                hx-target="#content"
+                                hx-push-url="true"
+                            >Edit</c-ui.button>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5"><c-ui.empty-state title="No schedules" icon="hero-calendar" /></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </c-ui.table>
+    </section>
 
-    <h2 class="mb-2 text-base font-semibold">Consumables</h2>
-    <c-ui.table size="sm">
-        <thead>
-            <tr>
-                <th scope="col">Consumable</th>
-                <th scope="col" class="hidden text-center sm:table-cell">Required</th>
-                <th scope="col" class="text-center">On Hand</th>
-                <th scope="col" class="hidden md:table-cell">Notes</th>
-                <th scope="col"><span class="sr-only">Edit</span></th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for tc in task_consumables %}
+    <section aria-labelledby="consumables-heading" class="min-w-0">
+        <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <h2 id="consumables-heading" class="flex flex-wrap items-center gap-2 font-semibold">
+                <c-ui.icon name="hero-archive-box" class="size-5" />
+                Consumables
+            </h2>
+            <c-ui.button
+                href="{% url 'upkeep:task-item-new' task.id %}"
+                icon="hero-plus"
+                hx-get="{% url 'upkeep:task-item-new' task.id %}"
+                hx-target="#content"
+                hx-push-url="true"
+            >Add item</c-ui.button>
+        </div>
+        <c-ui.table zebra="1">
+            <thead>
                 <tr>
-                    <td>
-                        <a
-                            href="{% url 'stuff:item-detail' tc.item.pk %}"
-                            hx-get="{% url 'stuff:item-detail' tc.item.pk %}"
-                            hx-target="#content"
-                            hx-push-url="true"
-                            class="link link-hover link-primary"
-                        >{{ tc.item.name }}</a>
-                    </td>
-                    <td class="hidden text-center text-base-content/70 sm:table-cell">{{ tc.quantity }}</td>
-                    <td class="text-center text-base-content/70">{{ tc.on_hand }}</td>
-                    <td class="hidden text-base-content/70 md:table-cell">{{ tc.item.notes }}</td>
-                    <td class="text-right">
-                        <c-ui.button
-                            href="{% url 'upkeep:task-item-edit' tc.id %}"
-                            variant="ghost"
-                            size="xs"
-                            hx-get="{% url 'upkeep:task-item-edit' tc.id %}"
-                            hx-target="#content"
-                            hx-push-url="true"
-                        >edit</c-ui.button>
-                    </td>
+                    <th scope="col">Consumable</th>
+                    <th scope="col" class="hidden text-center sm:table-cell">Required</th>
+                    <th scope="col" class="text-center">On Hand</th>
+                    <th scope="col" class="hidden md:table-cell">Notes</th>
+                    <th scope="col"><span class="sr-only">Actions</span></th>
                 </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="5"><c-ui.empty-state title="No consumables" icon="hero-archive-box" /></td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </c-ui.table>
+            </thead>
+            <tbody>
+                {% for tc in task_consumables %}
+                    <tr>
+                        <td>
+                            <a
+                                href="{% url 'stuff:item-detail' tc.item.pk %}"
+                                hx-get="{% url 'stuff:item-detail' tc.item.pk %}"
+                                hx-target="#content"
+                                hx-push-url="true"
+                                class="link link-hover link-primary"
+                            >{{ tc.item.name }}</a>
+                        </td>
+                        <td class="hidden text-center text-base-content/70 sm:table-cell">{{ tc.quantity }}</td>
+                        <td class="text-center text-base-content/70">{{ tc.on_hand }}</td>
+                        <td class="hidden text-base-content/70 md:table-cell">{{ tc.item.notes }}</td>
+                        <td class="text-right">
+                            <c-ui.button
+                                href="{% url 'upkeep:task-item-edit' tc.id %}"
+                                icon="hero-pencil-square"
+                                aria-label="Edit consumable {{ tc.item.name }}"
+                                hx-get="{% url 'upkeep:task-item-edit' tc.id %}"
+                                hx-target="#content"
+                                hx-push-url="true"
+                            >Edit</c-ui.button>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5"><c-ui.empty-state title="No consumables" icon="hero-archive-box" /></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </c-ui.table>
+    </section>
+
+    <div class="mt-8 border-t border-base-300 pt-4">
+        <form method="post" action="{% url 'upkeep:task-delete' task.id %}">
+            {% csrf_token %}
+            <c-ui.button
+                type="submit"
+                variant="error"
+                style="outline"
+                icon="hero-trash"
+                hx-post="{% url 'upkeep:task-delete' task.id %}"
+                hx-target="#content"
+                hx-confirm="Are you sure you want to delete this task?"
+            >Delete task</c-ui.button>
+        </form>
+        <p class="mt-2 text-xs text-base-content/70">
+            Deleting this task removes its schedules and consumables.
+        </p>
+    </div>
 {% endpartialdef detail-partial %}
 
 {% partialdef breadcrumbs %}

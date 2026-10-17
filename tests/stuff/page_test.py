@@ -277,6 +277,8 @@ def test_location_list_links_and_copy(admin_client):
     assert page.find("a", href=reverse("stuff:location-list", args=[leaf.pk]))
 
     page = parse_html(admin_client.get(reverse("stuff:location-detail", args=[leaf.pk])).content)
+    (edit,) = page.find("a", href=reverse("stuff:location-edit", args=[leaf.pk]))
+    assert "btn" in edit.attrs["class"].split()
     (crumbs,) = page.find("div", id="breadcrumbs")
     hrefs = [
         a.attrs["href"] for a in page.elements[page.elements.index(crumbs) :][:12] if a.tag == "a"

@@ -34,20 +34,28 @@ def test_task_detail(admin_client):
     (toggle,) = page.find("input", type="checkbox")
     assert toggle.attrs["hx-patch"] == reverse("upkeep:schedule-toggle", args=[schedule.pk])
     assert "checked" not in toggle.attrs
+    assert [el.attrs["id"] for el in page.find("h2")] == [
+        "schedules-heading",
+        "consumables-heading",
+    ]
+    assert [el.attrs["aria-labelledby"] for el in page.find("section")] == [
+        "schedules-heading",
+        "consumables-heading",
+    ]
     assert page.find("a", href=reverse("upkeep:schedule-edit", args=[schedule.pk]))
     assert page.find("a", href=reverse("upkeep:task-item-edit", args=[task_item.pk]))
     assert page.find("a", href=reverse("upkeep:area-detail", args=[task.area_id]))
     assert "6 months" in content
     (delete,) = page.find("button", hx_post=reverse("upkeep:task-delete", args=[task.pk]))
     assert delete.attrs["hx-confirm"] == "Are you sure you want to delete this task?"
-    (trigger,) = page.find("button", popovertarget="task-manage-menu")
-    assert trigger.text == "Manage"
+    assert not [button for button in page.find("button") if "popovertarget" in button.attrs]
     for name in ("upkeep:task-edit", "upkeep:schedule-new", "upkeep:task-item-new"):
         (link,) = page.find("a", href=reverse(name, args=[task.pk]))
+        assert "btn" in link.attrs["class"].split()
         assert link.attrs["hx-get"] == link.attrs["href"]
         assert link.attrs["hx-target"] == "#content"
         assert link.attrs["hx-push-url"] == "true"
-    assert [el.text for el in page.find("dt")] == ["Notes", "Interval", "Duration"]
+    assert [el.text for el in page.find("dt")] == ["Area", "Notes", "Interval", "Duration"]
 
 
 def test_task_detail_empty_states(admin_client):
@@ -125,7 +133,7 @@ def test_task_detail_displays_prepared_stock_total(admin_client, quantities):
     assert cells[2:4] == ["6", str(sum(quantities))]
 
 
-def test_area_detail_bookmarks_inside_definition_list(admin_client):
+def test_area_detail_sections_and_actions(admin_client):
     area = AreaFactory.create()
     bookmark = BookmarkFactory.create()
     bookmark.tags.add("manual")
@@ -134,15 +142,19 @@ def test_area_detail_bookmarks_inside_definition_list(admin_client):
         reverse("upkeep:area-detail", args=[area.pk]),
         headers=HTMX,
     ).content.decode()
-    dl = content[content.index("<dl") : content.index("</dl>")]
-    assert "<dd" in dl[dl.index("Bookmarks") :]
     assert "No tasks in this area" in content
     page = parse_html(content)
+
+    assert [el.attrs["id"] for el in page.find("h2")] == ["tasks-heading", "bookmarks-heading"]
+    assert [el.attrs["aria-labelledby"] for el in page.find("section")] == [
+        "tasks-heading",
+        "bookmarks-heading",
+    ]
+    assert [el.text for el in page.find("dt")] == ["Name", "Location", "Notes"]
     (badge,) = (el for el in page.find("span") if el.text == "manual")
     assert {"badge-info", "badge-soft"} <= set(badge.attrs["class"].split())
-    assert page.find("a", href=reverse("upkeep:task-new") + f"?area={area.pk}")
-    (trigger,) = page.find("button", popovertarget="area-manage-menu")
-    assert trigger.text == "Manage"
+    assert page.find("a", href=bookmark.url)
+    assert not [button for button in page.find("button") if "popovertarget" in button.attrs]
     (delete,) = page.find("button", hx_post=reverse("upkeep:area-delete", args=[area.pk]))
     assert delete.attrs["hx-confirm"] == "Are you sure you want to delete this area?"
     for path in (
@@ -151,6 +163,7 @@ def test_area_detail_bookmarks_inside_definition_list(admin_client):
         reverse("upkeep:bookmark-select", args=[area.pk]),
     ):
         (link,) = page.find("a", href=path)
+        assert "btn" in link.attrs["class"].split()
         assert link.attrs["hx-get"] == path
         assert link.attrs["hx-target"] == "#content"
         assert link.attrs["hx-push-url"] == "true"

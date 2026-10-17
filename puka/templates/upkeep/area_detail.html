@@ -8,46 +8,17 @@
     {% endif %}
     <c-layout.page-header title="{{ area.name }}">
         <c-slot name="actions">
-            <c-layout.manage-dropdown id="area-manage-menu">
-                <li>
-                    <a
-                        href="{% url 'upkeep:area-edit' area.id %}"
-                        hx-get="{% url 'upkeep:area-edit' area.id %}"
-                        hx-push-url="true"
-                        hx-target="#content"
-                    >Edit area</a>
-                </li>
-                <li>
-                    <a
-                        href="{% url 'upkeep:task-new' %}?area={{ area.id }}"
-                        hx-get="{% url 'upkeep:task-new' %}?area={{ area.id }}"
-                        hx-push-url="true"
-                        hx-target="#content"
-                    >Add task</a>
-                </li>
-                <li>
-                    <a
-                        href="{% url 'upkeep:bookmark-select' area.id %}"
-                        hx-get="{% url 'upkeep:bookmark-select' area.id %}"
-                        hx-push-url="true"
-                        hx-target="#content"
-                    >Add bookmark</a>
-                </li>
-                <li>
-                    <button
-                        type="button"
-                        class="text-error"
-                        hx-post="{% url 'upkeep:area-delete' area.id %}"
-                        hx-confirm="Are you sure you want to delete this area?"
-                    >
-                        Delete area
-                    </button>
-                </li>
-            </c-layout.manage-dropdown>
+            <c-ui.button
+                href="{% url 'upkeep:area-edit' area.id %}"
+                icon="hero-pencil-square"
+                hx-get="{% url 'upkeep:area-edit' area.id %}"
+                hx-target="#content"
+                hx-push-url="true"
+            >Edit area</c-ui.button>
         </c-slot>
     </c-layout.page-header>
 
-    <c-ui.card class="mb-4">
+    <c-ui.card class="mb-8">
         <dl class="divide-y divide-base-200">
             <c-ui.detail-row label="Name">{{ area.name }}</c-ui.detail-row>
             <c-ui.detail-row label="Location">
@@ -60,59 +31,110 @@
                 >{{ area.location.name }} ({{ area.location.code }})</a>
             </c-ui.detail-row>
             <c-ui.detail-row label="Notes">{{ area.notes }}</c-ui.detail-row>
-            {% with bookmarks=area.bookmarks.all %}
-                {% if bookmarks %}
-                    <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
-                        <dt class="text-sm font-medium text-base-content">Bookmarks</dt>
-                        <dd class="mt-1 sm:col-span-2 sm:mt-0">
-                            {% include "bookmarks/_detail_page.html" with item=area %}
-                        </dd>
-                    </div>
-                {% endif %}
-            {% endwith %}
         </dl>
     </c-ui.card>
 
-    <c-ui.table size="sm">
-        <thead>
-            <tr>
-                <th scope="col">Upcoming Task</th>
-                <th scope="col">Due</th>
-                <th scope="col" class="hidden md:table-cell">Consumables</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for task in area.tasks.all %}
+    <section aria-labelledby="tasks-heading" class="mb-8 min-w-0">
+        <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <h2 id="tasks-heading" class="flex flex-wrap items-center gap-2 font-semibold">
+                <c-ui.icon name="hero-clipboard-document-check" class="size-5" />
+                Tasks
+            </h2>
+            <c-ui.button
+                href="{% url 'upkeep:task-new' %}?area={{ area.id }}"
+                variant="primary"
+                icon="hero-plus"
+                hx-get="{% url 'upkeep:task-new' %}?area={{ area.id }}"
+                hx-target="#content"
+                hx-push-url="true"
+            >Add task</c-ui.button>
+        </div>
+        <c-ui.table zebra="1">
+            <thead>
                 <tr>
-                    <td class="font-medium">
-                        <a
-                            href="{% url 'upkeep:task-detail' task.id %}"
-                            hx-get="{% url 'upkeep:task-detail' task.id %}"
-                            hx-target="#content"
-                            hx-push-url="true"
-                            class="link link-hover link-primary"
-                        >{{ task.name }}</a>
-                    </td>
-                    <td class="whitespace-nowrap text-base-content/70">
-                        {{ task.earliest_due_date|default:"" }}
-                    </td>
-                    <td class="hidden md:table-cell">
-                        {% if task.are_consumables_stocked %}
-                            <c-ui.badge variant="success" style="soft" size="sm">in stock</c-ui.badge>
-                        {% else %}
-                            <c-ui.badge variant="warning" style="soft" size="sm">out of stock</c-ui.badge>
-                        {% endif %}
-                    </td>
+                    <th scope="col">Upcoming Task</th>
+                    <th scope="col">Due</th>
+                    <th scope="col" class="hidden md:table-cell">Consumables</th>
                 </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="3">
-                        <c-ui.empty-state title="No tasks in this area" icon="hero-clipboard-document-check" />
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </c-ui.table>
+            </thead>
+            <tbody>
+                {% for task in area.tasks.all %}
+                    <tr>
+                        <td class="font-medium">
+                            <a
+                                href="{% url 'upkeep:task-detail' task.id %}"
+                                hx-get="{% url 'upkeep:task-detail' task.id %}"
+                                hx-target="#content"
+                                hx-push-url="true"
+                                class="link link-hover link-primary"
+                            >{{ task.name }}</a>
+                        </td>
+                        <td class="whitespace-nowrap text-base-content/70">
+                            {{ task.earliest_due_date|default:"" }}
+                        </td>
+                        <td class="hidden md:table-cell">
+                            {% if task.are_consumables_stocked %}
+                                <c-ui.badge variant="success" style="soft" size="sm">in stock</c-ui.badge>
+                            {% else %}
+                                <c-ui.badge variant="warning" style="soft" size="sm">out of stock</c-ui.badge>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="3">
+                            <c-ui.empty-state title="No tasks in this area" icon="hero-clipboard-document-check" />
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </c-ui.table>
+    </section>
+
+    <section aria-labelledby="bookmarks-heading" class="min-w-0">
+        <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <h2 id="bookmarks-heading" class="flex items-center gap-2 font-semibold">
+                <c-ui.icon name="hero-bookmark" class="size-5" />
+                Bookmarks
+            </h2>
+            <c-ui.button
+                href="{% url 'upkeep:bookmark-select' area.pk %}"
+                icon="hero-plus"
+                hx-get="{% url 'upkeep:bookmark-select' area.pk %}"
+                hx-push-url="true"
+                hx-target="#content"
+            >Add bookmark</c-ui.button>
+        </div>
+        {% with bookmarks=area.bookmarks.all %}
+            {% if bookmarks %}
+                {% include "bookmarks/_detail_page.html" with item=area %}
+            {% else %}
+                <div class="rounded-box border border-base-300 bg-base-100">
+                    <c-ui.empty-state title="No bookmarks" icon="hero-bookmark"><p class="text-sm">
+                            Add links to manuals, product pages, or other references.
+                        </p></c-ui.empty-state>
+                </div>
+            {% endif %}
+        {% endwith %}
+    </section>
+
+    <div class="mt-8 border-t border-base-300 pt-4">
+        <form method="post" action="{% url 'upkeep:area-delete' area.id %}">
+            {% csrf_token %}
+            <c-ui.button
+                type="submit"
+                variant="error"
+                style="outline"
+                icon="hero-trash"
+                hx-post="{% url 'upkeep:area-delete' area.id %}"
+                hx-target="#content"
+                hx-confirm="Are you sure you want to delete this area?"
+            >Delete area</c-ui.button>
+        </form>
+        <p class="mt-2 text-xs text-base-content/70">
+            Deleting this area removes its tasks and schedules.
+        </p>
+    </div>
 {% endpartialdef detail-partial %}
 
 {% partialdef breadcrumbs %}

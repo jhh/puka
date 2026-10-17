@@ -281,6 +281,7 @@ Three small Cotton components replace repeated detail-page markup:
   The item page keeps its edit action in the slot; the location page omits it.
 - `layout/manage_dropdown.html`: a Manage trigger and menu shell. Each page
   supplies its own links, mutation buttons and confirmation messages.
+  Removed on 2026-10-17; see the follow-up section below.
 
 The user chose to migrate Manage menus to the native popover API. Menu IDs
 and CSS anchor names are unique per page. Keyboard Enter opens the menu,
@@ -363,3 +364,32 @@ details:
 `admin_client` creates a user, and PBKDF2 hashing dominated the suite (the
 full run went from 106 s to 14 s with this change alone). The consolidation
 above left 486 tests running in about 9 s.
+
+## Follow-up: detail pages use inline action buttons
+
+2026-10-17. Task and area detail now follow item detail's layout instead
+of using a Manage dropdown:
+
+- The page header holds a single edit action: "Edit task" or "Edit area",
+  with a pencil icon. Location detail's edit button matches it ("Edit
+  location"), replacing its primary-soft variant. The menu's other actions
+  became page buttons: "Create schedule" and "Add item" on task detail,
+  "Add task" and "Add bookmark" on area detail.
+- Task detail's title is the task name alone; the area moved to an "Area"
+  row in the details card, which now always renders.
+- Sections match item detail: icon headings, a primary add button for the
+  main table, zebra tables, item-detail row edit buttons and the existing
+  empty states. Area bookmarks moved out of the details card into their
+  own section, so that card now holds Name, Location and Notes.
+- Each detail page ends with a border-separated delete form and a short
+  explanation, replacing the menu's delete item.
+
+`layout/manage_dropdown.html` and its component tests are removed; no page
+renders a Manage popover. The changed pages issue no new queries, so the
+Step 3 budgets still hold.
+
+`tests/upkeep/views/page_test.py` and `tests/stuff/page_test.py` assert
+the section headings, button routes, row actions and delete confirmations.
+`just test` passes (620 tests). Browser checks at 1280x800 and 375x812
+covered populated and empty sections, htmx area-to-task navigation, edit
+navigation and delete wiring, with no overflow or console errors.

@@ -10,12 +10,11 @@
         <c-slot name="actions">
             <c-ui.button
                 href="{% url 'stuff:location-edit' location.pk %}"
-                variant="primary"
-                style="soft"
+                icon="hero-pencil-square"
                 hx-get="{% url 'stuff:location-edit' location.pk %}"
                 hx-target="#content"
                 hx-push-url="true"
-            >Edit</c-ui.button>
+            >Edit location</c-ui.button>
         </c-slot>
     </c-layout.page-header>
     <c-ui.card>

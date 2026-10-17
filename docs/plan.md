@@ -125,6 +125,8 @@ Document measured improvements rather than estimated speedups.
    adjustment values, accessible labels and page-specific edit actions.
 3. Extract the Manage dropdown shell used by item, task and area detail.
    Keep each page's routes, confirmation messages and actions in its slot.
+   Later removed (2026-10-17): task and area detail now use item detail's
+   header and section buttons; see `docs/template-baselines.md`.
 4. Share the identical card/form fragment in the stuff and upkeep form
    pages. Preserve app-specific titles, response partial names and the
    explicit targeting fixed in Step 2.
@@ -175,7 +177,8 @@ input state, and any asset removal leaves typography unchanged.
 
 - Fragment targets and page metadata remain correct across navigation.
 - Query-count tests cover the optimized list and detail rendering paths.
-- Repeated detail rows, inventory controls and dropdown shells are shared.
+- Repeated detail rows and inventory controls are shared; detail pages use
+  inline action buttons instead of dropdown shells.
 - Form wrappers retain titles, errors, CSRF protection and correct targets.
 - Tag URLs are encoded and item searches preserve input state.
 - Browser checks, formatting, types, tests and Nix checks are complete.
