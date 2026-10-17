@@ -6,10 +6,11 @@
     <c-form.field :field="form.frequency" class="sm:col-span-3" />
     <c-form.field :field="form.notes" class="sm:col-span-6" />
 </div>
+{% url 'upkeep:task-list' as task_list_url %}
 {% if form.instance.pk %}{% url 'upkeep:task-delete' form.instance.pk as delete_url %}{% endif %}
 <c-form.actions
     submit="Save task"
-    cancel="{% url 'upkeep:task-list' %}"
+    cancel="{{ form.cancel_url|default:task_list_url }}"
     delete="{{ delete_url }}"
     confirm="Delete this task?"
 />

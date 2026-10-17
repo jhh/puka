@@ -7,7 +7,7 @@
 {% if form.instance.pk %}{% url 'upkeep:task-item-delete' form.instance.pk as delete_url %}{% endif %}
 <c-form.actions
     submit="Save item"
-    cancel="{% url 'upkeep:home' %}"
+    cancel="{{ form.cancel_url }}"
     delete="{{ delete_url }}"
     confirm="Delete this item?"
 />

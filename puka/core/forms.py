@@ -25,6 +25,18 @@ INPUT_CLASSES = ("input w-full", "input-error")
 UNSTYLED = {"hidden", "multiplehidden", "radioselect", "checkboxselectmultiple"}
 
 
+class FormContext:
+    """
+    Typing hook for forms whose views attach navigation URLs.
+
+    Views set ``cancel_url`` (and ``delete_url``) so a form opened from a
+    page returns there when the user cancels.
+    """
+
+    cancel_url: str
+    delete_url: str
+
+
 class DaisyBoundField(BoundField):
     def build_widget_attrs(self, attrs, widget=None):
         attrs = super().build_widget_attrs(attrs, widget)

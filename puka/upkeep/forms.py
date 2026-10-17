@@ -1,5 +1,6 @@
 from django import forms
 
+from puka.core.forms import FormContext
 from puka.stuff.forms import LocationChoiceField
 from puka.stuff.models import Item, Location
 
@@ -11,7 +12,7 @@ def _task_choices():
     return [(pk, f"{area}: {name}") for pk, area, name in tasks]
 
 
-class AreaForm(forms.ModelForm):
+class AreaForm(FormContext, forms.ModelForm):
     template_name = "upkeep/forms/area.html"
 
     class Meta:
@@ -30,7 +31,7 @@ class AreaForm(forms.ModelForm):
             self.fields["name"].widget.attrs["autofocus"] = True
 
 
-class TaskForm(forms.ModelForm):
+class TaskForm(FormContext, forms.ModelForm):
     template_name = "upkeep/forms/task.html"
 
     class Meta:
@@ -44,7 +45,7 @@ class TaskForm(forms.ModelForm):
             self.fields["name"].widget.attrs["autofocus"] = True
 
 
-class ScheduleForm(forms.ModelForm):
+class ScheduleForm(FormContext, forms.ModelForm):
     template_name = "upkeep/forms/schedule.html"
 
     class Meta:
@@ -56,7 +57,7 @@ class ScheduleForm(forms.ModelForm):
         self.fields["task"].choices = _task_choices()  # ty: ignore[unresolved-attribute]
 
 
-class TaskItemForm(forms.ModelForm):
+class TaskItemForm(FormContext, forms.ModelForm):
     template_name = "upkeep/forms/task_item.html"
 
     class Meta:

@@ -5,16 +5,12 @@ from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from treebeard.forms import MoveNodeForm
 
+from puka.core.forms import FormContext
 from puka.stuff.models import Inventory, Item, Location
 from puka.stuff.services import parse_location_code
 
 
-class LocationFormContext:
-    cancel_url: str
-    delete_url: str
-
-
-class LocationForm(LocationFormContext, MoveNodeForm):
+class LocationForm(FormContext, MoveNodeForm):
     template_name = "stuff/forms/location.html"
 
     def __init__(self, *args, **kwargs):
@@ -23,7 +19,7 @@ class LocationForm(LocationFormContext, MoveNodeForm):
             self.fields["name"].widget.attrs["autofocus"] = True
 
 
-class ItemForm(ModelForm):
+class ItemForm(FormContext, ModelForm):
     template_name = "stuff/forms/item.html"
 
     location_code = forms.CharField(max_length=25, empty_value=None, required=False)
@@ -86,7 +82,7 @@ class ItemForm(ModelForm):
             self.add_error("quantity", msg)
 
 
-class InventoryForm(ModelForm):
+class InventoryForm(FormContext, ModelForm):
     template_name = "stuff/forms/inventory.html"
 
     class Meta:
@@ -103,7 +99,7 @@ class ItemImportForm(forms.Form):
     )
 
 
-class LocationInventoryForm(LocationFormContext, ModelForm):
+class LocationInventoryForm(FormContext, ModelForm):
     template_name = "stuff/forms/location_inventory.html"
 
     class Meta:
@@ -111,7 +107,7 @@ class LocationInventoryForm(LocationFormContext, ModelForm):
         fields = ("item", "quantity")
 
 
-class LocationItemForm(LocationFormContext, ItemForm):
+class LocationItemForm(ItemForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["location_code"].disabled = True
@@ -119,7 +115,7 @@ class LocationItemForm(LocationFormContext, ItemForm):
         self.fields["quantity"] = forms.IntegerField(min_value=1, initial=1)
 
 
-class InventoryQuantityForm(LocationFormContext, ModelForm):
+class InventoryQuantityForm(FormContext, ModelForm):
     template_name = "stuff/forms/location_inventory.html"
 
     class Meta:
@@ -134,7 +130,7 @@ class LocationChoiceField(forms.ModelChoiceField):
         return f"{obj.name} ({obj.code})"
 
 
-class InventoryMoveForm(LocationFormContext, forms.Form):
+class InventoryMoveForm(FormContext, forms.Form):
     template_name = "stuff/forms/location_inventory.html"
 
     destination = LocationChoiceField(queryset=Location.objects.all(), label="Move to")

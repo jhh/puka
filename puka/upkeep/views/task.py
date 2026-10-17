@@ -1,3 +1,5 @@
+from typing import cast
+
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 from django.db.models import F, OuterRef, Prefetch, Q, Subquery
 from django.shortcuts import get_object_or_404
@@ -87,6 +89,14 @@ class TaskCreateView(CreateView):
     def get_initial(self):
         return {"area": self.request.GET.get("area")}
 
+    def get_form(self, form_class=None):
+        form = cast("TaskForm", super().get_form(form_class))
+        area = self.request.GET.get("area")
+        form.cancel_url = (
+            reverse("upkeep:area-detail", args=[area]) if area else reverse("upkeep:task-list")
+        )
+        return form
+
 
 class TaskUpdateView(UpdateView):
     model = Task
@@ -94,6 +104,11 @@ class TaskUpdateView(UpdateView):
 
     def get_template_names(self):
         return get_template(self.request, "upkeep/form.html", "#form-partial")
+
+    def get_form(self, form_class=None):
+        form = cast("TaskForm", super().get_form(form_class))
+        form.cancel_url = reverse("upkeep:task-detail", args=[self.object.pk])
+        return form
 
 
 class TaskDeleteView(View):

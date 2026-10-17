@@ -1,3 +1,5 @@
+from typing import cast
+
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.generic import CreateView, UpdateView, View
@@ -18,6 +20,11 @@ class TaskItemCreateView(CreateView):
     def get_initial(self):
         return {"task": self.kwargs["pk"], "quantity": 1}
 
+    def get_form(self, form_class=None):
+        form = cast("TaskItemForm", super().get_form(form_class))
+        form.cancel_url = reverse("upkeep:task-detail", args=[self.kwargs["pk"]])
+        return form
+
 
 class TaskItemUpdateView(UpdateView):
     model = TaskItem
@@ -25,6 +32,11 @@ class TaskItemUpdateView(UpdateView):
 
     def get_template_names(self):
         return get_template(self.request, "upkeep/form.html", "#form-partial")
+
+    def get_form(self, form_class=None):
+        form = cast("TaskItemForm", super().get_form(form_class))
+        form.cancel_url = reverse("upkeep:task-detail", args=[self.object.task_id])
+        return form
 
 
 class TaskItemDeleteView(View):

@@ -59,7 +59,7 @@ FORM_CASES = (
         ("stuff:item-edit", ("item",)),
         {"name", "reorder_level", "tags", "notes"},
         "Save item",
-        ("stuff:item-list", ()),
+        ("stuff:item-detail", ("item",)),
         delete=("stuff:item-delete", ("item",)),
         delete_noun="item",
     ),
@@ -85,7 +85,7 @@ FORM_CASES = (
         ("stuff:inventory-new", ("item",)),
         {"item", "location", "quantity"},
         "Save item",
-        ("stuff:item-list", ()),
+        ("stuff:item-detail", ("item",)),
         hidden=frozenset({"item"}),
     ),
     FormCase(
@@ -93,7 +93,7 @@ FORM_CASES = (
         ("stuff:inventory-edit", ("inventory",)),
         {"item", "location", "quantity"},
         "Save item",
-        ("stuff:item-list", ()),
+        ("stuff:item-detail", ("item",)),
         delete=("stuff:inventory-delete", ("inventory",)),
         delete_noun="item",
         hidden=frozenset({"item"}),
@@ -111,7 +111,7 @@ FORM_CASES = (
         ("upkeep:area-edit", ("area",)),
         {"name", "location", "notes"},
         "Save area",
-        ("upkeep:area-list", ()),
+        ("upkeep:area-detail", ("area",)),
         delete=("upkeep:area-delete", ("area",)),
         delete_noun="area",
     ),
@@ -128,7 +128,7 @@ FORM_CASES = (
         ("upkeep:task-edit", ("task",)),
         {"area", "name", "interval", "frequency", "notes"},
         "Save task",
-        ("upkeep:task-list", ()),
+        ("upkeep:task-detail", ("task",)),
         delete=("upkeep:task-delete", ("task",)),
         delete_noun="task",
     ),
@@ -137,14 +137,14 @@ FORM_CASES = (
         ("upkeep:schedule-new", ("task",)),
         {"task", "due_date", "completion_date", "notes"},
         "Save schedule",
-        ("upkeep:home", ()),
+        ("upkeep:task-detail", ("task",)),
     ),
     FormCase(
         "schedule-edit",
         ("upkeep:schedule-edit", ("schedule",)),
         {"task", "due_date", "completion_date", "notes"},
         "Save schedule",
-        ("upkeep:home", ()),
+        ("upkeep:task-detail", ("task",)),
         delete=("upkeep:schedule-delete", ("schedule",)),
         delete_noun="schedule",
     ),
@@ -153,14 +153,14 @@ FORM_CASES = (
         ("upkeep:task-item-new", ("task",)),
         {"task", "item", "quantity"},
         "Save item",
-        ("upkeep:home", ()),
+        ("upkeep:task-detail", ("task",)),
     ),
     FormCase(
         "task-item-edit",
         ("upkeep:task-item-edit", ("task_item",)),
         {"task", "item", "quantity"},
         "Save item",
-        ("upkeep:home", ()),
+        ("upkeep:task-detail", ("task",)),
         delete=("upkeep:task-item-delete", ("task_item",)),
         delete_noun="item",
     ),
@@ -398,6 +398,16 @@ def test_schedule_form_task_choices_include_area(admin_client, objects):
 
     area = Area.objects.get(pk=objects["area"])
     assert page.options("task")[str(objects["task"])].text == f"{area.name}: Test Task"
+
+
+def test_task_create_cancel_returns_to_area(admin_client, objects):
+    url = reverse("upkeep:task-new") + f"?area={objects['area']}"
+    page = parse_html(admin_client.get(url, headers=HTMX).content)
+
+    cancel_url = reverse("upkeep:area-detail", args=[objects["area"]])
+    (cancel,) = page.find("a", hx_get=cancel_url)
+    assert cancel.attrs["href"] == cancel_url
+    assert cancel.text == "Cancel"
 
 
 # Bookmark, filter and login forms.

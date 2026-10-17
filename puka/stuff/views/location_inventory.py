@@ -14,7 +14,6 @@ from puka.core.views import get_template
 from puka.stuff.forms import (
     InventoryMoveForm,
     InventoryQuantityForm,
-    LocationFormContext,
     LocationInventoryForm,
     LocationItemForm,
 )
@@ -24,6 +23,8 @@ from puka.stuff.views.item import ItemCreateView
 
 if TYPE_CHECKING:
     from django.http import HttpRequest
+
+    from puka.core.forms import FormContext
 
 
 class LocationInventoryMixin(FormMixin):
@@ -45,7 +46,7 @@ class LocationInventoryMixin(FormMixin):
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
-        cast("LocationFormContext", form).cancel_url = self.get_success_url()
+        cast("FormContext", form).cancel_url = self.get_success_url()
         return form
 
     def get_context_data(self, **kwargs):

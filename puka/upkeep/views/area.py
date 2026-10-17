@@ -1,4 +1,5 @@
 from types import MappingProxyType
+from typing import cast
 
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
@@ -57,6 +58,11 @@ class AreaUpdateView(UpdateView):
 
     def get_template_names(self):
         return get_template(self.request, "upkeep/form.html", "#form-partial")
+
+    def get_form(self, form_class=None):
+        form = cast("AreaForm", super().get_form(form_class))
+        form.cancel_url = reverse("upkeep:area-detail", args=[self.object.pk])
+        return form
 
 
 class AreaDeleteView(View):

@@ -1,4 +1,5 @@
 import datetime
+from typing import cast
 
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -21,6 +22,11 @@ class ScheduleCreateView(CreateView):
         task = Task.objects.get(pk=self.kwargs["pk"])
         return {"task": task.id, "due_date": task.next_date()}
 
+    def get_form(self, form_class=None):
+        form = cast("ScheduleForm", super().get_form(form_class))
+        form.cancel_url = reverse("upkeep:task-detail", args=[self.kwargs["pk"]])
+        return form
+
 
 class ScheduleUpdateView(UpdateView):
     model = Schedule
@@ -28,6 +34,11 @@ class ScheduleUpdateView(UpdateView):
 
     def get_template_names(self):
         return get_template(self.request, "upkeep/form.html", "#form-partial")
+
+    def get_form(self, form_class=None):
+        form = cast("ScheduleForm", super().get_form(form_class))
+        form.cancel_url = reverse("upkeep:task-detail", args=[self.object.task_id])
+        return form
 
 
 class ScheduleDeleteView(View):

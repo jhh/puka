@@ -1,5 +1,6 @@
 import logging
 from types import MappingProxyType
+from typing import cast
 
 from django.db.models import Case, Count, F, IntegerField, Prefetch, Sum, Value, When
 from django.http import Http404, HttpResponse, HttpResponseRedirect
@@ -168,6 +169,11 @@ class ItemUpdateView(UpdateView):
     def get_template_names(self):
         return get_template(self.request, "stuff/form.html", "#form-partial")
 
+    def get_form(self, form_class=None):
+        form = cast("ItemForm", super().get_form(form_class))
+        form.cancel_url = reverse("stuff:item-detail", args=[self.object.pk])
+        return form
+
 
 class ItemDeleteView(View):
     def post(self, _request, pk):
@@ -194,6 +200,11 @@ class InventoryCreateView(CreateView):
     def get_initial(self):
         return {"item": self.kwargs["pk"]}
 
+    def get_form(self, form_class=None):
+        form = cast("InventoryForm", super().get_form(form_class))
+        form.cancel_url = reverse("stuff:item-detail", args=[self.kwargs["pk"]])
+        return form
+
 
 class InventoryUpdateView(UpdateView):
     model = Inventory
@@ -201,6 +212,11 @@ class InventoryUpdateView(UpdateView):
 
     def get_template_names(self):
         return get_template(self.request, "stuff/form.html", "#form-partial")
+
+    def get_form(self, form_class=None):
+        form = cast("InventoryForm", super().get_form(form_class))
+        form.cancel_url = reverse("stuff:item-detail", args=[self.object.item_id])
+        return form
 
 
 class InventoryDeleteView(View):
