@@ -72,7 +72,7 @@
                                 class="link link-hover link-primary"
                             >{{ task.name }}</a>
                         </td>
-                        <td class="text-base-content/70">{{ task.area.name }}</td>
+                        <td class="text-base-content/70">{{ task.area_root_name }} {{ task.area.name }}</td>
                         <td class="{% if task.due_soon %}text-base-content/70{% else %}text-base-content/50{% endif %}">
                             {{ task.earliest_due_date }}
                         </td>

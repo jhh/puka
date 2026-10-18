@@ -72,6 +72,7 @@ class Task(models.Model):
     area = models.ForeignKey(Area, on_delete=models.CASCADE, related_name="tasks")
     objects = TaskManager()
     schedules: models.Manager[Schedule]
+    area_root_name: str
     consumables_stocked: bool
     due_soon: bool
 

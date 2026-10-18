@@ -9,6 +9,7 @@ from django.core.management import call_command
 from django.core.paginator import Paginator
 from django.db.models import QuerySet
 
+from puka.stuff.models import Location
 from puka.upkeep.services import (
     get_areas_tasks_schedules,
     get_tasks_schedules,
@@ -117,6 +118,18 @@ def test_get_upcoming_tasks_due_soon_or_short_stocked(start_date):
     ]
     assert [task.are_consumables_stocked() for task in tasks] == [False, True, False]
     assert [task.due_soon for task in tasks] == [True, True, False]
+
+
+@pytest.mark.django_db
+def test_get_upcoming_tasks_annotates_area_root_name(start_date):
+    root = Location.objects.add_root({"name": "Cloyster", "code": "C"})
+    studio = Location.objects.add_child(root, {"name": "Studio", "code": "S"})
+    area = AreaFactory.create(name="Studio Air Purifier", location=studio)
+    task = TaskFactory.create(area=area)
+    ScheduleFactory.create(task=task, due_date=start_date)
+
+    (upcoming,) = get_upcoming_tasks(start_date)
+    assert upcoming.area_root_name == "Cloyster"
 
 
 @pytest.mark.django_db

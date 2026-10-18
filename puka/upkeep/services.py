@@ -20,7 +20,9 @@ from django.db.models import (
     Value,
     When,
 )
+from django.db.models.functions import Substr
 
+from puka.stuff.models import Location
 from puka.upkeep.models import Area, Schedule, Task, TaskItem
 
 if TYPE_CHECKING:
@@ -117,6 +119,9 @@ def get_upcoming_tasks(
     required. Overdue tasks are included. ``due_soon`` is True when the due
     date falls within ``task_within_days``.
 
+    Each task is annotated with ``area_root_name``, the name of the root
+    location of its area's location.
+
     """
     if start_date is None:
         start_date = datetime.datetime.now(tz=datetime.UTC).date()
@@ -128,6 +133,11 @@ def get_upcoming_tasks(
         get_tasks_with_earliest_due_date()
         .select_related("area")
         .annotate(
+            area_root_name=Subquery(
+                Location.objects.filter(
+                    path=Substr(OuterRef("area__location__path"), 1, Location.steplen),
+                ).values("name")[:1],
+            ),
             due_soon=Case(
                 When(earliest_due_date__lte=task_within_date, then=True),
                 default=False,

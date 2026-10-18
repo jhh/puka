@@ -6,6 +6,7 @@ import pytest
 from django.urls import reverse
 from django.utils.formats import date_format
 
+from puka.stuff.models import Location
 from tests.conftest import create_bookmark
 from tests.factories import (
     AreaFactory,
@@ -101,7 +102,9 @@ def test_overview_upcoming_tasks_table(admin_client):
     soon_date = today + timedelta(days=3)
     later_date = today + timedelta(days=25)
 
-    area = AreaFactory.create(name="Garden")
+    root = Location.objects.add_root({"name": "Cloyster", "code": "C"})
+    studio = Location.objects.add_child(root, {"name": "Studio", "code": "S"})
+    area = AreaFactory.create(name="Studio Air Purifier", location=studio)
     due_soon = TaskFactory.create(area=area, name="Water plants")
     ScheduleFactory.create(task=due_soon, due_date=soon_date)
     out_of_stock = TaskFactory.create(area=area, name="Replace filter")
@@ -120,7 +123,7 @@ def test_overview_upcoming_tasks_table(admin_client):
         assert link.attrs["hx-target"] == "#content"
 
     content = response.content.decode()
-    assert "Garden" in content
+    assert "Cloyster Studio Air Purifier" in content
     assert date_format(soon_date) in content
     badges = [el.text for el in page.find("span") if "badge" in el.attrs.get("class", "")]
     assert badges == ["in stock", "out of stock"]
