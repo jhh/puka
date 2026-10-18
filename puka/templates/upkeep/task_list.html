@@ -49,7 +49,9 @@
                             class="link link-hover link-primary"
                         >{{ task.name }}</a>
                     </td>
-                    <td class="hidden text-base-content/70 sm:table-cell">{{ task.area.name }}</td>
+                    <td class="hidden text-base-content/70 sm:table-cell">
+                        {{ task.area_root_name }} {{ task.area.name }}
+                    </td>
                     <td class="whitespace-nowrap text-base-content/70">
                         {{ task.earliest_due_date|default:"" }}
                     </td>

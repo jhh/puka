@@ -6,6 +6,7 @@ import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertContains
 
+from puka.stuff.models import Location
 from puka.upkeep.models import Task
 from tests.factories import AreaFactory, ScheduleFactory, TaskFactory
 from tests.utils import HTMX, assert_hx_location, assert_redirect
@@ -88,3 +89,16 @@ def test_task_list_due_date_order(admin_client):
     response = admin_client.get(reverse("upkeep:task-list"))
 
     assert [task.name for task in response.context["tasks"]] == ["Sooner", "Later", "Undated"]
+
+
+@pytest.mark.parametrize("name", ["upkeep:task-list", "upkeep:home"])
+def test_task_list_area_root_name(admin_client, name):
+    root = Location.objects.add_root({"name": "Cloyster", "code": "C"})
+    studio = Location.objects.add_child(root, {"name": "Studio", "code": "S"})
+    area = AreaFactory.create(name="Studio Air Purifier", location=studio)
+    task = TaskFactory.create(area=area, name="Replace filter")
+    ScheduleFactory.create(task=task)
+
+    response = admin_client.get(reverse(name))
+
+    assert "Cloyster Studio Air Purifier" in response.content.decode()
