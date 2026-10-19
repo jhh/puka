@@ -1,11 +1,20 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime, timedelta
+
 import pytest
 from django.urls import reverse
+from django.utils.formats import date_format
 from pytest_django.asserts import assertContains
 
 from puka.upkeep.models import Area
-from tests.factories import AreaFactory, BookmarkFactory, LocationFactory
+from tests.factories import (
+    AreaFactory,
+    BookmarkFactory,
+    LocationFactory,
+    ScheduleFactory,
+    TaskFactory,
+)
 from tests.utils import HTMX, assert_hx_location, assert_redirect, parse_html
 
 pytestmark = pytest.mark.django_db
@@ -82,6 +91,25 @@ def test_area_detail_shows_location(admin_client, area):
     page = parse_html(response.content)
     (link,) = page.find("a", href=reverse("stuff:location-detail", args=[location.pk]))
     assert link.text == "Garage (G)"
+
+
+def test_area_detail_highlights_past_due_date(admin_client, area):
+    today = datetime.now(UTC).date()
+    past_due = TaskFactory.create(area=area, name="Past due")
+    ScheduleFactory.create(task=past_due, due_date=today - timedelta(days=1))
+    due_today = TaskFactory.create(area=area, name="Due today")
+    ScheduleFactory.create(task=due_today, due_date=today)
+
+    response = admin_client.get(reverse("upkeep:area-detail", args=[area.pk]), headers=HTMX)
+    page = parse_html(response.content)
+
+    (past_due_cell,) = (
+        el for el in page.find("td") if el.text == date_format(today - timedelta(days=1))
+    )
+    assert {"font-semibold", "text-error"} <= set(past_due_cell.attrs["class"].split())
+
+    (due_today_cell,) = (el for el in page.find("td") if el.text == date_format(today))
+    assert "text-error" not in due_today_cell.attrs["class"]
 
 
 def test_area_list_shows_location(admin_client, area):

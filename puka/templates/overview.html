@@ -73,8 +73,9 @@
                             >{{ task.name }}</a>
                         </td>
                         <td class="text-base-content/70">{{ task.area_root_name }} {{ task.area.name }}</td>
-                        <td class="{% if task.due_soon %}text-base-content/70{% else %}text-base-content/50{% endif %}">
-                            {{ task.earliest_due_date }}
+                        <td class="{% if task.overdue %}font-semibold text-error{% elif task.due_soon %}text-base-content/70{% else %}text-base-content/50{% endif %}">
+                            {{ task.earliest_due_date }}{% if task.overdue %}<span class="sr-only">
+                                    (overdue)</span>{% endif %}
                         </td>
                         <td>
                             {% if task.are_consumables_stocked %}

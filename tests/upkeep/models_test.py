@@ -109,6 +109,15 @@ def test_task_bad_frequency():
         task.next_date()
 
 
+def test_schedule_is_overdue():
+    today = datetime.datetime.now(datetime.UTC).date()
+    assert Schedule(due_date=today - timedelta(days=1)).is_overdue()
+    assert not Schedule(due_date=today).is_overdue()
+    assert not Schedule(due_date=today + timedelta(days=1)).is_overdue()
+    completed = Schedule(due_date=today - timedelta(days=1), completion_date=today)
+    assert not completed.is_overdue()
+
+
 @pytest.mark.django_db
 def test_task_manager(none_location):
     a = Area.objects.create(name="Test Area")

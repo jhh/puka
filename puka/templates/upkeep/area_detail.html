@@ -69,8 +69,9 @@
                                 class="link link-hover link-primary"
                             >{{ task.name }}</a>
                         </td>
-                        <td class="whitespace-nowrap text-base-content/70">
-                            {{ task.earliest_due_date|default:"" }}
+                        <td class="whitespace-nowrap{% if task.overdue %} font-semibold text-error{% else %} text-base-content/70{% endif %}">
+                            {{ task.earliest_due_date|default:"" }}{% if task.overdue %}<span class="sr-only">
+                                    (overdue)</span>{% endif %}
                         </td>
                         <td class="hidden md:table-cell">
                             {% if task.are_consumables_stocked %}

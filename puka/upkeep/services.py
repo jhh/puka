@@ -91,7 +91,10 @@ def get_tasks_schedules(area=None) -> list[dict[str, Any]]:
     return tasks
 
 
-def get_tasks_with_earliest_due_date():
+def get_tasks_with_earliest_due_date(start_date=None):
+    if start_date is None:
+        start_date = datetime.datetime.now(tz=datetime.UTC).date()
+
     # Get the earliest due_date for each task where completion_date is None
     earliest_due_date_subquery = (
         Schedule.objects.filter(task=OuterRef("pk"), completion_date__isnull=True)
@@ -99,15 +102,26 @@ def get_tasks_with_earliest_due_date():
         .values("due_date")[:1]
     )
 
-    # Annotate each Task with its earliest incomplete schedule's due_date and
-    # the name of the root location of its area (e.g. "Cloyster" for "S Studio").
-    return Task.objects.with_stock_status().annotate(
-        earliest_due_date=Subquery(earliest_due_date_subquery),
-        area_root_name=Subquery(
-            Location.objects.filter(
-                path=Substr(OuterRef("area__location__path"), 1, Location.steplen),
-            ).values("name")[:1],
-        ),
+    # Annotate each Task with its earliest incomplete schedule's due_date, the
+    # name of the root location of its area (e.g. "Cloyster" for "S Studio"),
+    # and whether the due date has already passed.
+    return (
+        Task.objects.with_stock_status()
+        .annotate(
+            earliest_due_date=Subquery(earliest_due_date_subquery),
+            area_root_name=Subquery(
+                Location.objects.filter(
+                    path=Substr(OuterRef("area__location__path"), 1, Location.steplen),
+                ).values("name")[:1],
+            ),
+        )
+        .annotate(
+            overdue=Case(
+                When(earliest_due_date__lt=start_date, then=True),
+                default=False,
+                output_field=BooleanField(),
+            ),
+        )
     )
 
 
@@ -123,7 +137,8 @@ def get_upcoming_tasks(
     ``supplies_within_days``. It is returned when that due date falls within
     ``task_within_days`` or a consumable has less stock than the quantity
     required. Overdue tasks are included. ``due_soon`` is True when the due
-    date falls within ``task_within_days``.
+    date falls within ``task_within_days`` and ``overdue`` is True when it
+    has passed.
 
     """
     if start_date is None:
@@ -133,7 +148,7 @@ def get_upcoming_tasks(
     supplies_within_date = start_date + datetime.timedelta(days=supplies_within_days)
 
     return (
-        get_tasks_with_earliest_due_date()
+        get_tasks_with_earliest_due_date(start_date)
         .select_related("area")
         .annotate(
             due_soon=Case(

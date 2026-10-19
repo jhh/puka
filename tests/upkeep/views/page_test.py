@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import UTC, date, datetime, timedelta
 
 import pytest
 from django.urls import reverse
+from django.utils.formats import date_format
 
 from tests.factories import (
     AreaFactory,
@@ -114,6 +115,25 @@ def test_task_detail_without_upcoming_shows_only_latest_complete(admin_client):
     (toggle,) = page.find("input", type="checkbox")
     assert toggle.attrs["hx-patch"] == reverse("upkeep:schedule-toggle", args=[latest.pk])
     assert "checked" in toggle.attrs
+
+
+def test_task_detail_highlights_past_due_schedule(admin_client):
+    today = datetime.now(UTC).date()
+    task = TaskFactory.create()
+    ScheduleFactory.create(task=task, due_date=today - timedelta(days=1))
+    ScheduleFactory.create(task=task, due_date=today)
+
+    page = parse_html(
+        admin_client.get(reverse("upkeep:task-detail", args=[task.pk]), headers=HTMX).content,
+    )
+
+    (past_due_cell,) = (
+        el for el in page.find("td") if el.text == date_format(today - timedelta(days=1))
+    )
+    assert {"font-semibold", "text-error"} <= set(past_due_cell.attrs["class"].split())
+
+    (due_today_cell,) = (el for el in page.find("td") if el.text == date_format(today))
+    assert "text-error" not in due_today_cell.attrs["class"]
 
 
 @pytest.mark.parametrize("quantities", [[], [0], [2, 3]])

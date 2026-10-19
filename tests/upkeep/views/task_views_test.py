@@ -1,15 +1,16 @@
 from __future__ import annotations
 
-from datetime import date
+from datetime import UTC, date, datetime, timedelta
 
 import pytest
 from django.urls import reverse
+from django.utils.formats import date_format
 from pytest_django.asserts import assertContains
 
 from puka.stuff.models import Location
 from puka.upkeep.models import Task
 from tests.factories import AreaFactory, ScheduleFactory, TaskFactory
-from tests.utils import HTMX, assert_hx_location, assert_redirect
+from tests.utils import HTMX, assert_hx_location, assert_redirect, parse_html
 
 pytestmark = pytest.mark.django_db
 
@@ -89,6 +90,25 @@ def test_task_list_due_date_order(admin_client):
     response = admin_client.get(reverse("upkeep:task-list"))
 
     assert [task.name for task in response.context["tasks"]] == ["Sooner", "Later", "Undated"]
+
+
+def test_task_list_highlights_past_due_date(admin_client):
+    today = datetime.now(UTC).date()
+    past_due = TaskFactory.create(name="Past due")
+    ScheduleFactory.create(task=past_due, due_date=today - timedelta(days=1))
+    due_today = TaskFactory.create(name="Due today")
+    ScheduleFactory.create(task=due_today, due_date=today)
+
+    response = admin_client.get(reverse("upkeep:task-list"))
+    page = parse_html(response.content)
+
+    (past_due_cell,) = (
+        el for el in page.find("td") if el.text == date_format(today - timedelta(days=1))
+    )
+    assert {"font-semibold", "text-error"} <= set(past_due_cell.attrs["class"].split())
+
+    (due_today_cell,) = (el for el in page.find("td") if el.text == date_format(today))
+    assert "text-error" not in due_today_cell.attrs["class"]
 
 
 @pytest.mark.parametrize("name", ["upkeep:task-list", "upkeep:home"])

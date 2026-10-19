@@ -121,6 +121,24 @@ def test_get_upcoming_tasks_due_soon_or_short_stocked(start_date):
 
 
 @pytest.mark.django_db
+def test_get_upcoming_tasks_annotates_overdue(start_date):
+    area = AreaFactory.create()
+
+    past_due = TaskFactory.create(area=area, name="Past due")
+    ScheduleFactory.create(task=past_due, due_date=start_date - timedelta(days=1))
+
+    due_today = TaskFactory.create(area=area, name="Due today")
+    ScheduleFactory.create(task=due_today, due_date=start_date)
+
+    upcoming = TaskFactory.create(area=area, name="Upcoming")
+    ScheduleFactory.create(task=upcoming, due_date=start_date + timedelta(days=3))
+
+    tasks = list(get_upcoming_tasks(start_date))
+    assert [task.name for task in tasks] == ["Past due", "Due today", "Upcoming"]
+    assert [task.overdue for task in tasks] == [True, False, False]
+
+
+@pytest.mark.django_db
 def test_get_upcoming_tasks_annotates_area_root_name(start_date):
     root = Location.objects.add_root({"name": "Cloyster", "code": "C"})
     studio = Location.objects.add_child(root, {"name": "Studio", "code": "S"})

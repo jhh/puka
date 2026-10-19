@@ -75,6 +75,7 @@ class Task(models.Model):
     area_root_name: str
     consumables_stocked: bool
     due_soon: bool
+    overdue: bool
 
     def __str__(self):
         return f"{self.name} ({self.pk})"
@@ -161,6 +162,12 @@ class Schedule(models.Model):
 
     def is_complete(self) -> bool:
         return self.completion_date is not None
+
+    def is_overdue(self) -> bool:
+        """Return True when the schedule is incomplete and its due date has passed."""
+        if self.is_complete():
+            return False
+        return self.due_date < datetime.datetime.now(tz=datetime.UTC).date()
 
     def reschedule(self):
         start_date = self.completion_date or datetime.datetime.now(tz=datetime.UTC).date()

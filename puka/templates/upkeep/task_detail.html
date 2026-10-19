@@ -74,7 +74,10 @@
                                 {% if schedule.is_complete %}checked{% endif %}
                             >
                         </td>
-                        <td class="text-base-content/70">{{ schedule.due_date }}</td>
+                        <td class="{% if schedule.is_overdue %}font-semibold text-error{% else %}text-base-content/70{% endif %}">
+                            {{ schedule.due_date }}{% if schedule.is_overdue %}<span class="sr-only">
+                                    (overdue)</span>{% endif %}
+                        </td>
                         <td class="text-base-content/70">{{ schedule.completion_date|default:'' }}</td>
                         <td class="hidden text-base-content/70 md:table-cell">{{ schedule.notes }}</td>
                         <td class="text-right">

@@ -129,6 +129,26 @@ def test_overview_upcoming_tasks_table(admin_client):
     assert badges == ["in stock", "out of stock"]
 
 
+def test_overview_highlights_past_due_date(admin_client):
+    today = datetime.now(UTC).date()
+    past_due_date = today - timedelta(days=1)
+    soon_date = today + timedelta(days=3)
+    area = AreaFactory.create(name="Garden")
+    past_due = TaskFactory.create(area=area, name="Water plants")
+    ScheduleFactory.create(task=past_due, due_date=past_due_date)
+    due_soon = TaskFactory.create(area=area, name="Mow lawn")
+    ScheduleFactory.create(task=due_soon, due_date=soon_date)
+
+    response = admin_client.get(reverse("home"))
+    page = parse_html(response.content)
+
+    (past_due_cell,) = (el for el in page.find("td") if el.text == date_format(past_due_date))
+    assert {"font-semibold", "text-error"} <= set(past_due_cell.attrs["class"].split())
+
+    (due_soon_cell,) = (el for el in page.find("td") if el.text == date_format(soon_date))
+    assert "text-error" not in due_soon_cell.attrs["class"]
+
+
 def test_overview_without_upcoming_tasks(admin_client):
     response = admin_client.get(reverse("home"))
     assert "No upcoming tasks" in response.content.decode()
