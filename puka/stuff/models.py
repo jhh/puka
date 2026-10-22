@@ -15,9 +15,6 @@ from puka.bookmarks.models import Bookmark
 if TYPE_CHECKING:
     from puka.upkeep.models import Area
 
-# Every Area without an explicit location falls back to this one.
-NONE_LOCATION_CODE = "N"
-
 
 class Location(MP_Node):
     name: models.CharField = models.CharField(max_length=100)

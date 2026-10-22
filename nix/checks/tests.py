@@ -163,12 +163,14 @@ with subtest("create area"):
 
     csrf_token = get_csrf_token(f"{BASE_URL}/upkeep/area/new/")
 
-    # Areas require a location; the form defaults to the "None" location.
+    # Areas require a location; pick the first one offered by the form.
     html = machine.succeed(f"{CURL} -sLf {BASE_URL}/upkeep/area/new/")
     soup = BeautifulSoup(html, "html.parser")
-    default_location = soup.select_one("select[name=location] option[selected]")
-    assert default_location is not None, "create area: no default location selected"
-    location_pk = default_location["value"]
+    options = [
+        option for option in soup.select("select[name=location] option") if option.get("value")
+    ]
+    assert options, "create area: no location option"
+    location_pk = options[0]["value"]
 
     html = machine.succeed(f"""
         {CURL} -v -L \

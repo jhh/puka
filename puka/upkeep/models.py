@@ -8,12 +8,7 @@ from django.db.models import Exists, F, OuterRef, Sum
 from django.urls import reverse
 
 from puka.bookmarks.models import Bookmark
-from puka.stuff.models import NONE_LOCATION_CODE, Item, Location
-
-
-def default_area_location() -> int:
-    """Primary key of the "None" location that areas fall back to."""
-    return Location.objects.only("pk").get(code=NONE_LOCATION_CODE).pk
+from puka.stuff.models import Item, Location
 
 
 class Area(models.Model):
@@ -21,9 +16,8 @@ class Area(models.Model):
     notes = models.TextField(blank=True)
     location = models.ForeignKey(
         Location,
-        on_delete=models.SET_DEFAULT,
+        on_delete=models.PROTECT,
         related_name="areas",
-        default=default_area_location,
     )
     location_id: int
     bookmarks = models.ManyToManyField(Bookmark, related_name="+")

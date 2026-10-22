@@ -34,7 +34,7 @@ def test_overview_counts_and_links(admin_client):
     assert response.context["counts"] == {
         "bookmarks": 2,
         "items": 1,
-        # The schedule's task creates an area, which creates the None location.
+        # The schedule's task creates an area, which creates its location.
         "locations": 1,
         "tasks": 1,
         "bookmark_tags": 3,

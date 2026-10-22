@@ -3,7 +3,8 @@ from __future__ import annotations
 import logging
 from typing import cast
 
-from django.db.models import Count, Prefetch
+from django.db import transaction
+from django.db.models import Count, Prefetch, ProtectedError
 from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -13,10 +14,19 @@ from treebeard.forms import movenodeform_factory
 
 from puka.core.views import get_template
 from puka.stuff.forms import LocationForm
-from puka.stuff.models import NONE_LOCATION_CODE, Inventory, Location
+from puka.stuff.models import Inventory, Location
 from puka.upkeep.models import Area
 
 logger = logging.getLogger(__name__)
+
+
+def subtree_has_areas(location: Location) -> bool:
+    """Return whether ``location`` or any descendant has an assigned area."""
+    return (
+        Location.objects.get_descendants(location, include_self=True)
+        .filter(areas__isnull=False)
+        .exists()
+    )
 
 
 class LocationListView(ListView):
@@ -51,7 +61,6 @@ class LocationListView(ListView):
         context["parent_id"] = self.kwargs.get("pk", 0)
         context["ancestors"] = self.ancestors
         context["location"] = self.location
-        context["none_location_code"] = NONE_LOCATION_CODE
         if self.location:
             parent = Location.objects.get_parent(self.location)
             context["up_id"] = parent.pk if parent else 0
@@ -61,6 +70,7 @@ class LocationListView(ListView):
             context["areas"] = self.location.areas.annotate(task_count=Count("tasks")).order_by(
                 "name",
             )
+            context["location_has_areas"] = subtree_has_areas(self.location)
         return context
 
 
@@ -141,19 +151,24 @@ class LocationUpdateView(UpdateView):
 class LocationDeleteView(View):
     def post(self, request, pk):
         location = get_object_or_404(Location, pk=pk)
-        if self._contains_none_location(location):
-            return HttpResponseBadRequest(
-                "The None location is the default for areas and cannot be deleted.",
-            )
+        if subtree_has_areas(location):
+            return self._protected_response()
+
         parent = Location.objects.get_parent(location)
         url = reverse("stuff:location-list", args=[parent.pk if parent else 0])
-        location.delete()
+        try:
+            with transaction.atomic():
+                location.delete()
+        except ProtectedError:
+            return self._protected_response()
         if request.htmx:
             return HttpResponseLocation(url, target="#content")
         return redirect(url)
 
     @staticmethod
-    def _contains_none_location(location: Location) -> bool:
-        """Return whether ``location`` or any descendant is the "None" location."""
-        subtree = Location.objects.get_descendants(location, include_self=True)
-        return subtree.filter(code=NONE_LOCATION_CODE).exists()
+    def _protected_response() -> HttpResponseBadRequest:
+        """Return the error shown when a location's subtree has areas."""
+        return HttpResponseBadRequest(
+            "This location or one of its sublocations has areas assigned. "
+            "Reassign them before deleting.",
+        )

@@ -11,6 +11,7 @@ pytestmark = pytest.mark.django_db(transaction=True)
 
 MIGRATE_FROM = [("upkeep", "0002_area_bookmarks")]
 MIGRATE_TO = [("upkeep", "0003_area_location")]
+LATEST = [("upkeep", "0004_alter_area_location")]
 
 
 @pytest.fixture
@@ -19,7 +20,7 @@ def executor():
     yield migration_executor
     # Restore the latest schema even if a test fails mid-migration.
     migration_executor.loader.build_graph()
-    migration_executor.migrate(MIGRATE_TO)
+    migration_executor.migrate(LATEST)
 
 
 def test_backfill_creates_none_location(executor):

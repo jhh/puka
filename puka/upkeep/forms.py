@@ -25,8 +25,6 @@ class AreaForm(FormContext, forms.ModelForm):
         self.fields["name"].widget.attrs["autocomplete"] = "off"
         field = self.fields["location"]
         field.queryset = Location.objects.order_by("path")  # ty: ignore[unresolved-attribute]
-        # A callable model default makes Django render a hidden initial input.
-        field.show_hidden_initial = False
         if self.instance.pk is None:
             self.fields["name"].widget.attrs["autofocus"] = True
 

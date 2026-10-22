@@ -13,12 +13,12 @@ from puka.upkeep.models import Area, Schedule, Task
 
 from .factories import (
     AreaFactory,
+    AreaLocationFactory,
     BookmarkFactory,
     InventoryFactory,
     ItemFactory,
     ItemWithInventoryFactory,
     LocationFactory,
-    NoneLocationFactory,
     ScheduleFactory,
     TaskFactory,
     TaskItemFactory,
@@ -183,13 +183,13 @@ def start_date():
 
 
 @pytest.fixture
-def none_location(db):
-    return NoneLocationFactory.create()
+def area_location(db):
+    return AreaLocationFactory.create()
 
 
 @pytest.fixture
-def area(db, start_date, none_location):
-    area = Area.objects.create(name="Test Area")
+def area(db, start_date, area_location):
+    area = Area.objects.create(name="Test Area", location=area_location)
 
     for i in range(3):
         # create tasks 0, 1, 2

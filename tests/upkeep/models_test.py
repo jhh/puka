@@ -4,7 +4,6 @@ from datetime import timedelta
 import pytest
 from django.db import IntegrityError
 
-from puka.stuff.models import Location
 from puka.upkeep.models import Area, Schedule, Task, TaskItem
 from puka.upkeep.services import item_quantity_needed
 from tests.factories import (
@@ -25,26 +24,20 @@ def test_area(area):
 
 
 @pytest.mark.django_db
-def test_area_defaults_to_none_location(none_location):
-    area = Area.objects.create(name="Test Area")
-    assert area.location == none_location
-
-
-@pytest.mark.django_db
-def test_area_default_requires_none_location():
-    with pytest.raises(Location.DoesNotExist):
+def test_area_requires_location():
+    with pytest.raises(IntegrityError):
         Area.objects.create(name="Test Area")
 
 
 @pytest.mark.django_db
-def test_area_first_due_no_tasks(none_location):
-    area = Area.objects.create(name="Test Area")
+def test_area_first_due_no_tasks(area_location):
+    area = Area.objects.create(name="Test Area", location=area_location)
     assert area.first_due_schedule() is None
 
 
 @pytest.mark.django_db
-def test_area_first_due_no_schedules(none_location):
-    area = Area.objects.create(name="Test Area")
+def test_area_first_due_no_schedules(area_location):
+    area = Area.objects.create(name="Test Area", location=area_location)
     Task.objects.create(name="Test Task", area=area)
     assert area.tasks.count() == 1
     task = area.tasks.first()
@@ -119,8 +112,8 @@ def test_schedule_is_overdue():
 
 
 @pytest.mark.django_db
-def test_task_manager(none_location):
-    a = Area.objects.create(name="Test Area")
+def test_task_manager(area_location):
+    a = Area.objects.create(name="Test Area", location=area_location)
     t = Task.objects.create(area=a, name="test 1", interval=1, frequency="days")
 
     # Replace datetime.date.today() with datetime.datetime.now(datetime.UTC).date()

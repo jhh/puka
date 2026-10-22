@@ -244,7 +244,7 @@
             </section>
         {% endif %}
         <div class="mt-8 border-t border-base-300 pt-4">
-            {% if location.code == none_location_code %}
+            {% if location_has_areas %}
                 <c-ui.button
                     type="button"
                     variant="error"
@@ -253,7 +253,7 @@
                     disabled
                 >Delete location</c-ui.button>
                 <p class="mt-2 text-xs text-base-content/70">
-                    This is the default location for areas and cannot be deleted.
+                    This location or one of its sublocations has areas assigned. Reassign them before deleting.
                 </p>
             {% else %}
                 <form method="post" action="{% url 'stuff:location-delete' location.pk %}">

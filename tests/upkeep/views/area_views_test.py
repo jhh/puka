@@ -25,18 +25,18 @@ def area():
     return AreaFactory.create()
 
 
-def test_create_area(admin_client, none_location):
-    data = {"name": "Kitchen", "notes": "downstairs", "location": none_location.pk}
+def test_create_area(admin_client, location):
+    data = {"name": "Kitchen", "notes": "downstairs", "location": location.pk}
     response = admin_client.post(reverse("upkeep:area-new"), data, headers=HTMX)
 
     assert_redirect(response, reverse("upkeep:area-list"))
     area = Area.objects.get()
     assert area.name == "Kitchen"
     assert area.notes == "downstairs"
-    assert area.location == none_location
+    assert area.location == location
 
 
-def test_create_area_invalid(admin_client, none_location):
+def test_create_area_invalid(admin_client):
     response = admin_client.post(reverse("upkeep:area-new"), {"name": ""}, headers=HTMX)
 
     assert response.status_code == 200
@@ -44,19 +44,27 @@ def test_create_area_invalid(admin_client, none_location):
     assert not Area.objects.exists()
 
 
-def test_create_area_form_defaults_to_none_location(admin_client, none_location):
+def test_create_area_requires_location(admin_client):
+    response = admin_client.post(reverse("upkeep:area-new"), {"name": "Kitchen"}, headers=HTMX)
+
+    assert response.status_code == 200
+    assertContains(response, "This field is required.")
+    assert not Area.objects.exists()
+
+
+def test_create_area_form_has_no_default_location(admin_client):
     response = admin_client.get(reverse("upkeep:area-new"), headers=HTMX)
 
     form = response.context["form"]
-    assert form["location"].value() == none_location.pk
+    assert form["location"].value() is None
+    assert form.fields["location"].required
 
 
-def test_area_form_location_options(admin_client, none_location):
+def test_area_form_location_options(admin_client):
     location = LocationFactory.create(name="Garage", code="G")
     response = admin_client.get(reverse("upkeep:area-new"), headers=HTMX)
 
     options = parse_html(response.content).options("location")
-    assert options[str(none_location.pk)].text == "None (N)"
     assert options[str(location.pk)].text == "Garage (G)"
 
 
