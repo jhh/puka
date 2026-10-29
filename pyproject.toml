@@ -36,7 +36,7 @@ test = [
   "pytest-cov>=6.0.0",
   "pytest-django>=4.9.0",
   "pytest-factoryboy>=2.7.0",
-  "ty>=0.0.85",
+  "ty>=0.0.95",
 ]
 pre-commit = [
   "add-trailing-comma>=3.1.0",
@@ -119,3 +119,11 @@ possibly-unresolved-reference = "warn"
 unresolved-import = "warn"
 # django-stubs types BaseManager.__get__ with a mypy-only `Options` workaround
 invalid-attribute-access = "ignore"
+
+# factory_boy reads each factory's nested Meta dynamically, which ty treats as
+# an incompatible attribute override.
+[[tool.ty.overrides]]
+include = ["tests/factories.py"]
+
+[tool.ty.overrides.rules]
+invalid-attribute-override = "ignore"

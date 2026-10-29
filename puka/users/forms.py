@@ -4,12 +4,12 @@ from .models import CustomUser
 
 
 class CustomUserCreationForm(UserCreationForm):
-    class Meta:
+    class Meta:  # ty: ignore[invalid-attribute-override]
         model = CustomUser
         fields = ("username", "email")
 
 
 class CustomUserChangeForm(UserChangeForm):
-    class Meta:
+    class Meta:  # ty: ignore[invalid-attribute-override]
         model = CustomUser
         fields = ("username", "email")
