@@ -1,4 +1,5 @@
 {% extends "stuff/base.html" %}
+{% load markdown %}
 
 {% block title %}{{ item.name }}{% endblock %}
 
@@ -59,9 +60,9 @@
 
         <div class="mb-6 space-y-3">
             {% if item.notes %}
-                <p id="item-notes" class="text-sm break-words text-base-content/70">
-                    {{ item.notes|linebreaksbr }}
-                </p>
+                <div id="item-notes" class="markdown text-sm break-words text-base-content/70">
+                    {{ item.notes|markdown }}
+                </div>
             {% endif %}
             <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
                 {% if item.tags.all %}

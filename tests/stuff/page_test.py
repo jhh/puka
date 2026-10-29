@@ -106,8 +106,8 @@ def test_item_and_bookmark_tags_use_matching_info_badges(admin_client):
 
     assert not page.find("h2", id="details-heading")
     assert not page.find("dl")
-    (notes,) = page.find("p", id="item-notes")
-    assert notes.text == item.notes
+    assert page.find("div", id="item-notes")
+    assert any(p.text == item.notes for p in page.find("p"))
     (reorder_level,) = page.find("span", id="item-reorder-level")
     assert reorder_level.text == "3"
     for name in ("electronics", "manual"):
@@ -348,8 +348,8 @@ def test_shared_inventory_controls_on_detail_pages(admin_client, name):
     assert [button.attrs["aria-label"] for button in buttons] == ["Remove one", "Add one"]
     assert all(button.attrs["hx-target"] == f"#id_quantity_{inventory.pk}" for button in buttons)
     if name == "stuff:item-detail":
-        (notes,) = page.find("p", id="item-notes")
-        assert notes.text == "Saved notes"
+        assert page.find("div", id="item-notes")
+        assert any(p.text == "Saved notes" for p in page.find("p"))
         assert not page.find("span", id="item-reorder-level")
         assert page.find("a", hx_get=reverse("stuff:inventory-edit", args=[inventory.pk]))
     else:
