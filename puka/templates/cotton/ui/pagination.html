@@ -1,6 +1,7 @@
 {% comment %}
 Previous/next pager for a Django Page plus a page-size menu. Links keep the
-current query string (via {% querystring %}) and swap into `target`.
+current query string (via {% querystring request.GET %} because isolated
+components render with a plain Context) and swap into `target`.
 page_obj.paginator.page_size_options (puka.core.pagination.PageSizePaginator)
 lists the offered sizes; id is the size menu's popover id; every other
 attribute passes through to the <nav>. The chosen size is stored in
@@ -44,8 +45,8 @@ localStorage per view and restored on later visits (Alpine.data("pageSize")).
                         {% for size in page_obj.paginator.page_size_options %}
                             <li>
                                 <a
-                                    href="{% querystring page_size=size page=1 %}"
-                                    hx-get="{% querystring page_size=size page=1 %}"
+                                    href="{% querystring request.GET page_size=size page=1 %}"
+                                    hx-get="{% querystring request.GET page_size=size page=1 %}"
                                     hx-target="{{ target }}"
                                     hx-push-url="true"
                                     data-page-size="{{ size }}"
@@ -64,8 +65,8 @@ localStorage per view and restored on later visits (Alpine.data("pageSize")).
                 <div class="join">
                     {% if page_obj.has_previous %}
                         <a
-                            href="{% querystring page=page_obj.previous_page_number %}"
-                            hx-get="{% querystring page=page_obj.previous_page_number %}"
+                            href="{% querystring request.GET page=page_obj.previous_page_number %}"
+                            hx-get="{% querystring request.GET page=page_obj.previous_page_number %}"
                             hx-target="{{ target }}"
                             hx-push-url="true"
                             class="join-item btn btn-sm"
@@ -75,8 +76,8 @@ localStorage per view and restored on later visits (Alpine.data("pageSize")).
                     {% endif %}
                     {% if page_obj.has_next %}
                         <a
-                            href="{% querystring page=page_obj.next_page_number %}"
-                            hx-get="{% querystring page=page_obj.next_page_number %}"
+                            href="{% querystring request.GET page=page_obj.next_page_number %}"
+                            hx-get="{% querystring request.GET page=page_obj.next_page_number %}"
                             hx-target="{{ target }}"
                             hx-push-url="true"
                             class="join-item btn btn-sm"
