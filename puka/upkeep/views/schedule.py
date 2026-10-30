@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 from typing import cast
 
 from django.shortcuts import get_object_or_404
@@ -60,7 +60,7 @@ class ScheduleToggleView(View):
         if schedule.completion_date:
             schedule.completion_date = None
         else:
-            schedule.completion_date = datetime.datetime.now(datetime.UTC).date()
+            schedule.completion_date = dt.datetime.now(dt.UTC).date()
         schedule.save()
         return HttpResponseLocation(
             reverse("upkeep:task-detail", args=[schedule.task_id]),

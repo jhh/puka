@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import datetime
+import datetime as dt
 
 from dateutil.relativedelta import relativedelta
 from django.db import models
@@ -46,9 +46,9 @@ class TaskManager(models.Manager):
 
     def get_upcoming_due_tasks(self, within_days: int = 14, start_date=None):
         if start_date is None:
-            start_date = datetime.datetime.now(tz=datetime.UTC).date()
+            start_date = dt.datetime.now(tz=dt.UTC).date()
         return self.filter(
-            schedules__due_date__lte=start_date + datetime.timedelta(days=within_days),
+            schedules__due_date__lte=start_date + dt.timedelta(days=within_days),
             schedules__completion_date__isnull=True,
         ).order_by("schedules__due_date")
 
@@ -80,9 +80,9 @@ class Task(models.Model):
     def is_recurring(self) -> bool:
         return self.interval is not None
 
-    def next_date(self, start_date=None) -> datetime.date:
+    def next_date(self, start_date=None) -> dt.date:
         if start_date is None:
-            start_date = datetime.datetime.now(tz=datetime.UTC).date()
+            start_date = dt.datetime.now(tz=dt.UTC).date()
 
         if not self.interval:
             return start_date
@@ -161,10 +161,10 @@ class Schedule(models.Model):
         """Return True when the schedule is incomplete and its due date has passed."""
         if self.is_complete():
             return False
-        return self.due_date < datetime.datetime.now(tz=datetime.UTC).date()
+        return self.due_date < dt.datetime.now(tz=dt.UTC).date()
 
     def reschedule(self):
-        start_date = self.completion_date or datetime.datetime.now(tz=datetime.UTC).date()
+        start_date = self.completion_date or dt.datetime.now(tz=dt.UTC).date()
         next_date = self.task.next_date(start_date)
         if not next_date:
             error_msg = "Cannot reschedule a non-recurring task"
