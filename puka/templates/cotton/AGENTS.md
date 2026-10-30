@@ -9,9 +9,11 @@ rules are in `puka/templates/AGENTS.md`.
   with a `{% comment %}` describing its variables. Explicit setup:
   `django_cotton.apps.SimpleAppConfig`, loaders and builtins in `TEMPLATES`.
 - Components are presentation only; `partialdef`s are htmx swap targets.
-  `COTTON_ENABLE_CONTEXT_ISOLATION` means a component sees its attributes
-  plus context processors, not the parent context: pass data in. Only
-  `layout/nav-item` and `ui/pagination` read the request.
+  `COTTON_ISOLATE_BY_DEFAULT` means a component sees its attributes plus
+  context processors, not the parent context: pass data in. Only
+  `layout/nav-item` and `ui/pagination` read the request. Isolated
+  components get a plain `Context`, so Django's `{% querystring %}` needs
+  an explicit mapping (`{% querystring request.GET page=... %}`).
 - Attributes not declared in `<c-vars>` pass through `{{ attrs }}`, so put
   `hx-*` and `x-*` on component tags. Declare anything that isn't an HTML
   attribute (`variant`, `size`, `icon`, ...). Declare `class` bare

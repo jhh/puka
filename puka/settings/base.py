@@ -144,9 +144,9 @@ LOGIN_REDIRECT_URL = "/"
 
 TAGGIT_CASE_INSENSITIVE = True
 
-# Components get a fresh RequestContext (context processors only) plus the attributes
-# passed to them, not the whole parent context.
-COTTON_ENABLE_CONTEXT_ISOLATION = True
+# Components get context-processor output plus the attributes passed to them,
+# not the whole parent context.
+COTTON_ISOLATE_BY_DEFAULT = True
 
 # Forms render through settings.TEMPLATES (so Cotton components work in form templates)
 # with daisyUI classes on widgets; see puka/core/forms.py.
