@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import datetime
+import datetime as dt
 
 import pytest
 from django.urls import reverse
@@ -27,7 +27,7 @@ def test_create_schedule(admin_client):
     assert_redirect(response, reverse("upkeep:task-detail", args=[task.pk]))
     schedule = Schedule.objects.get()
     assert schedule.task == task
-    assert schedule.due_date == datetime.date(2026, 6, 1)
+    assert schedule.due_date == dt.date(2026, 6, 1)
     assert schedule.completion_date is None
 
 
@@ -64,8 +64,8 @@ def test_update_schedule(admin_client, schedule):
 
     assert_redirect(response, reverse("upkeep:task-detail", args=[schedule.task.pk]))
     schedule.refresh_from_db()
-    assert schedule.due_date == datetime.date(2024, 2, 1)
-    assert schedule.completion_date == datetime.date(2024, 2, 2)
+    assert schedule.due_date == dt.date(2024, 2, 1)
+    assert schedule.completion_date == dt.date(2024, 2, 2)
 
 
 def test_delete_schedule(admin_client, schedule):
@@ -83,7 +83,7 @@ def test_toggle_schedule(admin_client, schedule):
     response = admin_client.patch(url, headers=HTMX)
     assert_hx_location(response, task_detail)
     schedule.refresh_from_db()
-    assert schedule.completion_date == datetime.datetime.now(datetime.UTC).date()
+    assert schedule.completion_date == dt.datetime.now(dt.UTC).date()
 
     response = admin_client.patch(url, headers=HTMX)
     assert_hx_location(response, task_detail)

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import datetime
+import datetime as dt
 import logging
 from itertools import chain
 from operator import attrgetter
@@ -93,7 +93,7 @@ def get_tasks_schedules(area=None) -> list[dict[str, Any]]:
 
 def get_tasks_with_earliest_due_date(start_date=None):
     if start_date is None:
-        start_date = datetime.datetime.now(tz=datetime.UTC).date()
+        start_date = dt.datetime.now(tz=dt.UTC).date()
 
     # Get the earliest due_date for each task where completion_date is None
     earliest_due_date_subquery = (
@@ -126,7 +126,7 @@ def get_tasks_with_earliest_due_date(start_date=None):
 
 
 def get_upcoming_tasks(
-    start_date: datetime.date | None = None,
+    start_date: dt.date | None = None,
     task_within_days: int = 7,
     supplies_within_days: int = 30,
 ) -> QuerySet[Task]:
@@ -142,10 +142,10 @@ def get_upcoming_tasks(
 
     """
     if start_date is None:
-        start_date = datetime.datetime.now(tz=datetime.UTC).date()
+        start_date = dt.datetime.now(tz=dt.UTC).date()
 
-    task_within_date = start_date + datetime.timedelta(days=task_within_days)
-    supplies_within_date = start_date + datetime.timedelta(days=supplies_within_days)
+    task_within_date = start_date + dt.timedelta(days=task_within_days)
+    supplies_within_date = start_date + dt.timedelta(days=supplies_within_days)
 
     return (
         get_tasks_with_earliest_due_date(start_date)

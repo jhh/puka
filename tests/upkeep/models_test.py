@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 from datetime import timedelta
 
 import pytest
@@ -76,15 +76,15 @@ def test_task_is_recurring():
 )
 def test_task_next_date(interval, frequency, expected_delta):
     task = Task(name="test", interval=interval, frequency=frequency)
-    start_date = datetime.datetime(year=2024, month=1, day=1, tzinfo=datetime.UTC)
-    delta: datetime.timedelta = task.next_date(start_date) - start_date
+    start_date = dt.datetime(year=2024, month=1, day=1, tzinfo=dt.UTC)
+    delta: dt.timedelta = task.next_date(start_date) - start_date
     assert delta == expected_delta
 
 
 def test_task_next_date_today():
     task = Task(name="test", interval=1, frequency="days")
     next_date = task.next_date()
-    expected_next_date = datetime.datetime.now(datetime.UTC) + timedelta(days=1)
+    expected_next_date = dt.datetime.now(dt.UTC) + timedelta(days=1)
     assert next_date.year == expected_next_date.year
     assert next_date.month == expected_next_date.month
     assert next_date.day == expected_next_date.day
@@ -92,7 +92,7 @@ def test_task_next_date_today():
 
 def test_task_not_recurring():
     task = Task(name="test", frequency="days")
-    start_date = datetime.datetime(year=2024, month=1, day=1, tzinfo=datetime.UTC)
+    start_date = dt.datetime(year=2024, month=1, day=1, tzinfo=dt.UTC)
     assert task.next_date(start_date) == start_date
 
 
@@ -103,7 +103,7 @@ def test_task_bad_frequency():
 
 
 def test_schedule_is_overdue():
-    today = datetime.datetime.now(datetime.UTC).date()
+    today = dt.datetime.now(dt.UTC).date()
     assert Schedule(due_date=today - timedelta(days=1)).is_overdue()
     assert not Schedule(due_date=today).is_overdue()
     assert not Schedule(due_date=today + timedelta(days=1)).is_overdue()
@@ -116,8 +116,8 @@ def test_task_manager(area_location):
     a = Area.objects.create(name="Test Area", location=area_location)
     t = Task.objects.create(area=a, name="test 1", interval=1, frequency="days")
 
-    # Replace datetime.date.today() with datetime.datetime.now(datetime.UTC).date()
-    today = datetime.datetime.now(datetime.UTC).date()
+    # Replace date.today() with dt.datetime.now(dt.UTC).date()
+    today = dt.datetime.now(dt.UTC).date()
 
     s = Schedule.objects.create(task=t, due_date=today)
     tasks = Task.objects.get_upcoming_due_tasks(within_days=1)
