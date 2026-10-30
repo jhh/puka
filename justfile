@@ -148,6 +148,13 @@ db-load:
     tmpfile=$(mktemp).json
     ssh eris puka-manage dumpdata --natural-foreign -e contenttypes -e auth.permission > $tmpfile
     echo Loading data from $tmpfile...
+    dropdb --if-exists --force "$PGDATABASE"
+    createdb --template=template0 --encoding=UTF8 --locale="en_US.UTF-8" "$PGDATABASE"
+    psql -d "$PGDATABASE" -v ON_ERROR_STOP=1 \
+        -c "ALTER DATABASE \"$PGDATABASE\" SET client_encoding TO 'UTF8'" \
+        -c "ALTER DATABASE \"$PGDATABASE\" SET default_transaction_isolation TO 'read committed'" \
+        -c "ALTER DATABASE \"$PGDATABASE\" SET timezone TO 'UTC'"
+    uv run puka/manage.py migrate --no-input
     uv run puka/manage.py loaddata $tmpfile
 
 # bootstrap the development environment
