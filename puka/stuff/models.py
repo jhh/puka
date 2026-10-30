@@ -17,6 +17,10 @@ if TYPE_CHECKING:
 
 
 class Location(MP_Node):
+    # treebeard's paths are base62: "Z" sorts before "a" in byte order, but
+    # not under locales such as en_US.UTF-8. Force the column to C so path
+    # ordering, lookups, and the unique index match the path alphabet.
+    path = models.CharField(max_length=255, unique=True, db_collation="C")
     name: models.CharField = models.CharField(max_length=100)
     code: models.CharField = models.CharField(max_length=25, unique=True)
     alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
