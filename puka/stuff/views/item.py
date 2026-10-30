@@ -109,7 +109,7 @@ class ItemCreateView(CreateView):
         return get_template(self.request, "stuff/form.html", "#form-partial")
 
     def form_valid(self, form):
-        self.object: Item = create_item_from_form(form)
+        self.object = create_item_from_form(form)
         return HttpResponseRedirect(self.get_success_url())
 
 
