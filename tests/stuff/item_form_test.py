@@ -12,6 +12,16 @@ class TestItemForm:
     def test_happy_path(self, item_form_data):
         form = ItemForm(data=item_form_data)
         assert form.errors == {}
+        assert form.cleaned_data["category"] is None
+
+    def test_category_selected(self, item_form_data, category_factory):
+        category = category_factory(name="Tools")
+        item_form_data["category"] = category.pk
+
+        form = ItemForm(data=item_form_data)
+
+        assert form.errors == {}
+        assert form.cleaned_data["category"] == category
 
     def test_name_required(self, item_form_data):
         item_form_data["name"] = ""

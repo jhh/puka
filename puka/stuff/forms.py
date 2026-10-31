@@ -28,10 +28,11 @@ class ItemForm(FormContext, ModelForm):
 
     class Meta:
         model = Item
-        fields = ("name", "reorder_level", "tags", "notes")
+        fields = ("name", "category", "reorder_level", "tags", "notes")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["category"].empty_label = "No category"  # ty: ignore[unresolved-attribute]
         self.fields["name"].widget.attrs["autocomplete"] = "off"
         if self.instance.pk is None:
             self.fields["name"].widget.attrs["autofocus"] = True

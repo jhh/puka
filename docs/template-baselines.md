@@ -243,7 +243,7 @@ Current preparation/rendering budgets:
 
 | View | Preparation | Rendering |
 | --- | ---: | ---: |
-| Item list | 1 | 3 |
+| Item list | 1 | 4 |
 | Task list | 1 | 1 |
 | Area list | 1 | 1 |
 | Item detail | 5 | 0 |
@@ -252,8 +252,10 @@ Current preparation/rendering budgets:
 | Area detail | 4 | 0 |
 
 Lists still evaluate their primary querysets and bulk prefetches lazily
-during rendering. Location breadcrumbs still load ancestors once. Neither
-path issues a relationship query per rendered row. Location detail's
+during rendering. The item list rendering budget grew from 3 to 4 when the
+category drop-down added one query for its options. Location breadcrumbs
+still load ancestors once. Neither path issues a relationship query per
+rendered row. Location detail's
 preparation grew from 2 to 3 when the areas prefetch was added (see
 `docs/area-location.md`); the prefetch runs while `DetailView` evaluates
 its queryset, so it counts as preparation rather than rendering.

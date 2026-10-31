@@ -22,7 +22,7 @@ from puka.stuff.importer import (
     import_upload,
     template_csv,
 )
-from puka.stuff.models import Inventory, Item
+from puka.stuff.models import Category, Inventory, Item, ItemQuerySet
 from puka.stuff.services import adjust_inventory_quantity, create_item_from_form
 from puka.upkeep.models import TaskItem
 
@@ -31,6 +31,7 @@ logger = logging.getLogger(__name__)
 
 class ItemListView(PageSizeMixin, ListView):
     context_object_name = "items"
+    selected_category = None
 
     def get_template_names(self):
         partial = (
@@ -46,14 +47,20 @@ class ItemListView(PageSizeMixin, ListView):
             query_set = Item.objects.search(query)
             self.extra_context = {"query": query}
         else:
-            query_set = Item.objects.all().order_by("name")
+            query_set = cast("ItemQuerySet", Item.objects.all().order_by("name"))
+
+        category = self.request.GET.get("category", "").strip()
+        if category:
+            self.selected_category = Category.objects.find(category)
+            query_set = query_set.with_category(category)
 
         # Restock order: below-minimum items first, then items whose minimum is
         # met, then items without a minimum. Keep the queryset's own ordering
         # (name, relevance, location code) within each group.
         ordering = query_set.query.order_by or ("name",)
         return (
-            query_set.annotate(quantity=Sum("inventories__quantity", default=0))
+            query_set.select_related("category")
+            .annotate(quantity=Sum("inventories__quantity", default=0))
             .annotate(
                 reorder_rank=Case(
                     When(reorder_level__gt=0, quantity__lt=F("reorder_level"), then=Value(0)),
@@ -68,6 +75,12 @@ class ItemListView(PageSizeMixin, ListView):
                 "tags",
             )
         )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["categories"] = Category.objects.all()
+        context["selected_category"] = self.selected_category
+        return context
 
 
 class ItemDetailView(DetailView):

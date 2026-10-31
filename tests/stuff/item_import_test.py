@@ -37,7 +37,10 @@ def upload(text: str, name: str = "items.csv") -> SimpleUploadedFile:
 @pytest.mark.django_db
 class TestParseCsv:
     def test_missing_columns(self):
-        with pytest.raises(ImportFormatError, match="Missing columns: Quantity, Location Code"):
+        with pytest.raises(
+            ImportFormatError,
+            match="Missing columns: Quantity, Location Code, Tags, Category, Bookmark URL, Notes",
+        ):
             parse_csv("Name,Reorder Level\nWidget,1\n")
 
     def test_ignores_unknown_columns(self):
@@ -52,6 +55,7 @@ class TestParseCsv:
                 "Reorder Level": "1",
                 "Location Code": "",
                 "Tags": "home",
+                "Category": "",
                 "Bookmark URL": "",
                 "Notes": "",
             },
@@ -99,6 +103,38 @@ class TestImportRows:
         assert bookmark.title == "Shelf bracket"
         assert not bookmark.active
         assert list(bookmark.tags.names()) == ["stuff"]
+
+    def test_matches_category_by_name(self, category_factory):
+        category = category_factory(name="Tools")
+
+        text = csv_document(
+            {
+                "Name": "Shelf bracket",
+                "Reorder Level": "2",
+                "Tags": "hardware",
+                "Category": "tools",
+            },
+        )
+        result = import_rows(parse_csv(text))
+
+        assert result.imported == 1
+        assert result.failed == []
+        assert Item.objects.get(name="Shelf bracket").category == category
+
+    def test_unknown_category_fails_the_row(self):
+        text = csv_document(
+            {
+                "Name": "Shelf bracket",
+                "Reorder Level": "2",
+                "Tags": "hardware",
+                "Category": "Missing",
+            },
+        )
+        result = import_rows(parse_csv(text))
+
+        assert result.imported == 0
+        assert result.failed[0].errors == 'Category: No category named "Missing".'
+        assert not Item.objects.filter(name="Shelf bracket").exists()
 
     @pytest.mark.usefixtures("location")
     def test_creates_child_location(self):
@@ -178,7 +214,9 @@ class TestFailedRowsCsv:
         error_csv = failed_rows_csv(result.failed)
 
         header = error_csv.splitlines()[0]
-        assert header == "Name,Quantity,Reorder Level,Location Code,Tags,Bookmark URL,Notes,Error"
+        assert header == (
+            "Name,Quantity,Reorder Level,Location Code,Tags,Category,Bookmark URL,Notes,Error"
+        )
         assert "Name: This field is required." in error_csv
 
         # Fix the name and resubmit the same file: the Error column is ignored.
@@ -192,7 +230,9 @@ class TestFailedRowsCsv:
 class TestTemplateCsv:
     def test_header_only(self):
         lines = template_csv().strip().splitlines()
-        assert lines == ["Name,Quantity,Reorder Level,Location Code,Tags,Bookmark URL,Notes"]
+        assert lines == [
+            "Name,Quantity,Reorder Level,Location Code,Tags,Category,Bookmark URL,Notes",
+        ]
 
 
 @pytest.mark.django_db
@@ -204,7 +244,7 @@ class TestItemImportView:
         assertContains(response, "Download template")
         assertContains(
             response,
-            "Name, Quantity, Reorder Level, Location Code, Tags, Bookmark URL, Notes",
+            "Name, Quantity, Reorder Level, Location Code, Tags, Category, Bookmark URL, Notes",
         )
 
     def test_template_download(self, admin_client):
@@ -214,7 +254,7 @@ class TestItemImportView:
         assert response["Content-Type"] == "text/csv; charset=utf-8"
         assert "attachment" in response["Content-Disposition"]
         assert response.content.decode().strip() == (
-            "Name,Quantity,Reorder Level,Location Code,Tags,Bookmark URL,Notes"
+            "Name,Quantity,Reorder Level,Location Code,Tags,Category,Bookmark URL,Notes"
         )
 
     def test_errors_download_without_import(self, admin_client):
@@ -288,7 +328,7 @@ class TestItemImportView:
         assert response.status_code == 200
         assertContains(
             response,
-            "Missing columns: Quantity, Location Code, Tags, Bookmark URL, Notes.",
+            "Missing columns: Quantity, Location Code, Tags, Category, Bookmark URL, Notes.",
         )
 
     def test_no_data_rows(self, admin_client):

@@ -5,7 +5,7 @@ from factory.django import DjangoModelFactory
 from factory.faker import Faker
 
 from puka.bookmarks.models import Bookmark
-from puka.stuff.models import Inventory, Item, Location
+from puka.stuff.models import Category, Inventory, Item, Location
 from puka.upkeep.models import Area, Schedule, Task, TaskItem
 
 
@@ -51,6 +51,14 @@ class AreaLocationFactory(DjangoModelFactory[Location]):
         if location is None:
             location = model_class.objects.add_root(kwargs)
         return location
+
+
+class CategoryFactory(DjangoModelFactory[Category]):
+    class Meta:
+        model = Category
+        django_get_or_create = ("name",)
+
+    name = "Test Category"
 
 
 class ItemFactory(DjangoModelFactory[Item]):

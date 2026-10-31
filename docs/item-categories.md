@@ -1,6 +1,6 @@
 # Item categories
 
-Status: proposed on 2026-10-31. Not implemented.
+Status: implemented on 2026-10-31.
 
 ## Goal
 
@@ -79,15 +79,13 @@ The category list is expected to grow, so the foreign key fits better.
 7. **Tests:** model and manager filtering, the list view combined with
    each search type, the item form, and the importer column.
 
-## Open questions
+## Resolved questions
 
-1. **Who manages categories?** Admin only, or an in-app page to add and
-   rename them?
-2. **Uncategorized items:** allow items without a category, with "All"
-   and possibly "Uncategorized" options in the drop-down? Or require a
-   category once existing items are backfilled?
-3. **Nesting:** are subcategories needed (e.g. Hardware > Fasteners)? If
-   so, the treebeard `MP_Node` pattern used by `Location` could apply.
-   Start with a flat list unless nesting is needed.
-4. **Backfill:** do any current tags already act as categories, so the
-   data migration could convert them?
+1. **Who manages categories?** Admin only; there is no in-app category
+   page.
+2. **Uncategorized items:** allowed. The drop-down has "All categories"
+   plus each category, but no separate "Uncategorized" filter.
+3. **Nesting:** not supported yet. Categories are a flat list.
+4. **Backfill:** none. No data migration converts tags or seeds starter
+   categories. Add categories in the admin before assigning them in the
+   form or CSV import.

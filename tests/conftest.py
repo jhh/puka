@@ -15,6 +15,7 @@ from .factories import (
     AreaFactory,
     AreaLocationFactory,
     BookmarkFactory,
+    CategoryFactory,
     InventoryFactory,
     ItemFactory,
     ItemWithInventoryFactory,
@@ -114,6 +115,7 @@ register(BookmarkFactory)
 
 register(LocationFactory)
 
+register(CategoryFactory)
 register(ItemFactory)
 register(ItemFactory, "filter_item", name="Water Filter", notes="Purifies water")
 register(ItemFactory, "salt_item", name="Water Softener Salt", notes="Yellow bag")

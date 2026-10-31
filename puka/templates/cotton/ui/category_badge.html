@@ -1,0 +1,7 @@
+{% comment %}
+Category badge: a ghost badge inside a link that filters the item list by category.
+href: the link target; class merges onto the <a>; hx-*/x-* attrs pass through.
+{% endcomment %}
+<c-vars href="" class />
+
+<a href="{{ href }}" class="{{ class }}" {{ attrs }}><c-ui.badge variant="ghost" size="sm">{{ slot }}</c-ui.badge></a>

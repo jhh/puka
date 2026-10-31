@@ -238,6 +238,30 @@ def test_item_list_empty_and_pagination(admin_client):
     assert nxt.text == "Next"
 
 
+def test_item_category_is_shown_in_list_and_detail(admin_client, category_factory, item_factory):
+    category = category_factory(name="Tools")
+    item = item_factory(name="Hammer", category=category)
+
+    list_page = parse_html(admin_client.get(reverse("stuff:item-list"), headers=HTMX).content)
+    detail_page = parse_html(
+        admin_client.get(reverse("stuff:item-detail", args=[item.pk]), headers=HTMX).content,
+    )
+    category_url = f"{reverse('stuff:item-list')}?category={category.pk}"
+
+    for page in (list_page, detail_page):
+        (link,) = page.find("a", href=category_url)
+        assert link.attrs["hx-get"] == category_url
+        assert link.attrs["hx-target"] == "#content"
+        assert link.attrs["hx-push-url"] == "true"
+        assert any(
+            el.text == "Tools" and "badge" in el.attrs.get("class", "").split()
+            for el in page.find("span")
+        )
+
+    response = admin_client.get(category_url, headers=HTMX)
+    assert list(response.context["items"]) == [item]
+
+
 def test_item_list_table_grows_with_its_rows(admin_client):
     # The page-size menu is pointless if a fixed height keeps the table from growing.
     ItemFactory.create(name="Item")

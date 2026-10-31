@@ -53,6 +53,15 @@ class TestItemCreateView:
         assert bookmark.url == item_form_data["bookmark_url"]
         assert list(bookmark.tags.values_list("name", flat=True)) == ["stuff"]
 
+    def test_category_saved(self, admin_client, item_form_data, category_factory):
+        category = category_factory(name="Tools")
+        item_form_data["category"] = category.pk
+
+        response = admin_client.post(reverse("stuff:item-new"), item_form_data)
+
+        assert response.status_code == 302
+        assert Item.objects.get().category == category
+
     def test_bookmark_get(self, admin_client, bookmark, item_form_data):
         item_form_data["bookmark_url"] = bookmark.url
         response = admin_client.post(reverse("stuff:item-new"), item_form_data)

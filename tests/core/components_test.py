@@ -121,6 +121,26 @@ def test_tag_badge():
     assert badge.text == "ssh"
 
 
+# ui/category_badge
+
+
+def test_category_badge():
+    source = (
+        '<c-ui.category-badge href="/stuff/?category=7" class="mr-1"'
+        ' hx-get="/stuff/?category=7" hx-target="#content" hx-push-url="true">Tools</c-ui.category-badge>'
+    )
+    result = page(source)
+    link = only(result, "a")
+    assert link.attrs["href"] == "/stuff/?category=7"
+    assert link.attrs["hx-get"] == "/stuff/?category=7"
+    assert link.attrs["hx-target"] == "#content"
+    assert link.attrs["hx-push-url"] == "true"
+    assert classes(link) == ["mr-1"]
+    badge = only(result, "span")
+    assert classes(badge) == ["badge", "badge-ghost", "badge-soft", "badge-sm"]
+    assert badge.text == "Tools"
+
+
 # ui/card
 
 
@@ -401,11 +421,12 @@ def test_search_box_defaults():
 
 def test_search_box_options():
     source = (
-        '<c-ui.search-box name="query" value="{{ query }}" class="w-64"'
+        '<c-ui.search-box name="query" value="{{ query }}" class="w-64" input_class="join-item"'
         ' hx-get="/upkeep/task/" hx-trigger="change" hx-target="#content" />'
     )
     result = page(source, query='salt "fine"')
     assert classes(result.elements[0]) == ["w-64"]
+    assert classes(only(result, "label")) == ["input", "w-full", "join-item"]
     search = result.field("query")
     assert search.attrs["value"] == 'salt "fine"'
     assert search.attrs["hx-trigger"] == "change"
@@ -604,7 +625,12 @@ def test_navbar_without_end():
 
 
 BOOKMARK_SEARCH = ("q", "/bookmarks/", "input changed delay:0.5s", "#id_bookmarks")
-ITEM_SEARCH = ("query", "/stuff/", "input changed delay:0.5s", "#item-results")
+ITEM_SEARCH = (
+    "query",
+    "/stuff/",
+    "input changed delay:0.5s from:#search, change from:#category, submit",
+    "#item-results",
+)
 AREA_SEARCH = ("query", "/upkeep/area/", "change", "#content")
 TASK_SEARCH = ("query", "/upkeep/task/", "change", "#content")
 
@@ -631,9 +657,17 @@ def test_pages_use_search_box(admin_client, url, htmx, value, expected):
     search = result.field(name)
     assert search.attrs["x-ref"] == "input"
     assert search.attrs["value"] == value
-    assert search.attrs["hx-get"] == hx_get
-    assert search.attrs["hx-trigger"] == trigger
-    assert search.attrs["hx-target"] == target
+    if url.startswith("/stuff/"):
+        assert "hx-get" not in search.attrs
+        assert search.form is not None
+        form = result.forms[search.form]
+        assert form.attrs["hx-get"] == hx_get
+        assert form.attrs["hx-trigger"] == trigger
+        assert form.attrs["hx-target"] == target
+    else:
+        assert search.attrs["hx-get"] == hx_get
+        assert search.attrs["hx-trigger"] == trigger
+        assert search.attrs["hx-target"] == target
 
 
 @pytest.mark.django_db

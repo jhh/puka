@@ -16,19 +16,44 @@
         {% if request.htmx and not request.htmx.boosted and not request.htmx.history_restore_request and request.htmx.target != 'body' %}
             <c-layout.page-meta title="Inventory">{% partial breadcrumbs %}</c-layout.page-meta>
         {% endif %}
-        <div class="mb-4 flex justify-end gap-2">
-            <c-ui.search-box
-                name="query"
-                value="{{ query }}"
+        <div class="mb-4 flex flex-wrap items-center gap-2">
+            <form
+                role="search"
+                class="join w-full sm:w-auto"
                 hx-get="{% url 'stuff:item-list' %}"
-                hx-trigger="input changed delay:0.5s"
+                hx-trigger="input changed delay:0.5s from:#search, change from:#category, submit"
                 hx-target="#item-results"
                 hx-sync="this:replace"
-            />
+                hx-replace-url="true"
+            >
+                <c-ui.search-box
+                    name="query"
+                    value="{{ query }}"
+                    class="min-w-0 flex-1 sm:flex-none sm:w-80"
+                    input_class="join-item"
+                />
+                <select
+                    id="category"
+                    name="category"
+                    aria-label="Category"
+                    class="select join-item w-40 shrink-0 sm:w-48"
+                >
+                    <option value="">All categories</option>
+                    {% for category in categories %}
+                        <option
+                            value="{{ category.pk }}"
+                            {% if selected_category == category %}selected{% endif %}
+                        >
+                            {{ category.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </form>
             <c-ui.button
                 href="{% url 'stuff:item-new' %}"
                 variant="primary"
                 icon="hero-plus"
+                class="ml-auto"
                 hx-get="{% url 'stuff:item-new' %}"
                 hx-target="#content"
                 hx-push-url="true"
@@ -60,20 +85,38 @@
                                     >
                                         {{ item.name }}
                                     </a>
-                                    {% if item.tags.all %}
-                                        <ul role="list" aria-label="Item tags" class="mt-1 flex flex-wrap gap-1">
-                                            {% for tag in item.tags.all %}
-                                                <li>
-                                                    <c-ui.tag-badge
-                                                        href="{% url 'stuff:item-list' %}?query=%23{{ tag.name|urlencode:'' }}"
-                                                        hx-get="{% url 'stuff:item-list' %}?query=%23{{ tag.name|urlencode:'' }}"
+                                    {% with item_tags=item.tags.all %}
+                                        {% if item.category or item_tags %}
+                                            <div class="mt-1 flex flex-wrap items-center gap-1">
+                                                {% if item.category %}
+                                                    <c-ui.category-badge
+                                                        href="{% url 'stuff:item-list' %}?category={{ item.category.pk }}"
+                                                        hx-get="{% url 'stuff:item-list' %}?category={{ item.category.pk }}"
                                                         hx-push-url="true"
                                                         hx-target="#content"
-                                                    >{{ tag }}</c-ui.tag-badge>
-                                                </li>
-                                            {% endfor %}
-                                        </ul>
-                                    {% endif %}
+                                                    >{{ item.category.name }}</c-ui.category-badge>
+                                                {% endif %}
+                                                {% if item_tags %}
+                                                    <ul
+                                                        role="list"
+                                                        aria-label="Item tags"
+                                                        class="flex flex-wrap items-center gap-1"
+                                                    >
+                                                        {% for tag in item_tags %}
+                                                            <li>
+                                                                <c-ui.tag-badge
+                                                                    href="{% url 'stuff:item-list' %}?query=%23{{ tag.name|urlencode:'' }}"
+                                                                    hx-get="{% url 'stuff:item-list' %}?query=%23{{ tag.name|urlencode:'' }}"
+                                                                    hx-push-url="true"
+                                                                    hx-target="#content"
+                                                                >{{ tag }}</c-ui.tag-badge>
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+                                    {% endwith %}
                                 </td>
                                 <td class="text-base-content/70 max-sm:hidden">
                                     <span class="tabular-nums">{{ item.quantity }}</span>

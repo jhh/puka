@@ -43,7 +43,7 @@ class QueryCase:
 
 
 CASES = (
-    QueryCase("stuff:item-list", 1, 3),
+    QueryCase("stuff:item-list", 1, 4),
     QueryCase("upkeep:task-list", 1, 1),
     QueryCase("upkeep:area-list", 1, 1),
     QueryCase("stuff:item-detail", 6, 0, "item"),

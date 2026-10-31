@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 from django.core.exceptions import NON_FIELD_ERRORS
 
 from puka.stuff.forms import ItemForm
+from puka.stuff.models import Category
 from puka.stuff.services import create_item_from_form
 
 if TYPE_CHECKING:
@@ -21,6 +22,7 @@ COLUMNS = (
     "Reorder Level",
     "Location Code",
     "Tags",
+    "Category",
     "Bookmark URL",
     "Notes",
 )
@@ -31,6 +33,7 @@ FORM_FIELDS = {
     "Reorder Level": "reorder_level",
     "Location Code": "location_code",
     "Tags": "tags",
+    "Category": "category",
     "Bookmark URL": "bookmark_url",
     "Notes": "notes",
 }
@@ -80,8 +83,20 @@ def parse_csv(text: str) -> list[dict[str, str]]:
 def import_rows(rows: list[dict[str, str]]) -> ImportResult:
     """Validate each row with ItemForm and create the valid ones."""
     result = ImportResult()
+    category_ids = {category.name.casefold(): category.pk for category in Category.objects.all()}
     for row in rows:
-        form = ItemForm(data={FORM_FIELDS[column]: value for column, value in row.items()})
+        data = {FORM_FIELDS[column]: value for column, value in row.items()}
+        category_name = row["Category"]
+        if category_name:
+            category_id = category_ids.get(category_name.casefold())
+            if category_id is None:
+                result.failed.append(
+                    FailedRow(row=row, errors=f'Category: No category named "{category_name}".'),
+                )
+                continue
+            data["category"] = str(category_id)
+
+        form = ItemForm(data=data)
         if form.is_valid():
             create_item_from_form(form)
             result.imported += 1

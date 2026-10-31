@@ -118,6 +118,29 @@ def test_search_locations_are_case_insensitive(item_with_inventory_factory, loca
 
 
 @pytest.mark.django_db
+def test_with_category_filters_by_category_object_id_and_slug(item_factory, category_factory):
+    tools = category_factory(name="Tools", slug="tools")
+    electronics = category_factory(name="Electronics", slug="electronics")
+    hammer = item_factory(name="Hammer", category=tools)
+    item_factory(name="Radio", category=electronics)
+    item_factory(name="Loose screw")
+
+    assert list(Item.objects.with_category(tools)) == [hammer]
+    assert list(Item.objects.with_category(tools.pk)) == [hammer]
+    assert list(Item.objects.with_category(str(tools.pk))) == [hammer]
+    assert list(Item.objects.with_category("tools")) == [hammer]
+
+
+@pytest.mark.django_db
+def test_with_category_unknown_returns_nothing(item_factory, category_factory):
+    category_factory(name="Tools")
+    item_factory(name="Hammer")
+
+    assert not Item.objects.with_category("missing").exists()
+    assert not Item.objects.with_category(999).exists()
+
+
+@pytest.mark.django_db
 def test_search_blank_returns_all_items(filter_item, salt_item, container_item):
     qs = Item.objects.search("  ")
     results = list(qs)

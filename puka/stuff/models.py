@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVectorField
 from django.db import models
-from django.db.models import F, Sum
+from django.db.models import F, Q, Sum
 from django.urls import reverse
 from taggit.managers import TaggableManager
 from treebeard.mp_tree import MP_Node
@@ -32,11 +32,55 @@ class Location(MP_Node):
         return self.code
 
 
+class CategoryManager(models.Manager["Category"]):
+    def get_by_natural_key(self, name: str) -> Category:
+        return self.get(name=name)
+
+    def find(self, value: str | int) -> Category | None:
+        """Find a category by primary key or slug."""
+        lookup = Q(slug=str(value))
+        if str(value).isdecimal():
+            lookup |= Q(pk=value)
+        return self.filter(lookup).first()
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True, blank=True, null=True)
+
+    objects = CategoryManager()
+
+    class Meta:
+        ordering = ("name",)
+        verbose_name_plural = "categories"
+
+    def __str__(self):
+        return self.name
+
+    def natural_key(self):
+        return (self.name,)
+
+
+class ItemQuerySet(models.QuerySet["Item"]):
+    def with_category(self, category: Category | int | str) -> ItemQuerySet:
+        if isinstance(category, Category):
+            return self.filter(category=category)
+        if isinstance(category, int):
+            return self.filter(category_id=category)
+        found = Category.objects.find(category)
+        if found is None:
+            return self.none()
+        return self.filter(category=found)
+
+
 class ItemManager(models.Manager["Item"]):
-    def with_tag(self, tag: str) -> models.QuerySet[Item]:
+    def get_queryset(self) -> ItemQuerySet:
+        return ItemQuerySet(self.model, using=self._db)
+
+    def with_tag(self, tag: str) -> ItemQuerySet:
         return self.get_queryset().filter(tags__name__iexact=tag).order_by("name")
 
-    def with_text(self, text: str) -> models.QuerySet[Item]:
+    def with_text(self, text: str) -> ItemQuerySet:
         query = SearchQuery(text, search_type="websearch", config="english")
         return (
             self.get_queryset()
@@ -45,10 +89,13 @@ class ItemManager(models.Manager["Item"]):
             .order_by("-rank")
         )
 
-    def with_location(self, location: str) -> models.QuerySet[Item]:
-        return self.filter(locations__code__istartswith=location)
+    def with_location(self, location: str) -> ItemQuerySet:
+        return cast("ItemQuerySet", self.filter(locations__code__istartswith=location))
 
-    def search(self, text: str) -> models.QuerySet[Item]:
+    def with_category(self, category: Category | int | str) -> ItemQuerySet:
+        return self.get_queryset().with_category(category)
+
+    def search(self, text: str) -> ItemQuerySet:
         query = text.strip()
         if query.startswith("#"):
             tag = query[1:]
@@ -58,7 +105,7 @@ class ItemManager(models.Manager["Item"]):
             return self.with_location(location).order_by("locations__code")
         if query:
             return self.with_text(query)
-        return self.order_by("name").all()
+        return cast("ItemQuerySet", self.order_by("name").all())
 
     def get_by_natural_key(self, name):
         return self.get(name=name)
@@ -66,6 +113,13 @@ class ItemManager(models.Manager["Item"]):
 
 class Item(models.Model):
     name = models.CharField(max_length=100, unique=True)
+    category = models.ForeignKey(
+        Category,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="items",
+    )
     reorder_level = models.PositiveIntegerField()
     locations: models.ManyToManyField = models.ManyToManyField(
         Location,

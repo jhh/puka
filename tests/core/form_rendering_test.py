@@ -48,7 +48,16 @@ FORM_CASES = (
     FormCase(
         "item-new",
         ("stuff:item-new", ()),
-        {"name", "reorder_level", "tags", "notes", "location_code", "quantity", "bookmark_url"},
+        {
+            "name",
+            "category",
+            "reorder_level",
+            "tags",
+            "notes",
+            "location_code",
+            "quantity",
+            "bookmark_url",
+        },
         "Save item",
         ("stuff:item-list", ()),
         autofocus="name",
@@ -56,7 +65,7 @@ FORM_CASES = (
     FormCase(
         "item-edit",
         ("stuff:item-edit", ("item",)),
-        {"name", "reorder_level", "tags", "notes"},
+        {"name", "category", "reorder_level", "tags", "notes"},
         "Save item",
         ("stuff:item-detail", ("item",)),
         delete=("stuff:item-delete", ("item",)),
