@@ -49,8 +49,7 @@ The category list is expected to grow, so the foreign key fits better.
    - `Category` with a unique `name` and an optional `slug`, ordered by
      name, with a natural key to match `Item`.
    - On `Item`:
-     `category = ForeignKey(Category, null=True, blank=True,
-     on_delete=PROTECT, related_name="items")`. Allowing empty values
+     `category = ForeignKey(Category, null=True, blank=True, on_delete=PROTECT, related_name="items")`. Allowing empty values
      lets existing items migrate without a category.
 2. **Migrations:**
    - A schema migration.
