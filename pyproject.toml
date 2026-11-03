@@ -15,7 +15,7 @@ dependencies = [
   "django-filter>=24.3",
   "django-treebeard>=4.7.1",
   "python-dateutil>=2.9.0.post0",
-  "types-python-dateutil>=2.9.0.20241206",
+  "types-python-dateutil>=2.9.0.20261029",
   "django-cotton>=2.8.0",
   "markdown-it-py>=4.0.0",
 ]
