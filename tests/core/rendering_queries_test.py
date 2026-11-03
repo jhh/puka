@@ -43,7 +43,7 @@ class QueryCase:
 
 
 CASES = (
-    QueryCase("stuff:item-list", 1, 4),
+    QueryCase("stuff:item-list", 2, 4),
     QueryCase("upkeep:task-list", 1, 1),
     QueryCase("upkeep:area-list", 1, 1),
     QueryCase("stuff:item-detail", 6, 0, "item"),
@@ -152,5 +152,5 @@ def test_item_results_fragment_query_budget(admin_client, related_objects):
             headers={"HX-Request": "true", "HX-Target": "#item-results"},
         )
     assert response.status_code == 200
-    assert len(queries) <= 6, queries.captured_queries
+    assert len(queries) <= 7, queries.captured_queries
     assert len(response.context["items"]) == min(related_objects["size"], 10)

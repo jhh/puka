@@ -324,7 +324,7 @@ retains the toolbar and page metadata, and boosted/body/history requests still
 return full pages. Search and pagination swaps leave the input, toolbar and
 Alpine state intact. Debounced search uses `hx-sync="this:replace"` so a newer
 search cancels an older in-flight request. Other search pages are unchanged.
-The results-only fragment stays within the six-query authenticated budget
+The results-only fragment stays within the seven-query authenticated budget
 across datasets of 1, 3 and 15 items.
 
 Chrome loaded the Inter stylesheet before removal. None of the inventory
@@ -395,3 +395,17 @@ the section headings, button routes, row actions and delete confirmations.
 `just test` passes (620 tests). Browser checks at 1280x800 and 375x812
 covered populated and empty sections, htmx area-to-task navigation, edit
 navigation and delete wiring, with no overflow or console errors.
+
+## Follow-up: item list top tags
+
+2026-11-03. The item list ranks the ten most-used tags (count descending,
+name as the tie-break) within the current text/location and category
+filters, before the single `tag` filter is applied. The results fragment
+renders them in one horizontally scrollable row.
+
+Clicking a tag sets `?tag=`, keeps a text/location `query`, `category` and
+`page_size`, resets `page`, and swaps `#content` so the toolbar's hidden tag
+field stays in sync. Clicking the active tag removes it. A legacy
+`?query=#tag` search is treated as the tag being replaced, so only one tag
+filter applies at a time. The extra ranking query raises the item-list
+preparation budget to two and the results-fragment budget to seven.

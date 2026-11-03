@@ -10,6 +10,7 @@ from django.views.decorators.http import require_http_methods
 from django.views.generic import CreateView, DetailView, FormView, ListView, UpdateView, View
 from django_htmx.http import HttpResponseLocation, trigger_client_event
 from django_htmx.middleware import HtmxDetails
+from taggit.models import Tag
 
 from puka.core.pagination import PageSizeMixin
 from puka.core.views import get_template
@@ -27,6 +28,8 @@ from puka.stuff.services import adjust_inventory_quantity, create_item_from_form
 from puka.upkeep.models import TaskItem
 
 logger = logging.getLogger(__name__)
+
+TOP_TAG_LIMIT = 10
 
 
 class ItemListView(PageSizeMixin, ListView):
@@ -54,6 +57,26 @@ class ItemListView(PageSizeMixin, ListView):
             self.selected_category = Category.objects.find(category)
             query_set = query_set.with_category(category)
 
+        tag_name = self.request.GET.get("tag", "").strip()
+        self.active_tag = Tag.objects.filter(name__iexact=tag_name).first() if tag_name else None
+
+        # Rank tags within the current search/category filter. Keep the tag
+        # filter out of this queryset so the row still offers alternate tags.
+        self.top_tags = list(query_set.top_tags(TOP_TAG_LIMIT))
+        self.tag_filter_params = self.request.GET.copy()
+        if self.tag_filter_params.get("query", "").strip().startswith("#"):
+            # A legacy #tag search is a tag filter too; replace it rather than
+            # combining two tag filters.
+            self.tag_filter_params.pop("query")
+
+        if tag_name:
+            if self.active_tag is None:
+                query_set = query_set.none()
+            else:
+                query_set = query_set.filter(tags__name__iexact=self.active_tag.name)
+                if self.active_tag not in self.top_tags:
+                    self.top_tags.insert(0, self.active_tag)
+
         # Restock order: below-minimum items first, then items whose minimum is
         # met, then items without a minimum. Keep the queryset's own ordering
         # (name, relevance, location code) within each group.
@@ -80,6 +103,9 @@ class ItemListView(PageSizeMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["categories"] = Category.objects.all()
         context["selected_category"] = self.selected_category
+        context["active_tag"] = self.active_tag
+        context["top_tags"] = self.top_tags
+        context["tag_filter_params"] = self.tag_filter_params
         return context
 
 

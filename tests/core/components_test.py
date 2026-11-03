@@ -121,6 +121,14 @@ def test_tag_badge():
     assert badge.text == "ssh"
 
 
+def test_tag_badge_variant():
+    badge = only(
+        page('<c-ui.tag-badge href="/stuff/?tag=ssh" variant="primary">ssh</c-ui.tag-badge>'),
+        "span",
+    )
+    assert classes(badge) == ["badge", "badge-primary", "badge-soft", "badge-sm"]
+
+
 # ui/category_badge
 
 

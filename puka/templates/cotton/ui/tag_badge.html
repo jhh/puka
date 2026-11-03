@@ -1,7 +1,10 @@
 {% comment %}
-Tag badge: an info-soft badge inside a link. href: the link target; class merges
-onto the <a>; hx-*/x-* attrs pass through.
+Tag badge: a soft badge inside a link. variant: badge variant (default info);
+href: the link target; class merges onto the <a>; hx-*/x-* attrs pass through.
 {% endcomment %}
-<c-vars href="" class />
+<c-vars href="" variant="info" class />
 
-<a href="{{ href }}" class="{{ class }}" {{ attrs }}><c-ui.badge variant="info" size="sm">{{ slot }}</c-ui.badge></a>
+<a href="{{ href }}" class="{{ class }}" {{ attrs }}><c-ui.badge
+        variant="{{ variant }}"
+        size="sm"
+    >{{ slot }}</c-ui.badge></a>

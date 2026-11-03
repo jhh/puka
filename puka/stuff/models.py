@@ -2,12 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, cast
 
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVectorField
 from django.db import models
-from django.db.models import F, Q, Sum
+from django.db.models import Count, F, Q, Sum
 from django.urls import reverse
 from taggit.managers import TaggableManager
+from taggit.models import Tag
 from treebeard.mp_tree import MP_Node
 
 from puka.bookmarks.models import Bookmark
@@ -71,6 +73,20 @@ class ItemQuerySet(models.QuerySet["Item"]):
         if found is None:
             return self.none()
         return self.filter(category=found)
+
+    def top_tags(self, limit: int) -> models.QuerySet[Tag]:
+        """Most-used tags on the items in this queryset, highest count first."""
+        relname = self.model.tags.through.tag_relname()
+        return (
+            Tag.objects.filter(
+                **{
+                    f"{relname}__content_type": ContentType.objects.get_for_model(self.model),
+                    f"{relname}__object_id__in": self.order_by().values("pk"),
+                },
+            )
+            .annotate(num_times=Count(relname))
+            .order_by("-num_times", "name")[:limit]
+        )
 
 
 class ItemManager(models.Manager["Item"]):

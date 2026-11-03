@@ -19,7 +19,7 @@
         <div class="mb-4 flex flex-wrap items-center gap-2">
             <form
                 role="search"
-                class="join w-full sm:w-auto"
+                class="flex w-full gap-2 sm:w-auto"
                 hx-get="{% url 'stuff:item-list' %}"
                 hx-trigger="input changed delay:0.5s from:#search, change from:#category, submit"
                 hx-target="#item-results"
@@ -30,13 +30,15 @@
                     name="query"
                     value="{{ query }}"
                     class="min-w-0 flex-1 sm:flex-none sm:w-80"
-                    input_class="join-item"
                 />
+                {% if active_tag %}
+                    <input type="hidden" name="tag" value="{{ active_tag.name }}">
+                {% endif %}
                 <select
                     id="category"
                     name="category"
                     aria-label="Category"
-                    class="select join-item w-40 shrink-0 sm:w-48"
+                    class="select w-40 shrink-0 sm:w-48"
                 >
                     <option value="">All categories</option>
                     {% for category in categories %}
@@ -65,6 +67,41 @@
 
         <div id="item-results">
             {% partialdef results-partial inline %}
+                {% if top_tags %}
+                    <ul
+                        role="list"
+                        aria-label="Filter by tag"
+                        class="mb-4 flex min-w-0 flex-nowrap items-center gap-1 overflow-x-auto py-1"
+                    >
+                        {% for tag in top_tags %}
+                            <li class="shrink-0">
+                                {% if tag == active_tag %}
+                                    {% querystring tag_filter_params tag=None page=1 as tag_query %}
+                                    <c-ui.tag-badge
+                                        href="{% url 'stuff:item-list' %}{{ tag_query }}"
+                                        hx-get="{% url 'stuff:item-list' %}{{ tag_query }}"
+                                        hx-target="#content"
+                                        hx-push-url="true"
+                                        variant="primary"
+                                        aria-current="true"
+                                        title="Remove tag filter: {{ tag.name }}"
+                                    >
+                                        {{ tag.name }}
+                                        <c-ui.icon name="hero-x-mark" class="size-3" />
+                                    </c-ui.tag-badge>
+                                {% else %}
+                                    {% querystring tag_filter_params tag=tag.name page=1 as tag_query %}
+                                    <c-ui.tag-badge
+                                        href="{% url 'stuff:item-list' %}{{ tag_query }}"
+                                        hx-get="{% url 'stuff:item-list' %}{{ tag_query }}"
+                                        hx-target="#content"
+                                        hx-push-url="true"
+                                    >{{ tag.name }}</c-ui.tag-badge>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
                 <c-ui.table zebra="1">
                     <thead>
                         <tr>
