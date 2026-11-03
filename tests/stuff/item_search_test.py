@@ -86,7 +86,7 @@ def test_results_pagination_keeps_query_and_filter_click_resets_page(admin_clien
     Item.objects.filter(pk__in=[item.pk for item in items]).update(category=category)
     response = admin_client.get(
         reverse("stuff:item-list"),
-        {"query": "#parts & café+#", "category": "parts"},
+        {"query": "Filter", "category": "parts"},
         headers=RESULTS_HEADERS,
     )
     page = parse_html(response.content)
@@ -96,7 +96,7 @@ def test_results_pagination_keeps_query_and_filter_click_resets_page(admin_clien
     assert next_link.attrs["hx-get"] == next_link.attrs["href"]
     assert parse_qs(urlsplit(next_link.attrs["href"]).query) == {
         "page": ["2"],
-        "query": ["#parts & café+#"],
+        "query": ["Filter"],
         "category": ["parts"],
     }
     response = admin_client.get(
@@ -108,15 +108,20 @@ def test_results_pagination_keeps_query_and_filter_click_resets_page(admin_clien
     tag_link = next(
         link
         for link in page.find("a")
-        if link.attrs.get("href", "").startswith(reverse("stuff:item-list") + "?query=")
+        if parse_qs(urlsplit(link.attrs["href"]).query).get("tag") == ["parts & café+#"]
     )
-    assert parse_qs(urlsplit(tag_link.attrs["href"]).query) == {"query": ["#parts & café+#"]}
+    assert parse_qs(urlsplit(tag_link.attrs["href"]).query) == {
+        "query": ["Filter"],
+        "category": ["parts"],
+        "tag": ["parts & café+#"],
+        "page": ["1"],
+    }
     response = admin_client.get(
         tag_link.attrs["href"],
         headers={"HX-Request": "true", "HX-Target": "#content"},
     )
     assert response.context["page_obj"].number == 1
-    assert parse_html(response.content).field("query").attrs["value"] == "#parts & café+#"
+    assert parse_html(response.content).field("query").attrs["value"] == "Filter"
 
 
 def test_category_select_lists_categories_and_preserves_selection(admin_client, category_factory):

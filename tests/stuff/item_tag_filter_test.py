@@ -1,4 +1,4 @@
-"""Top tags on the item list and the single active tag filter."""
+"""Top tags and tag chips on the item list and the single active tag filter."""
 
 from __future__ import annotations
 
@@ -16,15 +16,29 @@ RESULTS_HEADERS = {"HX-Request": "true", "HX-Target": "#item-results"}
 CONTENT_HEADERS = {"HX-Request": "true", "HX-Target": "#content"}
 
 
-def tag_links(page):
-    """Links that set the single tag filter (item-row tag links use ?query=)."""
+def query(link):
+    return parse_qs(urlsplit(link.attrs["href"]).query)
+
+
+def table_index(page):
+    return next(index for index, element in enumerate(page.elements) if element.tag == "table")
+
+
+def top_tag_links(page):
+    """Links in the tag-filter row above the results table."""
     return [
-        link for link in page.find("a") if "tag" in parse_qs(urlsplit(link.attrs["href"]).query)
+        link
+        for link in page.elements[: table_index(page)]
+        if link.tag == "a" and "tag" in query(link)
     ]
 
 
-def query(link):
-    return parse_qs(urlsplit(link.attrs["href"]).query)
+def row_tag_links(page):
+    return [
+        link
+        for link in page.elements[table_index(page) :]
+        if link.tag == "a" and "tag" in query(link)
+    ]
 
 
 def test_top_tags_rank_tags_within_search_and_category(admin_client, category_factory):
@@ -48,7 +62,7 @@ def test_top_tags_rank_tags_within_search_and_category(admin_client, category_fa
 
     assert [tag.name for tag in response.context["top_tags"]] == ["common", "cordless"]
     page = parse_html(response.content)
-    links = tag_links(page)
+    links = top_tag_links(page)
     assert [query(link)["tag"] for link in links] == [["common"], ["cordless"]]
     for link in links:
         assert link.attrs["hx-get"] == link.attrs["href"]
@@ -72,6 +86,43 @@ def test_top_tags_are_limited_to_one_scrolling_row(admin_client):
     assert {"flex-nowrap", "overflow-x-auto"} <= set(tag_list.attrs["class"].split())
 
 
+def test_filtered_results_show_count(admin_client):
+    for index in range(3):
+        ItemFactory.create(name=f"Common item {index}").tags.add("common")
+    ItemFactory.create(name="Onlywidget")
+
+    response = admin_client.get(
+        reverse("stuff:item-list"),
+        {"tag": "common"},
+        headers=RESULTS_HEADERS,
+    )
+    page = parse_html(response.content)
+    (count,) = page.find("p", role="status")
+    assert count.text == "3 results"
+
+    response = admin_client.get(
+        reverse("stuff:item-list"),
+        {"query": "Onlywidget"},
+        headers=RESULTS_HEADERS,
+    )
+    page = parse_html(response.content)
+    (count,) = page.find("p", role="status")
+    assert count.text == "1 result"
+
+    response = admin_client.get(
+        reverse("stuff:item-list"),
+        {"query": "zzzznotfound"},
+        headers=RESULTS_HEADERS,
+    )
+    page = parse_html(response.content)
+    (count,) = page.find("p", role="status")
+    assert count.text == "0 results"
+
+    response = admin_client.get(reverse("stuff:item-list"), headers=RESULTS_HEADERS)
+    page = parse_html(response.content)
+    assert not page.find("p", role="status")
+
+
 def test_tag_filter_composes_with_query_and_category(admin_client, category_factory):
     tools = category_factory(name="Tools")
     electronics = category_factory(name="Electronics")
@@ -90,6 +141,34 @@ def test_tag_filter_composes_with_query_and_category(admin_client, category_fact
     assert list(response.context["items"]) == [hammer]
     assert response.context["active_tag"].name == "metal"
     assert response.context["page_obj"].number == 1
+
+
+def test_item_row_tag_chip_uses_the_tag_filter(admin_client, category_factory):
+    tools = category_factory(name="Tools")
+    hammer = ItemFactory.create(name="Claw hammer", category=tools)
+    hammer.tags.add("metal")
+    ItemFactory.create(name="Hammer drill", category=tools).tags.add("wood")
+
+    response = admin_client.get(
+        reverse("stuff:item-list"),
+        {"query": "claw", "category": tools.pk},
+        headers=RESULTS_HEADERS,
+    )
+    page = parse_html(response.content)
+    (row_link,) = (link for link in row_tag_links(page) if query(link)["tag"] == ["metal"])
+    assert query(row_link) == {
+        "query": ["claw"],
+        "category": [str(tools.pk)],
+        "tag": ["metal"],
+        "page": ["1"],
+    }
+    assert "query=%23" not in row_link.attrs["href"]
+
+    response = admin_client.get(row_link.attrs["href"], headers=CONTENT_HEADERS)
+    assert response.status_code == 200
+    assert response.context["active_tag"].name == "metal"
+    assert list(response.context["items"]) == [hammer]
+    assert parse_html(response.content).field("query").attrs["value"] == "claw"
 
 
 def test_tag_click_replaces_the_active_tag_and_keeps_other_filters(
@@ -118,7 +197,7 @@ def test_tag_click_replaces_the_active_tag_and_keeps_other_filters(
     )
     assert active_badge
 
-    (metal_link,) = (link for link in tag_links(page) if query(link)["tag"] == ["metal"])
+    (metal_link,) = (link for link in top_tag_links(page) if query(link)["tag"] == ["metal"])
     assert query(metal_link) == {
         "category": [str(tools.pk)],
         "tag": ["metal"],
@@ -165,7 +244,7 @@ def test_tag_filter_round_trips_hostile_tag_names(admin_client):
 
     response = admin_client.get(reverse("stuff:item-list"), headers=RESULTS_HEADERS)
     page = parse_html(response.content)
-    (link,) = tag_links(page)
+    (link,) = top_tag_links(page)
     assert query(link) == {"tag": [tag_name], "page": ["1"]}
 
     response = admin_client.get(link.attrs["href"], headers=RESULTS_HEADERS)

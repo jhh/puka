@@ -1,4 +1,4 @@
-"""Tag links replace filters and safely round-trip through ordinary and htmx requests."""
+"""Tag links keep or replace filters as appropriate and round-trip through ordinary and htmx requests."""
 
 from __future__ import annotations
 
@@ -67,19 +67,32 @@ def test_tag_link_round_trip(admin_client, source, tag, htmx):
     assert response.status_code == 200
     page = parse_html(response.content)
     inventory = source in {"stuff:item-list", "stuff:item-detail", "stuff:item-tags"}
-    (link,) = (
-        el
-        for el in page.find("a")
-        if ("?query=" if inventory else "?tags=") in el.attrs.get("href", "")
-    )
+    if source == "stuff:item-list":
+        link = next(
+            el
+            for el in page.find("a")
+            if parse_qs(urlsplit(el.attrs.get("href", "")).query).get("tag") == [tag]
+        )
+    else:
+        (link,) = (
+            el
+            for el in page.find("a")
+            if ("?query=" if inventory else "?tags=") in el.attrs.get("href", "")
+        )
     href = link.attrs["href"]
     assert link.attrs["hx-get"] == href
     parts = urlsplit(href)
     assert not parts.fragment
-    tag_value = f'"{tag}"' if source in {"bookmarks:filter", "upkeep:area-detail"} else tag
-    assert parse_qs(parts.query) == (
-        {"query": ["#" + tag]} if inventory else {"tags": [tag_value]}
-    )
+    if source == "stuff:item-list":
+        params = parse_qs(parts.query)
+        assert params["tag"] == [tag]
+        assert params["page"] == ["1"]
+        assert "query" not in params
+    else:
+        tag_value = f'"{tag}"' if source in {"bookmarks:filter", "upkeep:area-detail"} else tag
+        assert parse_qs(parts.query) == (
+            {"query": ["#" + tag]} if inventory else {"tags": [tag_value]}
+        )
     destination = parts.path or reverse(source)
     headers = {"HX-Request": "true", "HX-Target": link.attrs["hx-target"]} if htmx else {}
     filtered = admin_client.get(destination + "?" + parts.query, headers=headers)

@@ -405,7 +405,10 @@ renders them in one horizontally scrollable row.
 
 Clicking a tag sets `?tag=`, keeps a text/location `query`, `category` and
 `page_size`, resets `page`, and swaps `#content` so the toolbar's hidden tag
-field stays in sync. Clicking the active tag removes it. A legacy
+field stays in sync. Item-row tag chips use the same tag filter URL instead
+of rewriting the search box. While any search, category or tag filter is
+active, the row also shows the total matching result count. Clicking the
+active tag removes it. A legacy
 `?query=#tag` search is treated as the tag being replaced, so only one tag
 filter applies at a time. The extra ranking query raises the item-list
 preparation budget to two and the results-fragment budget to seven.

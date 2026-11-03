@@ -106,6 +106,11 @@ class ItemListView(PageSizeMixin, ListView):
         context["active_tag"] = self.active_tag
         context["top_tags"] = self.top_tags
         context["tag_filter_params"] = self.tag_filter_params
+        context["is_filtered"] = bool(
+            self.request.GET.get("query", "").strip()
+            or self.request.GET.get("category", "").strip()
+            or self.request.GET.get("tag", "").strip(),
+        )
         return context
 
 
