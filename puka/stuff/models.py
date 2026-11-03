@@ -136,14 +136,14 @@ class Item(models.Model):
         on_delete=models.PROTECT,
         related_name="items",
     )
-    reorder_level = models.PositiveIntegerField()
+    reorder_level = models.PositiveIntegerField(default=0)
     locations: models.ManyToManyField = models.ManyToManyField(
         Location,
         related_name="items",
         through="Inventory",
     )
     bookmarks = models.ManyToManyField(Bookmark, related_name="+")
-    tags = TaggableManager()
+    tags = TaggableManager(blank=True)
     notes = models.TextField(blank=True)
     name_notes_search = SearchVectorField(null=True, editable=False)
 

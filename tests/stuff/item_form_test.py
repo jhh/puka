@@ -42,15 +42,21 @@ class TestItemForm:
         form = ItemForm(data=item_form_data, instance=item)
         assert form.errors == {}
 
-    @pytest.mark.parametrize(
-        ("reorder_level", "msg"),
-        [("", FIELD_REQUIRED), ("  ", WHOLE_NUMBER)],
-    )
-    def test_reorder_level_required(self, item_form_data, reorder_level, msg):
-        item_form_data["reorder_level"] = reorder_level
+    def test_reorder_level_initial_is_zero(self):
+        form = ItemForm()
+        assert form["reorder_level"].value() == 0
+
+    def test_reorder_level_blank_defaults_to_zero(self, item_form_data):
+        item_form_data["reorder_level"] = ""
+        form = ItemForm(data=item_form_data)
+        assert form.errors == {}
+        assert form.cleaned_data["reorder_level"] == 0
+
+    def test_reorder_level_whitespace_is_invalid(self, item_form_data):
+        item_form_data["reorder_level"] = "  "
         form = ItemForm(data=item_form_data)
         assert len(form.errors) == 1
-        assert form.errors["reorder_level"] == msg
+        assert form.errors["reorder_level"] == WHOLE_NUMBER
 
     def test_reorder_level_postive(self, item_form_data):
         item_form_data["reorder_level"] = "-5"
@@ -58,11 +64,11 @@ class TestItemForm:
         assert len(form.errors) == 1
         assert form.errors["reorder_level"] == POSITIVE_NUMBER
 
-    def test_tags_required(self, item_form_data):
+    def test_tags_are_optional(self, item_form_data):
         item_form_data["tags"] = ""
         form = ItemForm(data=item_form_data)
-        assert len(form.errors) == 1
-        assert form.errors["tags"] == FIELD_REQUIRED
+        assert form.errors == {}
+        assert form.cleaned_data["tags"] == []
 
     @pytest.mark.parametrize("location_code", ["", " ", "  "])
     def test_location_code_not_required(self, item_form_data, location_code):

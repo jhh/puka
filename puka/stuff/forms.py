@@ -34,8 +34,14 @@ class ItemForm(FormContext, ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["category"].empty_label = "No category"  # ty: ignore[unresolved-attribute]
         self.fields["name"].widget.attrs["autocomplete"] = "off"
+        self.fields["reorder_level"].required = False
         if self.instance.pk is None:
             self.fields["name"].widget.attrs["autofocus"] = True
+            self.fields["reorder_level"].initial = 0
+
+    def clean_reorder_level(self):
+        value = self.cleaned_data["reorder_level"]
+        return value if value is not None else 0
 
     def clean_name(self):
         value = self.cleaned_data["name"]

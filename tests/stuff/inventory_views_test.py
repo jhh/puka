@@ -102,6 +102,17 @@ def test_update_item(admin_client, item):
     assert item.reorder_level == 5
 
 
+def test_update_item_blank_reorder_level_and_tags(admin_client, item):
+    item.tags.add("old")
+    data = {"name": item.name, "reorder_level": "", "tags": "", "notes": ""}
+    response = admin_client.post(reverse("stuff:item-edit", args=[item.pk]), data, headers=HTMX)
+
+    assert_redirect(response, reverse("stuff:item-list"))
+    item.refresh_from_db()
+    assert item.reorder_level == 0
+    assert list(item.tags.all()) == []
+
+
 def test_delete_item(admin_client, item):
     response = admin_client.post(reverse("stuff:item-delete", args=[item.pk]), headers=HTMX)
 

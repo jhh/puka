@@ -62,6 +62,17 @@ class TestItemCreateView:
         assert response.status_code == 302
         assert Item.objects.get().category == category
 
+    def test_blank_reorder_level_and_tags(self, admin_client, item_form_data):
+        item_form_data["reorder_level"] = ""
+        item_form_data["tags"] = ""
+
+        response = admin_client.post(reverse("stuff:item-new"), item_form_data)
+
+        assert response.status_code == 302
+        item = Item.objects.get()
+        assert item.reorder_level == 0
+        assert list(item.tags.all()) == []
+
     def test_bookmark_get(self, admin_client, bookmark, item_form_data):
         item_form_data["bookmark_url"] = bookmark.url
         response = admin_client.post(reverse("stuff:item-new"), item_form_data)
