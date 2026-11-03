@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.12"
 resolution-markers = [
     "python_full_version >= '3.15'",
@@ -353,14 +353,14 @@ wheels = [
 
 [[package]]
 name = "django-treebeard"
-version = "7.0.2"
+version = "7.0.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e1/c0/1875927de0e4b00670b3b8394c424edce7b964b30f06bb9e9f8e1657b6cc/django_treebeard-7.0.2.tar.gz", hash = "sha256:37b917c9b5d56ae2e0f3d03be4446e861d28bf021433045b37d952e0188a114d", size = 231337, upload-time = "2026-09-15T04:29:33.921Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9b/4b/6b24126d565f360630accb6089da7cd20665d75b8510d269527d497a996d/django_treebeard-7.0.3.tar.gz", hash = "sha256:eb25678a4e79bdcc315c3cf2158c33a8ade5f51cf4df220909abc603bbd62681", size = 234709, upload-time = "2026-10-21T06:20:45.594Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1e/b4/01235cccddcd911b26652da568d450ade8fa352631f518f0032edfa6c58f/django_treebeard-7.0.2-py3-none-any.whl", hash = "sha256:95bf9296401a99f3575b060265918b9456c7ec36eb2026c6287f33017ba0d5d7", size = 80452, upload-time = "2026-09-15T04:29:32.514Z" },
+    { url = "https://files.pythonhosted.org/packages/ea/8f/8f1e02f1da570cd4fb11dbec986b55ef5a9f0310bbe6240296d8766e045d/django_treebeard-7.0.3-py3-none-any.whl", hash = "sha256:7f1ddcad9cc4ee214c708d9496d574d9d92c155e59c1f335807ef5b0a83aad55", size = 81571, upload-time = "2026-10-21T06:20:44.017Z" },
 ]
 
 [[package]]
@@ -923,7 +923,7 @@ requires-dist = [
     { name = "django-filter", specifier = ">=24.3" },
     { name = "django-htmx", specifier = ">=1.21.0" },
     { name = "django-taggit", specifier = ">=6.1.0" },
-    { name = "django-treebeard", specifier = ">=4.7.1" },
+    { name = "django-treebeard", specifier = ">=7.0.3" },
     { name = "environs", extras = ["django"], specifier = ">=15.2.0" },
     { name = "gunicorn", specifier = ">=23.0.0" },
     { name = "markdown-it-py", specifier = ">=4.0.0" },
