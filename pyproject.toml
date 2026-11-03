@@ -29,7 +29,7 @@ dev = [
   { include-group = "pre-commit" },
   "ipython>=8.30.0",
   "rich>=13.9.4",
-  "ruff>=0.17.1",
+  "ruff>=0.17.3",
 ]
 test = [
   "django-stubs[compatible-mypy]>=6.1.2",
