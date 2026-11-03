@@ -47,6 +47,22 @@ Alpine.data("pageSize", (key, current, options) => ({
   },
 }));
 
+// Account menu: persist the daisyUI theme-controller choice across page loads.
+Alpine.data("theme", () => ({
+  current: document.documentElement.dataset.theme || "system",
+
+  remember(theme) {
+    this.current = theme;
+    if (theme === "system") {
+      delete document.documentElement.dataset.theme;
+      document.cookie = "theme=; Path=/; Max-Age=0; SameSite=Lax";
+      return;
+    }
+    document.documentElement.dataset.theme = theme;
+    document.cookie = `theme=${theme}; Path=/; Max-Age=31536000; SameSite=Lax`;
+  },
+}));
+
 // <c-layout.drawer>: close the (mobile) sidebar after navigating from it.
 Alpine.data("drawer", () => ({
   close() {

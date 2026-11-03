@@ -164,6 +164,59 @@ def test_sidebar_hrefs(admin_client):
     }
 
 
+def test_account_menu_closes_on_outside_click(admin_client):
+    page = _get(admin_client, reverse("home"))
+    assert any(
+        el.tag == "details" and el.attrs.get("x-on:click.outside") == "$el.open = false"
+        for el in page.elements
+    )
+
+
+def test_account_menu_theme_controller(admin_client):
+    page = _get(admin_client, reverse("home"))
+
+    inputs = page.find("input", name="theme")
+    assert [el.attrs["value"] for el in inputs] == ["system", "light", "dark"]
+    assert [el.attrs["aria-label"] for el in inputs] == [
+        "System theme",
+        "Light theme",
+        "Dark theme",
+    ]
+    assert all("theme-controller" in el.attrs["class"].split() for el in inputs)
+    assert [("checked" in el.attrs) for el in inputs] == [True, False, False]
+    (group,) = page.find("div", role="radiogroup", aria_label="Theme")
+    assert {"flex", "gap-0", "border", "overflow-hidden", "p-0"} <= set(
+        group.attrs["class"].split(),
+    )
+    labels = [el for el in page.find("label") if "flex-1" in el.attrs.get("class", "").split()]
+    assert [el.text for el in labels] == ["", "", ""]
+    assert all(
+        {"rounded-[var(--radius-field)]", "border-0"} <= set(el.attrs["class"].split())
+        for el in labels
+    )
+    assert any(el.text == "Profile" for el in page.find("span"))
+    assert not any(el.text == "Theme" for el in page.find("span"))
+
+
+@pytest.mark.parametrize(
+    ("theme", "data_theme"),
+    [("light", "light"), ("dark", "dark"), ("system", None), ("", None)],
+)
+def test_saved_theme_applies_to_root_and_controller(admin_client, theme, data_theme):
+    if theme:
+        admin_client.cookies["theme"] = theme
+
+    page = _get(admin_client, reverse("home"))
+
+    (html,) = page.find("html")
+    assert html.attrs.get("data-theme") == data_theme
+    checked = [
+        el.attrs["value"] for el in page.find("input", name="theme") if "checked" in el.attrs
+    ]
+    expected = theme if theme in {"light", "dark"} else "system"
+    assert checked == [expected]
+
+
 def test_navbar_shows_user_and_logout(admin_client, admin_user):
     page = _get(admin_client, reverse("home"))
     content = " ".join(el.text for el in page.elements)

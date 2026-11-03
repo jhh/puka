@@ -14,7 +14,7 @@
                 </div>
             </c-slot>
             <c-slot name="end">
-                <details class="dropdown dropdown-end">
+                <details class="dropdown dropdown-end" x-on:click.outside="$el.open = false">
                     <summary class="btn btn-ghost gap-2 px-2">
                         <span class="hidden text-sm font-medium text-base-content/80 sm:block">
                             {% firstof user.email user.get_username %}
@@ -22,7 +22,66 @@
                         <c-ui.icon name="hero-chevron-down" class="size-4 text-base-content/60" />
                     </summary>
                     <ul class="menu dropdown-content z-30 mt-2 w-56 rounded-box border border-base-200 bg-base-100 p-2 shadow">
-                        <li class="menu-title"><span>Account</span></li>
+                        <li class="menu-title"><span>Profile</span></li>
+                        <li
+                            class="px-2 pb-2"
+                            x-data="theme"
+                            x-on:change="remember($event.target.value)"
+                        >
+                            <div
+                                class="flex w-full gap-0 overflow-hidden rounded-[var(--radius-field)] border border-base-content/20 p-0"
+                                role="radiogroup"
+                                aria-label="Theme"
+                            >
+                                <label
+                                    class="btn btn-sm flex-1 rounded-[var(--radius-field)] border-0"
+                                    x-bind:class="current === 'system' ? 'btn-primary' : 'btn-ghost'"
+                                    title="System theme"
+                                >
+                                    <input
+                                        type="radio"
+                                        name="theme"
+                                        value="system"
+                                        class="sr-only theme-controller"
+                                        aria-label="System theme"
+                                        {% if request.COOKIES.theme != 'light' and request.COOKIES.theme != 'dark' %}
+                                            checked
+                                        {% endif %}
+                                    >
+                                    <c-ui.icon name="hero-computer-desktop" class="size-4" />
+                                </label>
+                                <label
+                                    class="btn btn-sm flex-1 rounded-[var(--radius-field)] border-0"
+                                    x-bind:class="current === 'light' ? 'btn-primary' : 'btn-ghost'"
+                                    title="Light theme"
+                                >
+                                    <input
+                                        type="radio"
+                                        name="theme"
+                                        value="light"
+                                        class="sr-only theme-controller"
+                                        aria-label="Light theme"
+                                        {% if request.COOKIES.theme == 'light' %}checked{% endif %}
+                                    >
+                                    <c-ui.icon name="hero-sun" class="size-4" />
+                                </label>
+                                <label
+                                    class="btn btn-sm flex-1 rounded-[var(--radius-field)] border-0"
+                                    x-bind:class="current === 'dark' ? 'btn-primary' : 'btn-ghost'"
+                                    title="Dark theme"
+                                >
+                                    <input
+                                        type="radio"
+                                        name="theme"
+                                        value="dark"
+                                        class="sr-only theme-controller"
+                                        aria-label="Dark theme"
+                                        {% if request.COOKIES.theme == 'dark' %}checked{% endif %}
+                                    >
+                                    <c-ui.icon name="hero-moon" class="size-4" />
+                                </label>
+                            </div>
+                        </li>
                         <li>
                             <form action="{% url 'logout' %}" method="post">
                                 {% csrf_token %}
